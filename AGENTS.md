@@ -2,25 +2,39 @@
 
 ## Project Structure & Module Organization
 
-This is a zero-dependency Node.js CLI. `bin/repo-kb.mjs` owns argument parsing, Git-root discovery, report writing, and command dispatch. Shared behavior lives in `lib/`: `rules.mjs` loads and evaluates `ontology.yml`, `glob.mjs` implements the local glob matcher, `ids.mjs` scans staged additions for unresolved `US-###`, `ADR-###`, and `IDR-###` references, `llm.mjs` runs the optional Groq semantic pass, and `staged.mjs` wraps Git diff/staging queries. `ontology.yml` is the default rule file used by the CLI from the repository root.
+This is a Go CLI. `cmd/repo-kb/main.go` owns argument parsing, repo-root
+discovery, report writing, and command dispatch. Shared behavior lives under
+`internal/`: `ontology` loads `ontology.yml` (via `gopkg.in/yaml.v3`), `rules`
+evaluates parsed rules against file lists, `glob` implements the local glob
+matcher, `ids` scans staged additions for unresolved `US-###`, `ADR-###`, and
+`IDR-###` references, `llm` runs the optional Groq semantic pass, `git` wraps
+the git diff/staging queries, `report` writes `.repo-kb/last-report.json`, and
+`status` writes `.repo-kb/STATUS.md`. `ontology.yml` is the default rule file
+used by the CLI from the repository root.
 
-Generated reports are written under `.repo-kb/`, which is ignored. The local pre-commit hook is `.githooks/pre-commit`; enable it with `npm run install:hook`.
+Generated reports are written under `.repo-kb/`, which is ignored. The local
+pre-commit hook is `.githooks/pre-commit`; enable it with
+`git config core.hooksPath .githooks`.
 
 ## Build, Test, and Development Commands
 
-Use Node 20 or newer.
+Use Go 1.22 or newer.
 
-- `npm test` runs the full test suite with Node's built-in test runner.
-- `node --test test/repo-kb.test.mjs` runs the current test file directly.
-- `npm run coverage` runs the same tests with Node's experimental coverage output.
-- `npm run check -- --ref=HEAD~1` checks a diff range.
-- `npm run check:staged` checks staged files, matching the pre-commit hook.
-- `npm run status` rewrites `.repo-kb/STATUS.md`.
+- `go test ./...` runs the full test suite.
+- `go build -o bin/repo-kb ./cmd/repo-kb` produces the CLI binary.
+- `go install ./cmd/repo-kb` installs `repo-kb` to `$GOBIN`.
+- `./bin/repo-kb check --ref=HEAD~1` checks a diff range.
+- `./bin/repo-kb scan --staged` checks staged files, matching the pre-commit hook.
+- `./bin/repo-kb status` rewrites `.repo-kb/STATUS.md`.
 
 ## Coding Style & Naming Conventions
 
-The project uses native ES modules and Node built-ins only. Follow the existing style: double-quoted strings, named exports for library helpers, synchronous filesystem/Git operations where the command path is already synchronous, and small functions with explicit return objects. Keep CLI output stable and concise because hooks consume it directly.
+Standard Go style: `gofmt`/`goimports`, tab indentation, lowerCamelCase locals,
+PascalCase exports, package names short and lowercase. Keep CLI output stable
+and concise because hooks consume it directly.
 
 ## Testing Guidelines
 
-Tests live in `test/repo-kb.test.mjs` and use `node:test` plus `node:assert/strict`. Add focused cases for parser, glob, ontology, rule-evaluation, and staged-scan behavior when changing those modules. Keep tests dependency-free.
+Tests live next to the package they cover (`*_test.go`) and use Go's `testing`
+package. Add focused cases for parser, glob, ontology, rule-evaluation, and
+staged-scan behavior when changing those modules.
