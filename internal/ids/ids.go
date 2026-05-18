@@ -10,7 +10,7 @@ import (
 	"regexp"
 	"strings"
 
-	"repo-kb/internal/git"
+	"coherence/internal/git"
 )
 
 type Index struct {

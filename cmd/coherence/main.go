@@ -1,5 +1,5 @@
-// Command repo-kb runs repo-coherence checks against staged or diffed git
-// changes. Mirrors the CLI defined in the old bin/repo-kb.mjs.
+// Command coherence runs repo-coherence checks against staged or diffed git
+// changes.
 package main
 
 import (
@@ -9,24 +9,24 @@ import (
 	"path/filepath"
 	"strings"
 
-	"repo-kb/internal/git"
-	"repo-kb/internal/ids"
-	"repo-kb/internal/llm"
-	"repo-kb/internal/ontology"
-	"repo-kb/internal/report"
-	"repo-kb/internal/rules"
-	"repo-kb/internal/status"
+	"coherence/internal/git"
+	"coherence/internal/ids"
+	"coherence/internal/llm"
+	"coherence/internal/ontology"
+	"coherence/internal/report"
+	"coherence/internal/rules"
+	"coherence/internal/status"
 )
 
-const usage = `repo-kb <subcommand> [flags]
+const usage = `coherence <subcommand> [flags]
   scan --staged [--llm] [--ontology=path]  evaluate staged files
   check [--ref=HEAD~1] [--ontology=path]   evaluate a diff range
-  report                   print the last report stored at .repo-kb/last-report.json
-  status [--ontology=path] rewrite .repo-kb/STATUS.md (current state)
+  report                   print the last report stored at .coherence/last-report.json
+  status [--ontology=path] rewrite .coherence/STATUS.md (current state)
 env:
-  ZEN_REPO_KB_OFF=1        skip all checks, exit 0
-  ZEN_REPO_KB_LLM=1        enable LLM semantic pass (requires GROQ_API_KEY)
-  ZEN_REPO_KB_GROQ_MODEL   override Groq model id (default: llama-3.3-70b-versatile)
+  COHERENCE_OFF=1          skip all checks, exit 0
+  COHERENCE_LLM=1          enable LLM semantic pass (requires GROQ_API_KEY)
+  COHERENCE_GROQ_MODEL     override Groq model id (default: llama-3.3-70b-versatile)
 `
 
 type parsedArgs struct {
@@ -153,17 +153,17 @@ func summarizeFinding(f rules.Finding) string {
 }
 
 func printReport(files []string, ruleCount int, findings []rules.Finding, llmRes llm.Result) {
-	fmt.Printf("repo-kb: %d file(s), %d rules loaded\n", len(files), ruleCount)
+	fmt.Printf("coherence: %d file(s), %d rules loaded\n", len(files), ruleCount)
 	if llmRes.Skipped != "" {
-		fmt.Printf("repo-kb: llm pass skipped (%s)\n", llmRes.Skipped)
+		fmt.Printf("coherence: llm pass skipped (%s)\n", llmRes.Skipped)
 	} else {
-		fmt.Printf("repo-kb: llm pass via %s, %d call(s)\n", llmRes.Model, llmRes.Calls)
+		fmt.Printf("coherence: llm pass via %s, %d call(s)\n", llmRes.Model, llmRes.Calls)
 	}
 	if len(findings) == 0 {
-		fmt.Println("repo-kb: no findings.")
+		fmt.Println("coherence: no findings.")
 		return
 	}
-	fmt.Printf("repo-kb: %d finding(s):\n", len(findings))
+	fmt.Printf("coherence: %d finding(s):\n", len(findings))
 	for _, f := range findings {
 		fmt.Println(summarizeFinding(f))
 	}
@@ -197,14 +197,14 @@ func run() int {
 		return 0
 	}
 
-	if os.Getenv("ZEN_REPO_KB_OFF") == "1" {
-		fmt.Fprintln(os.Stderr, "repo-kb: ZEN_REPO_KB_OFF=1 set; skipping coherence checks")
+	if os.Getenv("COHERENCE_OFF") == "1" {
+		fmt.Fprintln(os.Stderr, "coherence: COHERENCE_OFF=1 set; skipping coherence checks")
 		return 0
 	}
 
 	rootDir, err := git.Root()
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "repo-kb: fatal:", err)
+		fmt.Fprintln(os.Stderr, "coherence: fatal:", err)
 		return 2
 	}
 	ontPath := resolveOntologyPath(rootDir, args)
@@ -214,12 +214,12 @@ func run() int {
 		p := report.Path(rootDir)
 		f, err := os.Open(p)
 		if err != nil {
-			fmt.Fprintln(os.Stderr, "repo-kb: no report on disk yet")
+			fmt.Fprintln(os.Stderr, "coherence: no report on disk yet")
 			return 0
 		}
 		defer f.Close()
 		if _, err := io.Copy(os.Stdout, f); err != nil {
-			fmt.Fprintln(os.Stderr, "repo-kb: fatal:", err)
+			fmt.Fprintln(os.Stderr, "coherence: fatal:", err)
 			return 2
 		}
 		return 0
@@ -227,19 +227,19 @@ func run() int {
 	case "status":
 		ont, err := ontology.Load(ontPath)
 		if err != nil {
-			fmt.Fprintln(os.Stderr, "repo-kb: fatal:", err)
+			fmt.Fprintln(os.Stderr, "coherence: fatal:", err)
 			return 2
 		}
 		out, err := status.Write(rootDir, ont)
 		if err != nil {
-			fmt.Fprintln(os.Stderr, "repo-kb: fatal:", err)
+			fmt.Fprintln(os.Stderr, "coherence: fatal:", err)
 			return 2
 		}
 		rel, err := filepath.Rel(rootDir, out)
 		if err != nil {
 			rel = out
 		}
-		fmt.Printf("repo-kb: wrote %s\n", rel)
+		fmt.Printf("coherence: wrote %s\n", rel)
 		return 0
 
 	case "scan", "check":
@@ -247,7 +247,7 @@ func run() int {
 		useLLM, _ := args.flags["llm"].(bool)
 		ruleCount, findings, llmRes, err := runScan(files, useLLM, rootDir, ontPath)
 		if err != nil {
-			fmt.Fprintln(os.Stderr, "repo-kb: fatal:", err)
+			fmt.Fprintln(os.Stderr, "coherence: fatal:", err)
 			return 2
 		}
 		payload := report.Payload{
@@ -260,7 +260,7 @@ func run() int {
 			GeneratedAt: report.Now(),
 		}
 		if err := report.Write(rootDir, payload); err != nil {
-			fmt.Fprintln(os.Stderr, "repo-kb: fatal:", err)
+			fmt.Fprintln(os.Stderr, "coherence: fatal:", err)
 			return 2
 		}
 		printReport(files, ruleCount, findings, llmRes)
@@ -270,7 +270,7 @@ func run() int {
 		return 0
 
 	default:
-		fmt.Fprintf(os.Stderr, "repo-kb: unknown subcommand '%s'. Try 'help'.\n", sub)
+		fmt.Fprintf(os.Stderr, "coherence: unknown subcommand '%s'. Try 'help'.\n", sub)
 		return 2
 	}
 }

@@ -1,5 +1,4 @@
-// Package report writes the .repo-kb/last-report.json file using the exact
-// shape produced by the JS implementation.
+// Package report writes the .coherence/last-report.json file.
 package report
 
 import (
@@ -8,13 +7,13 @@ import (
 	"path/filepath"
 	"time"
 
-	"repo-kb/internal/llm"
-	"repo-kb/internal/rules"
+	"coherence/internal/llm"
+	"coherence/internal/rules"
 )
 
 // LLM is the JSON object stored under the top-level "llm" key. The pointer
-// fields render as JSON null when nil, matching the JS behavior where
-// `skipped` and `model` are null in different states.
+// fields render as JSON null when nil — `skipped` and `model` are null in
+// different states.
 type LLM struct {
 	Skipped *string `json:"skipped"`
 	Calls   int     `json:"calls"`
@@ -50,18 +49,17 @@ type Payload struct {
 	GeneratedAt string         `json:"generated_at"`
 }
 
-// Now returns the current time formatted as JS Date.toISOString() does
-// (millisecond precision, UTC, Z suffix).
+// Now returns the current time in millisecond-precision UTC with a Z suffix.
 func Now() string {
 	return time.Now().UTC().Format("2006-01-02T15:04:05.000Z")
 }
 
 // Path returns the canonical report path for the given repo root.
 func Path(rootDir string) string {
-	return filepath.Join(rootDir, ".repo-kb", "last-report.json")
+	return filepath.Join(rootDir, ".coherence", "last-report.json")
 }
 
-// Write encodes payload to .repo-kb/last-report.json as pretty JSON with a
+// Write encodes payload to .coherence/last-report.json as pretty JSON with a
 // trailing newline.
 func Write(rootDir string, p Payload) error {
 	if p.Files == nil {

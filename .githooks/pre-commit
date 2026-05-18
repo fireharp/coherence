@@ -1,6 +1,6 @@
 #!/bin/sh
 set -eu
 
-# Assumes `repo-kb` is on PATH (via `go install ./cmd/repo-kb` or similar).
+# Assumes `coherence` is on PATH (via `go install ./cmd/coherence` or similar).
 # To use a different binary path, edit this hook.
-repo-kb scan --staged
+coherence scan --staged

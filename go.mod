@@ -1,4 +1,4 @@
-module repo-kb
+module coherence
 
 go 1.26.3
 

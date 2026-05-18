@@ -3,7 +3,7 @@ package rules
 import (
 	"testing"
 
-	"repo-kb/internal/ontology"
+	"coherence/internal/ontology"
 )
 
 func TestEvaluateReportsUnsatisfiedArtifacts(t *testing.T) {
