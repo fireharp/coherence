@@ -1,0 +1,64 @@
+version: 1
+rules:
+  - id: metrics-yaml-needs-fixture-refresh
+    when:
+      - "rill/metrics/*.yaml"
+    expect_any:
+      - "frontend/public/fixtures/dashboard.json"
+      - "frontend/public/fixtures/api/run_search.json"
+    severity: warn
+    message: "Metric def changed; re-run frontend/scripts/build-fixtures.mjs and stage outputs."
+
+  - id: fixture-generator-needs-output
+    when:
+      - "frontend/scripts/build-fixtures.mjs"
+      - "rill/fixtures/**/*.ndjson"
+    expect_any:
+      - "frontend/public/fixtures/dashboard.json"
+      - "frontend/public/fixtures/api/run_search.json"
+    severity: error
+    message: "Fixture source changed; outputs must be regenerated and co-staged."
+
+  - id: meta-stats-go-needs-readme
+    when:
+      - "tools/meta-stats/main.go"
+    expect_any:
+      - "tools/meta-stats/README.md"
+    severity: warn
+    message: "main.go changed; verify README CLI usage / output shape still matches."
+
+  - id: spec-change-needs-decision-or-evidence
+    when:
+      - "docs/specs/*.md"
+    expect_any:
+      - "docs/decisions/ADR-*.md"
+      - "docs/decisions/IDR-*.md"
+      - "docs/evidence/*/README.md"
+    severity: warn
+    message: "Spec changed without a paired ADR/IDR or evidence packet."
+
+  - id: telemetry-contract-needs-metrics-alignment
+    when:
+      - "docs/specs/telemetry-contract.md"
+    expect_any:
+      - "docs/specs/metrics-glossary.md"
+      - "rill/metrics/*.yaml"
+    severity: warn
+    message: "Telemetry contract changed; confirm glossary / Rill metric defs still align."
+
+  - id: user-story-change-needs-evidence
+    when:
+      - "docs/user-stories/**/US-*.md"
+    expect_any:
+      - "docs/evidence/*/README.md"
+    severity: warn
+    message: "User story modified without a co-staged evidence packet."
+
+  - id: pre-commit-hook-needs-doc
+    when:
+      - ".githooks/pre-commit"
+    expect_any:
+      - "AGENTS.md"
+      - "docs/**/*.md"
+    severity: warn
+    message: "Pre-commit hook changed; note the change in AGENTS.md or relevant docs."
