@@ -7,8 +7,8 @@ import (
 	"strings"
 	"testing"
 
-	"repo-kb/internal/llm"
-	"repo-kb/internal/rules"
+	"coherence/internal/llm"
+	"coherence/internal/rules"
 )
 
 func TestPayloadJSONShape(t *testing.T) {
@@ -26,7 +26,7 @@ func TestPayloadJSONShape(t *testing.T) {
 	if err := Write(dir, p); err != nil {
 		t.Fatal(err)
 	}
-	data, err := os.ReadFile(filepath.Join(dir, ".repo-kb", "last-report.json"))
+	data, err := os.ReadFile(filepath.Join(dir, ".coherence", "last-report.json"))
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -14,7 +14,7 @@ import (
 	"strings"
 	"time"
 
-	"repo-kb/internal/git"
+	"coherence/internal/git"
 )
 
 const (
@@ -54,7 +54,7 @@ func isEnabled(flag bool) bool {
 	if flag {
 		return true
 	}
-	return os.Getenv("ZEN_REPO_KB_LLM") == "1"
+	return os.Getenv("COHERENCE_LLM") == "1"
 }
 
 func hasAPIKey() bool {
@@ -234,7 +234,7 @@ func Run(stagedFiles []string, enabled bool, rootDir string) Result {
 		return Result{Skipped: "no-candidates", Findings: []Finding{}}
 	}
 
-	model := os.Getenv("ZEN_REPO_KB_GROQ_MODEL")
+	model := os.Getenv("COHERENCE_GROQ_MODEL")
 	if model == "" {
 		model = DefaultModel
 	}

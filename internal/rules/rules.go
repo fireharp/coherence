@@ -2,12 +2,12 @@
 package rules
 
 import (
-	"repo-kb/internal/glob"
-	"repo-kb/internal/ontology"
+	"coherence/internal/glob"
+	"coherence/internal/ontology"
 )
 
-// Finding has JSON tags matching the keys produced by the JS implementation in
-// bin/repo-kb.mjs (line 358 onward).
+// Finding is the per-rule output emitted under the top-level "findings" key of
+// .coherence/last-report.json.
 type Finding struct {
 	Rule          string   `json:"rule"`
 	Severity      string   `json:"severity"`

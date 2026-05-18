@@ -2,17 +2,17 @@
 
 ## Project Structure & Module Organization
 
-This is a Go CLI. `cmd/repo-kb/main.go` owns argument parsing, repo-root
+This is a Go CLI. `cmd/coherence/main.go` owns argument parsing, repo-root
 discovery, report writing, and command dispatch. Shared behavior lives under
 `internal/`: `ontology` loads `ontology.yml` (via `gopkg.in/yaml.v3`), `rules`
 evaluates parsed rules against file lists, `glob` implements the local glob
 matcher, `ids` scans staged additions for unresolved `US-###`, `ADR-###`, and
 `IDR-###` references, `llm` runs the optional Groq semantic pass, `git` wraps
-the git diff/staging queries, `report` writes `.repo-kb/last-report.json`, and
-`status` writes `.repo-kb/STATUS.md`. `ontology.yml` is the default rule file
-used by the CLI from the repository root.
+the git diff/staging queries, `report` writes `.coherence/last-report.json`,
+and `status` writes `.coherence/STATUS.md`. `ontology.yml` is the default rule
+file used by the CLI from the repository root.
 
-Generated reports are written under `.repo-kb/`, which is ignored. The local
+Generated reports are written under `.coherence/`, which is ignored. The local
 pre-commit hook is `.githooks/pre-commit`; enable it with
 `git config core.hooksPath .githooks`.
 
@@ -21,11 +21,11 @@ pre-commit hook is `.githooks/pre-commit`; enable it with
 Use Go 1.22 or newer.
 
 - `go test ./...` runs the full test suite.
-- `go build -o bin/repo-kb ./cmd/repo-kb` produces the CLI binary.
-- `go install ./cmd/repo-kb` installs `repo-kb` to `$GOBIN`.
-- `./bin/repo-kb check --ref=HEAD~1` checks a diff range.
-- `./bin/repo-kb scan --staged` checks staged files, matching the pre-commit hook.
-- `./bin/repo-kb status` rewrites `.repo-kb/STATUS.md`.
+- `go build -o bin/coherence ./cmd/coherence` produces the CLI binary.
+- `go install ./cmd/coherence` installs `coherence` to `$GOBIN`.
+- `./bin/coherence check --ref=HEAD~1` checks a diff range.
+- `./bin/coherence scan --staged` checks staged files, matching the pre-commit hook.
+- `./bin/coherence status` rewrites `.coherence/STATUS.md`.
 
 ## Coding Style & Naming Conventions
 

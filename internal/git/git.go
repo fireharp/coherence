@@ -1,4 +1,4 @@
-// Package git wraps the small set of git commands repo-kb uses.
+// Package git wraps the small set of git commands coherence uses.
 // All returned paths are forward-slash, repo-relative (git's native format).
 package git
 

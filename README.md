@@ -1,4 +1,4 @@
-# repo-kb
+# coherence
 
 Repository-coherence CLI for Git projects, written in Go. It checks staged or
 diffed files against declarative rules in `ontology.yml`, scans non-Markdown
@@ -14,33 +14,33 @@ optionally run a Groq semantic pass.
 ## Build
 
 ```bash
-go build -o bin/repo-kb ./cmd/repo-kb   # local build into ./bin
-go install ./cmd/repo-kb                # install to $GOBIN / $GOPATH/bin
+go build -o bin/coherence ./cmd/coherence   # local build into ./bin
+go install ./cmd/coherence                  # install to $GOBIN / $GOPATH/bin
 ```
 
 ## Commands
 
 ```bash
-repo-kb scan --staged          # evaluate staged files (used by the hook)
-repo-kb check --ref=HEAD~1     # evaluate a diff range
-repo-kb status                 # rewrite .repo-kb/STATUS.md
-repo-kb report                 # print the last stored report
-repo-kb help                   # usage
+coherence scan --staged          # evaluate staged files (used by the hook)
+coherence check --ref=HEAD~1     # evaluate a diff range
+coherence status                 # rewrite .coherence/STATUS.md
+coherence report                 # print the last stored report
+coherence help                   # usage
 ```
 
-`scan` and `check` also write `.repo-kb/last-report.json`. The `.repo-kb/`
+`scan` and `check` also write `.coherence/last-report.json`. The `.coherence/`
 directory is gitignored.
 
 ## Pre-commit hook
 
-`.githooks/pre-commit` runs `repo-kb scan --staged`. To use it:
+`.githooks/pre-commit` runs `coherence scan --staged`. To use it:
 
 ```bash
 git config core.hooksPath .githooks
 ```
 
-The hook expects `repo-kb` to be on `PATH`. To point at a different binary,
-edit `.githooks/pre-commit` directly (e.g. change it to `./bin/repo-kb scan --staged`
+The hook expects `coherence` to be on `PATH`. To point at a different binary,
+edit `.githooks/pre-commit` directly (e.g. change it to `./bin/coherence scan --staged`
 if you prefer to build into the repo).
 
 ## Tests
@@ -72,7 +72,7 @@ non-default ontology.
 
 ## LLM pass
 
-Set `ZEN_REPO_KB_LLM=1` or pass `--llm` to enable the optional Groq pass. It
+Set `COHERENCE_LLM=1` or pass `--llm` to enable the optional Groq pass. It
 uses `GROQ_API_KEY`, defaults to `llama-3.3-70b-versatile`, and can be
-overridden with `ZEN_REPO_KB_GROQ_MODEL`. Hard cap: 3 calls per run; findings
+overridden with `COHERENCE_GROQ_MODEL`. Hard cap: 3 calls per run; findings
 are always `warn`.
