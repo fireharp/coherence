@@ -1,4 +1,6 @@
 #!/bin/sh
 set -eu
 
-node ./bin/repo-kb.mjs scan --staged
+# Assumes `repo-kb` is on PATH (via `go install ./cmd/repo-kb` or similar).
+# To use a different binary path, edit this hook.
+repo-kb scan --staged
