@@ -637,7 +637,7 @@ meters today:
 | `trace_coverage`          | base + current graph                 | user_story nodes referenced (via defining doc) / total; reports `newly_uncovered_stories` + `newly_covered_stories` when a base graph is on disk |
 | `neighborhood_drift`      | base + current graph                 | weighted Δ over added/removed nodes and edges               |
 | `semantic_movement`       | base + current snapshot              | markdown_semantic_changed / markdown_total (noop excluded)  |
-| `path_loss`               | BFS over typed edges from each concept (base + current) | concepts that don't reach a `test`/`evidence`/`endpoint`/`generated_artifact` via chain; reports `newly_orphaned_concepts` and `newly_supported_concepts` when a base graph is on disk |
+| `path_loss`               | BFS over typed edges from each concept (base + current) | concepts that don't reach a `test`/`evidence`/`endpoint`/`generated_artifact` via chain; reports `newly_orphaned_concepts` and `newly_supported_concepts` when a base graph is on disk; `convention=false` (no concept ever supported) skips score-based verdict promotion so kickoff projects don't look like 100% regression |
 | `blast_radius`            | base + current graph                 | unique 1-hop neighbors of touched nodes (`Score`/`ImpactedNeighbors`) + `CentralityWeight` = sum of touched-node degree (GOAL.md centrality contribution) |
 | `staleness`               | `git log` per tracked file + graph concept-importance | concept-weighted stale-file share (threshold: 90 days); `weighted=false` falls back to uniform `stale_files / total_files` |
 | `claim_support`           | BFS over typed edges from each claim (base + current) | claims that don't reach a `test`/`evidence`/`endpoint`/`generated_artifact` via chain; reports `newly_unsupported_claims` and `newly_supported_claims` when a base graph is on disk |
@@ -651,7 +651,7 @@ meters today:
 | `unknown_id_references`   | typed-id regex over non-Markdown production code | code mentions of US/ADR/IDR ids not defined in the graph; test files (`*_test.go`, `*.test.ts`, etc.), `.agents/`, and fixture-shaped dirs (`scenarios/`, `fixtures/`, `testdata/`, `golden/`, `eval/`) are excluded |
 | `stale_tests`             | `verifies` + base/current snapshot   | tests unchanged while their `verifies`-linked source changed    |
 | `orphaned_metric_aliases` | base+current metric diff + frontend scan | frontend string refs to metric names removed/renamed in current |
-| `dangling_imports`        | TS + Python source re-scan + relative-path resolution | count of `./x` (TS) or `from .x` (Py) imports whose target isn't in the tracked set (warn-level — breaks the build); entries carry `lang: "ts"` / `lang: "py"` |
+| `dangling_imports`        | TS + Python source re-scan + relative-path resolution (incl. ESM `.js`/`.ts` suffix swap) | count of `./x` (TS) or `from .x` (Py) imports whose target isn't in the tracked set (warn-level — breaks the build); entries carry `lang: "ts"` / `lang: "py"`. TS resolver follows the Node ESM convention where source imports `./foo.js` and resolves to `./foo.ts` on disk |
 
 Each meter also contributes to a top-level `verdict`:
 
