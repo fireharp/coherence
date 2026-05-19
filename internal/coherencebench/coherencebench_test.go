@@ -15,6 +15,7 @@ func TestIDsShipsAllExpectedScenarios(t *testing.T) {
 		"CB-006", "CB-007", "CB-008", "CB-009", "CB-010",
 		"CB-011", "CB-012", "CB-013", "CB-014", "CB-015",
 		"CB-016", "CB-017", "CB-018", "CB-019", "CB-020",
+		"CB-021",
 	}
 	gotSet := map[string]bool{}
 	for _, n := range got {
@@ -38,11 +39,11 @@ func TestRunAllPassesDeterministicAndSkipsRest(t *testing.T) {
 		}
 		t.Fatal("suite did not pass")
 	}
-	if suite.Counts.Total != 20 {
-		t.Errorf("total = %d, want 20", suite.Counts.Total)
+	if suite.Counts.Total != 21 {
+		t.Errorf("total = %d, want 21", suite.Counts.Total)
 	}
-	if suite.Counts.Pass < 12 {
-		t.Errorf("expected >=12 deterministic passes, got %d", suite.Counts.Pass)
+	if suite.Counts.Pass < 13 {
+		t.Errorf("expected >=13 deterministic passes, got %d", suite.Counts.Pass)
 	}
 	if suite.Counts.Skipped < 1 {
 		t.Errorf("expected >=1 skipped (LLM-only deferred), got %d", suite.Counts.Skipped)
@@ -268,6 +269,26 @@ func TestCB020IsDeterministicAndPasses(t *testing.T) {
 	}
 	if r.Scenario.Expected.Drift == nil || r.Scenario.Expected.Drift.Verdict != "telemetry" {
 		t.Errorf("CB-020 should assert drift verdict=telemetry, got %+v", r.Scenario.Expected.Drift)
+	}
+}
+
+func TestCB021IsDeterministicAndPasses(t *testing.T) {
+	// CB-021 validates iteration 97's convention gate: a kickoff-style
+	// repo with 100% orphan concepts and no chain pattern (no tests,
+	// evidence, endpoints) should stay clean, not telemetry, even
+	// though path_loss score = 1.0.
+	r := Run("CB-021")
+	if r.Skipped {
+		t.Fatal("CB-021 should be deterministic, not skipped")
+	}
+	if r.Error != "" {
+		t.Fatalf("CB-021 errored: %s", r.Error)
+	}
+	if !r.Pass {
+		t.Errorf("CB-021 should pass, got missing=%v extra=%v", r.Missing, r.Extra)
+	}
+	if r.Scenario.Expected.Drift == nil || r.Scenario.Expected.Drift.Verdict != "clean" {
+		t.Errorf("CB-021 should assert drift verdict=clean, got %+v", r.Scenario.Expected.Drift)
 	}
 }
 

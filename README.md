@@ -220,7 +220,7 @@ scenario is a self-contained directory under
   scenarios (CB-004/006/008/011..015) are shipped as stubs so the suite is
   honest about scope. Each stub records the milestone that would enable it.
 
-The shipped totals are: **20 scenarios, 19 pass, 0 fail, 1 skipped** —
+The shipped totals are: **21 scenarios, 20 pass, 0 fail, 1 skipped** —
 matching M1's "at least 8 internal scenarios exist" bar.
 
 ### Scored scenarios (Files mode)
@@ -640,12 +640,12 @@ meters today:
 | `path_loss`               | BFS over typed edges from each concept (base + current) | concepts that don't reach a `test`/`evidence`/`endpoint`/`generated_artifact` via chain; reports `newly_orphaned_concepts` and `newly_supported_concepts` when a base graph is on disk; `convention=false` (no concept ever supported) skips score-based verdict promotion so kickoff projects don't look like 100% regression |
 | `blast_radius`            | base + current graph                 | unique 1-hop neighbors of touched nodes (`Score`/`ImpactedNeighbors`) + `CentralityWeight` = sum of touched-node degree (GOAL.md centrality contribution) |
 | `staleness`               | `git log` per tracked file + graph concept-importance | concept-weighted stale-file share (threshold: 90 days); `weighted=false` falls back to uniform `stale_files / total_files` |
-| `claim_support`           | BFS over typed edges from each claim (base + current) | claims that don't reach a `test`/`evidence`/`endpoint`/`generated_artifact` via chain; reports `newly_unsupported_claims` and `newly_supported_claims` when a base graph is on disk |
+| `claim_support`           | BFS over typed edges from each claim (base + current) | claims that don't reach a `test`/`evidence`/`endpoint`/`generated_artifact` via chain; reports `newly_unsupported_claims` and `newly_supported_claims` when a base graph is on disk; `convention=false` (no claim ever supported) skips score-based verdict promotion |
 | `contradiction`           | optional LLM findings (`--llm`)      | count of `llm-contradiction` findings; disabled without LLM    |
 | `stale_decision_links`    | `supersedes` + `mentions` traversal  | count of docs citing a superseded id without naming the new one |
 | `broken_implements_chains`| `implements` + `supports` traversal  | count of code symbols implementing ids with no evidence packet  |
 | `dependency_cycles`       | DFS over `depends_on` (dir-level)    | count of import cycles (warn-level — cycles break the build)    |
-| `orphan_endpoints`        | `defines` (reverse) + `verifies` (base + current) | count of HTTP endpoints whose source file has no test; reports `newly_orphaned_endpoints` and `newly_covered_endpoints` when a base graph is on disk |
+| `orphan_endpoints`        | `defines` (reverse) + `verifies` (base + current) | count of HTTP endpoints whose source file has no test; reports `newly_orphaned_endpoints` and `newly_covered_endpoints` when a base graph is on disk; `convention=false` (no verifies edge anywhere) skips score-based verdict promotion so kickoff projects without tests yet don't look like 100% orphan regressions |
 | `unimplemented_stories`   | user_story nodes + `implements`      | stories with no incoming implements claim (gated on convention) |
 | `broken_links`            | markdown re-scan of tracked .md      | inline links pointing to paths not in the tracked set           |
 | `unknown_id_references`   | typed-id regex over non-Markdown production code | code mentions of US/ADR/IDR ids not defined in the graph; test files (`*_test.go`, `*.test.ts`, etc.), `.agents/`, and fixture-shaped dirs (`scenarios/`, `fixtures/`, `testdata/`, `golden/`, `eval/`) are excluded |
