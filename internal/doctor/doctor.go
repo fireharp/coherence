@@ -7,6 +7,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 
@@ -35,6 +36,7 @@ func Run(rootDir, ontPath string) Report {
 
 	out.Checks = append(out.Checks, checkOntology(ontPath))
 	out.Checks = append(out.Checks, checkHook(rootDir))
+	out.Checks = append(out.Checks, checkHooksPath(rootDir))
 	out.Checks = append(out.Checks, checkGitIgnore(rootDir))
 	out.Checks = append(out.Checks, checkCoherenceState(rootDir))
 	out.Checks = append(out.Checks, checkAgentSkill(rootDir))
@@ -101,6 +103,36 @@ func checkHook(rootDir string) Check {
 	return Check{
 		ID: "hook", Status: "ok",
 		Message: ".githooks/pre-commit present and executable",
+	}
+}
+
+// checkHooksPath verifies `git config core.hooksPath` is set to
+// `.githooks` so the pre-commit hook actually runs on commit. Without
+// this config, the hook in .githooks/ is silently dormant — a common
+// first-time-user pitfall after `coherence init`.
+func checkHooksPath(rootDir string) Check {
+	cmd := exec.Command("git", "config", "core.hooksPath")
+	cmd.Dir = rootDir
+	out, err := cmd.Output()
+	if err != nil {
+		// `git config` returns non-zero when the key is unset.
+		return Check{
+			ID: "hooks-path", Status: "warn",
+			Message: "git config core.hooksPath is not set",
+			Fix:     "run `git config core.hooksPath .githooks` so the pre-commit hook fires",
+		}
+	}
+	value := strings.TrimSpace(string(out))
+	if value != ".githooks" {
+		return Check{
+			ID: "hooks-path", Status: "warn",
+			Message: fmt.Sprintf("git config core.hooksPath = %q (expected `.githooks`)", value),
+			Fix:     "run `git config core.hooksPath .githooks` to point git at the coherence hook",
+		}
+	}
+	return Check{
+		ID: "hooks-path", Status: "ok",
+		Message: "git config core.hooksPath = .githooks",
 	}
 }
 
