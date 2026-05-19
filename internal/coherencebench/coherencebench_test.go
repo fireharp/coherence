@@ -43,8 +43,8 @@ func TestRunAllPassesDeterministicAndSkipsRest(t *testing.T) {
 	if suite.Counts.Pass < 7 {
 		t.Errorf("expected >=7 deterministic passes, got %d", suite.Counts.Pass)
 	}
-	if suite.Counts.Skipped < 2 {
-		t.Errorf("expected >=2 skipped (graph/semantic deferred), got %d", suite.Counts.Skipped)
+	if suite.Counts.Skipped < 1 {
+		t.Errorf("expected >=1 skipped (LLM/semantic deferred), got %d", suite.Counts.Skipped)
 	}
 }
 
@@ -71,6 +71,21 @@ func TestCB011IsDeterministicAndPasses(t *testing.T) {
 	}
 	if !r.Pass {
 		t.Errorf("CB-011 should pass, got missing=%v extra=%v", r.Missing, r.Extra)
+	}
+}
+
+func TestCB012IsDeterministicAndPasses(t *testing.T) {
+	// CB-012 uses stale_tests meter: baseline test+source share content;
+	// current modifies only source; meter flags the unchanged test.
+	r := Run("CB-012")
+	if r.Skipped {
+		t.Fatal("CB-012 should be deterministic, not skipped")
+	}
+	if r.Error != "" {
+		t.Fatalf("CB-012 errored: %s", r.Error)
+	}
+	if !r.Pass {
+		t.Errorf("CB-012 should pass, got missing=%v extra=%v", r.Missing, r.Extra)
 	}
 }
 

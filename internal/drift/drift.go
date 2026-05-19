@@ -61,6 +61,23 @@ type NeighborhoodDrift struct {
 	EdgesRemoved  int     `json:"edges_removed"`
 }
 
+// StaleTest records one (test, source) pair where the source content
+// changed between baseline and current but the test file did not — the
+// test still passes but no longer reflects current behavior.
+type StaleTest struct {
+	Test   string `json:"test"`
+	Source string `json:"source"`
+}
+
+// StaleTests is the 17th drift meter. It walks `verifies` edges and
+// compares base+current snapshot content_hashes for the test-source
+// pair. When the source content changed but the test didn't, the test
+// is flagged as potentially stale.
+type StaleTests struct {
+	Score int         `json:"score"`
+	Stale []StaleTest `json:"stale"`
+}
+
 // UnknownIDReference records one (file, id) pair where the file
 // references a typed id (US-###, ADR-###, IDR-###) that has no matching
 // node in the graph.
@@ -266,6 +283,7 @@ type Report struct {
 	UnimplementedStories   UnimplementedStories   `json:"unimplemented_stories"`
 	BrokenLinks            BrokenLinks            `json:"broken_links"`
 	UnknownIDReferences    UnknownIDReferences    `json:"unknown_id_references"`
+	StaleTests             StaleTests             `json:"stale_tests"`
 	Explanations         []string          `json:"explanations"`
 	SuggestedActions     []string          `json:"suggested_actions"`
 }
@@ -367,6 +385,9 @@ func ComputeWith(rootDir, ontologyPath string, opts ComputeOptions) (Report, err
 
 	// Meter 16: unknown typed-id references (lifted IDs scanner).
 	report.UnknownIDReferences = computeUnknownIDReferences(rootDir, currentGraph)
+
+	// Meter 17: stale tests (verifies + base/current snapshot diff).
+	report.StaleTests = computeStaleTests(baseSnap, currentSnap, currentGraph)
 
 	report.Verdict = computeVerdict(report)
 	report.Explanations = renderExplanations(report)
@@ -1147,6 +1168,9 @@ func computeVerdict(r Report) string {
 	if r.UnknownIDReferences.Score > 0 {
 		return VerdictTelemetry
 	}
+	if r.StaleTests.Score > 0 {
+		return VerdictTelemetry
+	}
 	return VerdictClean
 }
 
@@ -1265,6 +1289,15 @@ func renderExplanations(r Report) []string {
 			"unknown id references: %d typed-id mention(s) in code without a defining doc (%s).",
 			r.UnknownIDReferences.Score, joinShort(ids, 4)))
 	}
+	if r.StaleTests.Score > 0 {
+		pairs := make([]string, 0, len(r.StaleTests.Stale))
+		for _, s := range r.StaleTests.Stale {
+			pairs = append(pairs, s.Test+"→"+s.Source)
+		}
+		out = append(out, fmt.Sprintf(
+			"stale tests: %d test(s) unchanged while their source changed (%s).",
+			r.StaleTests.Score, joinShort(pairs, 3)))
+	}
 	return out
 }
 
@@ -1323,6 +1356,9 @@ func renderActions(r Report) []string {
 	}
 	if r.UnknownIDReferences.Score > 0 {
 		out = append(out, "define the referenced ids (under docs/user-stories or docs/decisions), or remove the references from code")
+	}
+	if r.StaleTests.Score > 0 {
+		out = append(out, "update the test(s) whose source changed without them (or accept the verifies wiring is wrong)")
 	}
 	if len(out) == 0 {
 		out = append(out, "no action needed")
@@ -1426,6 +1462,7 @@ func Human(r Report) string {
 	}
 	fmt.Fprintf(&b, "  broken_links:           %d markdown link(s) to untracked paths\n", r.BrokenLinks.Score)
 	fmt.Fprintf(&b, "  unknown_id_refs:        %d typed-id mention(s) in code without a defining doc\n", r.UnknownIDReferences.Score)
+	fmt.Fprintf(&b, "  stale_tests:            %d test(s) with changed source but no test edit\n", r.StaleTests.Score)
 	if len(r.Explanations) > 0 {
 		fmt.Fprintln(&b, "\nexplanations:")
 		for _, e := range r.Explanations {

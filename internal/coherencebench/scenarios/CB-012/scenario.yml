@@ -1,14 +1,41 @@
 id: CB-012
 name: test passes but no longer validates changed behavior
 description: |
-  Production code change shifted the behavior, but the existing test still
-  passes (and was not touched). Detecting stale tests requires the
-  evidence/claim support layer (M4) so the engine can flag passing-but-stale
-  tests via claim support delta.
-status: skip
-changed_files:
-  - src/auth/policy.go
+  The baseline has `pkg/policy.go` + `pkg/policy_test.go` (the Go test
+  naming convention wires a `verifies` edge from test to source). The
+  current state modifies the source but leaves the test file untouched.
+  The new `stale_tests` drift meter walks `verifies` edges and compares
+  base+current snapshot content_hashes, flagging the pair as stale.
+  Verdict bumps to `telemetry`.
+status: deterministic
+base_files:
+  pkg/policy.go: |
+    package pkg
+
+    func Approve(score int) bool {
+        return score >= 50
+    }
+  pkg/policy_test.go: |
+    package pkg
+
+    import "testing"
+
+    func TestApprove(t *testing.T) {
+        if !Approve(60) {
+            t.Fatal("expected approval at 60")
+        }
+    }
+files:
+  pkg/policy.go: |
+    package pkg
+
+    // Threshold raised from 50 to 80; existing test still passes at 60
+    // but no longer reflects the new approval behavior.
+    func Approve(score int) bool {
+        return score >= 80
+    }
 expected:
-  fires:
-    - stale-test-risk
+  fires: []
   blocking_error: false
+  drift:
+    verdict: telemetry
