@@ -8,8 +8,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"path/filepath"
 	"path"
+	"path/filepath"
 	"sort"
 	"strings"
 	"time"
@@ -114,6 +114,23 @@ type UnknownIDReferences struct {
 	UnknownRefs []UnknownIDReference `json:"unknown_refs"`
 }
 
+// DanglingImport is one (source file, unresolved import spec) pair.
+type DanglingImport struct {
+	Source string `json:"source"`
+	Spec   string `json:"spec"`
+}
+
+// DanglingImports is the 19th drift meter — TypeScript source files whose
+// relative-path imports don't resolve to any tracked file. Mirrors
+// `broken_links` for code: a deleted file leaves callers pointing at a
+// nonexistent path; the build will fail but coherence surfaces it before
+// commit. Score is the count of unresolved imports. Bare module
+// specifiers and `.d.ts`/test/spec files are excluded.
+type DanglingImports struct {
+	Score   int              `json:"score"`
+	Imports []DanglingImport `json:"imports"`
+}
+
 // BrokenLink is one (source doc, dangling target) pair.
 type BrokenLink struct {
 	Source string `json:"source"`
@@ -203,10 +220,10 @@ type StaleDecisionLinks struct {
 // the caller fed in LLM findings (so plain `coherence drift` reports
 // Enabled=false, while `review --llm` reports the actual count).
 type Contradiction struct {
-	Enabled              bool     `json:"enabled"`
-	Score                int      `json:"score"`
-	ContradictionCount   int      `json:"contradiction_count"`
-	Candidates           []string `json:"candidates"`
+	Enabled            bool     `json:"enabled"`
+	Score              int      `json:"score"`
+	ContradictionCount int      `json:"contradiction_count"`
+	Candidates         []string `json:"candidates"`
 }
 
 // ClaimSupport scores the share of `claim` nodes whose defining doc has at
@@ -214,10 +231,10 @@ type Contradiction struct {
 // referenced from elsewhere in the repo. Same indirection pattern as
 // trace_coverage and path_loss, applied to assertive-bullet claims.
 type ClaimSupport struct {
-	Score              float64  `json:"score"`
-	TotalClaims        int      `json:"total_claims"`
-	SupportedClaims    int      `json:"supported_claims"`
-	UnsupportedClaims  []string `json:"unsupported_claims"`
+	Score             float64  `json:"score"`
+	TotalClaims       int      `json:"total_claims"`
+	SupportedClaims   int      `json:"supported_claims"`
+	UnsupportedClaims []string `json:"unsupported_claims"`
 }
 
 // StaleFile records one file's age data, surfaced in the OldestStaleFiles
@@ -248,11 +265,11 @@ type Staleness struct {
 // (centrality * changed_edges * failing_required_paths) is sharpened over
 // time; this MVP is the simplest signal computable from the existing graph.
 type BlastRadius struct {
-	Score                    int      `json:"score"`
-	BaseAvailable            bool     `json:"base_available"`
-	ChangedNodeCount         int      `json:"changed_node_count"`
-	ImpactedNeighbors        int      `json:"impacted_neighbors"`
-	TopImpactedChangedNodes  []string `json:"top_impacted_changed_nodes"`
+	Score                   int      `json:"score"`
+	BaseAvailable           bool     `json:"base_available"`
+	ChangedNodeCount        int      `json:"changed_node_count"`
+	ImpactedNeighbors       int      `json:"impacted_neighbors"`
+	TopImpactedChangedNodes []string `json:"top_impacted_changed_nodes"`
 }
 
 // PathLoss measures the share of concept nodes that lack a support path —
@@ -272,26 +289,26 @@ type PathLoss struct {
 // (content_hash differs but semantic_hash matches) are reported separately
 // so an agent can tell apart "typo" from "actual edit".
 type SemanticMovement struct {
-	Score                 float64  `json:"score"`
-	BaseAvailable         bool     `json:"base_available"`
-	MarkdownTotal         int      `json:"markdown_total"`
-	MarkdownSemanticChange int     `json:"markdown_semantic_changed"`
-	MarkdownNoopChanges   int      `json:"markdown_noop_changes"`
-	ChangedDocs           []string `json:"changed_docs"`
+	Score                  float64  `json:"score"`
+	BaseAvailable          bool     `json:"base_available"`
+	MarkdownTotal          int      `json:"markdown_total"`
+	MarkdownSemanticChange int      `json:"markdown_semantic_changed"`
+	MarkdownNoopChanges    int      `json:"markdown_noop_changes"`
+	ChangedDocs            []string `json:"changed_docs"`
 }
 
 // Report is the on-disk shape of `.coherence/drift.json`.
 type Report struct {
-	GeneratedAt          string            `json:"generated_at"`
-	Verdict              string            `json:"verdict"`
-	RequiredEdgeBreakage EdgeBreakage      `json:"required_edge_breakage"`
-	TraceCoverage        TraceCoverage     `json:"trace_coverage"`
-	NeighborhoodDrift    NeighborhoodDrift `json:"neighborhood_drift"`
-	SemanticMovement     SemanticMovement  `json:"semantic_movement"`
-	PathLoss             PathLoss          `json:"path_loss"`
-	BlastRadius          BlastRadius       `json:"blast_radius"`
-	Staleness            Staleness         `json:"staleness"`
-	ClaimSupport         ClaimSupport      `json:"claim_support"`
+	GeneratedAt            string                 `json:"generated_at"`
+	Verdict                string                 `json:"verdict"`
+	RequiredEdgeBreakage   EdgeBreakage           `json:"required_edge_breakage"`
+	TraceCoverage          TraceCoverage          `json:"trace_coverage"`
+	NeighborhoodDrift      NeighborhoodDrift      `json:"neighborhood_drift"`
+	SemanticMovement       SemanticMovement       `json:"semantic_movement"`
+	PathLoss               PathLoss               `json:"path_loss"`
+	BlastRadius            BlastRadius            `json:"blast_radius"`
+	Staleness              Staleness              `json:"staleness"`
+	ClaimSupport           ClaimSupport           `json:"claim_support"`
 	Contradiction          Contradiction          `json:"contradiction"`
 	StaleDecisionLinks     StaleDecisionLinks     `json:"stale_decision_links"`
 	BrokenImplementsChains BrokenImplementsChains `json:"broken_implements_chains"`
@@ -302,8 +319,9 @@ type Report struct {
 	UnknownIDReferences    UnknownIDReferences    `json:"unknown_id_references"`
 	StaleTests             StaleTests             `json:"stale_tests"`
 	OrphanedMetricAliases  OrphanedMetricAliases  `json:"orphaned_metric_aliases"`
-	Explanations         []string          `json:"explanations"`
-	SuggestedActions     []string          `json:"suggested_actions"`
+	DanglingImports        DanglingImports        `json:"dangling_imports"`
+	Explanations           []string               `json:"explanations"`
+	SuggestedActions       []string               `json:"suggested_actions"`
 }
 
 // PathFor returns the canonical drift report path for the given repo root.
@@ -409,6 +427,9 @@ func ComputeWith(rootDir, ontologyPath string, opts ComputeOptions) (Report, err
 
 	// Meter 18: orphaned metric aliases (frontend references a renamed metric).
 	report.OrphanedMetricAliases = computeOrphanedMetricAliases(rootDir, baseGraph, currentGraph)
+
+	// Meter 19: dangling TypeScript imports (relative target not in tracked set).
+	report.DanglingImports = computeDanglingImports(rootDir)
 
 	report.Verdict = computeVerdict(report)
 	report.Explanations = renderExplanations(report)
@@ -809,11 +830,11 @@ func computeBrokenImplementsChains(g graph.Graph) BrokenImplementsChains {
 // computeStaleDecisionLinks walks supersedes + mentions edges to detect
 // docs that still cite a superseded id without acknowledging its
 // superseder. For each supersedes edge A → B:
-//   1. find docs D_B that `defines` B (the source files for the
-//      superseded id)
-//   2. find docs M that `mentions` any D_B (citers of the old id)
-//   3. find docs D_A that `defines` A (the new id's source files)
-//   4. each M that does NOT also mention any D_A is a stale link.
+//  1. find docs D_B that `defines` B (the source files for the
+//     superseded id)
+//  2. find docs M that `mentions` any D_B (citers of the old id)
+//  3. find docs D_A that `defines` A (the new id's source files)
+//  4. each M that does NOT also mention any D_A is a stale link.
 func computeStaleDecisionLinks(g graph.Graph) StaleDecisionLinks {
 	// Index defines edges: typed-id → list of doc node ids.
 	defines := map[string][]string{}
@@ -1195,6 +1216,11 @@ func computeVerdict(r Report) string {
 	if r.OrphanedMetricAliases.Score > 0 {
 		return VerdictTelemetry
 	}
+	if r.DanglingImports.Score > 0 {
+		// Unresolved relative imports break the TS build; promote to warn
+		// for parity with `dependency_cycles`.
+		return VerdictWarn
+	}
 	return VerdictClean
 }
 
@@ -1331,6 +1357,15 @@ func renderExplanations(r Report) []string {
 			"orphaned metric aliases: %d frontend reference(s) to renamed/removed metric(s) (%s).",
 			r.OrphanedMetricAliases.Score, joinShort(names, 4)))
 	}
+	if r.DanglingImports.Score > 0 {
+		pairs := make([]string, 0, len(r.DanglingImports.Imports))
+		for _, di := range r.DanglingImports.Imports {
+			pairs = append(pairs, di.Source+"→"+di.Spec)
+		}
+		out = append(out, fmt.Sprintf(
+			"dangling imports: %d TS import(s) point to unresolved relative path(s) (%s).",
+			r.DanglingImports.Score, joinShort(pairs, 3)))
+	}
 	return out
 }
 
@@ -1395,6 +1430,9 @@ func renderActions(r Report) []string {
 	}
 	if r.OrphanedMetricAliases.Score > 0 {
 		out = append(out, "update frontend references to the new metric name (or restore the old metric definition)")
+	}
+	if r.DanglingImports.Score > 0 {
+		out = append(out, "fix the dangling TS import path(s) or restore the deleted module")
 	}
 	if len(out) == 0 {
 		out = append(out, "no action needed")
@@ -1500,6 +1538,7 @@ func Human(r Report) string {
 	fmt.Fprintf(&b, "  unknown_id_refs:        %d typed-id mention(s) in code without a defining doc\n", r.UnknownIDReferences.Score)
 	fmt.Fprintf(&b, "  stale_tests:            %d test(s) with changed source but no test edit\n", r.StaleTests.Score)
 	fmt.Fprintf(&b, "  orphaned_metric_aliases:%d frontend reference(s) to renamed/removed metric(s)\n", r.OrphanedMetricAliases.Score)
+	fmt.Fprintf(&b, "  dangling_imports:       %d TS import(s) to unresolved relative path(s)\n", r.DanglingImports.Score)
 	if len(r.Explanations) > 0 {
 		fmt.Fprintln(&b, "\nexplanations:")
 		for _, e := range r.Explanations {

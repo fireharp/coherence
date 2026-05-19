@@ -51,7 +51,11 @@ Use Go 1.22 or newer.
   `contradicts`, `mirrors`, `invalidates`). Pass 10 adds `command:make
   <target>` nodes from `Makefile`/`*.mk` target declarations (wired via
   `defines` edges from the source file), so Makefile-driven workflows
-  surface in the graph alongside ontology-derived commands. The Markdown
+  surface in the graph alongside ontology-derived commands. Pass 11 adds
+  TypeScript shallow extraction over `*.ts`/`*.tsx`/`*.mts`/`*.cts`
+  files (skipping `*.test.*`/`*.spec.*` and `*.d.ts`): exported
+  declarations become `code_symbol` nodes (`code_symbol:<file-stem>.<Name>`),
+  and relative in-repo imports emit `depends_on` edges. The Markdown
   semantic hash ignores prose typos but flips
   on heading/link/frontmatter/code-fence-language edits. Foundation for
   drift scoring and the deferred CB-008/011/013/014/015 scenarios.
