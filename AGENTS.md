@@ -30,10 +30,10 @@ Use Go 1.22 or newer.
 - `./bin/coherence init --template=<name> [--force] [--json]` scaffolds a
   fresh repo (writes ontology, hook, updates .gitignore). Run
   `./bin/coherence templates` to list available templates.
-- `./bin/coherence review --base=HEAD --worktree --json` runs the combined
+- `./bin/coherence review --base=HEAD --worktree --json [--strict]` runs the combined
   local/agent review (dirty tracked + untracked) — the recommended pre-commit
   follow-up when `scan --staged --json` reports `review_recommended: true`.
-- `./bin/coherence watch [--once] [--interval=1s] [--json]` runs the M5
+- `./bin/coherence watch [--once] [--interval=1s] [--json] [--strict]` runs the M5
   watch surface. `--once` is single-fire (same wiring as
   `review --base=HEAD --worktree`). Default mode is a live polling loop —
   Merkle-root polling at `--interval` cadence, emits one JSON document to
@@ -113,7 +113,10 @@ Use Go 1.22 or newer.
   (`markdown-index`, `privacy-collectors`) that are domain-specific
   examples meant to be merged into an existing ontology rather than used
   standalone.
-- `./bin/coherence status` rewrites `.coherence/STATUS.md`.
+- `./bin/coherence status [--json]` rewrites `.coherence/STATUS.md` (or
+  emits the structured payload with `--json`: `graph_counts`,
+  `drift` summary including `newly_orphaned_concepts` etc., live-eval
+  findings counts, scenario snapshot history).
 
 The optional LLM pass uses two different candidate selectors depending on
 the subcommand: `scan` / `check` filter staged markdown by path glob;
