@@ -509,7 +509,7 @@ func ComputeWith(rootDir, ontologyPath string, opts ComputeOptions) (Report, err
 	report.OrphanEndpoints = computeOrphanEndpoints(baseGraph, currentGraph)
 
 	// Meter 14: unimplemented stories (gated on implements convention).
-	report.UnimplementedStories = computeUnimplementedStories(currentGraph)
+	report.UnimplementedStories = computeUnimplementedStories(baseGraph, currentGraph)
 
 	// Meter 15: broken markdown links (intra-repo targets not in tracked).
 	report.BrokenLinks = computeBrokenLinks(rootDir)
@@ -880,7 +880,7 @@ func computeContradiction(findings []llm.Finding) Contradiction {
 // demonstrably uses the convention (at least one story has one). In
 // repos that don't carry `// implements US-001` annotations at all the
 // meter stays silent (Convention=false, Score=0) to avoid noise.
-func computeUnimplementedStories(g graph.Graph) UnimplementedStories {
+func computeUnimplementedStories(base *graph.Graph, g graph.Graph) UnimplementedStories {
 	stories := []string{}
 	for _, n := range g.Nodes {
 		if n.Kind == graph.NodeUserStory {
@@ -893,7 +893,20 @@ func computeUnimplementedStories(g graph.Graph) UnimplementedStories {
 			implemented[e.To] = true
 		}
 	}
-	if len(implemented) == 0 {
+	// Convention check: prefer current, fall back to base. Catches the
+	// edge case where base had implements edges but current removed
+	// them all — that regression should still fire the meter rather
+	// than silently silence it. Symmetric with path_loss/claim_support.
+	convention := len(implemented) > 0
+	if !convention && base != nil {
+		for _, e := range base.Edges {
+			if e.Kind == graph.EdgeImplements {
+				convention = true
+				break
+			}
+		}
+	}
+	if !convention {
 		return UnimplementedStories{Convention: false, UnimplementedIDs: []string{}}
 	}
 	unimpl := []string{}
@@ -1769,11 +1782,17 @@ func renderExplanations(r Report) []string {
 			joinShort(r.TraceCoverage.UncoveredStories, 4)))
 	}
 	if r.NeighborhoodDrift.BaseAvailable {
-		out = append(out, fmt.Sprintf(
+		msg := fmt.Sprintf(
 			"neighborhood drift score = %.2f (edges +%d/-%d, nodes +%d/-%d).",
 			r.NeighborhoodDrift.Score,
 			r.NeighborhoodDrift.EdgesAdded, r.NeighborhoodDrift.EdgesRemoved,
-			r.NeighborhoodDrift.NodesAdded, r.NeighborhoodDrift.NodesRemoved))
+			r.NeighborhoodDrift.NodesAdded, r.NeighborhoodDrift.NodesRemoved)
+		// If the score is very large, the baseline is likely stale — hint
+		// at re-indexing so the next drift run starts from current state.
+		if r.NeighborhoodDrift.Score >= 100 {
+			msg += " baseline looks stale — `coherence index` will refresh."
+		}
+		out = append(out, msg)
 	} else {
 		out = append(out, "no base graph on disk — neighborhood drift unavailable (run `coherence index`).")
 	}

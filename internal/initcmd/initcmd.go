@@ -108,6 +108,7 @@ func Run(rootDir string, opts Options) (Result, error) {
 		"git config core.hooksPath .githooks",
 		"coherence doctor",
 		"coherence scan --staged",
+		"coherence index    # re-run after major changes to refresh the drift baseline",
 	}
 	return res, nil
 }
@@ -120,15 +121,14 @@ func Run(rootDir string, opts Options) (Result, error) {
 func buildBaseline(rootDir string, force bool) Action {
 	snapPath := snapshot.PathFor(rootDir)
 	graphPath := graph.PathFor(rootDir)
-	if !force {
-		_, sErr := os.Stat(snapPath)
-		_, gErr := os.Stat(graphPath)
-		if sErr == nil && gErr == nil {
-			return Action{
-				Path:   ".coherence/snapshot.json + graph.json",
-				Status: "skipped",
-				Detail: "baseline already on disk (use --force to refresh, or `coherence index`)",
-			}
+	_, sErr := os.Stat(snapPath)
+	_, gErr := os.Stat(graphPath)
+	preExisting := sErr == nil && gErr == nil
+	if preExisting && !force {
+		return Action{
+			Path:   ".coherence/snapshot.json + graph.json",
+			Status: "skipped",
+			Detail: "baseline already on disk (use --force to refresh, or `coherence index`)",
 		}
 	}
 	snap, err := snapshot.Compute(rootDir)
@@ -145,9 +145,13 @@ func buildBaseline(rootDir string, force bool) Action {
 	if err := graph.Write(rootDir, g); err != nil {
 		return Action{Path: ".coherence/baseline", Status: "skipped", Detail: "graph write failed: " + err.Error()}
 	}
+	status := "created"
+	if preExisting {
+		status = "updated"
+	}
 	return Action{
 		Path:   ".coherence/snapshot.json + graph.json",
-		Status: "created",
+		Status: status,
 		Detail: fmt.Sprintf("baseline indexed: %d nodes, %d edges, %d files",
 			g.Counts.TotalNodes, g.Counts.TotalEdges, snap.FileCount),
 	}

@@ -12,12 +12,12 @@ import (
 // fields are populated by the CLI from both the template eval suite and
 // the CoherenceBench scenario suite, so a single run report covers both.
 type CombinedReport struct {
-	GeneratedAt          time.Time
-	TemplateScenarios    int
-	TemplatePass         int
-	TemplateFail         int
-	CoherenceBenchSuite  Suite
-	KnownLimitations     []string
+	GeneratedAt         time.Time
+	TemplateScenarios   int
+	TemplatePass        int
+	TemplateFail        int
+	CoherenceBenchSuite Suite
+	KnownLimitations    []string
 }
 
 // WriteMarkdown writes the run report to .coherence/runs/YYYY-MM-DD/index.md
@@ -40,27 +40,37 @@ func renderMarkdown(r CombinedReport) string {
 	var b strings.Builder
 	fmt.Fprintf(&b, "# coherence run %s\n\n", r.GeneratedAt.UTC().Format(time.RFC3339))
 
-	fmt.Fprintln(&b, "## Template eval suite")
-	fmt.Fprintf(&b, "- Scenarios: %d\n", r.TemplateScenarios)
-	fmt.Fprintf(&b, "- Pass: %d\n", r.TemplatePass)
-	fmt.Fprintf(&b, "- Fail: %d\n", r.TemplateFail)
-	verdict := "`pass`"
-	if r.TemplateFail > 0 {
-		verdict = "`fail`"
+	// Template section is skipped when zero scenarios — lets us reuse
+	// the same renderer for coherencebench-only reports without
+	// emitting a misleading "Pass: 0, verdict: pass" block.
+	if r.TemplateScenarios > 0 {
+		fmt.Fprintln(&b, "## Template eval suite")
+		fmt.Fprintf(&b, "- Scenarios: %d\n", r.TemplateScenarios)
+		fmt.Fprintf(&b, "- Pass: %d\n", r.TemplatePass)
+		fmt.Fprintf(&b, "- Fail: %d\n", r.TemplateFail)
+		verdict := "`pass`"
+		if r.TemplateFail > 0 {
+			verdict = "`fail`"
+		}
+		fmt.Fprintf(&b, "- **Suite verdict:** %s\n\n", verdict)
 	}
-	fmt.Fprintf(&b, "- **Suite verdict:** %s\n\n", verdict)
 
 	cb := r.CoherenceBenchSuite
-	fmt.Fprintln(&b, "## CoherenceBench (internal scenarios)")
-	fmt.Fprintf(&b, "- Scenarios: %d\n", cb.Counts.Total)
-	fmt.Fprintf(&b, "- Pass: %d\n", cb.Counts.Pass)
-	fmt.Fprintf(&b, "- Fail: %d\n", cb.Counts.Fail)
-	fmt.Fprintf(&b, "- Skipped (deferred to graph/semantic milestones): %d\n", cb.Counts.Skipped)
-	cbVerdict := "`pass`"
-	if !cb.Pass {
-		cbVerdict = "`fail`"
+	// CoherenceBench section is also conditional — when only the
+	// template suite ran, this stays absent. Symmetric with the
+	// template section above.
+	if cb.Counts.Total > 0 {
+		fmt.Fprintln(&b, "## CoherenceBench (internal scenarios)")
+		fmt.Fprintf(&b, "- Scenarios: %d\n", cb.Counts.Total)
+		fmt.Fprintf(&b, "- Pass: %d\n", cb.Counts.Pass)
+		fmt.Fprintf(&b, "- Fail: %d\n", cb.Counts.Fail)
+		fmt.Fprintf(&b, "- Skipped (deferred to graph/semantic milestones): %d\n", cb.Counts.Skipped)
+		cbVerdict := "`pass`"
+		if !cb.Pass {
+			cbVerdict = "`fail`"
+		}
+		fmt.Fprintf(&b, "- **Suite verdict:** %s\n\n", cbVerdict)
 	}
-	fmt.Fprintf(&b, "- **Suite verdict:** %s\n\n", cbVerdict)
 
 	if len(cb.Results) > 0 {
 		fmt.Fprintln(&b, "| ID | Status | Pass | Name |")
