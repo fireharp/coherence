@@ -6,19 +6,36 @@ import (
 )
 
 func TestStrictPromotionMessageWithRegressions(t *testing.T) {
-	got := strictPromotionMessage(3)
+	got := strictPromotionMessage(3, nil)
 	if !strings.Contains(got, "3 regression(s)") {
 		t.Errorf("expected regression count in message, got %q", got)
 	}
 }
 
 func TestStrictPromotionMessageWithoutRegressions(t *testing.T) {
-	got := strictPromotionMessage(0)
+	got := strictPromotionMessage(0, nil)
 	if !strings.Contains(got, "drift movement detected") {
 		t.Errorf("expected generic movement message, got %q", got)
 	}
 	if strings.Contains(got, "regression") {
 		t.Errorf("zero-count message should not mention regressions, got %q", got)
+	}
+}
+
+func TestStrictPromotionMessageRealMeterActive(t *testing.T) {
+	got := strictPromotionMessage(0, []string{"orphan_endpoints", "neighborhood_drift"})
+	if !strings.Contains(got, "real meter(s) active: orphan_endpoints") {
+		t.Errorf("expected real-meter call-out, got %q", got)
+	}
+	if strings.Contains(got, "neighborhood_drift") {
+		t.Errorf("movement meter should be filtered out, got %q", got)
+	}
+}
+
+func TestStrictPromotionMessageOnlyMovementMeters(t *testing.T) {
+	got := strictPromotionMessage(0, []string{"neighborhood_drift", "semantic_movement"})
+	if !strings.Contains(got, "drift movement detected") {
+		t.Errorf("movement-only meters should fall through to generic message, got %q", got)
 	}
 }
 
