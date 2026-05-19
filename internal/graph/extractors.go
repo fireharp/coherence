@@ -545,6 +545,40 @@ func isTestFile(p string) bool {
 	return false
 }
 
+// SuggestTestFilePath returns the conventional test-file path for the
+// given source file, based on the language's most common pattern.
+// Returns empty string when the source doesn't match a known extension.
+// Useful for telling users where to add a test for an untested route.
+func SuggestTestFilePath(src string) string {
+	ext := strings.ToLower(filepath.Ext(src))
+	base := filepath.Base(src)
+	dir := filepath.Dir(src)
+	stem := strings.TrimSuffix(base, filepath.Ext(base))
+	switch ext {
+	case ".go":
+		return filepath.Join(dir, stem+"_test.go")
+	case ".ts":
+		return filepath.Join(dir, stem+".test.ts")
+	case ".tsx":
+		return filepath.Join(dir, stem+".test.tsx")
+	case ".mts":
+		return filepath.Join(dir, stem+".test.mts")
+	case ".cts":
+		return filepath.Join(dir, stem+".test.cts")
+	case ".js":
+		return filepath.Join(dir, stem+".test.js")
+	case ".jsx":
+		return filepath.Join(dir, stem+".test.jsx")
+	case ".py":
+		return filepath.Join(dir, "test_"+stem+".py")
+	case ".rs":
+		// Rust convention: tests/<stem>.rs at crate root or inline #[test] blocks.
+		// Reverse-mapping isn't clean here; return empty.
+		return ""
+	}
+	return ""
+}
+
 // sourceFileForTest tries to reverse-map a test path to the source file it
 // verifies. Returns (path, true) when a likely source exists in the
 // tracked set. For Python tests/ and TS __tests__/ dirs the reverse-map

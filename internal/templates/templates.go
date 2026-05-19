@@ -21,6 +21,39 @@ var assets embed.FS
 // auto-detection finds no better match.
 const Default = "generic"
 
+// CatalogueEntry describes one template's role and shape so users
+// can pick the right one when running `coherence templates` or `init`.
+type CatalogueEntry struct {
+	Name        string `json:"name"`
+	Kind        string `json:"kind"` // "starter" or "overlay"
+	Description string `json:"description"`
+}
+
+// catalogue is the canonical metadata table for templates. Order
+// roughly maps to popularity / first-fit detection priority.
+var catalogue = []CatalogueEntry{
+	{"generic", "starter", "minimal baseline — docs + code coupling"},
+	{"go-cli", "starter", "cmd/<bin>/main.go + internal/ + go.mod/go.sum"},
+	{"typescript-app", "starter", "package.json + src/ + tsconfig"},
+	{"python-package", "starter", "pyproject.toml + src/ + tests/"},
+	{"data-pipeline", "starter", "schema/migrations/dbt-style projects"},
+	{"docs-site", "starter", "markdown-heavy repos with an index/nav file"},
+	{"infra-terraform", "starter", ".tf modules + runbooks"},
+	{"monorepo", "starter", "packages/* + apps/* workspaces"},
+	{"agent-repo", "starter", "AI/automation agents with task/evidence traceability"},
+	{"markdown-index", "overlay", "KB content/* with index files + frontmatter schema"},
+	{"privacy-collectors", "overlay", "privacy-sensitive Go collectors + redaction policy"},
+}
+
+// Catalogue returns the metadata for every shipped template, in
+// canonical order. Used by `coherence templates` to render a useful
+// list (vs. just bare names).
+func Catalogue() []CatalogueEntry {
+	out := make([]CatalogueEntry, len(catalogue))
+	copy(out, catalogue)
+	return out
+}
+
 // Detect inspects rootDir for tell-tale files and returns the best-fit
 // template name, or Default if no signal is strong enough. Cheap path
 // checks only — never reads file contents.
