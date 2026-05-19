@@ -49,9 +49,11 @@ func TestRunAllPassesDeterministicAndSkipsRest(t *testing.T) {
 }
 
 func TestRunSkipScenarioReturnsSkippedResult(t *testing.T) {
-	r := Run("CB-008")
+	// CB-006 is LLM-only and stays skipped until a real LLM harness is
+	// wired into bench; we use it as the canonical example here.
+	r := Run("CB-006")
 	if !r.Skipped {
-		t.Errorf("CB-008 should be skipped, got %+v", r)
+		t.Errorf("CB-006 should be skipped, got %+v", r)
 	}
 	if !r.Pass {
 		t.Errorf("skipped scenarios should report pass=true")
