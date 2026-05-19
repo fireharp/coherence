@@ -61,6 +61,25 @@ type NeighborhoodDrift struct {
 	EdgesRemoved  int     `json:"edges_removed"`
 }
 
+// UnknownIDReference records one (file, id) pair where the file
+// references a typed id (US-###, ADR-###, IDR-###) that has no matching
+// node in the graph.
+type UnknownIDReference struct {
+	File string `json:"file"`
+	ID   string `json:"id"`
+	Kind string `json:"kind"`
+}
+
+// UnknownIDReferences is the 16th drift meter. Lifts the IDs scanner
+// (originally in `coherence scan`'s per-staged-addition mode) into the
+// drift report so the same coherence check runs against the full tracked
+// state. Markdown files are excluded — docs frequently reference
+// not-yet-implemented ids deliberately.
+type UnknownIDReferences struct {
+	Score       int                  `json:"score"`
+	UnknownRefs []UnknownIDReference `json:"unknown_refs"`
+}
+
 // BrokenLink is one (source doc, dangling target) pair.
 type BrokenLink struct {
 	Source string `json:"source"`
@@ -246,6 +265,7 @@ type Report struct {
 	OrphanEndpoints        OrphanEndpoints        `json:"orphan_endpoints"`
 	UnimplementedStories   UnimplementedStories   `json:"unimplemented_stories"`
 	BrokenLinks            BrokenLinks            `json:"broken_links"`
+	UnknownIDReferences    UnknownIDReferences    `json:"unknown_id_references"`
 	Explanations         []string          `json:"explanations"`
 	SuggestedActions     []string          `json:"suggested_actions"`
 }
@@ -344,6 +364,9 @@ func ComputeWith(rootDir, ontologyPath string, opts ComputeOptions) (Report, err
 
 	// Meter 15: broken markdown links (intra-repo targets not in tracked).
 	report.BrokenLinks = computeBrokenLinks(rootDir)
+
+	// Meter 16: unknown typed-id references (lifted IDs scanner).
+	report.UnknownIDReferences = computeUnknownIDReferences(rootDir, currentGraph)
 
 	report.Verdict = computeVerdict(report)
 	report.Explanations = renderExplanations(report)
