@@ -1739,6 +1739,10 @@ func renderActions(r Report) []string {
 	if r.OrphanEndpoints.Score > 0 {
 		out = append(out, "add a test alongside the source file containing the orphan endpoint(s)")
 	}
+	if len(r.OrphanEndpoints.NewlyOrphanedEndpoints) > 0 {
+		out = append(out, "restore test coverage for endpoint(s) that lost their verifies link since baseline: "+
+			joinShort(r.OrphanEndpoints.NewlyOrphanedEndpoints, 3))
+	}
 	if r.UnimplementedStories.Convention && r.UnimplementedStories.Score > 0 {
 		out = append(out, "add `// implements US-###` doc comments to code, or close out the unreferenced stories")
 	}
