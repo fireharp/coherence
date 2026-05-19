@@ -61,8 +61,8 @@ type Scenario struct {
 	// RemovedFiles is the list of paths from BaseFiles to delete during
 	// the overlay step. Models rename / removal scenarios — without it,
 	// Files only adds or overwrites and the baseline file persists.
-	RemovedFiles []string          `yaml:"removed_files,omitempty" json:"removed_files,omitempty"`
-	Expected     Expected          `yaml:"expected" json:"expected"`
+	RemovedFiles []string `yaml:"removed_files,omitempty" json:"removed_files,omitempty"`
+	Expected     Expected `yaml:"expected" json:"expected"`
 }
 
 // Result is one scenario outcome.

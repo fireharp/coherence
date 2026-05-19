@@ -95,8 +95,8 @@ union Pet = Dog | Cat
 
 func TestExtractSchemaDedupsAcrossSources(t *testing.T) {
 	dir := gitInit(t, map[string]string{
-		"api/profile.proto":   "message Profile {}\n",
-		"api/schema.graphql":  "type Profile { id: ID! }\n",
+		"api/profile.proto":  "message Profile {}\n",
+		"api/schema.graphql": "type Profile { id: ID! }\n",
 	})
 	g, err := Build(dir)
 	if err != nil {
@@ -124,9 +124,9 @@ func TestExtractSchemaDedupsAcrossSources(t *testing.T) {
 
 func TestExtractSchemaSkipsNonSchemaFiles(t *testing.T) {
 	dir := gitInit(t, map[string]string{
-		"README.md":         "# Look type Foo here\n",
-		"config/db.yaml":    "host: localhost\n",
-		"src/auth.go":       "package src\ntype Foo struct{}\n",
+		"README.md":      "# Look type Foo here\n",
+		"config/db.yaml": "host: localhost\n",
+		"src/auth.go":    "package src\ntype Foo struct{}\n",
 	})
 	g, err := Build(dir)
 	if err != nil {

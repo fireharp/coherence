@@ -19,18 +19,18 @@ import (
 )
 
 const (
-	DefaultModel    = "llama-3.3-70b-versatile"
-	endpoint        = "https://api.groq.com/openai/v1/chat/completions"
-	maxCallsPerRun  = 3
-	maxCitedBytes   = 4096
-	maxHunkBytes    = 2048
+	DefaultModel   = "llama-3.3-70b-versatile"
+	endpoint       = "https://api.groq.com/openai/v1/chat/completions"
+	maxCallsPerRun = 3
+	maxCitedBytes  = 4096
+	maxHunkBytes   = 2048
 )
 
 var (
-	linkRe         = regexp.MustCompile(`\[[^\]]*\]\(([^)\s#]+)(?:#[^)]*)?\)`)
-	schemeRe       = regexp.MustCompile(`^[a-zA-Z][a-zA-Z0-9+.\-]*:`)
-	candidateRe    = regexp.MustCompile(`^docs/(user-stories|specs)/.+\.md$`)
-	contradictionRe = regexp.MustCompile(`(?i)^CONTRADICTION:`)
+	linkRe           = regexp.MustCompile(`\[[^\]]*\]\(([^)\s#]+)(?:#[^)]*)?\)`)
+	schemeRe         = regexp.MustCompile(`^[a-zA-Z][a-zA-Z0-9+.\-]*:`)
+	candidateRe      = regexp.MustCompile(`^docs/(user-stories|specs)/.+\.md$`)
+	contradictionRe  = regexp.MustCompile(`(?i)^CONTRADICTION:`)
 	repoPathPrefixes = []string{"agents/", "design/", "docs/", "frontend/", "rill/", "rill-clickhouse/", "tools/"}
 )
 

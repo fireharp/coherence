@@ -65,8 +65,8 @@ func (p *Poller) Tick() (PollResult, error) {
 
 // Options configures Run.
 type Options struct {
-	Interval     time.Duration
-	EmitInitial  bool // emit one tick at startup before the first interval
+	Interval    time.Duration
+	EmitInitial bool // emit one tick at startup before the first interval
 }
 
 // DefaultInterval is the default polling cadence when Options.Interval is

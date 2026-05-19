@@ -17,10 +17,10 @@ import (
 
 // Scenario is one bench entry.
 type Scenario struct {
-	ID            string   `yaml:"id" json:"id"`
-	Description   string   `yaml:"description" json:"description"`
-	ChangedFiles  []string `yaml:"changed_files" json:"changed_files"`
-	ExpectFires   []string `yaml:"expect_fires" json:"expect_fires"`
+	ID           string   `yaml:"id" json:"id"`
+	Description  string   `yaml:"description" json:"description"`
+	ChangedFiles []string `yaml:"changed_files" json:"changed_files"`
+	ExpectFires  []string `yaml:"expect_fires" json:"expect_fires"`
 }
 
 type scenarioFile struct {

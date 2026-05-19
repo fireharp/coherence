@@ -88,7 +88,7 @@ func TestMetricMentionsSkipsUnknownNames(t *testing.T) {
 func TestMetricMentionsDedupedPerFile(t *testing.T) {
 	dir := gitInit(t, map[string]string{
 		"rill/metrics/success_rate.yaml": "name: success_rate\n",
-		"frontend/app.ts": `const a = "success_rate"; const b = 'success_rate'; const c = ` + "`success_rate`",
+		"frontend/app.ts":                `const a = "success_rate"; const b = 'success_rate'; const c = ` + "`success_rate`",
 	})
 	g, err := Build(dir)
 	if err != nil {

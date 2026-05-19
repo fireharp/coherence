@@ -13,12 +13,12 @@ import (
 // computeOrphanedMetricAliases detects the "metric renamed in frontend
 // only" pattern. Algorithm:
 //
-//   1. Build set of metric names from base + current graphs (using
-//      `Label` since slug normalization can drop case info).
-//   2. Compute `orphaned` = base_names \ current_names.
-//   3. Substring-scan frontend files (`.ts`/`.tsx`/`.js`/`.jsx`/
-//      `.mjs`/`.cjs`/`.json`) for each orphan name.
-//   4. Each match becomes an OrphanedMetricAlias entry.
+//  1. Build set of metric names from base + current graphs (using
+//     `Label` since slug normalization can drop case info).
+//  2. Compute `orphaned` = base_names \ current_names.
+//  3. Substring-scan frontend files (`.ts`/`.tsx`/`.js`/`.jsx`/
+//     `.mjs`/`.cjs`/`.json`) for each orphan name.
+//  4. Each match becomes an OrphanedMetricAlias entry.
 //
 // Silent without a baseline (no prior metric set to diff against). The
 // substring match is intentionally loose — frontend code that referenced

@@ -16,12 +16,12 @@ func TestPayloadJSONShape(t *testing.T) {
 	dir := t.TempDir()
 	skipped := "off"
 	p := Payload{
-		Subcommand: "scan",
-		Flags:      map[string]any{"staged": true},
-		Files:      []string{},
-		RuleCount:  7,
-		LLM:        LLM{Skipped: &skipped, Calls: 0, Model: nil},
-		Findings:   []rules.Finding{},
+		Subcommand:  "scan",
+		Flags:       map[string]any{"staged": true},
+		Files:       []string{},
+		RuleCount:   7,
+		LLM:         LLM{Skipped: &skipped, Calls: 0, Model: nil},
+		Findings:    []rules.Finding{},
 		GeneratedAt: "2026-05-18T00:00:00.000Z",
 	}
 	if err := Write(dir, p); err != nil {
