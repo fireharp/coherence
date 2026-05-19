@@ -1156,6 +1156,85 @@ func TestMirrorsInvalidatesSelfReferenceFiltered(t *testing.T) {
 	}
 }
 
+func TestImplementsScalarFrontmatter(t *testing.T) {
+	dir := gitInit(t, map[string]string{
+		"docs/decisions/ADR-040.md": "---\nid: ADR-040\nimplements: US-007\n---\n# ADR-040\n",
+	})
+	g, err := Build(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !hasEdge(g, IDNodeID("ADR", "ADR-040"),
+		IDNodeID("US", "US-007"), EdgeImplements) {
+		t.Error("missing implements edge ADR-040 → US-007")
+	}
+}
+
+func TestImplementsListForm(t *testing.T) {
+	dir := gitInit(t, map[string]string{
+		"docs/decisions/ADR-041.md": "---\nid: ADR-041\nimplements: [US-001, US-002, IDR-010]\n---\n# ADR-041\n",
+	})
+	g, err := Build(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, pair := range []struct{ label, id string }{
+		{"US", "US-001"},
+		{"US", "US-002"},
+		{"IDR", "IDR-010"},
+	} {
+		if !hasEdge(g, IDNodeID("ADR", "ADR-041"),
+			IDNodeID(pair.label, pair.id), EdgeImplements) {
+			t.Errorf("missing implements edge ADR-041 → %s", pair.id)
+		}
+	}
+}
+
+func TestImplementsCoexistsWithOtherRelations(t *testing.T) {
+	dir := gitInit(t, map[string]string{
+		"docs/decisions/ADR-042.md": `---
+id: ADR-042
+supersedes: ADR-001
+implements: US-005
+contradicts: ADR-002
+---
+# ADR-042
+`,
+	})
+	g, err := Build(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, c := range []struct {
+		to   string
+		kind EdgeKind
+		name string
+	}{
+		{IDNodeID("ADR", "ADR-001"), EdgeSupersedes, "supersedes"},
+		{IDNodeID("US", "US-005"), EdgeImplements, "implements"},
+		{IDNodeID("ADR", "ADR-002"), EdgeContradicts, "contradicts"},
+	} {
+		if !hasEdge(g, IDNodeID("ADR", "ADR-042"), c.to, c.kind) {
+			t.Errorf("missing %s edge ADR-042 → %s", c.name, c.to)
+		}
+	}
+}
+
+func TestImplementsSelfReferenceFiltered(t *testing.T) {
+	dir := gitInit(t, map[string]string{
+		"docs/decisions/ADR-043.md": "---\nid: ADR-043\nimplements: ADR-043\n---\n# ADR-043\n",
+	})
+	g, err := Build(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, e := range g.Edges {
+		if e.Kind == EdgeImplements && e.From == e.To {
+			t.Errorf("unexpected self implements edge: %+v", e)
+		}
+	}
+}
+
 func TestLoadWriteRoundTrip(t *testing.T) {
 	dir := t.TempDir()
 	g := Graph{

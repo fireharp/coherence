@@ -41,12 +41,19 @@ type EdgeBreakage struct {
 
 // TraceCoverage measures how many of the user_story nodes currently have at
 // least one incoming `mentions` edge from another doc (i.e. the story is
-// referenced somewhere besides its own definition).
+// referenced somewhere besides its own definition). When a base graph
+// is supplied, also reports story transitions: NewlyUncoveredStories
+// went from covered to uncovered since baseline (a commit removed the
+// only mention) — the actionable "you broke this story's trace"
+// signal. NewlyCoveredStories went the other direction.
 type TraceCoverage struct {
-	StoryCoverage    float64  `json:"story_coverage"`
-	StoriesTotal     int      `json:"stories_total"`
-	StoriesCovered   int      `json:"stories_covered"`
-	UncoveredStories []string `json:"uncovered_stories"`
+	StoryCoverage         float64  `json:"story_coverage"`
+	StoriesTotal          int      `json:"stories_total"`
+	StoriesCovered        int      `json:"stories_covered"`
+	UncoveredStories      []string `json:"uncovered_stories"`
+	BaseAvailable         bool     `json:"base_available"`
+	NewlyUncoveredStories []string `json:"newly_uncovered_stories"`
+	NewlyCoveredStories   []string `json:"newly_covered_stories"`
 }
 
 // NeighborhoodDrift is the weighted-delta score between the on-disk base
@@ -402,7 +409,7 @@ func ComputeWith(rootDir, ontologyPath string, opts ComputeOptions) (Report, err
 	}
 
 	// Meter 2: trace coverage.
-	report.TraceCoverage = computeTraceCoverage(currentGraph)
+	report.TraceCoverage = computeTraceCoverage(baseGraph, currentGraph)
 
 	// Meter 3: neighborhood drift.
 	report.NeighborhoodDrift = computeNeighborhoodDrift(baseGraph, currentGraph)
@@ -493,56 +500,107 @@ func computeEdgeBreakage(rootDir, ontologyPath string) (EdgeBreakage, error) {
 	}, nil
 }
 
-func computeTraceCoverage(g graph.Graph) TraceCoverage {
+func computeTraceCoverage(base *graph.Graph, current graph.Graph) TraceCoverage {
 	stories := []graph.Node{}
-	for _, n := range g.Nodes {
+	for _, n := range current.Nodes {
 		if n.Kind == graph.NodeUserStory {
 			stories = append(stories, n)
 		}
 	}
 	if len(stories) == 0 {
-		return TraceCoverage{StoriesTotal: 0, StoriesCovered: 0, StoryCoverage: 1.0, UncoveredStories: []string{}}
-	}
-
-	// Build story -> defining-doc index from defines edges.
-	storyDefiners := map[string][]string{}
-	for _, e := range g.Edges {
-		if e.Kind == graph.EdgeDefines {
-			storyDefiners[e.To] = append(storyDefiners[e.To], e.From)
-		}
-	}
-	// Build set of doc node ids that have at least one incoming mention.
-	docHasIncomingMention := map[string]bool{}
-	for _, e := range g.Edges {
-		if e.Kind == graph.EdgeMentions {
-			docHasIncomingMention[e.To] = true
+		return TraceCoverage{
+			StoriesTotal:          0,
+			StoriesCovered:        0,
+			StoryCoverage:         1.0,
+			UncoveredStories:      []string{},
+			BaseAvailable:         base != nil,
+			NewlyUncoveredStories: []string{},
+			NewlyCoveredStories:   []string{},
 		}
 	}
 
+	currentCovered, currentCoveredSet := traceCoverageState(current)
 	uncovered := []string{}
 	covered := 0
 	for _, s := range stories {
-		definers := storyDefiners[s.ID]
-		isCovered := false
-		for _, d := range definers {
-			if docHasIncomingMention[d] {
-				isCovered = true
-				break
-			}
-		}
-		if isCovered {
+		if currentCoveredSet[s.ID] {
 			covered++
 		} else {
 			uncovered = append(uncovered, s.ID)
 		}
 	}
 	sort.Strings(uncovered)
-	return TraceCoverage{
-		StoryCoverage:    float64(covered) / float64(len(stories)),
-		StoriesTotal:     len(stories),
-		StoriesCovered:   covered,
-		UncoveredStories: uncovered,
+	_ = currentCovered
+
+	newlyUncovered := []string{}
+	newlyCovered := []string{}
+	if base != nil {
+		baseHasStory := map[string]bool{}
+		for _, n := range base.Nodes {
+			if n.Kind == graph.NodeUserStory {
+				baseHasStory[n.ID] = true
+			}
+		}
+		_, baseCoveredSet := traceCoverageState(*base)
+		for _, s := range stories {
+			if !baseHasStory[s.ID] {
+				continue
+			}
+			wasCovered := baseCoveredSet[s.ID]
+			nowCovered := currentCoveredSet[s.ID]
+			switch {
+			case wasCovered && !nowCovered:
+				newlyUncovered = append(newlyUncovered, s.ID)
+			case !wasCovered && nowCovered:
+				newlyCovered = append(newlyCovered, s.ID)
+			}
+		}
+		sort.Strings(newlyUncovered)
+		sort.Strings(newlyCovered)
 	}
+
+	return TraceCoverage{
+		StoryCoverage:         float64(covered) / float64(len(stories)),
+		StoriesTotal:          len(stories),
+		StoriesCovered:        covered,
+		UncoveredStories:      uncovered,
+		BaseAvailable:         base != nil,
+		NewlyUncoveredStories: newlyUncovered,
+		NewlyCoveredStories:   newlyCovered,
+	}
+}
+
+// traceCoverageState computes the per-story coverage status in a single
+// graph: returns the count of covered stories and a set of covered story
+// ids. Shared by current-state evaluation and base-vs-current diffing.
+func traceCoverageState(g graph.Graph) (int, map[string]bool) {
+	storyDefiners := map[string][]string{}
+	for _, e := range g.Edges {
+		if e.Kind == graph.EdgeDefines {
+			storyDefiners[e.To] = append(storyDefiners[e.To], e.From)
+		}
+	}
+	docHasIncomingMention := map[string]bool{}
+	for _, e := range g.Edges {
+		if e.Kind == graph.EdgeMentions {
+			docHasIncomingMention[e.To] = true
+		}
+	}
+	covered := 0
+	coveredSet := map[string]bool{}
+	for _, n := range g.Nodes {
+		if n.Kind != graph.NodeUserStory {
+			continue
+		}
+		for _, d := range storyDefiners[n.ID] {
+			if docHasIncomingMention[d] {
+				coveredSet[n.ID] = true
+				covered++
+				break
+			}
+		}
+	}
+	return covered, coveredSet
 }
 
 // edgeWeights mirrors GOAL.md's "Drift meters #3 neighborhood drift" table.
@@ -1554,6 +1612,10 @@ func renderActions(r Report) []string {
 	}
 	if r.TraceCoverage.StoriesTotal > 0 && len(r.TraceCoverage.UncoveredStories) > 0 {
 		out = append(out, "link the uncovered stories from a spec or evidence packet")
+	}
+	if len(r.TraceCoverage.NewlyUncoveredStories) > 0 {
+		out = append(out, "restore trace coverage for stories that lost mentions since baseline: "+
+			joinShort(r.TraceCoverage.NewlyUncoveredStories, 3))
 	}
 	if r.NeighborhoodDrift.BaseAvailable && r.NeighborhoodDrift.Score >= telemetryFloor {
 		out = append(out, "run `coherence diff` to inspect concept-level changes")

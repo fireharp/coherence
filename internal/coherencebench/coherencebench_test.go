@@ -14,7 +14,7 @@ func TestIDsShipsAllExpectedScenarios(t *testing.T) {
 		"CB-001", "CB-002", "CB-003", "CB-004", "CB-005",
 		"CB-006", "CB-007", "CB-008", "CB-009", "CB-010",
 		"CB-011", "CB-012", "CB-013", "CB-014", "CB-015",
-		"CB-016", "CB-017",
+		"CB-016", "CB-017", "CB-018",
 	}
 	gotSet := map[string]bool{}
 	for _, n := range got {
@@ -38,11 +38,11 @@ func TestRunAllPassesDeterministicAndSkipsRest(t *testing.T) {
 		}
 		t.Fatal("suite did not pass")
 	}
-	if suite.Counts.Total != 17 {
-		t.Errorf("total = %d, want 17", suite.Counts.Total)
+	if suite.Counts.Total != 18 {
+		t.Errorf("total = %d, want 18", suite.Counts.Total)
 	}
-	if suite.Counts.Pass < 9 {
-		t.Errorf("expected >=9 deterministic passes, got %d", suite.Counts.Pass)
+	if suite.Counts.Pass < 10 {
+		t.Errorf("expected >=10 deterministic passes, got %d", suite.Counts.Pass)
 	}
 	if suite.Counts.Skipped < 1 {
 		t.Errorf("expected >=1 skipped (LLM-only deferred), got %d", suite.Counts.Skipped)
@@ -213,6 +213,26 @@ func TestCB017IsDeterministicAndPasses(t *testing.T) {
 	}
 }
 
+func TestCB018IsDeterministicAndPasses(t *testing.T) {
+	// CB-018 validates iteration 67's claim_support side of the
+	// verdict-promotion logic: a single claim losing backing since
+	// baseline flips verdict to telemetry even when the overall
+	// claim_support score is below floor.
+	r := Run("CB-018")
+	if r.Skipped {
+		t.Fatal("CB-018 should be deterministic, not skipped")
+	}
+	if r.Error != "" {
+		t.Fatalf("CB-018 errored: %s", r.Error)
+	}
+	if !r.Pass {
+		t.Errorf("CB-018 should pass, got missing=%v extra=%v", r.Missing, r.Extra)
+	}
+	if r.Scenario.Expected.Drift == nil || r.Scenario.Expected.Drift.Verdict != "telemetry" {
+		t.Errorf("CB-018 should assert drift verdict=telemetry, got %+v", r.Scenario.Expected.Drift)
+	}
+}
+
 func TestExistingScenariosUnaffectedByFilesMode(t *testing.T) {
 	// Path-list scenarios (CB-001..CB-010 etc.) shouldn't regress —
 	// they don't set Files and continue to use rules.Evaluate.
@@ -241,7 +261,7 @@ func TestWriteMarkdownProducesIndexFile(t *testing.T) {
 		TemplatePass:      38,
 		TemplateFail:      0,
 		CoherenceBenchSuite: Suite{
-			Pass: true,
+			Pass:   true,
 			Counts: Counts{Total: 15, Pass: 7, Skipped: 8},
 			Results: []Result{
 				{Scenario: Scenario{ID: "CB-001", Name: "test", Status: "deterministic"}, Pass: true},

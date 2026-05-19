@@ -1,0 +1,85 @@
+id: CB-018
+name: single claim regression promotes verdict via claim_support diff
+description: |
+  Symmetric counterpart to CB-017 for the claim_support diff path.
+  Baseline has three docs (no H1, so no concept nodes — isolating the
+  claim_support meter from path_loss) each carrying one assertive
+  bullet (`must A`, `must B`, `must C`) plus a markdown link to a
+  decision doc whose `docs/evidence/<ADR>/` bucket auto-emits a
+  `supports` edge. All three claims reach an evidence artifact via the
+  typed-edge BFS.
+
+  Current removes the single evidence file backing claim `must C`,
+  dropping its only support path. Score = 1/3 ≈ 0.333, below
+  claimSupportFloor (0.5). The diff list `NewlyUnsupportedClaims`
+  contains exactly the claim that lost backing, and iteration 67's
+  promotion path flips verdict from `clean` to `telemetry`.
+status: deterministic
+base_files:
+  docs/spec-a.md: |
+    ---
+    title: Spec A
+    ---
+
+    - must do A correctly
+
+    See [the auth decision](../docs/decisions/ADR-001.md).
+  docs/spec-b.md: |
+    ---
+    title: Spec B
+    ---
+
+    - must do B correctly
+
+    See [the audit decision](../docs/decisions/ADR-002.md).
+  docs/spec-c.md: |
+    ---
+    title: Spec C
+    ---
+
+    - must do C correctly
+
+    See [the retry decision](../docs/decisions/ADR-003.md).
+  docs/decisions/ADR-001.md: |
+    ---
+    id: ADR-001
+    title: Auth
+    ---
+  docs/decisions/ADR-002.md: |
+    ---
+    id: ADR-002
+    title: Audit
+    ---
+  docs/decisions/ADR-003.md: |
+    ---
+    id: ADR-003
+    title: Retry
+    ---
+  docs/evidence/ADR-001/note.md: |
+    ---
+    title: Evidence for ADR-001
+    ---
+  docs/evidence/ADR-002/note.md: |
+    ---
+    title: Evidence for ADR-002
+    ---
+  docs/evidence/ADR-003/note.md: |
+    ---
+    title: Evidence for ADR-003
+    ---
+files:
+  docs/spec-c.md: |
+    ---
+    title: Spec C
+    ---
+
+    - must do C correctly
+
+    See [the retry decision](../docs/decisions/ADR-003.md).
+removed_files:
+  - docs/evidence/ADR-003/note.md
+expected:
+  fires: []
+  blocking_error: false
+  drift:
+    verdict: telemetry

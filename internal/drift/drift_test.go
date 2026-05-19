@@ -36,7 +36,7 @@ func TestComputeTraceCoverageStoryWithMentionCovered(t *testing.T) {
 			{From: "doc:docs/specs/auth.md", To: "doc:docs/user-stories/US-001.md", Kind: graph.EdgeMentions},
 		},
 	}
-	tc := computeTraceCoverage(g)
+	tc := computeTraceCoverage(nil, g)
 	if tc.StoriesTotal != 1 || tc.StoriesCovered != 1 {
 		t.Errorf("expected 1/1 covered, got %d/%d uncovered=%v", tc.StoriesCovered, tc.StoriesTotal, tc.UncoveredStories)
 	}
@@ -60,7 +60,7 @@ func TestComputeTraceCoverageUncoveredStoryListed(t *testing.T) {
 			{From: "doc:docs/specs/auth.md", To: "doc:docs/user-stories/US-001.md", Kind: graph.EdgeMentions},
 		},
 	}
-	tc := computeTraceCoverage(g)
+	tc := computeTraceCoverage(nil, g)
 	if tc.StoriesCovered != 1 || tc.StoriesTotal != 2 {
 		t.Errorf("expected 1/2 covered")
 	}
@@ -70,12 +70,110 @@ func TestComputeTraceCoverageUncoveredStoryListed(t *testing.T) {
 }
 
 func TestComputeTraceCoverageNoStoriesIsClean(t *testing.T) {
-	tc := computeTraceCoverage(graph.Graph{})
+	tc := computeTraceCoverage(nil, graph.Graph{})
 	if tc.StoryCoverage != 1.0 || tc.StoriesTotal != 0 {
 		t.Errorf("empty graph should be perfectly covered: %+v", tc)
 	}
 	if tc.UncoveredStories == nil {
 		t.Error("UncoveredStories should be []string{}, not nil")
+	}
+	if tc.NewlyUncoveredStories == nil || tc.NewlyCoveredStories == nil {
+		t.Error("diff lists should be []string{} not nil")
+	}
+}
+
+func TestTraceCoverageDetectsNewlyUncoveredStory(t *testing.T) {
+	base := graph.Graph{
+		Nodes: []graph.Node{
+			{ID: "us:US-001", Kind: graph.NodeUserStory},
+			{ID: "doc:docs/user-stories/US-001.md", Kind: graph.NodeDoc},
+			{ID: "doc:docs/specs/auth.md", Kind: graph.NodeDoc},
+		},
+		Edges: []graph.Edge{
+			{From: "doc:docs/user-stories/US-001.md", To: "us:US-001", Kind: graph.EdgeDefines},
+			{From: "doc:docs/specs/auth.md", To: "doc:docs/user-stories/US-001.md", Kind: graph.EdgeMentions},
+		},
+	}
+	current := graph.Graph{
+		Nodes: []graph.Node{
+			{ID: "us:US-001", Kind: graph.NodeUserStory},
+			{ID: "doc:docs/user-stories/US-001.md", Kind: graph.NodeDoc},
+		},
+		Edges: []graph.Edge{
+			{From: "doc:docs/user-stories/US-001.md", To: "us:US-001", Kind: graph.EdgeDefines},
+			// mentions edge removed.
+		},
+	}
+	tc := computeTraceCoverage(&base, current)
+	if !tc.BaseAvailable {
+		t.Fatal("BaseAvailable should be true")
+	}
+	if len(tc.NewlyUncoveredStories) != 1 || tc.NewlyUncoveredStories[0] != "us:US-001" {
+		t.Errorf("NewlyUncoveredStories = %v, want [us:US-001]", tc.NewlyUncoveredStories)
+	}
+	if len(tc.NewlyCoveredStories) != 0 {
+		t.Errorf("NewlyCoveredStories should be empty, got %v", tc.NewlyCoveredStories)
+	}
+}
+
+func TestTraceCoverageDetectsNewlyCoveredStory(t *testing.T) {
+	base := graph.Graph{
+		Nodes: []graph.Node{
+			{ID: "us:US-001", Kind: graph.NodeUserStory},
+			{ID: "doc:docs/user-stories/US-001.md", Kind: graph.NodeDoc},
+		},
+		Edges: []graph.Edge{
+			{From: "doc:docs/user-stories/US-001.md", To: "us:US-001", Kind: graph.EdgeDefines},
+		},
+	}
+	current := graph.Graph{
+		Nodes: []graph.Node{
+			{ID: "us:US-001", Kind: graph.NodeUserStory},
+			{ID: "doc:docs/user-stories/US-001.md", Kind: graph.NodeDoc},
+			{ID: "doc:docs/specs/auth.md", Kind: graph.NodeDoc},
+		},
+		Edges: []graph.Edge{
+			{From: "doc:docs/user-stories/US-001.md", To: "us:US-001", Kind: graph.EdgeDefines},
+			{From: "doc:docs/specs/auth.md", To: "doc:docs/user-stories/US-001.md", Kind: graph.EdgeMentions},
+		},
+	}
+	tc := computeTraceCoverage(&base, current)
+	if len(tc.NewlyCoveredStories) != 1 || tc.NewlyCoveredStories[0] != "us:US-001" {
+		t.Errorf("NewlyCoveredStories = %v, want [us:US-001]", tc.NewlyCoveredStories)
+	}
+	if len(tc.NewlyUncoveredStories) != 0 {
+		t.Errorf("NewlyUncoveredStories should be empty, got %v", tc.NewlyUncoveredStories)
+	}
+}
+
+func TestTraceCoverageNewStoryNotCountedAsTransition(t *testing.T) {
+	base := graph.Graph{}
+	current := graph.Graph{
+		Nodes: []graph.Node{
+			{ID: "us:US-FRESH", Kind: graph.NodeUserStory},
+			{ID: "doc:docs/user-stories/fresh.md", Kind: graph.NodeDoc},
+		},
+		Edges: []graph.Edge{
+			{From: "doc:docs/user-stories/fresh.md", To: "us:US-FRESH", Kind: graph.EdgeDefines},
+		},
+	}
+	tc := computeTraceCoverage(&base, current)
+	if len(tc.NewlyUncoveredStories) != 0 || len(tc.NewlyCoveredStories) != 0 {
+		t.Errorf("brand-new story should not be transition-counted: uncovered=%v covered=%v",
+			tc.NewlyUncoveredStories, tc.NewlyCoveredStories)
+	}
+}
+
+func TestTraceCoverageDiffEmptyWhenNoBase(t *testing.T) {
+	g := graph.Graph{
+		Nodes: []graph.Node{{ID: "us:US-001", Kind: graph.NodeUserStory}},
+	}
+	tc := computeTraceCoverage(nil, g)
+	if tc.BaseAvailable {
+		t.Error("BaseAvailable should be false")
+	}
+	if len(tc.NewlyUncoveredStories) != 0 || len(tc.NewlyCoveredStories) != 0 {
+		t.Error("diff lists empty when no base supplied")
 	}
 }
 
