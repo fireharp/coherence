@@ -8,6 +8,7 @@ import (
 	"regexp"
 	"sort"
 	"strings"
+	"time"
 
 	"coherence/internal/git"
 	"coherence/internal/graph"
@@ -38,6 +39,126 @@ func Write(rootDir string, ont *ontology.Ontology) (string, error) {
 	return dst, nil
 }
 
+// Payload is the agent-readable shape of the current state. Mirrors the
+// STATUS.md sections without prose noise: drift verdict + diff
+// regressions, graph counts, and live-eval summaries. Returned by
+// Compute() and emitted by `coherence status --json`.
+type Payload struct {
+	GeneratedAt    string        `json:"generated_at"`
+	GraphAvailable bool          `json:"graph_available"`
+	GraphCounts    graph.Counts  `json:"graph_counts"`
+	Drift          *DriftSummary `json:"drift,omitempty"`
+	Live           LiveSummary   `json:"live"`
+	Snapshots      []Snapshot    `json:"scenario_snapshots"`
+	OntologyRules  int           `json:"ontology_rules"`
+}
+
+// DriftSummary captures just the verdict + diff-aware regressions from
+// the last report — the actionable subset for agents that don't want
+// the full drift report inline.
+type DriftSummary struct {
+	Verdict                string   `json:"verdict"`
+	GeneratedAt            string   `json:"generated_at"`
+	NewlyOrphanedConcepts  []string `json:"newly_orphaned_concepts"`
+	NewlyUnsupportedClaims []string `json:"newly_unsupported_claims"`
+	NewlyUncoveredStories  []string `json:"newly_uncovered_stories"`
+}
+
+// LiveSummary is the per-range eval slice used by the markdown render.
+type LiveSummary struct {
+	Last     LiveSection `json:"last_commit"`
+	Worktree LiveSection `json:"worktree"`
+}
+
+// LiveSection is one live-eval range's findings.
+type LiveSection struct {
+	Range      string   `json:"range"`
+	Files      []string `json:"files"`
+	ErrorCount int      `json:"error_count"`
+	WarnCount  int      `json:"warn_count"`
+	TotalCount int      `json:"total_findings"`
+}
+
+// Snapshot is one entry of the scenario run history.
+type Snapshot struct {
+	Date          string `json:"date"`
+	Verdict       string `json:"verdict"`
+	ScenarioCount int    `json:"scenario_count"`
+}
+
+// Compute returns the structured Payload without touching disk.
+func Compute(rootDir string, ont *ontology.Ontology) Payload {
+	last := report.Load(rootDir)
+	snapshots := listSnapshots(rootDir)
+	live := computeLive(ont, rootDir)
+	g, gErr := graph.Load(rootDir)
+
+	p := Payload{
+		GeneratedAt:    nowUTC(),
+		GraphAvailable: gErr == nil,
+		Live: LiveSummary{
+			Last:     toLiveSection(live.Last),
+			Worktree: toLiveSection(live.Worktree),
+		},
+		Snapshots: toSnapshots(snapshots),
+	}
+	if ont != nil {
+		p.OntologyRules = len(ont.Rules)
+	}
+	if gErr == nil {
+		p.GraphCounts = g.Counts
+	}
+	if last != nil && last.Drift != nil {
+		d := last.Drift
+		p.Drift = &DriftSummary{
+			Verdict:                d.Verdict,
+			GeneratedAt:            d.GeneratedAt,
+			NewlyOrphanedConcepts:  cloneStrings(d.PathLoss.NewlyOrphanedConcepts),
+			NewlyUnsupportedClaims: cloneStrings(d.ClaimSupport.NewlyUnsupportedClaims),
+			NewlyUncoveredStories:  cloneStrings(d.TraceCoverage.NewlyUncoveredStories),
+		}
+	}
+	return p
+}
+
+func toLiveSection(s liveSection) LiveSection {
+	c := summarize(s.Findings)
+	return LiveSection{
+		Range:      s.Range,
+		Files:      append([]string{}, s.Files...),
+		ErrorCount: c.err,
+		WarnCount:  c.warn,
+		TotalCount: c.total,
+	}
+}
+
+func toSnapshots(in []snapshot) []Snapshot {
+	out := make([]Snapshot, 0, len(in))
+	for _, s := range in {
+		out = append(out, Snapshot{Date: s.Date, Verdict: s.Verdict, ScenarioCount: s.ScenarioCount})
+	}
+	return out
+}
+
+func cloneStrings(s []string) []string {
+	if len(s) == 0 {
+		return []string{}
+	}
+	out := make([]string, len(s))
+	copy(out, s)
+	return out
+}
+
+func nowUTC() string {
+	return graphNow().UTC().Format("2006-01-02T15:04:05Z07:00")
+}
+
+// graphNow is a tiny indirection for tests. Implementations using a
+// real time source live in the time package; we expose this so a test
+// fixture can override if needed (currently unused but kept for
+// symmetry with other meters' clock-injection patterns).
+var graphNow = time.Now
+
 type snapshot struct {
 	Date          string
 	Verdict       string
@@ -45,9 +166,9 @@ type snapshot struct {
 }
 
 var (
-	dateDirRe   = regexp.MustCompile(`^\d{4}-\d{2}-\d{2}$`)
-	verdictRe   = regexp.MustCompile(`(?im)^- \*\*Suite verdict:\*\*\s*` + "`?" + `([a-z]+)` + "`?")
-	tableRowRe  = regexp.MustCompile(`(?m)^\|\s*[A-Za-z0-9]`)
+	dateDirRe  = regexp.MustCompile(`^\d{4}-\d{2}-\d{2}$`)
+	verdictRe  = regexp.MustCompile(`(?im)^- \*\*Suite verdict:\*\*\s*` + "`?" + `([a-z]+)` + "`?")
+	tableRowRe = regexp.MustCompile(`(?m)^\|\s*[A-Za-z0-9]`)
 )
 
 func listSnapshots(rootDir string) []snapshot {
@@ -172,6 +293,29 @@ func render(ont *ontology.Ontology, last *report.Payload, snapshots []snapshot, 
 		push(fmt.Sprintf("- Findings: **%d error**, **%d warn**, %d total", s.err, s.warn, s.total))
 		push("")
 		push(findingsTable(live.Worktree.Findings)...)
+	}
+	push("")
+
+	push("## Drift Snapshot", "")
+	push("_From the last stored report. Run `coherence drift` or `coherence review` to refresh._", "")
+	if last == nil || last.Drift == nil {
+		push("_No drift report on disk yet._")
+	} else {
+		d := last.Drift
+		push(fmt.Sprintf("- Verdict: **%s**", d.Verdict))
+		push(fmt.Sprintf("- Generated: %s", d.GeneratedAt))
+		if d.PathLoss.BaseAvailable && len(d.PathLoss.NewlyOrphanedConcepts) > 0 {
+			push(fmt.Sprintf("- Newly orphaned concept(s) since baseline: %s",
+				strings.Join(d.PathLoss.NewlyOrphanedConcepts, ", ")))
+		}
+		if d.ClaimSupport.BaseAvailable && len(d.ClaimSupport.NewlyUnsupportedClaims) > 0 {
+			push(fmt.Sprintf("- Newly unsupported claim(s) since baseline: %s",
+				strings.Join(d.ClaimSupport.NewlyUnsupportedClaims, ", ")))
+		}
+		if d.TraceCoverage.BaseAvailable && len(d.TraceCoverage.NewlyUncoveredStories) > 0 {
+			push(fmt.Sprintf("- Newly uncovered stor(ies) since baseline: %s",
+				strings.Join(d.TraceCoverage.NewlyUncoveredStories, ", ")))
+		}
 	}
 	push("")
 

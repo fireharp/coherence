@@ -41,10 +41,10 @@ const usage = `coherence <subcommand> [flags]
                                           evaluate staged files (pre-commit gate)
   check [--ref=HEAD~1] [--include-untracked] [--json] [--ontology=path]
                                           evaluate a diff range
-  review [--base=HEAD] [--worktree|--staged] [--json] [--ontology=path]
-                                          combined agent/local review
-  watch [--once] [--interval=1s] [--json] [--ontology=path]
-                                          live worktree signal loop
+  review [--base=HEAD] [--worktree|--staged] [--json] [--strict] [--ontology=path]
+                                          combined agent/local review (--strict: exit 1 on telemetry drift)
+  watch [--once] [--interval=1s] [--json] [--strict] [--ontology=path]
+                                          live worktree signal loop (--strict applies to --once only)
                                           (--once = single fire; default = streaming)
   doctor [--json] [--ontology=path]       validate ontology, hook, .gitignore
   bench [--suite=templates|coherencebench|external|all] [--template=<name>]
@@ -53,7 +53,7 @@ const usage = `coherence <subcommand> [flags]
   diff [--base=path] [--json]             compare current snapshot to base
   drift [--json] [--strict]               compute drift meters → .coherence/drift.json (--strict: exit 1 on telemetry too)
   report                                  print the last report JSON
-  status [--ontology=path]                rewrite .coherence/STATUS.md
+  status [--json] [--ontology=path]       rewrite .coherence/STATUS.md (or emit JSON payload)
 
   templates                               list available init templates
 env:
@@ -517,6 +517,16 @@ func run() int {
 			fmt.Fprintln(os.Stderr, "coherence: fatal:", err)
 			return 2
 		}
+		if boolFlag(args, "json") {
+			payload := status.Compute(rootDir, ont)
+			enc := json.NewEncoder(os.Stdout)
+			enc.SetIndent("", "  ")
+			if err := enc.Encode(payload); err != nil {
+				fmt.Fprintln(os.Stderr, "coherence: fatal:", err)
+				return 2
+			}
+			return 0
+		}
 		out, err := status.Write(rootDir, ont)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, "coherence: fatal:", err)
@@ -549,10 +559,17 @@ func run() int {
 
 	case "review":
 		fs := collectReviewFiles(args, rootDir)
-		_, exit, err := runEvaluation(sub, fs, args, rootDir, ontPath)
+		payload, exit, err := runEvaluation(sub, fs, args, rootDir, ontPath)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, "coherence: fatal:", err)
 			return 2
+		}
+		// `--strict`: promote telemetry drift verdict to exit 1.
+		// Mirrors `coherence drift --strict` so CI gates can require
+		// zero-drift on the full review flow too.
+		if exit == 0 && boolFlag(args, "strict") && payload.DriftVerdict == drift.VerdictTelemetry {
+			fmt.Fprintln(os.Stderr, "coherence: --strict promoted telemetry → exit 1 (drift movement detected)")
+			exit = 1
 		}
 		return exit
 
@@ -567,10 +584,14 @@ func run() int {
 		}
 		if boolFlag(args, "once") {
 			fs := collectReviewFiles(args, rootDir)
-			_, exit, err := runEvaluation(sub, fs, args, rootDir, ontPath)
+			payload, exit, err := runEvaluation(sub, fs, args, rootDir, ontPath)
 			if err != nil {
 				fmt.Fprintln(os.Stderr, "coherence: fatal:", err)
 				return 2
+			}
+			if exit == 0 && boolFlag(args, "strict") && payload.DriftVerdict == drift.VerdictTelemetry {
+				fmt.Fprintln(os.Stderr, "coherence: --strict promoted telemetry → exit 1 (drift movement detected)")
+				exit = 1
 			}
 			return exit
 		}
@@ -755,6 +776,7 @@ func run() int {
 			return 1
 		}
 		if boolFlag(args, "strict") && rep.Verdict == drift.VerdictTelemetry {
+			fmt.Fprintln(os.Stderr, "coherence: --strict promoted telemetry → exit 1 (drift movement detected)")
 			return 1
 		}
 		return 0

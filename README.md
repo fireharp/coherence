@@ -36,6 +36,7 @@ coherence diff                                       # compare current snapshot 
 coherence drift                                      # compute drift meters → .coherence/drift.json
 coherence drift --strict                             # same, but exit 1 on telemetry too (zero-drift CI gate)
 coherence status                                     # rewrite .coherence/STATUS.md
+coherence status --json                              # same data as STATUS.md but structured for agents
 coherence report                                     # print the last stored report
 coherence help                                       # usage
 ```
@@ -694,10 +695,12 @@ reports whether the graph had any concept nodes — when zero, the score
 degrades to the uniform `stale_files / total_files` share.
 
 Exit code: `1` only on `warn`; `telemetry`/`clean` are 0. Pass
-`--strict` to `coherence drift` to also exit 1 on `telemetry` —
-useful for CI gates that want zero-drift commits, where any
-movement (including diff-aware regressions like `newly_orphaned_concepts`)
-should block the merge.
+`--strict` to `coherence drift`, `coherence review`, or
+`coherence watch --once` to also exit 1 on `telemetry` — useful for CI
+gates that want zero-drift commits, where any movement (including
+diff-aware regressions like `newly_orphaned_concepts`) should block the
+merge. The live `coherence watch` loop ignores `--strict` (it streams
+events; there's no single exit code to promote).
 
 ### `review` now includes drift
 
