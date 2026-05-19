@@ -392,14 +392,19 @@ func runEvaluation(sub string, fs fileSet, args parsedArgs, rootDir, ontPath str
 		}
 	}
 
+	driftRegressionCount := 0
+	if driftReport != nil {
+		driftRegressionCount = driftReport.Regressions.Count
+	}
 	oc := outcome.Compute(outcome.Input{
-		Subcommand:         sub,
-		Findings:           findings,
-		StagedFileCount:    fs.stagedCount,
-		TrackedDirtyCount:  fs.trackedDirtyCount,
-		UntrackedFileCount: fs.untrackedCount,
-		IncludeUntracked:   fs.includeUntracked,
-		DriftVerdict:       driftVerdict,
+		Subcommand:           sub,
+		Findings:             findings,
+		StagedFileCount:      fs.stagedCount,
+		TrackedDirtyCount:    fs.trackedDirtyCount,
+		UntrackedFileCount:   fs.untrackedCount,
+		IncludeUntracked:     fs.includeUntracked,
+		DriftVerdict:         driftVerdict,
+		DriftRegressionCount: driftRegressionCount,
 	})
 
 	suggested := rules.AggregateSuggestedCommands(findings)
