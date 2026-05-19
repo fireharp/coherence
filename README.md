@@ -132,7 +132,12 @@ to load a non-default ontology.
 ## Init and templates
 
 `coherence init [--template=<name>] [--force] [--skill-install=auto|native|off] [--json]`
-scaffolds a fresh repository:
+scaffolds a fresh repository. When `--template` is omitted, the command
+auto-detects from layout tells (`pnpm-workspace.yaml`, `go.mod`,
+`pyproject.toml`, `apps/`+`packages/`, etc.) and falls back to
+`generic` if nothing strong matches. The detected template name prints
+to stderr (or the `template` field in `--json` mode) so users see what
+shape was inferred.
 
 - writes `ontology.yml` (template-specific rules + `commands:` + per-rule
   `suggested_commands`),
@@ -140,6 +145,10 @@ scaffolds a fresh repository:
   falls back to `$HOME/go/bin/coherence`),
 - ensures `.coherence/` is listed in `.gitignore`,
 - creates the local `.coherence/` state directory,
+- builds an initial `.coherence/snapshot.json` + `graph.json` baseline so
+  the first `coherence drift` / `diff` compares against real state
+  rather than empty (rather than leaving the user to remember
+  `coherence index` post-init),
 - installs the Codex project skill at `.agents/skills/coherence/SKILL.md`.
 
 It is idempotent: existing files are skipped without `--force`. After init,
@@ -734,7 +743,10 @@ top-level outcome contract gains three fields:
   regression lists (`newly_orphaned_concepts` + `newly_unsupported_claims` +
   `newly_uncovered_stories` + `newly_orphaned_endpoints`). Omitted when 0.
   Agents can gate on `drift_regression_count > 0` for a single-key
-  regression check.
+  regression check. When non-zero on a telemetry verdict, the outcome
+  also flips `review_recommended` to `true` and sets
+  `recommended_next_command` to `"coherence drift --json"` — pure
+  movement-driven telemetry stays informational.
 - `drift_regressions` — the full typed list of regressions
   (`[{kind, id, suggested_action}, …]`) inline in the outcome contract.
   Omitted when empty. Lets an agent reading just the outcome JSON act

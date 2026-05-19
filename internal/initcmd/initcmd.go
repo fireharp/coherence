@@ -12,6 +12,8 @@ import (
 	"strings"
 	"time"
 
+	"coherence/internal/graph"
+	"coherence/internal/snapshot"
 	"coherence/internal/templates"
 )
 
@@ -93,12 +95,62 @@ func Run(rootDir string, opts Options) (Result, error) {
 		res.Actions = append(res.Actions, a)
 	}
 
+	// Build an initial snapshot + graph baseline so the first
+	// `coherence drift` / `diff` compares against a real state rather
+	// than empty. Best-effort — if the repo isn't a git working tree
+	// yet (rare for init), the baseline stays absent and existing
+	// fallback logic in drift handles it gracefully. Skips when a
+	// baseline already exists unless --force, so re-running init
+	// doesn't clobber a user's hand-curated state.
+	res.Actions = append(res.Actions, buildBaseline(rootDir, opts.Force))
+
 	res.HintNext = []string{
 		"git config core.hooksPath .githooks",
 		"coherence doctor",
 		"coherence scan --staged",
 	}
 	return res, nil
+}
+
+// buildBaseline writes .coherence/snapshot.json + graph.json so the
+// first drift comparison has a real starting point. Errors are
+// captured in the returned Action's Detail rather than propagated —
+// init should not fail on a missing-git or readonly-fs edge case.
+// Skips entirely when both files already exist unless force=true.
+func buildBaseline(rootDir string, force bool) Action {
+	snapPath := snapshot.PathFor(rootDir)
+	graphPath := graph.PathFor(rootDir)
+	if !force {
+		_, sErr := os.Stat(snapPath)
+		_, gErr := os.Stat(graphPath)
+		if sErr == nil && gErr == nil {
+			return Action{
+				Path:   ".coherence/snapshot.json + graph.json",
+				Status: "skipped",
+				Detail: "baseline already on disk (use --force to refresh, or `coherence index`)",
+			}
+		}
+	}
+	snap, err := snapshot.Compute(rootDir)
+	if err != nil {
+		return Action{Path: ".coherence/baseline", Status: "skipped", Detail: "snapshot compute failed: " + err.Error()}
+	}
+	if err := snapshot.Write(rootDir, snap); err != nil {
+		return Action{Path: ".coherence/baseline", Status: "skipped", Detail: "snapshot write failed: " + err.Error()}
+	}
+	g, err := graph.Build(rootDir)
+	if err != nil {
+		return Action{Path: ".coherence/baseline", Status: "skipped", Detail: "graph build failed: " + err.Error()}
+	}
+	if err := graph.Write(rootDir, g); err != nil {
+		return Action{Path: ".coherence/baseline", Status: "skipped", Detail: "graph write failed: " + err.Error()}
+	}
+	return Action{
+		Path:   ".coherence/snapshot.json + graph.json",
+		Status: "created",
+		Detail: fmt.Sprintf("baseline indexed: %d nodes, %d edges, %d files",
+			g.Counts.TotalNodes, g.Counts.TotalEdges, snap.FileCount),
+	}
 }
 
 func installSkill(rootDir string, files []templates.AssetFile, force bool, mode string) (Action, error) {

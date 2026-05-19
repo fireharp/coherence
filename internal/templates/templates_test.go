@@ -1,6 +1,8 @@
 package templates
 
 import (
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -93,5 +95,91 @@ func TestResolveEmptyUsesDefault(t *testing.T) {
 	}
 	if tpl.Name != Default {
 		t.Errorf("expected default %q, got %q", Default, tpl.Name)
+	}
+}
+
+func detectFixture(t *testing.T, files map[string]string, dirs []string) string {
+	t.Helper()
+	dir := t.TempDir()
+	for _, d := range dirs {
+		if err := os.MkdirAll(filepath.Join(dir, d), 0o755); err != nil {
+			t.Fatal(err)
+		}
+	}
+	for rel, body := range files {
+		abs := filepath.Join(dir, rel)
+		if err := os.MkdirAll(filepath.Dir(abs), 0o755); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(abs, []byte(body), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	return dir
+}
+
+func TestDetectMonorepoFromAppsAndPackages(t *testing.T) {
+	dir := detectFixture(t, nil, []string{"apps", "packages"})
+	if got := Detect(dir); got != "monorepo" {
+		t.Errorf("apps + packages should detect monorepo, got %q", got)
+	}
+}
+
+func TestDetectMonorepoFromPnpmWorkspace(t *testing.T) {
+	dir := detectFixture(t, map[string]string{
+		"pnpm-workspace.yaml": "packages:\n  - apps/*\n",
+	}, nil)
+	if got := Detect(dir); got != "monorepo" {
+		t.Errorf("pnpm-workspace.yaml should detect monorepo, got %q", got)
+	}
+}
+
+func TestDetectTypeScriptApp(t *testing.T) {
+	dir := detectFixture(t, map[string]string{
+		"package.json":  `{"name":"x"}`,
+		"tsconfig.json": `{}`,
+	}, nil)
+	if got := Detect(dir); got != "typescript-app" {
+		t.Errorf("package.json+tsconfig.json should detect typescript-app, got %q", got)
+	}
+}
+
+func TestDetectGoCLI(t *testing.T) {
+	dir := detectFixture(t, map[string]string{"go.mod": "module x\n"}, nil)
+	if got := Detect(dir); got != "go-cli" {
+		t.Errorf("go.mod should detect go-cli, got %q", got)
+	}
+}
+
+func TestDetectPython(t *testing.T) {
+	dir := detectFixture(t, map[string]string{"pyproject.toml": "[project]\nname='x'\n"}, nil)
+	if got := Detect(dir); got != "python-package" {
+		t.Errorf("pyproject.toml should detect python-package, got %q", got)
+	}
+}
+
+func TestDetectFallsBackToDefault(t *testing.T) {
+	dir := detectFixture(t, map[string]string{"README.md": "# repo\n"}, nil)
+	if got := Detect(dir); got != Default {
+		t.Errorf("ambiguous repo should fall back to %q, got %q", Default, got)
+	}
+}
+
+func TestDetectAppsAloneIsNotMonorepo(t *testing.T) {
+	// A repo with just `apps/` and a TS shape should detect typescript-app,
+	// not monorepo (which now requires packages/+apps/ or workspace files).
+	dir := detectFixture(t, map[string]string{
+		"package.json":  `{"name":"x"}`,
+		"tsconfig.json": `{}`,
+	}, []string{"apps"})
+	if got := Detect(dir); got != "typescript-app" {
+		t.Errorf("apps/ alone shouldn't force monorepo, got %q", got)
+	}
+}
+
+func TestDetectNxIsMonorepo(t *testing.T) {
+	dir := detectFixture(t, map[string]string{"nx.json": "{}"}, nil)
+	if got := Detect(dir); got != "monorepo" {
+		t.Errorf("nx.json should detect monorepo, got %q", got)
 	}
 }

@@ -627,8 +627,18 @@ func run() int {
 		return runWatchLoop(args, rootDir, ontPath)
 
 	case "init":
+		// Auto-detect template when the user didn't specify one.
+		defaultTpl := templates.Detect(rootDir)
+		userTpl := stringFlag(args, "template", "")
+		chosen := userTpl
+		if chosen == "" {
+			chosen = defaultTpl
+			if !boolFlag(args, "json") && defaultTpl != templates.Default {
+				fmt.Fprintf(os.Stderr, "coherence: auto-detected template %q (use --template=NAME to override)\n", defaultTpl)
+			}
+		}
 		opts := initcmd.Options{
-			Template:     stringFlag(args, "template", templates.Default),
+			Template:     chosen,
 			Force:        boolFlag(args, "force"),
 			SkillInstall: stringFlag(args, "skill-install", initcmd.SkillInstallAuto),
 		}

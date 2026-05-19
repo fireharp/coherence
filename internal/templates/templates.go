@@ -7,7 +7,9 @@ import (
 	"embed"
 	"fmt"
 	"io/fs"
+	"os"
 	"path"
+	"path/filepath"
 	"sort"
 	"strings"
 )
@@ -15,8 +17,85 @@ import (
 //go:embed all:assets
 var assets embed.FS
 
-// Default is the template used when --template is not supplied.
+// Default is the template used when --template is not supplied and
+// auto-detection finds no better match.
 const Default = "generic"
+
+// Detect inspects rootDir for tell-tale files and returns the best-fit
+// template name, or Default if no signal is strong enough. Cheap path
+// checks only — never reads file contents.
+func Detect(rootDir string) string {
+	if exists(rootDir, "pnpm-workspace.yaml") ||
+		exists(rootDir, "turbo.json") ||
+		exists(rootDir, "nx.json") ||
+		(isDir(rootDir, "packages") && isDir(rootDir, "apps")) {
+		return "monorepo"
+	}
+	if exists(rootDir, "package.json") &&
+		(exists(rootDir, "tsconfig.json") || isDir(rootDir, "src")) {
+		return "typescript-app"
+	}
+	if exists(rootDir, "go.mod") {
+		return "go-cli"
+	}
+	if exists(rootDir, "pyproject.toml") || exists(rootDir, "setup.py") {
+		return "python-package"
+	}
+	if exists(rootDir, "dbt_project.yml") ||
+		isDir(rootDir, "migrations") ||
+		isDir(rootDir, "rill") {
+		return "data-pipeline"
+	}
+	// Terraform: any .tf in root or modules dir.
+	if hasExt(rootDir, ".tf") || isDir(rootDir, "terraform") {
+		return "infra-terraform"
+	}
+	// docs-heavy repo: lots of markdown under docs/.
+	if isDir(rootDir, "docs") && countExt(rootDir, ".md") >= 5 {
+		return "docs-site"
+	}
+	if isDir(rootDir, ".agents") || isDir(rootDir, "agents") {
+		return "agent-repo"
+	}
+	return Default
+}
+
+func exists(rootDir, rel string) bool {
+	_, err := os.Stat(filepath.Join(rootDir, rel))
+	return err == nil
+}
+
+func isDir(rootDir, rel string) bool {
+	info, err := os.Stat(filepath.Join(rootDir, rel))
+	return err == nil && info.IsDir()
+}
+
+func hasExt(rootDir, ext string) bool {
+	entries, err := os.ReadDir(rootDir)
+	if err != nil {
+		return false
+	}
+	for _, e := range entries {
+		if !e.IsDir() && strings.HasSuffix(strings.ToLower(e.Name()), ext) {
+			return true
+		}
+	}
+	return false
+}
+
+func countExt(rootDir, ext string) int {
+	entries, err := os.ReadDir(rootDir)
+	if err != nil {
+		return 0
+	}
+	n := 0
+	for _, e := range entries {
+		if !e.IsDir() && strings.HasSuffix(strings.ToLower(e.Name()), ext) {
+			n++
+		}
+	}
+	return n
+}
 
 // Template bundles the files written by `init` for a given template name.
 type Template struct {
