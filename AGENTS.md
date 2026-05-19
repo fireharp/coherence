@@ -48,7 +48,11 @@ Use Go 1.22 or newer.
   `endpoint`, `data_model`) and all 15 edge kinds (`contains`, `defines`,
   `mentions`, `suggests`, `describes`, `verifies`, `supports`,
   `generates`, `supersedes`, `depends_on`, `implements`, `expects`,
-  `contradicts`, `mirrors`, `invalidates`). The Markdown semantic hash ignores prose typos but flips
+  `contradicts`, `mirrors`, `invalidates`). Pass 10 adds `command:make
+  <target>` nodes from `Makefile`/`*.mk` target declarations (wired via
+  `defines` edges from the source file), so Makefile-driven workflows
+  surface in the graph alongside ontology-derived commands. The Markdown
+  semantic hash ignores prose typos but flips
   on heading/link/frontmatter/code-fence-language edits. Foundation for
   drift scoring and the deferred CB-008/011/013/014/015 scenarios.
 - `./bin/coherence diff [--base=path] [--json]` compares the current
