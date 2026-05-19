@@ -44,7 +44,7 @@ func TestRunAllPassesDeterministicAndSkipsRest(t *testing.T) {
 		t.Errorf("expected >=7 deterministic passes, got %d", suite.Counts.Pass)
 	}
 	if suite.Counts.Skipped < 1 {
-		t.Errorf("expected >=1 skipped (LLM/semantic deferred), got %d", suite.Counts.Skipped)
+		t.Errorf("expected >=1 skipped (LLM-only deferred), got %d", suite.Counts.Skipped)
 	}
 }
 
@@ -71,6 +71,23 @@ func TestCB011IsDeterministicAndPasses(t *testing.T) {
 	}
 	if !r.Pass {
 		t.Errorf("CB-011 should pass, got missing=%v extra=%v", r.Missing, r.Extra)
+	}
+}
+
+func TestCB008IsDeterministicAndPasses(t *testing.T) {
+	// CB-008 exercises orphaned_metric_aliases + RemovedFiles. Baseline
+	// has success_rate metric + frontend referencing it; current renames
+	// to conversion_rate (removed_files drops old yaml). Frontend still
+	// references the old name; the meter catches the orphaned alias.
+	r := Run("CB-008")
+	if r.Skipped {
+		t.Fatal("CB-008 should be deterministic, not skipped")
+	}
+	if r.Error != "" {
+		t.Fatalf("CB-008 errored: %s", r.Error)
+	}
+	if !r.Pass {
+		t.Errorf("CB-008 should pass, got missing=%v extra=%v", r.Missing, r.Extra)
 	}
 }
 

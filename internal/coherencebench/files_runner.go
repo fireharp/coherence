@@ -135,6 +135,16 @@ func materializeScenario(sc Scenario) (string, error) {
 		os.RemoveAll(dir)
 		return "", err
 	}
+	// Remove any paths listed in RemovedFiles (after writeFiles, so that
+	// a path in both Files and RemovedFiles still ends up deleted — an
+	// unusual case but the explicit order makes the semantics clear).
+	for _, rel := range sc.RemovedFiles {
+		abs := filepath.Join(dir, rel)
+		if err := os.Remove(abs); err != nil && !os.IsNotExist(err) {
+			os.RemoveAll(dir)
+			return "", fmt.Errorf("remove %s: %w", rel, err)
+		}
+	}
 	if err := exec.Command("git", "-C", dir, "add", "-A").Run(); err != nil {
 		os.RemoveAll(dir)
 		return "", fmt.Errorf("git add current: %w", err)

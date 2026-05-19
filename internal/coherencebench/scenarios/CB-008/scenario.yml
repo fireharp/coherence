@@ -1,14 +1,38 @@
 id: CB-008
 name: metric renamed in frontend only
 description: |
-  A metric was renamed in frontend code but the canonical Rill definition
-  was not touched. Detecting concept split / orphaned alias requires the
-  knowledge-graph layer (M3) — both files would map to the same
-  metric:<name> node and the rename would split that node.
-status: skip
-changed_files:
-  - frontend/src/charts/success_rate.tsx
+  The baseline has a Rill metric `success_rate.yaml` plus a frontend
+  TypeScript file that references the literal string "success_rate".
+  The current state renames the metric to `conversion_rate.yaml` (added
+  in `files:`, old yaml removed via `removed_files`) but leaves the
+  frontend untouched — it still says "success_rate". The
+  `orphaned_metric_aliases` drift meter diffs the metric label sets
+  between base and current graphs, then substring-scans frontend files
+  for any orphaned name. Verdict bumps to `telemetry`.
+status: deterministic
+base_files:
+  rill/metrics/success_rate.yaml: |
+    version: 1
+    type: metric_view
+    measures:
+      - name: success_rate
+        expression: COUNT(*) FILTER (WHERE outcome = 'success')
+  frontend/dashboard.ts: |
+    export const dashboard = {
+        title: "Outcome",
+        metric: "success_rate",
+    };
+files:
+  rill/metrics/conversion_rate.yaml: |
+    version: 1
+    type: metric_view
+    measures:
+      - name: conversion_rate
+        expression: COUNT(*) FILTER (WHERE outcome IN ('success','converted'))
+removed_files:
+  - rill/metrics/success_rate.yaml
 expected:
-  fires:
-    - orphaned-metric-alias
+  fires: []
   blocking_error: false
+  drift:
+    verdict: telemetry

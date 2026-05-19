@@ -61,6 +61,23 @@ type NeighborhoodDrift struct {
 	EdgesRemoved  int     `json:"edges_removed"`
 }
 
+// OrphanedMetricAlias records one (file, name) pair where a frontend
+// file still references a metric name that existed in the baseline graph
+// but was renamed or removed from the current graph.
+type OrphanedMetricAlias struct {
+	File       string `json:"file"`
+	OrphanName string `json:"orphan_name"`
+}
+
+// OrphanedMetricAliases is the 18th drift meter. It catches the
+// "metric renamed in frontend only" pattern: code keeps referencing an
+// old metric name as a string literal while the canonical definition
+// moved or vanished. Silent without a baseline.
+type OrphanedMetricAliases struct {
+	Score   int                   `json:"score"`
+	Orphans []OrphanedMetricAlias `json:"orphans"`
+}
+
 // StaleTest records one (test, source) pair where the source content
 // changed between baseline and current but the test file did not — the
 // test still passes but no longer reflects current behavior.
@@ -284,6 +301,7 @@ type Report struct {
 	BrokenLinks            BrokenLinks            `json:"broken_links"`
 	UnknownIDReferences    UnknownIDReferences    `json:"unknown_id_references"`
 	StaleTests             StaleTests             `json:"stale_tests"`
+	OrphanedMetricAliases  OrphanedMetricAliases  `json:"orphaned_metric_aliases"`
 	Explanations         []string          `json:"explanations"`
 	SuggestedActions     []string          `json:"suggested_actions"`
 }
@@ -388,6 +406,9 @@ func ComputeWith(rootDir, ontologyPath string, opts ComputeOptions) (Report, err
 
 	// Meter 17: stale tests (verifies + base/current snapshot diff).
 	report.StaleTests = computeStaleTests(baseSnap, currentSnap, currentGraph)
+
+	// Meter 18: orphaned metric aliases (frontend references a renamed metric).
+	report.OrphanedMetricAliases = computeOrphanedMetricAliases(rootDir, baseGraph, currentGraph)
 
 	report.Verdict = computeVerdict(report)
 	report.Explanations = renderExplanations(report)
@@ -1171,6 +1192,9 @@ func computeVerdict(r Report) string {
 	if r.StaleTests.Score > 0 {
 		return VerdictTelemetry
 	}
+	if r.OrphanedMetricAliases.Score > 0 {
+		return VerdictTelemetry
+	}
 	return VerdictClean
 }
 
@@ -1298,6 +1322,15 @@ func renderExplanations(r Report) []string {
 			"stale tests: %d test(s) unchanged while their source changed (%s).",
 			r.StaleTests.Score, joinShort(pairs, 3)))
 	}
+	if r.OrphanedMetricAliases.Score > 0 {
+		names := make([]string, 0, len(r.OrphanedMetricAliases.Orphans))
+		for _, o := range r.OrphanedMetricAliases.Orphans {
+			names = append(names, o.OrphanName)
+		}
+		out = append(out, fmt.Sprintf(
+			"orphaned metric aliases: %d frontend reference(s) to renamed/removed metric(s) (%s).",
+			r.OrphanedMetricAliases.Score, joinShort(names, 4)))
+	}
 	return out
 }
 
@@ -1359,6 +1392,9 @@ func renderActions(r Report) []string {
 	}
 	if r.StaleTests.Score > 0 {
 		out = append(out, "update the test(s) whose source changed without them (or accept the verifies wiring is wrong)")
+	}
+	if r.OrphanedMetricAliases.Score > 0 {
+		out = append(out, "update frontend references to the new metric name (or restore the old metric definition)")
 	}
 	if len(out) == 0 {
 		out = append(out, "no action needed")
@@ -1463,6 +1499,7 @@ func Human(r Report) string {
 	fmt.Fprintf(&b, "  broken_links:           %d markdown link(s) to untracked paths\n", r.BrokenLinks.Score)
 	fmt.Fprintf(&b, "  unknown_id_refs:        %d typed-id mention(s) in code without a defining doc\n", r.UnknownIDReferences.Score)
 	fmt.Fprintf(&b, "  stale_tests:            %d test(s) with changed source but no test edit\n", r.StaleTests.Score)
+	fmt.Fprintf(&b, "  orphaned_metric_aliases:%d frontend reference(s) to renamed/removed metric(s)\n", r.OrphanedMetricAliases.Score)
 	if len(r.Explanations) > 0 {
 		fmt.Fprintln(&b, "\nexplanations:")
 		for _, e := range r.Explanations {
