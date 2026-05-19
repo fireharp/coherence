@@ -645,7 +645,7 @@ meters today:
 | `stale_decision_links`    | `supersedes` + `mentions` traversal  | count of docs citing a superseded id without naming the new one |
 | `broken_implements_chains`| `implements` + `supports` traversal  | count of code symbols implementing ids with no evidence packet  |
 | `dependency_cycles`       | DFS over `depends_on` (dir-level)    | count of import cycles (warn-level — cycles break the build)    |
-| `orphan_endpoints`        | `defines` (reverse) + `verifies`     | count of HTTP endpoints whose source file has no test           |
+| `orphan_endpoints`        | `defines` (reverse) + `verifies` (base + current) | count of HTTP endpoints whose source file has no test; reports `newly_orphaned_endpoints` and `newly_covered_endpoints` when a base graph is on disk |
 | `unimplemented_stories`   | user_story nodes + `implements`      | stories with no incoming implements claim (gated on convention) |
 | `broken_links`            | markdown re-scan of tracked .md      | inline links pointing to paths not in the tracked set           |
 | `unknown_id_references`   | typed-id regex over non-Markdown     | code mentions of US/ADR/IDR ids not defined in the graph        |
@@ -701,6 +701,13 @@ gates that want zero-drift commits, where any movement (including
 diff-aware regressions like `newly_orphaned_concepts`) should block the
 merge. The live `coherence watch` loop ignores `--strict` (it streams
 events; there's no single exit code to promote).
+
+For agent consumers: the drift report exposes a top-level `regressions`
+field aggregating the four diff-aware `newly_*` lists
+(`newly_orphaned_concepts`, `newly_unsupported_claims`,
+`newly_uncovered_stories`, `newly_orphaned_endpoints`) plus a `count`
+total. A single check on `drift.regressions.count > 0` answers "did this
+commit regress anything?" without navigating four nested meter blocks.
 
 ### `review` now includes drift
 

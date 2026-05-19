@@ -18,6 +18,12 @@ type Outcome struct {
 	UntrackedFileCount     int    `json:"untracked_file_count"`
 	RecommendedNextCommand string `json:"recommended_next_command,omitempty"`
 	DriftVerdict           string `json:"drift_verdict,omitempty"`
+	// DriftRegressionCount is the total number of diff-aware regression
+	// entries surfaced by the drift report (sum of newly_orphaned_concepts +
+	// newly_unsupported_claims + newly_uncovered_stories +
+	// newly_orphaned_endpoints). Lets agents gate on "did this commit
+	// regress anything?" without descending into drift.regressions.
+	DriftRegressionCount int `json:"drift_regression_count,omitempty"`
 }
 
 // Input captures everything Compute needs. The caller is responsible for
@@ -34,6 +40,10 @@ type Input struct {
 	// DriftVerdict is the optional drift.Report.Verdict the caller computed
 	// alongside its evaluation. Empty string means "drift not computed".
 	DriftVerdict string
+	// DriftRegressionCount is the optional drift.Report.Regressions.Count.
+	// Zero is the default (no drift run, or no regressions). Set by callers
+	// that ran drift.
+	DriftRegressionCount int
 }
 
 // Compute returns the Outcome for the supplied input.
@@ -78,6 +88,9 @@ func Compute(in Input) Outcome {
 		}
 	}
 
+	if in.DriftRegressionCount > 0 {
+		o.DriftRegressionCount = in.DriftRegressionCount
+	}
 	if in.DriftVerdict != "" {
 		o.DriftVerdict = in.DriftVerdict
 		switch in.DriftVerdict {

@@ -661,7 +661,7 @@ func TestVerdictCleanWhenConventionUnused(t *testing.T) {
 }
 
 func TestOrphanEndpointsEmptyGraph(t *testing.T) {
-	r := computeOrphanEndpoints(graph.Graph{})
+	r := computeOrphanEndpoints(nil, graph.Graph{})
 	if r.Score != 0 {
 		t.Errorf("expected 0 orphans, got %d", r.Score)
 	}
@@ -676,7 +676,7 @@ func TestOrphanEndpointsDetectsUntestedRoute(t *testing.T) {
 			{From: "file:server.go", To: "endpoint:*:/x", Kind: graph.EdgeDefines},
 		},
 	}
-	r := computeOrphanEndpoints(g)
+	r := computeOrphanEndpoints(nil, g)
 	if r.Score != 1 || r.Orphans[0] != "endpoint:*:/x" {
 		t.Errorf("expected orphan endpoint:*:/x, got %+v", r)
 	}
@@ -689,7 +689,7 @@ func TestOrphanEndpointsSkipsTestedRoute(t *testing.T) {
 			{From: "test:server_test.go", To: "file:server.go", Kind: graph.EdgeVerifies},
 		},
 	}
-	r := computeOrphanEndpoints(g)
+	r := computeOrphanEndpoints(nil, g)
 	if r.Score != 0 {
 		t.Errorf("verified endpoint should not be orphan, got %+v", r)
 	}
@@ -704,7 +704,7 @@ func TestOrphanEndpointsCoTenancyInheritsVerification(t *testing.T) {
 			{From: "test:server_test.go", To: "file:server.go", Kind: graph.EdgeVerifies},
 		},
 	}
-	r := computeOrphanEndpoints(g)
+	r := computeOrphanEndpoints(nil, g)
 	if r.Score != 0 {
 		t.Errorf("co-tenant endpoints should inherit verified state, got %+v", r)
 	}
@@ -714,6 +714,140 @@ func TestVerdictTelemetryOnOrphanEndpoints(t *testing.T) {
 	r := Report{OrphanEndpoints: OrphanEndpoints{Score: 1, Orphans: []string{"endpoint:*:/x"}}}
 	if v := computeVerdict(r); v != VerdictTelemetry {
 		t.Errorf("expected telemetry, got %s", v)
+	}
+}
+
+func TestOrphanEndpointsDetectsNewlyOrphanedEndpoint(t *testing.T) {
+	// Base: endpoint defined in server.go, verified by server_test.go.
+	// Current: verifies edge removed (e.g., test file deleted).
+	base := graph.Graph{
+		Nodes: []graph.Node{
+			{ID: "endpoint:GET:/api/users", Kind: graph.NodeEndpoint},
+			{ID: "file:server.go", Kind: graph.NodeFile},
+			{ID: "test:server_test.go", Kind: graph.NodeTest},
+		},
+		Edges: []graph.Edge{
+			{From: "file:server.go", To: "endpoint:GET:/api/users", Kind: graph.EdgeDefines},
+			{From: "test:server_test.go", To: "file:server.go", Kind: graph.EdgeVerifies},
+		},
+	}
+	current := graph.Graph{
+		Nodes: []graph.Node{
+			{ID: "endpoint:GET:/api/users", Kind: graph.NodeEndpoint},
+			{ID: "file:server.go", Kind: graph.NodeFile},
+		},
+		Edges: []graph.Edge{
+			{From: "file:server.go", To: "endpoint:GET:/api/users", Kind: graph.EdgeDefines},
+		},
+	}
+	r := computeOrphanEndpoints(&base, current)
+	if !r.BaseAvailable {
+		t.Fatal("BaseAvailable should be true")
+	}
+	if len(r.NewlyOrphanedEndpoints) != 1 || r.NewlyOrphanedEndpoints[0] != "endpoint:GET:/api/users" {
+		t.Errorf("NewlyOrphanedEndpoints = %v, want [endpoint:GET:/api/users]", r.NewlyOrphanedEndpoints)
+	}
+}
+
+func TestOrphanEndpointsDetectsNewlyCoveredEndpoint(t *testing.T) {
+	base := graph.Graph{
+		Nodes: []graph.Node{
+			{ID: "endpoint:GET:/api/users", Kind: graph.NodeEndpoint},
+			{ID: "file:server.go", Kind: graph.NodeFile},
+		},
+		Edges: []graph.Edge{
+			{From: "file:server.go", To: "endpoint:GET:/api/users", Kind: graph.EdgeDefines},
+		},
+	}
+	current := graph.Graph{
+		Nodes: []graph.Node{
+			{ID: "endpoint:GET:/api/users", Kind: graph.NodeEndpoint},
+			{ID: "file:server.go", Kind: graph.NodeFile},
+			{ID: "test:server_test.go", Kind: graph.NodeTest},
+		},
+		Edges: []graph.Edge{
+			{From: "file:server.go", To: "endpoint:GET:/api/users", Kind: graph.EdgeDefines},
+			{From: "test:server_test.go", To: "file:server.go", Kind: graph.EdgeVerifies},
+		},
+	}
+	r := computeOrphanEndpoints(&base, current)
+	if len(r.NewlyCoveredEndpoints) != 1 || r.NewlyCoveredEndpoints[0] != "endpoint:GET:/api/users" {
+		t.Errorf("NewlyCoveredEndpoints = %v, want [endpoint:GET:/api/users]", r.NewlyCoveredEndpoints)
+	}
+}
+
+func TestOrphanEndpointsNewEndpointNotCountedAsTransition(t *testing.T) {
+	base := graph.Graph{}
+	current := graph.Graph{
+		Nodes: []graph.Node{
+			{ID: "endpoint:GET:/new", Kind: graph.NodeEndpoint},
+			{ID: "file:server.go", Kind: graph.NodeFile},
+		},
+		Edges: []graph.Edge{
+			{From: "file:server.go", To: "endpoint:GET:/new", Kind: graph.EdgeDefines},
+		},
+	}
+	r := computeOrphanEndpoints(&base, current)
+	if len(r.NewlyOrphanedEndpoints) != 0 || len(r.NewlyCoveredEndpoints) != 0 {
+		t.Errorf("brand-new endpoint should not be transition-counted: orphaned=%v covered=%v",
+			r.NewlyOrphanedEndpoints, r.NewlyCoveredEndpoints)
+	}
+}
+
+func TestAggregateRegressionsCombinesAllFourMeters(t *testing.T) {
+	r := Report{
+		PathLoss: PathLoss{
+			NewlyOrphanedConcepts: []string{"concept:a", "concept:b"},
+		},
+		ClaimSupport: ClaimSupport{
+			NewlyUnsupportedClaims: []string{"claim:x"},
+		},
+		TraceCoverage: TraceCoverage{
+			NewlyUncoveredStories: []string{"us:US-001"},
+		},
+		OrphanEndpoints: OrphanEndpoints{
+			NewlyOrphanedEndpoints: []string{"endpoint:GET:/x"},
+		},
+	}
+	reg := aggregateRegressions(r)
+	if reg.Count != 5 {
+		t.Errorf("Count = %d, want 5", reg.Count)
+	}
+	if len(reg.NewlyOrphanedConcepts) != 2 {
+		t.Errorf("concepts list lost data: %v", reg.NewlyOrphanedConcepts)
+	}
+	// Mutating the returned list should not mutate the source meter.
+	reg.NewlyOrphanedConcepts[0] = "MUTATED"
+	if r.PathLoss.NewlyOrphanedConcepts[0] == "MUTATED" {
+		t.Error("aggregator must clone lists, not alias them")
+	}
+}
+
+func TestAggregateRegressionsEmptyMetersStaysZero(t *testing.T) {
+	r := Report{}
+	reg := aggregateRegressions(r)
+	if reg.Count != 0 {
+		t.Errorf("Count should be 0 on empty report, got %d", reg.Count)
+	}
+	// Empty slices, not nil, so JSON shape stays stable.
+	if reg.NewlyOrphanedConcepts == nil ||
+		reg.NewlyUnsupportedClaims == nil ||
+		reg.NewlyUncoveredStories == nil ||
+		reg.NewlyOrphanedEndpoints == nil {
+		t.Error("regression lists must be []string{}, not nil")
+	}
+}
+
+func TestVerdictTelemetryOnNewlyOrphanedEndpoint(t *testing.T) {
+	r := Report{
+		OrphanEndpoints: OrphanEndpoints{
+			Score:                  0,
+			BaseAvailable:          true,
+			NewlyOrphanedEndpoints: []string{"endpoint:GET:/x"},
+		},
+	}
+	if v := computeVerdict(r); v != VerdictTelemetry {
+		t.Errorf("newly-orphaned endpoint should promote to telemetry, got %s", v)
 	}
 }
 

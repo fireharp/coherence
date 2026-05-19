@@ -158,6 +158,28 @@ func TestEmptyDriftVerdictOmittedFromOutcome(t *testing.T) {
 	}
 }
 
+func TestDriftRegressionCountSurfacesAtTopLevel(t *testing.T) {
+	o := Compute(Input{
+		Subcommand:           "review",
+		DriftVerdict:         "telemetry",
+		DriftRegressionCount: 3,
+	})
+	if o.DriftRegressionCount != 3 {
+		t.Errorf("DriftRegressionCount = %d, want 3", o.DriftRegressionCount)
+	}
+}
+
+func TestZeroRegressionCountIsOmitted(t *testing.T) {
+	o := Compute(Input{
+		Subcommand:           "review",
+		DriftVerdict:         "clean",
+		DriftRegressionCount: 0,
+	})
+	if o.DriftRegressionCount != 0 {
+		t.Errorf("zero regression count should stay 0, got %d", o.DriftRegressionCount)
+	}
+}
+
 func TestCheckIncludingUntrackedDoesNotExclude(t *testing.T) {
 	o := Compute(Input{
 		Subcommand:         "check",

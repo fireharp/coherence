@@ -23,10 +23,21 @@ func Path(rootDir string) string {
 }
 
 // Write recomputes and writes STATUS.md. Returns the path written.
+// A nil ontology skips live evaluation (the working-tree section will
+// show no findings) but otherwise renders normally.
 func Write(rootDir string, ont *ontology.Ontology) (string, error) {
 	last := report.Load(rootDir)
 	snapshots := listSnapshots(rootDir)
-	live := computeLive(ont, rootDir)
+	live := struct {
+		Last     liveSection
+		Worktree liveSection
+	}{
+		Last:     liveSection{Range: "HEAD~1..HEAD"},
+		Worktree: liveSection{},
+	}
+	if ont != nil {
+		live = computeLive(ont, rootDir)
+	}
 	g, gErr := graph.Load(rootDir)
 	out := render(ont, last, snapshots, live, gErr == nil, g)
 	dst := Path(rootDir)
@@ -86,21 +97,32 @@ type Snapshot struct {
 	ScenarioCount int    `json:"scenario_count"`
 }
 
-// Compute returns the structured Payload without touching disk.
+// Compute returns the structured Payload without touching disk. A nil
+// ontology skips the live-eval section (live findings stay empty);
+// agents calling without an ontology still get the graph + drift
+// snapshot.
 func Compute(rootDir string, ont *ontology.Ontology) Payload {
 	last := report.Load(rootDir)
 	snapshots := listSnapshots(rootDir)
-	live := computeLive(ont, rootDir)
 	g, gErr := graph.Load(rootDir)
+
+	live := LiveSummary{
+		Last:     LiveSection{Files: []string{}},
+		Worktree: LiveSection{Files: []string{}},
+	}
+	if ont != nil {
+		l := computeLive(ont, rootDir)
+		live = LiveSummary{
+			Last:     toLiveSection(l.Last),
+			Worktree: toLiveSection(l.Worktree),
+		}
+	}
 
 	p := Payload{
 		GeneratedAt:    nowUTC(),
 		GraphAvailable: gErr == nil,
-		Live: LiveSummary{
-			Last:     toLiveSection(live.Last),
-			Worktree: toLiveSection(live.Worktree),
-		},
-		Snapshots: toSnapshots(snapshots),
+		Live:           live,
+		Snapshots:      toSnapshots(snapshots),
 	}
 	if ont != nil {
 		p.OntologyRules = len(ont.Rules)
@@ -377,13 +399,17 @@ func render(ont *ontology.Ontology, last *report.Payload, snapshots []snapshot, 
 	push("")
 
 	push("## Active Rules", "")
-	push("| Rule | Severity | When | Expect Any Of |", "| --- | --- | --- | --- |")
-	for _, r := range ont.Rules {
-		when := bullets(r.When)
-		expect := bullets(r.ExpectAny)
-		push(fmt.Sprintf("| `%s` | %s | %s | %s |", r.ID, r.Severity, when, expect))
+	if ont == nil {
+		push("_No ontology loaded._", "")
+	} else {
+		push("| Rule | Severity | When | Expect Any Of |", "| --- | --- | --- | --- |")
+		for _, r := range ont.Rules {
+			when := bullets(r.When)
+			expect := bullets(r.ExpectAny)
+			push(fmt.Sprintf("| `%s` | %s | %s | %s |", r.ID, r.Severity, when, expect))
+		}
+		push("")
 	}
-	push("")
 
 	push("## LLM Pass Configuration", "")
 	push("- Provider: Groq (OpenAI-compatible Chat Completions endpoint).")

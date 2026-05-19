@@ -334,6 +334,20 @@ type SemanticMovement struct {
 	ChangedDocs            []string `json:"changed_docs"`
 }
 
+// Regressions aggregates the diff-aware `newly_*` lists from the four
+// meters that track support transitions. Surfaced at the top level of
+// the drift report so agents can answer "did this commit regress
+// anything?" with a single navigation rather than four nested checks.
+// Count is the total number of regression entries across all four
+// lists — non-zero means at least one transition was detected.
+type Regressions struct {
+	Count                  int      `json:"count"`
+	NewlyOrphanedConcepts  []string `json:"newly_orphaned_concepts"`
+	NewlyUnsupportedClaims []string `json:"newly_unsupported_claims"`
+	NewlyUncoveredStories  []string `json:"newly_uncovered_stories"`
+	NewlyOrphanedEndpoints []string `json:"newly_orphaned_endpoints"`
+}
+
 // Report is the on-disk shape of `.coherence/drift.json`.
 type Report struct {
 	GeneratedAt            string                 `json:"generated_at"`
@@ -357,6 +371,7 @@ type Report struct {
 	StaleTests             StaleTests             `json:"stale_tests"`
 	OrphanedMetricAliases  OrphanedMetricAliases  `json:"orphaned_metric_aliases"`
 	DanglingImports        DanglingImports        `json:"dangling_imports"`
+	Regressions            Regressions            `json:"regressions"`
 	Explanations           []string               `json:"explanations"`
 	SuggestedActions       []string               `json:"suggested_actions"`
 }
@@ -468,10 +483,38 @@ func ComputeWith(rootDir, ontologyPath string, opts ComputeOptions) (Report, err
 	// Meter 19: dangling TypeScript imports (relative target not in tracked set).
 	report.DanglingImports = computeDanglingImports(rootDir)
 
+	report.Regressions = aggregateRegressions(report)
 	report.Verdict = computeVerdict(report)
 	report.Explanations = renderExplanations(report)
 	report.SuggestedActions = renderActions(report)
 	return report, nil
+}
+
+// aggregateRegressions copies the diff-aware `newly_*` lists from the
+// four meters that track support transitions into a single navigable
+// surface. `Count` is the sum of entries across all four. Empty lists
+// stay as `[]` (not nil) so the JSON shape is stable.
+func aggregateRegressions(r Report) Regressions {
+	out := Regressions{
+		NewlyOrphanedConcepts:  cloneList(r.PathLoss.NewlyOrphanedConcepts),
+		NewlyUnsupportedClaims: cloneList(r.ClaimSupport.NewlyUnsupportedClaims),
+		NewlyUncoveredStories:  cloneList(r.TraceCoverage.NewlyUncoveredStories),
+		NewlyOrphanedEndpoints: cloneList(r.OrphanEndpoints.NewlyOrphanedEndpoints),
+	}
+	out.Count = len(out.NewlyOrphanedConcepts) +
+		len(out.NewlyUnsupportedClaims) +
+		len(out.NewlyUncoveredStories) +
+		len(out.NewlyOrphanedEndpoints)
+	return out
+}
+
+func cloneList(s []string) []string {
+	if len(s) == 0 {
+		return []string{}
+	}
+	out := make([]string, len(s))
+	copy(out, s)
+	return out
 }
 
 func computeEdgeBreakage(rootDir, ontologyPath string) (EdgeBreakage, error) {
@@ -1791,7 +1834,11 @@ func Write(rootDir string, r Report) error {
 // Human renders a drift report as readable lines.
 func Human(r Report) string {
 	var b strings.Builder
-	fmt.Fprintf(&b, "coherence drift: verdict=%s\n", r.Verdict)
+	fmt.Fprintf(&b, "coherence drift: verdict=%s", r.Verdict)
+	if r.Regressions.Count > 0 {
+		fmt.Fprintf(&b, " (regressions=%d)", r.Regressions.Count)
+	}
+	fmt.Fprintln(&b)
 	fmt.Fprintln(&b)
 	fmt.Fprintf(&b, "  required_edge_breakage: %.2f (broken=%d/%d)\n",
 		r.RequiredEdgeBreakage.Score,
