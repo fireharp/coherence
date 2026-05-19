@@ -58,6 +58,8 @@ const (
 	EdgeImplements  EdgeKind = "implements"
 	EdgeExpects     EdgeKind = "expects"
 	EdgeContradicts EdgeKind = "contradicts"
+	EdgeMirrors     EdgeKind = "mirrors"
+	EdgeInvalidates EdgeKind = "invalidates"
 )
 
 // Node is one graph entry.
