@@ -409,15 +409,24 @@ rules dedupes to one node with multiple `generates` edges. Concrete
 paths and wildcards both work; expected paths missing from the tracked
 set are skipped.
 
-`code_symbol` nodes come from a shallow Go AST scan over tracked `*.go`
-files (Go-only MVP today; `_test.go` is skipped to avoid overlap with the
-`test` node kind). Exported top-level declarations emit one symbol per
-name: funcs, types, consts, vars. ID format `code_symbol:<pkg>.<Name>`
-groups symbols across files in the same package. Methods are skipped in
-the MVP — only package-scope functions and value declarations are
-captured. `defines` edge wires from the source file to each symbol. Each
-node carries `go_kind` (`func`/`type`/`const`/`var`) and `package` meta
-for downstream tooling.
+`code_symbol` nodes come from two shallow extractors today. (1) A Go AST
+scan over tracked `*.go` files (`_test.go` skipped). Exported top-level
+declarations emit one symbol per name: funcs, types, consts, vars. ID
+format `code_symbol:<pkg>.<Name>` groups symbols across files in the
+same package. Methods are skipped — only package-scope functions and
+value declarations are captured. Each node carries `go_kind`
+(`func`/`type`/`const`/`var`) and `package` meta. (2) A TypeScript
+regex-driven scan over `*.ts`/`*.tsx`/`*.mts`/`*.cts` files (test/spec
+files and `*.d.ts` declarations skipped). Captures `export function`,
+`export class` (incl. `abstract`), `export interface`, `export type`,
+`export enum`/`export const enum`, and `export const|let|var`. Default
+exports of named declarations are captured; anonymous defaults are not.
+Re-exports (`export { foo } from`, `export *`) are not captured today
+since they don't introduce a fresh symbol. ID format uses the file path
+stem as module: `code_symbol:src/api/auth.User`. Imports of relative
+specifiers (`./b`, `../shared/x`) that resolve to a tracked file emit
+`depends_on` edges; bare module specifiers (`react`, `@scope/pkg`) are
+ignored. A `defines` edge wires from the source file to each symbol.
 
 `endpoint` nodes come from the same Go AST scan walking all `CallExpr`
 nodes for HTTP route registrations. Recognized patterns: stdlib
@@ -570,6 +579,7 @@ meters today:
 | `unknown_id_references`   | typed-id regex over non-Markdown     | code mentions of US/ADR/IDR ids not defined in the graph        |
 | `stale_tests`             | `verifies` + base/current snapshot   | tests unchanged while their `verifies`-linked source changed    |
 | `orphaned_metric_aliases` | base+current metric diff + frontend scan | frontend string refs to metric names removed/renamed in current |
+| `dangling_imports`        | TS source re-scan + relative-path resolution | count of TS imports whose relative target isn't in the tracked set (warn-level — breaks the build) |
 
 Each meter also contributes to a top-level `verdict`:
 
@@ -579,12 +589,13 @@ Each meter also contributes to a top-level `verdict`:
   in the JSON outcome contract).
 - `clean` — nothing to do.
 
-All 9 GOAL.md M4 meters are now shipping, plus nine extra graph-traversal,
-link-integrity, id-reference, test-staleness, and metric-rename meters:
-`stale_decision_links`, `broken_implements_chains`, `dependency_cycles`,
-`orphan_endpoints`, `unimplemented_stories`, `broken_links`,
-`unknown_id_references`, `stale_tests`, and `orphaned_metric_aliases`.
-Together that's 18 meters today. The cycle meter promotes to
+All 9 GOAL.md M4 meters are now shipping, plus ten extra graph-traversal,
+link-integrity, id-reference, test-staleness, metric-rename, and
+TS-import-resolution meters: `stale_decision_links`,
+`broken_implements_chains`, `dependency_cycles`, `orphan_endpoints`,
+`unimplemented_stories`, `broken_links`, `unknown_id_references`,
+`stale_tests`, `orphaned_metric_aliases`, and `dangling_imports`.
+Together that's 19 meters today. The cycle and dangling-imports meters promote to
 `warn`; convention-gated meters (like `unimplemented_stories`) stay
 silent unless the repo actually uses the annotation, avoiding false
 positives on repos that don't. The deterministic 8 always run;

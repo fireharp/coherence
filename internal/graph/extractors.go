@@ -76,6 +76,9 @@ func Build(rootDir string) (Graph, error) {
 	// Pass 10: command nodes from Makefile / *.mk target declarations.
 	extractMakefile(b, rootDir, tracked)
 
+	// Pass 11: code_symbol + depends_on from TypeScript shallow scan.
+	extractTSSymbols(b, rootDir, tracked)
+
 	return b.Build(), nil
 }
 
