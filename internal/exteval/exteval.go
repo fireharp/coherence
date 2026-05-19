@@ -174,6 +174,11 @@ func PredictImpact(g graph.Graph, seed []string) []string {
 				if n.Path == "" {
 					continue
 				}
+				// Directory nodes share Path with their files but don't
+				// represent files themselves — skip to keep precision high.
+				if n.Kind == graph.NodeDirectory {
+					continue
+				}
 				if seedSet[n.Path] {
 					continue
 				}
