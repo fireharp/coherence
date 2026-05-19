@@ -355,7 +355,14 @@ Node and edge kinds shipped today:
 `rule` and `command` nodes come from `ontology.yml`: every rule becomes a
 `rule:<id>` node; every entry under top-level `commands:` and every
 per-rule `suggested_commands` becomes a `command:<text>` node connected to
-the rule via a `suggests` edge.
+the rule via a `suggests` edge. Additional `command` nodes come from
+Makefile/`*.mk` target declarations: each non-pattern, non-`.PHONY`
+target becomes a `command:make <target>` node wired via a `defines` edge
+from the source Makefile. `.PHONY`/`.DEFAULT_GOAL` and other `.`-prefixed
+special targets are skipped, as are variable assignments (`name = value`,
+`:=`, `?=`, `+=`, `!=`) and pattern rules (`%.o: %.c`). The canonical
+filenames `Makefile`, `makefile`, `GNUmakefile`, plus any `*.mk` include
+file, are scanned.
 
 `concept` nodes come from the first H1 in each Markdown doc, slugified
 (lowercased, non-alphanumeric → hyphen). Multiple docs whose H1 slugifies
