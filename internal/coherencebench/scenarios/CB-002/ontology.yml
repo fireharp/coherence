@@ -1,0 +1,14 @@
+version: 1
+rules:
+  - id: fixture-generator-needs-output
+    when:
+      - "frontend/scripts/build-fixtures.mjs"
+      - "rill/fixtures/**/*.ndjson"
+    expect_any:
+      - "frontend/public/fixtures/dashboard.json"
+      - "frontend/public/fixtures/api/run_search.json"
+    severity: error
+    message: "Fixture source changed; outputs must be regenerated and co-staged."
+    suggested_commands:
+      - node frontend/scripts/build-fixtures.mjs
+      - git add frontend/public/fixtures

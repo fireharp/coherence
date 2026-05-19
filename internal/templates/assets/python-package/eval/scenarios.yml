@@ -1,0 +1,21 @@
+scenarios:
+  - id: pyproject-without-lockfile
+    description: pyproject.toml changed without uv.lock/poetry.lock co-staged
+    changed_files:
+      - pyproject.toml
+    expect_fires:
+      - pyproject-change-needs-lockfile
+
+  - id: pyproject-with-uvlock-passes
+    description: coherent pyproject + uv.lock update
+    changed_files:
+      - pyproject.toml
+      - uv.lock
+    expect_fires: []
+
+  - id: src-without-tests
+    description: src python code changed but no test touch
+    changed_files:
+      - src/mypkg/core.py
+    expect_fires:
+      - src-change-needs-tests

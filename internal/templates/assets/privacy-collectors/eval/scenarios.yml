@@ -1,0 +1,42 @@
+scenarios:
+  - id: collector-without-redaction-test
+    description: collector code changed without colocated test or privacy doc
+    changed_files:
+      - internal/collectors/claude.go
+    expect_fires:
+      - collector-change-needs-redaction-test
+
+  - id: collector-with-test-passes
+    description: collector + colocated test update together
+    changed_files:
+      - internal/collectors/claude.go
+      - internal/collectors/claude_test.go
+    expect_fires: []
+
+  - id: collector-with-privacy-doc-passes
+    description: collector change paired with privacy doc update also passes
+    changed_files:
+      - internal/collectors/codex.go
+      - docs/privacy-collectors.md
+    expect_fires: []
+
+  - id: privacy-config-change-without-doc-or-test
+    description: privacy/redaction code changed without ADR, doc, or test
+    changed_files:
+      - internal/privacy/policy.go
+    expect_fires:
+      - privacy-config-change-needs-doc
+
+  - id: pii-fixture-without-redaction-test
+    description: PII fixture changed without redaction test re-run
+    changed_files:
+      - testdata/pii/claude-conversation.json
+    expect_fires:
+      - pii-fixture-change-needs-redaction-test
+
+  - id: vendor-token-without-security-doc
+    description: vendor token handler changed without security doc/ADR/test
+    changed_files:
+      - internal/vendors/groq/client.go
+    expect_fires:
+      - vendor-token-handling-needs-secret-doc

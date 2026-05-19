@@ -1,0 +1,13 @@
+version: 1
+rules:
+  - id: spec-change-needs-decision-or-evidence
+    when:
+      - "docs/specs/*.md"
+    expect_any:
+      - "docs/decisions/ADR-*.md"
+      - "docs/decisions/IDR-*.md"
+      - "docs/evidence/*/README.md"
+    severity: warn
+    message: "Spec changed without a paired ADR/IDR or evidence packet."
+    suggested_commands:
+      - ls docs/decisions/ | tail -5

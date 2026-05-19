@@ -9,16 +9,18 @@ import (
 )
 
 type Rule struct {
-	ID         string   `yaml:"id"`
-	When       []string `yaml:"when"`
-	ExpectAny  []string `yaml:"expect_any"`
-	Severity   string   `yaml:"severity"`
-	Message    string   `yaml:"message"`
+	ID                string   `yaml:"id"`
+	When              []string `yaml:"when"`
+	ExpectAny         []string `yaml:"expect_any"`
+	Severity          string   `yaml:"severity"`
+	Message           string   `yaml:"message"`
+	SuggestedCommands []string `yaml:"suggested_commands"`
 }
 
 type Ontology struct {
-	Version int    `yaml:"version"`
-	Rules   []Rule `yaml:"rules"`
+	Version  int                 `yaml:"version"`
+	Rules    []Rule              `yaml:"rules"`
+	Commands map[string][]string `yaml:"commands"`
 }
 
 // Load reads, parses, and validates an ontology YAML file. Mirrors the checks

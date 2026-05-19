@@ -1,0 +1,44 @@
+id: CB-011
+name: doc typo-only change classified as semantic no-op
+description: |
+  The baseline auth spec has correct prose. The current version contains
+  a single prose typo in body text — headings, links, frontmatter, and
+  code fences are unchanged. The snapshot semantic_hash is identical to
+  baseline (only `content_hash` flips), so the `semantic_movement` drift
+  meter classifies this as a noop and the verdict stays `clean`.
+status: deterministic
+base_files:
+  docs/index.md: |
+    ---
+    title: Project Docs
+    ---
+
+    See [the auth spec](specs/auth.md) for details.
+  docs/specs/auth.md: |
+    ---
+    title: Auth Spec
+    ---
+
+    # Authentication
+
+    This is a sample paragraph that explains the auth flow.
+files:
+  docs/index.md: |
+    ---
+    title: Project Docs
+    ---
+
+    See [the auth spec](specs/auth.md) for details.
+  docs/specs/auth.md: |
+    ---
+    title: Auth Spec
+    ---
+
+    # Authentication
+
+    This is a smaple paragrahp that explians the auth flow.
+expected:
+  fires: []
+  blocking_error: false
+  drift:
+    verdict: clean

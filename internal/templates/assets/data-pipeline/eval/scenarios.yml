@@ -1,0 +1,21 @@
+scenarios:
+  - id: schema-without-migration
+    description: schema sql/yaml changed without paired migration
+    changed_files:
+      - schema/users.sql
+    expect_fires:
+      - schema-change-needs-migration
+
+  - id: schema-with-migration-passes
+    description: coherent schema + migration update
+    changed_files:
+      - schema/users.sql
+      - migrations/20260519_users.sql
+    expect_fires: []
+
+  - id: model-without-test
+    description: dbt model changed without test or schema.yml update
+    changed_files:
+      - models/marts/orders.sql
+    expect_fires:
+      - model-change-needs-test

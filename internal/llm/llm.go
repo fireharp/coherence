@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"coherence/internal/git"
+	"coherence/internal/snapshot"
 )
 
 const (
@@ -213,24 +214,74 @@ func callAPI(apiKey, model, system, cited, dynamic string) (string, error) {
 	return "", nil
 }
 
-// Run executes the LLM pass over staged markdown files.
-func Run(stagedFiles []string, enabled bool, rootDir string) Result {
+// SelectCandidatesFromSnapshotDiff is the graph-driven selector used by
+// review/watch. It picks markdown files whose semantic_hash differs
+// between the base and current snapshots — narrower than the staged-glob
+// selector and biased toward files with *real* edits (typo-noops are
+// excluded). Caps at maxCallsPerRun to honor the per-run LLM budget.
+func SelectCandidatesFromSnapshotDiff(base, current snapshot.Snapshot) []string {
+	baseByPath := map[string]snapshot.FileEntry{}
+	for _, f := range base.Files {
+		baseByPath[f.Path] = f
+	}
+	out := []string{}
+	for _, f := range current.Files {
+		if f.Kind != snapshot.KindMarkdown {
+			continue
+		}
+		b, ok := baseByPath[f.Path]
+		if !ok {
+			// New markdown file — worth LLM-checking.
+			out = append(out, f.Path)
+			continue
+		}
+		if b.SemanticHash != f.SemanticHash {
+			out = append(out, f.Path)
+		}
+	}
+	if len(out) > maxCallsPerRun {
+		out = out[:maxCallsPerRun]
+	}
+	return out
+}
+
+// SelectCandidatesFromStaged is the path-glob selector used by scan/check.
+// It picks markdown files under docs/{user-stories,specs}/ from a staged
+// file list — the original behavior preserved for the pre-commit hook path
+// where snapshot diff isn't available.
+func SelectCandidatesFromStaged(stagedFiles []string) []string {
+	out := []string{}
+	for _, p := range stagedFiles {
+		if candidateRe.MatchString(p) {
+			out = append(out, p)
+			if len(out) >= maxCallsPerRun {
+				break
+			}
+		}
+	}
+	return out
+}
+
+// Run executes the LLM pass over the supplied candidate files. When
+// candidates is nil, falls back to the staged-glob selector applied to
+// stagedFiles for backwards compatibility with scan/check.
+func Run(stagedFiles []string, enabled bool, rootDir string, candidates ...[]string) Result {
 	if !isEnabled(enabled) {
 		return Result{Skipped: "off", Findings: []Finding{}}
 	}
 	if !hasAPIKey() {
 		return Result{Skipped: "no-api-key", Findings: []Finding{}}
 	}
-	candidates := []string{}
-	for _, p := range stagedFiles {
-		if candidateRe.MatchString(p) {
-			candidates = append(candidates, p)
-			if len(candidates) >= maxCallsPerRun {
-				break
-			}
+	var picks []string
+	if len(candidates) > 0 && candidates[0] != nil {
+		picks = candidates[0]
+		if len(picks) > maxCallsPerRun {
+			picks = picks[:maxCallsPerRun]
 		}
+	} else {
+		picks = SelectCandidatesFromStaged(stagedFiles)
 	}
-	if len(candidates) == 0 {
+	if len(picks) == 0 {
 		return Result{Skipped: "no-candidates", Findings: []Finding{}}
 	}
 
@@ -245,7 +296,7 @@ func Run(stagedFiles []string, enabled bool, rootDir string) Result {
 	apiKey := os.Getenv("GROQ_API_KEY")
 	findings := []Finding{}
 	calls := 0
-	for _, rel := range candidates {
+	for _, rel := range picks {
 		if calls >= maxCallsPerRun {
 			break
 		}

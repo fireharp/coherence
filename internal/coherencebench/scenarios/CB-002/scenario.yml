@@ -1,0 +1,12 @@
+id: CB-002
+name: fixture generator changed but output not staged
+description: |
+  Build-fixtures script changed without the generated dashboard.json being
+  co-staged. Engine should hard-fail this scenario (severity=error).
+status: deterministic
+changed_files:
+  - frontend/scripts/build-fixtures.mjs
+expected:
+  fires:
+    - fixture-generator-needs-output
+  blocking_error: true

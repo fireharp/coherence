@@ -1,0 +1,12 @@
+id: CB-009
+name: package implementation changes but README stays stale
+description: |
+  Package source changed without the package README being touched. Engine
+  should detect the code/doc support weakening.
+status: deterministic
+changed_files:
+  - packages/auth/src/index.ts
+expected:
+  fires:
+    - package-impl-change-needs-readme
+  blocking_error: false

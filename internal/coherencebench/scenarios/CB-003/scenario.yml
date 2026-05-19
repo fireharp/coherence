@@ -1,0 +1,12 @@
+id: CB-003
+name: user story changes without evidence packet
+description: |
+  User story markdown changed but no evidence/<id>/README.md was co-staged.
+  Engine should warn about the missing support edge.
+status: deterministic
+changed_files:
+  - docs/user-stories/auth/US-042.md
+expected:
+  fires:
+    - user-story-change-needs-evidence
+  blocking_error: false

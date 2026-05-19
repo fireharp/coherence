@@ -5,7 +5,9 @@ package git
 import (
 	"errors"
 	"os/exec"
+	"strconv"
 	"strings"
+	"time"
 )
 
 func run(cwd string, args ...string) (string, error) {
@@ -63,11 +65,9 @@ func DiffNameOnly(ref, cwd string) []string {
 
 // WorktreeChangedFiles unions tracked-vs-HEAD changes with untracked files.
 func WorktreeChangedFiles(cwd string) []string {
-	tracked, _ := run(cwd, "diff", "HEAD", "--name-only", "--diff-filter=ACMR")
-	untracked, _ := run(cwd, "ls-files", "--others", "--exclude-standard")
 	seen := map[string]bool{}
 	out := []string{}
-	for _, l := range append(splitLines(tracked), splitLines(untracked)...) {
+	for _, l := range append(TrackedDirtyFiles(cwd), UntrackedFiles(cwd)...) {
 		if seen[l] {
 			continue
 		}
@@ -75,6 +75,57 @@ func WorktreeChangedFiles(cwd string) []string {
 		out = append(out, l)
 	}
 	return out
+}
+
+// TrackedDirtyFiles lists tracked files whose contents differ from HEAD.
+// It includes both staged and unstaged changes for tracked files.
+func TrackedDirtyFiles(cwd string) []string {
+	out, err := run(cwd, "diff", "HEAD", "--name-only", "--diff-filter=ACMR")
+	if err != nil {
+		return nil
+	}
+	return splitLines(out)
+}
+
+// UntrackedFiles lists files reported by
+// `git ls-files --others --exclude-standard` (untracked, gitignore-respecting).
+func UntrackedFiles(cwd string) []string {
+	out, err := run(cwd, "ls-files", "--others", "--exclude-standard")
+	if err != nil {
+		return nil
+	}
+	return splitLines(out)
+}
+
+// LastCommitTime returns the timestamp of the most recent commit that
+// touched the given path, as a UTC time.Time. The second return is false
+// when no commit exists for the path (e.g. brand-new untracked file or
+// path not in history).
+func LastCommitTime(cwd, path string) (time.Time, bool) {
+	out, err := run(cwd, "log", "-1", "--format=%ct", "--", path)
+	if err != nil {
+		return time.Time{}, false
+	}
+	s := strings.TrimSpace(out)
+	if s == "" {
+		return time.Time{}, false
+	}
+	n, err := strconv.ParseInt(s, 10, 64)
+	if err != nil {
+		return time.Time{}, false
+	}
+	return time.Unix(n, 0).UTC(), true
+}
+
+// DiffNameOnlyBase lists files changed between <base> and the working tree
+// (i.e. `git diff <base> --name-only --diff-filter=ACMR`). When base is HEAD
+// this equals TrackedDirtyFiles; for refs like origin/main it spans commits.
+func DiffNameOnlyBase(base, cwd string) []string {
+	out, err := run(cwd, "diff", base, "--name-only", "--diff-filter=ACMR")
+	if err != nil {
+		return nil
+	}
+	return splitLines(out)
 }
 
 // StagedHunk returns `git diff --cached --unified=2 -- <path>`.

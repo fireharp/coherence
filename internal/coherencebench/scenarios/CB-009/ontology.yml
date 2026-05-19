@@ -1,0 +1,13 @@
+version: 1
+rules:
+  - id: package-impl-change-needs-readme
+    when:
+      - "packages/*/src/**/*.ts"
+      - "packages/*/src/**/*.js"
+    expect_any:
+      - "packages/*/README.md"
+      - "packages/*/docs/**/*.md"
+    severity: warn
+    message: "Package implementation changed; refresh the package README usage section."
+    suggested_commands:
+      - pnpm --filter ./packages/* docs

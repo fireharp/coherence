@@ -1,0 +1,12 @@
+id: CB-001
+name: metric formula changed without generated fixture refresh
+description: |
+  rill/metrics/*.yaml changed but no frontend fixture was co-staged.
+  Engine should fire the metric-yaml rule with a suggested regeneration command.
+status: deterministic
+changed_files:
+  - rill/metrics/org_metrics.yaml
+expected:
+  fires:
+    - metrics-yaml-needs-fixture-refresh
+  blocking_error: false

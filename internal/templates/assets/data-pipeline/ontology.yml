@@ -1,0 +1,50 @@
+version: 1
+# Data pipeline template — schema/migrations/dbt-style projects.
+
+commands:
+  test:
+    - dbt test
+  build:
+    - dbt compile
+  lint:
+    - sqlfluff lint .
+
+rules:
+  - id: schema-change-needs-migration
+    when:
+      - "schema/**/*.sql"
+      - "schema/**/*.yaml"
+      - "schema/**/*.yml"
+    expect_any:
+      - "migrations/**/*.sql"
+      - "db/migrations/**/*"
+    severity: error
+    message: "Schema changed; a migration must be co-staged."
+    suggested_commands:
+      - ls migrations/ | tail -5
+      - dbt compile
+
+  - id: model-change-needs-test
+    when:
+      - "models/**/*.sql"
+    expect_any:
+      - "tests/**/*.sql"
+      - "tests/**/*.yml"
+      - "models/**/schema.yml"
+    severity: warn
+    message: "dbt model changed without a test or schema.yml update."
+    suggested_commands:
+      - dbt test --select "@<model>"
+
+  - id: fixture-or-seed-source-needs-output
+    when:
+      - "seeds/**/*.csv"
+      - "fixtures/**/*"
+    expect_any:
+      - "target/**/*"
+      - "docs/data/**/*.md"
+    severity: warn
+    message: "Seed/fixture data changed; regenerate compiled artifacts and docs."
+    suggested_commands:
+      - dbt seed
+      - dbt docs generate

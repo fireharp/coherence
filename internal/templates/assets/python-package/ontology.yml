@@ -1,0 +1,48 @@
+version: 1
+# Python package template — assumes pyproject.toml + src/ layout, pytest.
+
+commands:
+  test:
+    - uv run pytest -q
+  build:
+    - uv build
+  lint:
+    - uv run ruff check src tests
+
+rules:
+  - id: pyproject-change-needs-lockfile
+    when:
+      - "pyproject.toml"
+    expect_any:
+      - "uv.lock"
+      - "poetry.lock"
+      - "requirements.lock"
+    severity: error
+    message: "pyproject.toml changed; lockfile must be co-staged."
+    suggested_commands:
+      - uv lock
+      - git add uv.lock
+
+  - id: src-change-needs-tests
+    when:
+      - "src/**/*.py"
+    expect_any:
+      - "tests/**/*.py"
+      - "src/**/tests/**/*.py"
+    severity: warn
+    message: "Library code changed without an accompanying test edit."
+    suggested_commands:
+      - uv run pytest -q
+
+  - id: src-change-needs-readme-or-changelog
+    when:
+      - "src/**/__init__.py"
+      - "src/**/cli.py"
+    expect_any:
+      - "README.md"
+      - "CHANGELOG.md"
+      - "docs/**/*.md"
+    severity: warn
+    message: "Public API surface changed; refresh README, docs, or CHANGELOG."
+    suggested_commands:
+      - uv run python -m pydoc -w src

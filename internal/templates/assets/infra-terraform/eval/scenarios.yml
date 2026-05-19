@@ -1,0 +1,30 @@
+scenarios:
+  - id: backend-tf-without-decision-or-runbook
+    description: backend.tf changed without ADR or runbook — both rules fire
+    changed_files:
+      - backend.tf
+    expect_fires:
+      - tf-change-needs-plan-or-runbook
+      - tf-state-config-needs-review
+
+  - id: backend-tf-with-adr-passes
+    description: coherent backend.tf + ADR update satisfies both rules
+    changed_files:
+      - backend.tf
+      - docs/decisions/ADR-012.md
+    expect_fires: []
+
+  - id: module-variable-without-readme-or-runbook
+    description: module variables.tf changed without README/runbook — both rules fire
+    changed_files:
+      - modules/network/variables.tf
+    expect_fires:
+      - tf-change-needs-plan-or-runbook
+      - module-change-needs-variable-doc
+
+  - id: module-variable-with-readme-passes
+    description: module variables.tf + module README satisfies both rules
+    changed_files:
+      - modules/network/variables.tf
+      - modules/network/README.md
+    expect_fires: []

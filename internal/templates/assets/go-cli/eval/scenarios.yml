@@ -1,0 +1,30 @@
+scenarios:
+  - id: gomod-without-gosum
+    description: go.mod changed but go.sum is not co-staged
+    changed_files:
+      - go.mod
+    expect_fires:
+      - gomod-change-needs-sum
+
+  - id: gomod-with-gosum-passes
+    description: coherent go.mod + go.sum update
+    changed_files:
+      - go.mod
+      - go.sum
+    expect_fires: []
+
+  - id: cmd-without-build-or-readme
+    description: cmd code changed without build pipeline + README update
+    changed_files:
+      - cmd/coherence/main.go
+    expect_fires:
+      - cli-cmd-change-needs-build-validation
+      - cli-readme-needs-refresh-on-flag-change
+
+  - id: cmd-with-readme-and-makefile-passes
+    description: cmd code + Makefile + README all updated together
+    changed_files:
+      - cmd/coherence/main.go
+      - Makefile
+      - README.md
+    expect_fires: []

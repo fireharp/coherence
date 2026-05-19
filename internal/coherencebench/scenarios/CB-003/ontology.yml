@@ -1,0 +1,11 @@
+version: 1
+rules:
+  - id: user-story-change-needs-evidence
+    when:
+      - "docs/user-stories/**/US-*.md"
+    expect_any:
+      - "docs/evidence/*/README.md"
+    severity: warn
+    message: "User story modified without a co-staged evidence packet."
+    suggested_commands:
+      - ls docs/evidence/ | tail -5

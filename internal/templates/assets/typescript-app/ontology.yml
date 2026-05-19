@@ -1,0 +1,54 @@
+version: 1
+# TypeScript app template — assumes pnpm/npm + src/ + tsconfig.
+
+commands:
+  test:
+    - pnpm test
+  build:
+    - pnpm build
+  lint:
+    - pnpm lint
+    - pnpm tsc --noEmit
+
+rules:
+  - id: package-json-change-needs-lockfile
+    when:
+      - "package.json"
+    expect_any:
+      - "pnpm-lock.yaml"
+      - "package-lock.json"
+      - "yarn.lock"
+    severity: error
+    message: "package.json changed; lockfile must be co-staged."
+    suggested_commands:
+      - pnpm install
+      - git add pnpm-lock.yaml
+
+  - id: src-change-needs-tests
+    when:
+      - "src/**/*.ts"
+      - "src/**/*.tsx"
+    expect_any:
+      - "tests/**/*"
+      - "src/**/*.test.ts"
+      - "src/**/*.test.tsx"
+      - "src/**/*.spec.ts"
+    severity: warn
+    message: "TS source changed without an accompanying test edit."
+    suggested_commands:
+      - pnpm test
+      - pnpm tsc --noEmit
+
+  - id: api-routes-need-types
+    when:
+      - "src/api/**/*.ts"
+      - "src/server/**/*.ts"
+    expect_any:
+      - "src/types/**/*.ts"
+      - "src/schemas/**/*.ts"
+      - "openapi.yaml"
+      - "docs/api/**/*.md"
+    severity: warn
+    message: "Server-side handler changed; verify shared types/schema still match."
+    suggested_commands:
+      - pnpm tsc --noEmit

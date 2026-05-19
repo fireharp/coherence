@@ -1,4 +1,10 @@
 version: 1
+commands:
+  test:
+    - go test ./...
+  build:
+    - go build ./cmd/coherence
+
 rules:
   - id: metrics-yaml-needs-fixture-refresh
     when:
@@ -8,6 +14,8 @@ rules:
       - "frontend/public/fixtures/api/run_search.json"
     severity: warn
     message: "Metric def changed; re-run frontend/scripts/build-fixtures.mjs and stage outputs."
+    suggested_commands:
+      - node frontend/scripts/build-fixtures.mjs
 
   - id: fixture-generator-needs-output
     when:
@@ -18,6 +26,9 @@ rules:
       - "frontend/public/fixtures/api/run_search.json"
     severity: error
     message: "Fixture source changed; outputs must be regenerated and co-staged."
+    suggested_commands:
+      - node frontend/scripts/build-fixtures.mjs
+      - git add frontend/public/fixtures
 
   - id: meta-stats-go-needs-readme
     when:
@@ -26,6 +37,9 @@ rules:
       - "tools/meta-stats/README.md"
     severity: warn
     message: "main.go changed; verify README CLI usage / output shape still matches."
+    suggested_commands:
+      - go build ./tools/meta-stats
+      - tools/meta-stats/meta-stats --help
 
   - id: spec-change-needs-decision-or-evidence
     when:

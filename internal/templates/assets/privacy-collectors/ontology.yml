@@ -1,0 +1,77 @@
+version: 1
+# Domain example: Go services with privacy-sensitive collectors. Mirrors the
+# example shipped in GOAL.md. Merge these rules into a base template's
+# ontology (typically `go-cli`) when you have collector code that handles
+# PII, third-party tokens, or vendor logs.
+
+commands:
+  test:
+    - go test ./...
+  build:
+    - go build ./...
+  lint:
+    - go vet ./...
+
+rules:
+  - id: collector-change-needs-redaction-test
+    when:
+      - "internal/collectors/**/*.go"
+    expect_any:
+      - "internal/collectors/**/*_test.go"
+      - "internal/server/**/*_test.go"
+      - "docs/privacy*.md"
+      - "docs/privacy/**/*.md"
+    severity: warn
+    message: "Collector/privacy-sensitive code changed; update redaction/privacy tests or docs."
+    suggested_commands:
+      - go test ./internal/collectors/...
+      - go test ./internal/server/...
+
+  - id: privacy-config-change-needs-doc
+    when:
+      - "internal/privacy/**/*.go"
+      - "internal/redaction/**/*.go"
+      - "config/privacy.yaml"
+      - "config/redaction.yaml"
+    expect_any:
+      - "docs/privacy*.md"
+      - "docs/privacy/**/*.md"
+      - "docs/decisions/ADR-*.md"
+      - "internal/privacy/**/*_test.go"
+      - "internal/redaction/**/*_test.go"
+    severity: error
+    message: "Privacy/redaction policy changed; require an ADR or doc update + test coverage."
+    suggested_commands:
+      - go test ./internal/privacy/...
+      - go test ./internal/redaction/...
+
+  - id: pii-fixture-change-needs-redaction-test
+    when:
+      - "testdata/pii/**/*"
+      - "testdata/redaction/**/*"
+      - "fixtures/pii/**/*"
+    expect_any:
+      - "internal/redaction/**/*_test.go"
+      - "internal/collectors/**/*_test.go"
+      - "docs/privacy*.md"
+    severity: warn
+    message: "PII fixture changed; rerun redaction-coverage tests so masking stays correct."
+    suggested_commands:
+      - go test ./internal/redaction/...
+
+  - id: vendor-token-handling-needs-secret-doc
+    when:
+      - "internal/vendors/**/*.go"
+      - "internal/auth/tokens.go"
+      - "internal/auth/keys.go"
+    expect_any:
+      - "docs/security/**/*.md"
+      - "docs/privacy*.md"
+      - "docs/decisions/ADR-*.md"
+      - "internal/auth/*_test.go"
+      - "internal/vendors/**/*_test.go"
+    severity: warn
+    message: "Vendor token/key handling changed; verify secret-management docs and tests still align."
+    suggested_commands:
+      - go test ./internal/auth/...
+      - go test ./internal/vendors/...
