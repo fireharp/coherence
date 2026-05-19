@@ -1,0 +1,52 @@
+id: CB-020
+name: orphan_endpoints diff fires telemetry on lost test coverage
+description: |
+  End-to-end exercise of the diff-aware orphan_endpoints meter
+  (iteration 78). Baseline has one HTTP endpoint (`http.HandleFunc`)
+  defined in server.go, plus a server_test.go that verifies the
+  source via the reverse-map convention (foo_test.go → foo.go). The
+  endpoint is covered.
+
+  Current removes server_test.go — the endpoint loses its only
+  `verifies` link. orphan_endpoints fires telemetry on score > 0,
+  and the diff-aware addition surfaces the specific endpoint via
+  `NewlyOrphanedEndpoints` (visible in `drift.regressions.entries`
+  with kind `newly_orphaned_endpoint`). The scenario asserts
+  verdict=telemetry, proving the meter fires end-to-end after the
+  diff rewrite.
+status: deterministic
+base_files:
+  server.go: |
+    package main
+
+    import "net/http"
+
+    func login(w http.ResponseWriter, r *http.Request) {}
+
+    func init() {
+        http.HandleFunc("/login", login)
+    }
+  server_test.go: |
+    package main
+
+    import "testing"
+
+    func TestLogin(t *testing.T) {}
+files:
+  server.go: |
+    package main
+
+    import "net/http"
+
+    func login(w http.ResponseWriter, r *http.Request) {}
+
+    func init() {
+        http.HandleFunc("/login", login)
+    }
+removed_files:
+  - server_test.go
+expected:
+  fires: []
+  blocking_error: false
+  drift:
+    verdict: telemetry

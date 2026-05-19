@@ -1338,6 +1338,68 @@ func TestVerdictTelemetryOnUnsupportedClaims(t *testing.T) {
 	}
 }
 
+func TestActiveMetersListsAllFiringMeters(t *testing.T) {
+	r := Report{
+		RequiredEdgeBreakage:  EdgeBreakage{BrokenCount: 1, TotalRules: 5},
+		BrokenLinks:           BrokenLinks{Score: 2},
+		StaleTests:            StaleTests{Score: 1},
+		OrphanEndpoints:       OrphanEndpoints{Score: 3},
+		ClaimSupport:          ClaimSupport{TotalClaims: 1, Score: 1.0},
+		UnknownIDReferences:   UnknownIDReferences{Score: 7},
+		PathLoss:              PathLoss{TotalConcepts: 5, Score: 1.0},
+	}
+	got := activeMeters(r)
+	want := map[string]bool{
+		"required_edge_breakage": true,
+		"path_loss":              true,
+		"claim_support":          true,
+		"orphan_endpoints":       true,
+		"broken_links":           true,
+		"unknown_id_references":  true,
+		"stale_tests":            true,
+	}
+	gotSet := map[string]bool{}
+	for _, m := range got {
+		gotSet[m] = true
+	}
+	for w := range want {
+		if !gotSet[w] {
+			t.Errorf("expected %s in active_meters, got %v", w, got)
+		}
+	}
+}
+
+func TestActiveMetersEmptyOnCleanReport(t *testing.T) {
+	got := activeMeters(Report{})
+	if len(got) != 0 {
+		t.Errorf("clean report should have empty active_meters, got %v", got)
+	}
+}
+
+func TestActiveMetersTriggeredByDiffOnly(t *testing.T) {
+	// PathLoss with no current orphans but a newly_orphaned diff entry
+	// should still mark path_loss active.
+	r := Report{
+		PathLoss: PathLoss{
+			TotalConcepts:         10,
+			Score:                 0.01,
+			BaseAvailable:         true,
+			NewlyOrphanedConcepts: []string{"concept:auth"},
+		},
+	}
+	got := activeMeters(r)
+	found := false
+	for _, m := range got {
+		if m == "path_loss" {
+			found = true
+			break
+		}
+	}
+	if !found {
+		t.Errorf("path_loss should be active via diff regression, got %v", got)
+	}
+}
+
 func TestHumanRendersRegressionsSection(t *testing.T) {
 	r := Report{
 		Verdict: VerdictTelemetry,

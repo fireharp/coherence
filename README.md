@@ -220,7 +220,7 @@ scenario is a self-contained directory under
   scenarios (CB-004/006/008/011..015) are shipped as stubs so the suite is
   honest about scope. Each stub records the milestone that would enable it.
 
-The shipped totals are: **18 scenarios, 17 pass, 0 fail, 1 skipped** —
+The shipped totals are: **20 scenarios, 19 pass, 0 fail, 1 skipped** —
 matching M1's "at least 8 internal scenarios exist" bar.
 
 ### Scored scenarios (Files mode)
@@ -648,7 +648,7 @@ meters today:
 | `orphan_endpoints`        | `defines` (reverse) + `verifies` (base + current) | count of HTTP endpoints whose source file has no test; reports `newly_orphaned_endpoints` and `newly_covered_endpoints` when a base graph is on disk |
 | `unimplemented_stories`   | user_story nodes + `implements`      | stories with no incoming implements claim (gated on convention) |
 | `broken_links`            | markdown re-scan of tracked .md      | inline links pointing to paths not in the tracked set           |
-| `unknown_id_references`   | typed-id regex over non-Markdown     | code mentions of US/ADR/IDR ids not defined in the graph        |
+| `unknown_id_references`   | typed-id regex over non-Markdown production code | code mentions of US/ADR/IDR ids not defined in the graph; test files (`*_test.go`, `*.test.ts`, etc.), `.agents/`, and fixture-shaped dirs (`scenarios/`, `fixtures/`, `testdata/`, `golden/`, `eval/`) are excluded |
 | `stale_tests`             | `verifies` + base/current snapshot   | tests unchanged while their `verifies`-linked source changed    |
 | `orphaned_metric_aliases` | base+current metric diff + frontend scan | frontend string refs to metric names removed/renamed in current |
 | `dangling_imports`        | TS + Python source re-scan + relative-path resolution | count of `./x` (TS) or `from .x` (Py) imports whose target isn't in the tracked set (warn-level — breaks the build); entries carry `lang: "ts"` / `lang: "py"` |
@@ -702,7 +702,11 @@ diff-aware regressions like `newly_orphaned_concepts`) should block the
 merge. The live `coherence watch` loop ignores `--strict` (it streams
 events; there's no single exit code to promote).
 
-For agent consumers: the drift report exposes a top-level `regressions`
+For agent consumers: the drift report exposes a top-level
+`active_meters` field listing the names of meters that contributed
+signal to the verdict (mirrors the verdict-promotion gates). Agents
+triage with `drift.active_meters.length > 0` rather than inspecting
+every per-meter score. The drift report also exposes a top-level `regressions`
 field aggregating the four diff-aware `newly_*` lists
 (`newly_orphaned_concepts`, `newly_unsupported_claims`,
 `newly_uncovered_stories`, `newly_orphaned_endpoints`) plus a `count`

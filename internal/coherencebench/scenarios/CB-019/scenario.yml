@@ -1,0 +1,48 @@
+id: CB-019
+name: trace_coverage diff fires warn on lost story mention
+description: |
+  End-to-end exercise of the diff-aware trace_coverage meter
+  (iteration 71). Baseline has one user_story (US-001) defined by its
+  own doc and covered by an incoming `mentions` edge from a spec doc.
+  Current removes the spec doc's markdown link to the story, dropping
+  the only mentions edge — the story is no longer covered.
+
+  trace_coverage's existing behavior is to promote verdict to `warn`
+  on any uncovered story. The diff-aware addition surfaces the
+  specific story that lost coverage via `NewlyUncoveredStories`
+  (visible in `drift.regressions.entries` with kind
+  `newly_uncovered_story`). The scenario asserts verdict=warn,
+  proving the meter still fires end-to-end after the diff rewrite.
+status: deterministic
+base_files:
+  docs/user-stories/US-001.md: |
+    ---
+    id: US-001
+    title: Login
+    ---
+
+    # Login
+
+    A user can authenticate.
+  docs/specs/auth.md: |
+    ---
+    title: Auth Spec
+    ---
+
+    # Auth
+
+    See [the login story](../user-stories/US-001.md).
+files:
+  docs/specs/auth.md: |
+    ---
+    title: Auth Spec
+    ---
+
+    # Auth
+
+    Implementation details follow. (No link to US-001 anymore.)
+expected:
+  fires: []
+  blocking_error: false
+  drift:
+    verdict: warn
