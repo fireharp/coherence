@@ -38,7 +38,7 @@ func TestBrokenLinksEmptyRepo(t *testing.T) {
 
 func TestBrokenLinksTrackedTargetIsNotFlagged(t *testing.T) {
 	dir := brokenLinksGitInit(t, map[string]string{
-		"docs/index.md": "See [auth](specs/auth.md).\n",
+		"docs/index.md":      "See [auth](specs/auth.md).\n",
 		"docs/specs/auth.md": "# Auth\n",
 	})
 	r := computeBrokenLinks(dir)
@@ -49,7 +49,7 @@ func TestBrokenLinksTrackedTargetIsNotFlagged(t *testing.T) {
 
 func TestBrokenLinksUntrackedTargetIsFlagged(t *testing.T) {
 	dir := brokenLinksGitInit(t, map[string]string{
-		"docs/index.md": "See [missing](specs/removed.md) and [extant](specs/auth.md).\n",
+		"docs/index.md":      "See [missing](specs/removed.md) and [extant](specs/auth.md).\n",
 		"docs/specs/auth.md": "# Auth\n",
 	})
 	r := computeBrokenLinks(dir)
@@ -91,6 +91,23 @@ func TestBrokenLinksAbsolutePathResolution(t *testing.T) {
 	}
 	if r.Score == 1 && r.Links[0].Target != "specs/removed.md" {
 		t.Errorf("target should resolve to repo-relative: %+v", r.Links[0])
+	}
+}
+
+func TestBrokenLinksUntrackedButOnDiskNotFlagged(t *testing.T) {
+	// Targets that are .gitignored or otherwise untracked but exist on
+	// disk (e.g., LOCAL.md notes) shouldn't be flagged — the link works
+	// for the user's working tree. Only truly-missing files count.
+	dir := brokenLinksGitInit(t, map[string]string{
+		"README.md": "See [local notes](LOCAL.md).\n",
+	})
+	// Create LOCAL.md on disk but do NOT git-add it.
+	if err := os.WriteFile(filepath.Join(dir, "LOCAL.md"), []byte("# Local\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	r := computeBrokenLinks(dir)
+	if r.Score != 0 {
+		t.Errorf("untracked-but-on-disk target should not be flagged, got %+v", r.Links)
 	}
 }
 
