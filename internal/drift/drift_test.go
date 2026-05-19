@@ -534,10 +534,27 @@ func TestVerdictTelemetryOnPathLossCrossingFloor(t *testing.T) {
 		PathLoss: PathLoss{
 			TotalConcepts: 4,
 			Score:         pathLossFloor + 0.1,
+			Convention:    true,
 		},
 	}
 	if v := computeVerdict(r); v != VerdictTelemetry {
 		t.Errorf("expected telemetry on high path_loss, got %s", v)
+	}
+}
+
+func TestVerdictCleanWhenPathLossWithoutConvention(t *testing.T) {
+	// Kickoff project shape: 100% orphan but no concept ever supported.
+	// The verdict should NOT promote to telemetry — the repo doesn't
+	// use the chain pattern, so the meter is uninformative.
+	r := Report{
+		PathLoss: PathLoss{
+			TotalConcepts: 28,
+			Score:         1.0,
+			Convention:    false,
+		},
+	}
+	if v := computeVerdict(r); v != VerdictClean {
+		t.Errorf("path_loss without convention should not promote, got %s", v)
 	}
 }
 
@@ -1340,13 +1357,13 @@ func TestVerdictTelemetryOnUnsupportedClaims(t *testing.T) {
 
 func TestActiveMetersListsAllFiringMeters(t *testing.T) {
 	r := Report{
-		RequiredEdgeBreakage:  EdgeBreakage{BrokenCount: 1, TotalRules: 5},
-		BrokenLinks:           BrokenLinks{Score: 2},
-		StaleTests:            StaleTests{Score: 1},
-		OrphanEndpoints:       OrphanEndpoints{Score: 3},
-		ClaimSupport:          ClaimSupport{TotalClaims: 1, Score: 1.0},
-		UnknownIDReferences:   UnknownIDReferences{Score: 7},
-		PathLoss:              PathLoss{TotalConcepts: 5, Score: 1.0},
+		RequiredEdgeBreakage: EdgeBreakage{BrokenCount: 1, TotalRules: 5},
+		BrokenLinks:          BrokenLinks{Score: 2},
+		StaleTests:           StaleTests{Score: 1},
+		OrphanEndpoints:      OrphanEndpoints{Score: 3},
+		ClaimSupport:         ClaimSupport{TotalClaims: 1, Score: 1.0},
+		UnknownIDReferences:  UnknownIDReferences{Score: 7},
+		PathLoss:             PathLoss{TotalConcepts: 5, Score: 1.0, Convention: true},
 	}
 	got := activeMeters(r)
 	want := map[string]bool{

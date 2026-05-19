@@ -133,6 +133,35 @@ func TestTSImportResolvesExtensionFallbacks(t *testing.T) {
 	}
 }
 
+func TestTSImportResolvesESMJsSuffix(t *testing.T) {
+	// Node ESM requires explicit extensions, so TypeScript source
+	// commonly imports `./foo.js` paths that resolve to `./foo.ts` on
+	// disk (the .js suffix gets emitted by tsc/swc). The resolver
+	// must follow that convention so dangling_imports doesn't false-
+	// positive on every import in modern Node-targeted TS projects.
+	dir := gitInit(t, map[string]string{
+		"src/a.ts":     `import { x } from "./b.js"; export const y = x`,
+		"src/b.ts":     `export const x = 1`,
+		"src/c.ts":     `import { c } from "./comp.jsx"; export const w = c`,
+		"src/comp.tsx": `export const c = 1`,
+		"src/d.mts":    `import "./util.mjs"; export const z = 1`,
+		"src/util.mts": `export const u = 1`,
+	})
+	g, err := Build(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, c := range []struct{ from, to string }{
+		{"src/a.ts", "src/b.ts"},
+		{"src/c.ts", "src/comp.tsx"},
+		{"src/d.mts", "src/util.mts"},
+	} {
+		if !hasEdge(g, FileNodeID(c.from), FileNodeID(c.to), EdgeDependsOn) {
+			t.Errorf("ESM .js→.ts (or variant) should resolve: %s → %s", c.from, c.to)
+		}
+	}
+}
+
 func TestTSImportResolvesDirectoryIndex(t *testing.T) {
 	dir := gitInit(t, map[string]string{
 		"src/a.ts":             `import { core } from "./feature"; export const x = core`,

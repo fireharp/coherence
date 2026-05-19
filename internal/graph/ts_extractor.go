@@ -268,6 +268,38 @@ func ResolveTSImport(fromRel, spec string, tracked map[string]struct{}) (string,
 			return candidate, true
 		}
 	}
+	// ESM Node convention: TypeScript source imports `./foo.js` paths
+	// that resolve to `./foo.ts` on disk (Node ESM requires explicit
+	// extensions, while tsc/swc rewrite the suffix). Try swapping a
+	// `.js`/`.jsx` suffix for `.ts`/`.tsx` and re-checking.
+	switch {
+	case strings.HasSuffix(joined, ".js"):
+		base := strings.TrimSuffix(joined, ".js")
+		for _, ext := range []string{".ts", ".tsx", ".mts", ".cts"} {
+			candidate := base + ext
+			if _, ok := tracked[candidate]; ok {
+				return candidate, true
+			}
+		}
+	case strings.HasSuffix(joined, ".jsx"):
+		base := strings.TrimSuffix(joined, ".jsx")
+		for _, ext := range []string{".tsx", ".ts"} {
+			candidate := base + ext
+			if _, ok := tracked[candidate]; ok {
+				return candidate, true
+			}
+		}
+	case strings.HasSuffix(joined, ".mjs"):
+		base := strings.TrimSuffix(joined, ".mjs")
+		if _, ok := tracked[base+".mts"]; ok {
+			return base + ".mts", true
+		}
+	case strings.HasSuffix(joined, ".cjs"):
+		base := strings.TrimSuffix(joined, ".cjs")
+		if _, ok := tracked[base+".cts"]; ok {
+			return base + ".cts", true
+		}
+	}
 	// Directory-as-module fallback.
 	for _, ext := range []string{".ts", ".tsx", ".mts", ".cts", ".js", ".jsx"} {
 		candidate := path.Join(joined, "index"+ext)

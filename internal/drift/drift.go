@@ -260,6 +260,7 @@ type ClaimSupport struct {
 	TotalClaims            int      `json:"total_claims"`
 	SupportedClaims        int      `json:"supported_claims"`
 	UnsupportedClaims      []string `json:"unsupported_claims"`
+	Convention             bool     `json:"convention"`
 	BaseAvailable          bool     `json:"base_available"`
 	NewlyUnsupportedClaims []string `json:"newly_unsupported_claims"`
 	NewlySupportedClaims   []string `json:"newly_supported_claims"`
@@ -316,11 +317,19 @@ type BlastRadius struct {
 // fields below report concept transitions across base→current when a
 // base graph is on disk: a concept that flipped from supported to
 // orphan is the actionable "this commit lost a support path" signal.
+//
+// `Convention` is true iff at least one concept is supported in either
+// the base or the current graph — proof the repo actually uses the
+// chain pattern. When Convention=false the verdict skips path_loss
+// (data still surfaces) so kickoff projects with no chains yet don't
+// get treated as 100% orphan regressions. Diff transitions still
+// promote regardless since they imply prior support existed.
 type PathLoss struct {
 	Score                  float64  `json:"score"`
 	TotalConcepts          int      `json:"total_concepts"`
 	SupportedConcepts      int      `json:"supported_concepts"`
 	OrphanConcepts         []string `json:"orphan_concepts"`
+	Convention             bool     `json:"convention"`
 	BaseAvailable          bool     `json:"base_available"`
 	NewlyOrphanedConcepts  []string `json:"newly_orphaned_concepts"`
 	NewlySupportedConcepts []string `json:"newly_supported_concepts"`
@@ -536,7 +545,7 @@ func activeMeters(r Report) []string {
 	if r.SemanticMovement.BaseAvailable && r.SemanticMovement.Score >= semanticMovementFloor {
 		out = append(out, "semantic_movement")
 	}
-	if (r.PathLoss.TotalConcepts > 0 && r.PathLoss.Score >= pathLossFloor) ||
+	if (r.PathLoss.TotalConcepts > 0 && r.PathLoss.Convention && r.PathLoss.Score >= pathLossFloor) ||
 		len(r.PathLoss.NewlyOrphanedConcepts) > 0 {
 		out = append(out, "path_loss")
 	}
@@ -1314,11 +1323,27 @@ func computeClaimSupport(base *graph.Graph, current graph.Graph) ClaimSupport {
 		sort.Strings(newlySupported)
 	}
 
+	// Convention: same rule as path_loss — true iff at least one claim
+	// reaches an artifact via the BFS in either base or current. Lets
+	// the verdict skip score-based promotion on repos that don't use
+	// the claim/support pattern yet.
+	convention := supported > 0
+	if base != nil {
+		baseReaches, _ := supportPathReacher(*base)
+		for _, n := range base.Nodes {
+			if n.Kind == graph.NodeClaim && baseReaches(n.ID) {
+				convention = true
+				break
+			}
+		}
+	}
+
 	return ClaimSupport{
 		Score:                  float64(len(unsupported)) / float64(len(claims)),
 		TotalClaims:            len(claims),
 		SupportedClaims:        supported,
 		UnsupportedClaims:      unsupported,
+		Convention:             convention,
 		BaseAvailable:          base != nil,
 		NewlyUnsupportedClaims: newlyUnsupported,
 		NewlySupportedClaims:   newlySupported,
@@ -1548,11 +1573,25 @@ func computePathLoss(base *graph.Graph, current graph.Graph) PathLoss {
 		sort.Strings(newlySupported)
 	}
 
+	// Convention detection: the repo "uses" the support-chain pattern
+	// if at least one concept is supported in either base or current.
+	convention := supported > 0
+	if base != nil {
+		baseReaches, _ := supportPathReacher(*base)
+		for _, n := range base.Nodes {
+			if n.Kind == graph.NodeConcept && baseReaches(n.ID) {
+				convention = true
+				break
+			}
+		}
+	}
+
 	return PathLoss{
 		Score:                  float64(len(orphans)) / float64(len(concepts)),
 		TotalConcepts:          len(concepts),
 		SupportedConcepts:      supported,
 		OrphanConcepts:         orphans,
+		Convention:             convention,
 		BaseAvailable:          base != nil,
 		NewlyOrphanedConcepts:  newlyOrphaned,
 		NewlySupportedConcepts: newlySupported,
@@ -1628,7 +1667,7 @@ func computeVerdict(r Report) string {
 	if r.SemanticMovement.BaseAvailable && r.SemanticMovement.Score >= semanticMovementFloor {
 		return VerdictTelemetry
 	}
-	if r.PathLoss.TotalConcepts > 0 && r.PathLoss.Score >= pathLossFloor {
+	if r.PathLoss.TotalConcepts > 0 && r.PathLoss.Convention && r.PathLoss.Score >= pathLossFloor {
 		return VerdictTelemetry
 	}
 	// Concept regressions (path_loss diff): any concept that lost its
@@ -1868,7 +1907,7 @@ func renderActions(r Report) []string {
 	if !r.NeighborhoodDrift.BaseAvailable {
 		out = append(out, "coherence index   # build initial graph baseline")
 	}
-	if r.PathLoss.TotalConcepts > 0 && r.PathLoss.Score >= pathLossFloor {
+	if r.PathLoss.TotalConcepts > 0 && r.PathLoss.Convention && r.PathLoss.Score >= pathLossFloor {
 		out = append(out, "link orphan concepts from a supporting doc (or accept them as standalone)")
 	}
 	if len(r.PathLoss.NewlyOrphanedConcepts) > 0 {

@@ -64,15 +64,19 @@ type Payload struct {
 	OntologyRules  int           `json:"ontology_rules"`
 }
 
-// DriftSummary captures just the verdict + diff-aware regressions from
-// the last report — the actionable subset for agents that don't want
-// the full drift report inline.
+// DriftSummary captures just the verdict + diff-aware regressions +
+// active meter list from the last report — the actionable subset for
+// agents that don't want the full drift report inline. Kept in sync
+// with drift.Report's diff-aware fields and active_meters list.
 type DriftSummary struct {
 	Verdict                string   `json:"verdict"`
 	GeneratedAt            string   `json:"generated_at"`
+	ActiveMeters           []string `json:"active_meters"`
 	NewlyOrphanedConcepts  []string `json:"newly_orphaned_concepts"`
 	NewlyUnsupportedClaims []string `json:"newly_unsupported_claims"`
 	NewlyUncoveredStories  []string `json:"newly_uncovered_stories"`
+	NewlyOrphanedEndpoints []string `json:"newly_orphaned_endpoints"`
+	RegressionCount        int      `json:"regression_count"`
 }
 
 // LiveSummary is the per-range eval slice used by the markdown render.
@@ -135,9 +139,12 @@ func Compute(rootDir string, ont *ontology.Ontology) Payload {
 		p.Drift = &DriftSummary{
 			Verdict:                d.Verdict,
 			GeneratedAt:            d.GeneratedAt,
+			ActiveMeters:           cloneStrings(d.ActiveMeters),
 			NewlyOrphanedConcepts:  cloneStrings(d.PathLoss.NewlyOrphanedConcepts),
 			NewlyUnsupportedClaims: cloneStrings(d.ClaimSupport.NewlyUnsupportedClaims),
 			NewlyUncoveredStories:  cloneStrings(d.TraceCoverage.NewlyUncoveredStories),
+			NewlyOrphanedEndpoints: cloneStrings(d.OrphanEndpoints.NewlyOrphanedEndpoints),
+			RegressionCount:        d.Regressions.Count,
 		}
 	}
 	return p
@@ -326,6 +333,12 @@ func render(ont *ontology.Ontology, last *report.Payload, snapshots []snapshot, 
 		d := last.Drift
 		push(fmt.Sprintf("- Verdict: **%s**", d.Verdict))
 		push(fmt.Sprintf("- Generated: %s", d.GeneratedAt))
+		if len(d.ActiveMeters) > 0 {
+			push(fmt.Sprintf("- Active meters: %s", strings.Join(d.ActiveMeters, ", ")))
+		}
+		if d.Regressions.Count > 0 {
+			push(fmt.Sprintf("- Regressions since baseline: **%d**", d.Regressions.Count))
+		}
 		if d.PathLoss.BaseAvailable && len(d.PathLoss.NewlyOrphanedConcepts) > 0 {
 			push(fmt.Sprintf("- Newly orphaned concept(s) since baseline: %s",
 				strings.Join(d.PathLoss.NewlyOrphanedConcepts, ", ")))
@@ -337,6 +350,10 @@ func render(ont *ontology.Ontology, last *report.Payload, snapshots []snapshot, 
 		if d.TraceCoverage.BaseAvailable && len(d.TraceCoverage.NewlyUncoveredStories) > 0 {
 			push(fmt.Sprintf("- Newly uncovered stor(ies) since baseline: %s",
 				strings.Join(d.TraceCoverage.NewlyUncoveredStories, ", ")))
+		}
+		if d.OrphanEndpoints.BaseAvailable && len(d.OrphanEndpoints.NewlyOrphanedEndpoints) > 0 {
+			push(fmt.Sprintf("- Newly orphaned endpoint(s) since baseline: %s",
+				strings.Join(d.OrphanEndpoints.NewlyOrphanedEndpoints, ", ")))
 		}
 	}
 	push("")
