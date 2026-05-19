@@ -196,6 +196,48 @@ def handler():
 	}
 }
 
+func TestTSImplementsSkipsBacktickInlineCode(t *testing.T) {
+	// A JSDoc that describes the convention by quoting the syntax in
+	// backticks ("use `// implements US-999`") should not emit a real
+	// claim against US-999.
+	dir := gitInit(t, map[string]string{
+		"src/notes.ts": "/**\n" +
+			" * Documents the convention — use `// implements US-999`\n" +
+			" * on the line above an export to mark it.\n" +
+			" */\n" +
+			"export class Convention {}\n",
+	})
+	g, err := Build(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if hasEdge(g, CodeSymbolNodeID("src/notes", "Convention"),
+		IDNodeID("US", "US-999"), EdgeImplements) {
+		t.Error("backtick-wrapped example should not emit TS implements edge")
+	}
+}
+
+func TestPyImplementsSkipsBacktickInlineCode(t *testing.T) {
+	// Python docstring describing the convention shouldn't emit a
+	// claim. Backtick-wrapped example IDs are documentation, not claims.
+	dir := gitInit(t, map[string]string{
+		"app/notes.py": "\"\"\"\n" +
+			"Module documenting `# implements US-999` style annotations.\n" +
+			"\"\"\"\n" +
+			"\n" +
+			"def convention():\n" +
+			"    pass\n",
+	})
+	g, err := Build(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if hasEdge(g, CodeSymbolNodeID("app.notes", "convention"),
+		IDNodeID("US", "US-999"), EdgeImplements) {
+		t.Error("backtick-wrapped example should not emit Python implements edge")
+	}
+}
+
 func TestImplementsDoesNotDoubleEmitGoSourceFromNewExtractor(t *testing.T) {
 	// Go's emitImplementsFromDoc still owns Go `*.go` files. The new
 	// extractor must NOT touch Go sources — sanity check that the

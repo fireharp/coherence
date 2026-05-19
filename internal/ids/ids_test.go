@@ -33,6 +33,57 @@ func TestScanWarnsOnlyForMissing(t *testing.T) {
 	}
 }
 
+func TestScanSkipsBacktickInlineCode(t *testing.T) {
+	// Doc comments that wrap an ID in backticks are documenting the
+	// convention itself, not making a reference. Don't fire.
+	idx := &Index{US: map[string]struct{}{}, ADR: map[string]struct{}{}, IDR: map[string]struct{}{}}
+	added := map[string]string{
+		"src/notes.go": "// covers `US-999` as an inline example\n",
+	}
+	findings := Scan(added, []string{"src/notes.go"}, idx)
+	if len(findings) != 0 {
+		t.Errorf("backtick-wrapped ID should not fire, got %d findings: %+v", len(findings), findings)
+	}
+}
+
+func TestScanSkipsRawStringFixtures(t *testing.T) {
+	// Typed-IDs embedded in a Go raw-string literal (sample fixture
+	// data) shouldn't fire as unknown references.
+	idx := &Index{US: map[string]struct{}{}, ADR: map[string]struct{}{}, IDR: map[string]struct{}{}}
+	added := map[string]string{
+		"internal/samples.go": "var Sample = `id: US-007\n# US-007 — Monthly invoicing\n`\n",
+	}
+	findings := Scan(added, []string{"internal/samples.go"}, idx)
+	if len(findings) != 0 {
+		t.Errorf("raw-string-embedded ID should not fire, got %+v", findings)
+	}
+}
+
+func TestScanSkipsDoubleQuotedStrings(t *testing.T) {
+	// Same for `"docs/.../US-007.md"` fixture path literals.
+	idx := &Index{US: map[string]struct{}{}, ADR: map[string]struct{}{}, IDR: map[string]struct{}{}}
+	added := map[string]string{
+		"internal/samples.go": "var Gold = []string{\"docs/user-stories/US-007.md\"}\n",
+	}
+	findings := Scan(added, []string{"internal/samples.go"}, idx)
+	if len(findings) != 0 {
+		t.Errorf("double-quoted-path ID should not fire, got %+v", findings)
+	}
+}
+
+func TestScanStillFiresOnBareReference(t *testing.T) {
+	// Guard against the backtick-skip over-relaxing the meter: a bare
+	// reference outside of any quote-span should still fire.
+	idx := &Index{US: map[string]struct{}{}, ADR: map[string]struct{}{}, IDR: map[string]struct{}{}}
+	added := map[string]string{
+		"src/main.go": "// implements US-999\n",
+	}
+	findings := Scan(added, []string{"src/main.go"}, idx)
+	if len(findings) != 1 || !strings.Contains(findings[0].Message, "US-999") {
+		t.Errorf("bare reference should still fire, got %+v", findings)
+	}
+}
+
 func TestScanDedupesPerFile(t *testing.T) {
 	idx := &Index{
 		US: map[string]struct{}{}, ADR: map[string]struct{}{}, IDR: map[string]struct{}{},
