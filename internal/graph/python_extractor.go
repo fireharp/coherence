@@ -87,8 +87,10 @@ var pyDecoratorEndpointRe = regexp.MustCompile(
 // pyDecoratorPathRe pulls the first positional string-literal argument
 // from the decorator call body. Anchored to the start of the args so
 // `@app.get(PREFIX + "/items")` does NOT match — `"/items"` is not the
-// first arg, it's part of an expression.
-var pyDecoratorPathRe = regexp.MustCompile(`^\s*["']([^"']+)["']`)
+// first arg, it's part of an expression. The path must begin with `/`
+// to match how Flask/FastAPI routes are conventionally declared,
+// rejecting decorator-shaped patterns that aren't routes.
+var pyDecoratorPathRe = regexp.MustCompile(`^\s*["'](/[^"']*)["']`)
 
 // pyRouteMethodsRe pulls method names from a Flask `methods=[...]`
 // keyword argument.

@@ -31,6 +31,10 @@ type Options struct {
 	Template     string
 	Force        bool
 	SkillInstall string
+	// NoBaseline disables the snapshot+graph baseline build that
+	// otherwise runs as part of init. Useful for CI/test flows that
+	// build the baseline explicitly with `coherence index` later.
+	NoBaseline bool
 }
 
 // Action describes one filesystem effect.
@@ -101,8 +105,12 @@ func Run(rootDir string, opts Options) (Result, error) {
 	// yet (rare for init), the baseline stays absent and existing
 	// fallback logic in drift handles it gracefully. Skips when a
 	// baseline already exists unless --force, so re-running init
-	// doesn't clobber a user's hand-curated state.
-	res.Actions = append(res.Actions, buildBaseline(rootDir, opts.Force))
+	// doesn't clobber a user's hand-curated state. `--no-baseline`
+	// suppresses the baseline build for CI/test flows that index
+	// explicitly later.
+	if !opts.NoBaseline {
+		res.Actions = append(res.Actions, buildBaseline(rootDir, opts.Force))
+	}
 
 	res.HintNext = []string{
 		"git config core.hooksPath .githooks",

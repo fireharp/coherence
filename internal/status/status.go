@@ -72,6 +72,7 @@ type DriftSummary struct {
 	Verdict                string   `json:"verdict"`
 	GeneratedAt            string   `json:"generated_at"`
 	ActiveMeters           []string `json:"active_meters"`
+	SilencedMeters         []string `json:"silenced_meters"`
 	NewlyOrphanedConcepts  []string `json:"newly_orphaned_concepts"`
 	NewlyUnsupportedClaims []string `json:"newly_unsupported_claims"`
 	NewlyUncoveredStories  []string `json:"newly_uncovered_stories"`
@@ -140,6 +141,7 @@ func Compute(rootDir string, ont *ontology.Ontology) Payload {
 			Verdict:                d.Verdict,
 			GeneratedAt:            d.GeneratedAt,
 			ActiveMeters:           cloneStrings(d.ActiveMeters),
+			SilencedMeters:         cloneStrings(d.SilencedMeters),
 			NewlyOrphanedConcepts:  cloneStrings(d.PathLoss.NewlyOrphanedConcepts),
 			NewlyUnsupportedClaims: cloneStrings(d.ClaimSupport.NewlyUnsupportedClaims),
 			NewlyUncoveredStories:  cloneStrings(d.TraceCoverage.NewlyUncoveredStories),
@@ -335,6 +337,10 @@ func render(ont *ontology.Ontology, last *report.Payload, snapshots []snapshot, 
 		push(fmt.Sprintf("- Generated: %s", d.GeneratedAt))
 		if len(d.ActiveMeters) > 0 {
 			push(fmt.Sprintf("- Active meters: %s", strings.Join(d.ActiveMeters, ", ")))
+		}
+		if len(d.SilencedMeters) > 0 {
+			push(fmt.Sprintf("- Silenced meters (convention not yet adopted): %s",
+				strings.Join(d.SilencedMeters, ", ")))
 		}
 		if d.Regressions.Count > 0 {
 			push(fmt.Sprintf("- Regressions since baseline: **%d**", d.Regressions.Count))
