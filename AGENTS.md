@@ -84,9 +84,11 @@ Use Go 1.22 or newer.
   `unknown_id_references` (typed-id mentions in code without a defining
   doc; lifted from the original IDs scanner), `stale_tests` (tests
   unchanged while their `verifies`-linked source changed between
-  baseline and current snapshots), and `orphaned_metric_aliases` (frontend
+  baseline and current snapshots), `orphaned_metric_aliases` (frontend
   string refs to metric names that vanished between base and current
-  graphs). The top-level `verdict` is
+  graphs), and `dangling_imports` (TS relative-path imports that don't
+  resolve to a tracked file; warn-level since the build would break).
+  The top-level `verdict` is
   `warn` (actionable findings) / `telemetry` (movement only) / `clean`
   (nothing). Exit 1 only on `warn`. `review` automatically embeds the
   drift report inline under the `drift` key and surfaces
