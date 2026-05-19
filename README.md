@@ -213,7 +213,7 @@ scenario is a self-contained directory under
   scenarios (CB-004/006/008/011..015) are shipped as stubs so the suite is
   honest about scope. Each stub records the milestone that would enable it.
 
-The shipped totals are: **15 scenarios, 13 pass, 0 fail, 2 skipped** —
+The shipped totals are: **15 scenarios, 14 pass, 0 fail, 1 skipped** —
 matching M1's "at least 8 internal scenarios exist" bar.
 
 ### Scored scenarios (Files mode)
@@ -266,9 +266,16 @@ Graduated scored scenarios so far:
   current snapshot content_hashes, and flags the unchanged test whose
   source did change.
 
-Skipped scenarios that still need graduation work (CB-006 LLM
-contradiction, CB-008 metric rename) can join via the same materializer
-once their specific meter or extractor exists.
+- **CB-008** ("metric renamed in frontend only") — base+current scenario
+  using the new `RemovedFiles` materializer option to model the rename.
+  The new `orphaned_metric_aliases` meter diffs the metric label set
+  between base and current graphs, then substring-scans frontend files
+  (.ts/.tsx/.js/.jsx/.mjs/.cjs/.json) for any orphaned name. Verdict
+  bumps to `telemetry`.
+
+The lone remaining skip is **CB-006 (LLM contradiction)** which requires a
+live Groq API key in CI; the materializer is otherwise fully equipped to
+host any future graduation.
 
 ### External-style evaluations (M7)
 
@@ -556,6 +563,7 @@ meters today:
 | `broken_links`            | markdown re-scan of tracked .md      | inline links pointing to paths not in the tracked set           |
 | `unknown_id_references`   | typed-id regex over non-Markdown     | code mentions of US/ADR/IDR ids not defined in the graph        |
 | `stale_tests`             | `verifies` + base/current snapshot   | tests unchanged while their `verifies`-linked source changed    |
+| `orphaned_metric_aliases` | base+current metric diff + frontend scan | frontend string refs to metric names removed/renamed in current |
 
 Each meter also contributes to a top-level `verdict`:
 
@@ -565,12 +573,12 @@ Each meter also contributes to a top-level `verdict`:
   in the JSON outcome contract).
 - `clean` — nothing to do.
 
-All 9 GOAL.md M4 meters are now shipping, plus eight extra graph-traversal,
-link-integrity, id-reference, and test-staleness meters:
+All 9 GOAL.md M4 meters are now shipping, plus nine extra graph-traversal,
+link-integrity, id-reference, test-staleness, and metric-rename meters:
 `stale_decision_links`, `broken_implements_chains`, `dependency_cycles`,
 `orphan_endpoints`, `unimplemented_stories`, `broken_links`,
-`unknown_id_references`, and `stale_tests`. Together that's 17 meters
-today. The cycle meter promotes to
+`unknown_id_references`, `stale_tests`, and `orphaned_metric_aliases`.
+Together that's 18 meters today. The cycle meter promotes to
 `warn`; convention-gated meters (like `unimplemented_stories`) stay
 silent unless the repo actually uses the annotation, avoiding false
 positives on repos that don't. The deterministic 8 always run;
