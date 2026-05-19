@@ -955,6 +955,120 @@ func TestContradictsSelfReferenceFiltered(t *testing.T) {
 	}
 }
 
+func TestMirrorsScalarFrontmatter(t *testing.T) {
+	dir := gitInit(t, map[string]string{
+		"docs/decisions/ADR-030.md": "---\nid: ADR-030\nmirrors: ADR-001\n---\n# ADR-030\n",
+	})
+	g, err := Build(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !hasEdge(g, IDNodeID("ADR", "ADR-030"),
+		IDNodeID("ADR", "ADR-001"), EdgeMirrors) {
+		t.Error("missing mirrors edge ADR-030 → ADR-001")
+	}
+}
+
+func TestMirrorsListForm(t *testing.T) {
+	dir := gitInit(t, map[string]string{
+		"docs/decisions/ADR-031.md": "---\nid: ADR-031\nmirrors: [ADR-001, IDR-007]\n---\n# ADR-031\n",
+	})
+	g, err := Build(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, pair := range []struct{ label, id string }{
+		{"ADR", "ADR-001"},
+		{"IDR", "IDR-007"},
+	} {
+		if !hasEdge(g, IDNodeID("ADR", "ADR-031"),
+			IDNodeID(pair.label, pair.id), EdgeMirrors) {
+			t.Errorf("missing mirrors edge ADR-031 → %s", pair.id)
+		}
+	}
+}
+
+func TestInvalidatesScalarFrontmatter(t *testing.T) {
+	dir := gitInit(t, map[string]string{
+		"docs/decisions/ADR-032.md": "---\nid: ADR-032\ninvalidates: IDR-010\n---\n# ADR-032\n",
+	})
+	g, err := Build(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !hasEdge(g, IDNodeID("ADR", "ADR-032"),
+		IDNodeID("IDR", "IDR-010"), EdgeInvalidates) {
+		t.Error("missing invalidates edge ADR-032 → IDR-010")
+	}
+}
+
+func TestInvalidatesListForm(t *testing.T) {
+	dir := gitInit(t, map[string]string{
+		"docs/decisions/ADR-033.md": "---\nid: ADR-033\ninvalidates: [US-001, ADR-005]\n---\n# ADR-033\n",
+	})
+	g, err := Build(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, pair := range []struct{ label, id string }{
+		{"US", "US-001"},
+		{"ADR", "ADR-005"},
+	} {
+		if !hasEdge(g, IDNodeID("ADR", "ADR-033"),
+			IDNodeID(pair.label, pair.id), EdgeInvalidates) {
+			t.Errorf("missing invalidates edge ADR-033 → %s", pair.id)
+		}
+	}
+}
+
+func TestMirrorsInvalidatesCoexistWithSupersedes(t *testing.T) {
+	dir := gitInit(t, map[string]string{
+		"docs/decisions/ADR-034.md": `---
+id: ADR-034
+supersedes: ADR-001
+contradicts: ADR-002
+mirrors: ADR-003
+invalidates: ADR-004
+---
+# ADR-034
+`,
+	})
+	g, err := Build(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, c := range []struct {
+		target string
+		kind   EdgeKind
+		name   string
+	}{
+		{"ADR-001", EdgeSupersedes, "supersedes"},
+		{"ADR-002", EdgeContradicts, "contradicts"},
+		{"ADR-003", EdgeMirrors, "mirrors"},
+		{"ADR-004", EdgeInvalidates, "invalidates"},
+	} {
+		if !hasEdge(g, IDNodeID("ADR", "ADR-034"),
+			IDNodeID("ADR", c.target), c.kind) {
+			t.Errorf("missing %s edge ADR-034 → %s", c.name, c.target)
+		}
+	}
+}
+
+func TestMirrorsInvalidatesSelfReferenceFiltered(t *testing.T) {
+	dir := gitInit(t, map[string]string{
+		"docs/decisions/ADR-035.md": "---\nid: ADR-035\nmirrors: ADR-035\ninvalidates: ADR-035\n---\n# ADR-035\n",
+	})
+	g, err := Build(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, e := range g.Edges {
+		if (e.Kind == EdgeMirrors || e.Kind == EdgeInvalidates) && e.From == e.To {
+			t.Errorf("unexpected self %s edge: %+v", e.Kind, e)
+		}
+	}
+}
+
 func TestLoadWriteRoundTrip(t *testing.T) {
 	dir := t.TempDir()
 	g := Graph{

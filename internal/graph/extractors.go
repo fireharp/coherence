@@ -197,11 +197,12 @@ func emitDocNode(b *Builder, rel string, data []byte) {
 
 var (
 	frontmatterIDRe = regexp.MustCompile(`(?m)^id:\s*((US|ADR|IDR)-\d{3})\s*$`)
-	// relationLineRe captures both `supersedes:` and `contradicts:`
-	// frontmatter fields. Accepts scalar (`<key>: ADR-001`) and inline
-	// list (`<key>: [ADR-001, ADR-002]`) forms. The first capture group
-	// is the key name; the second is the comma-joined value text.
-	relationLineRe = regexp.MustCompile(`(?m)^(supersedes|contradicts):\s*(.+?)\s*$`)
+	// relationLineRe captures the four typed-id relation fields shipped
+	// today: supersedes, contradicts, mirrors, invalidates. Accepts scalar
+	// (`<key>: ADR-001`) and inline-list (`<key>: [ADR-001, ADR-002]`)
+	// forms. The first capture group is the key name; the second is the
+	// comma-joined value text.
+	relationLineRe = regexp.MustCompile(`(?m)^(supersedes|contradicts|mirrors|invalidates):\s*(.+?)\s*$`)
 	supersedesIDRe = regexp.MustCompile(`(US|ADR|IDR)-\d{3}`)
 	headingRe       = regexp.MustCompile(`(?m)^#\s+(.+)$`)
 	titleFrontRe    = regexp.MustCompile(`(?m)^title:\s*(.+?)\s*$`)
@@ -289,23 +290,30 @@ func emitFrontmatterIDNode(b *Builder, rel string, data []byte) {
 	emitSupersedesEdges(b, rel, data, currentLabel, currentID)
 }
 
-// emitSupersedesEdges scans the document's frontmatter for `supersedes:`
-// and `contradicts:` fields and emits one edge per target id found, with
-// edge kind matching the field name. Accepts scalar (`<key>: ADR-001`)
-// and inline-list (`<key>: [ADR-001, ADR-002]`) forms. Target nodes are
-// not pre-created — dangling references still emit edges so downstream
-// consumers see the claim.
+// emitSupersedesEdges scans the document's frontmatter for typed-id
+// relation fields (`supersedes`, `contradicts`, `mirrors`, `invalidates`)
+// and emits one edge per target id found, with the edge kind dispatched
+// from the key name. Accepts scalar (`<key>: ADR-001`) and inline-list
+// (`<key>: [ADR-001, ADR-002]`) forms. Target nodes are not pre-created —
+// dangling references still emit edges so downstream consumers see the
+// claim.
 func emitSupersedesEdges(b *Builder, rel string, data []byte, currentLabel, currentID string) {
 	from := IDNodeID(currentLabel, currentID)
 	for _, m := range relationLineRe.FindAllSubmatch(data, -1) {
 		key := string(m[1])
 		value := string(m[2])
-		kind := EdgeSupersedes
-		provLabel := "supersedes"
-		if key == "contradicts" {
+		var kind EdgeKind
+		switch key {
+		case "contradicts":
 			kind = EdgeContradicts
-			provLabel = "contradicts"
+		case "mirrors":
+			kind = EdgeMirrors
+		case "invalidates":
+			kind = EdgeInvalidates
+		default:
+			kind = EdgeSupersedes
 		}
+		provLabel := key
 		for _, idMatch := range supersedesIDRe.FindAllStringSubmatch(value, -1) {
 			tgtLabel := idMatch[1]
 			tgtID := idMatch[0]

@@ -45,10 +45,10 @@ Use Go 1.22 or newer.
   the full M3 catalogue: 17 node kinds (`file`, `directory`, `doc`,
   `user_story`, `adr`, `idr`, `rule`, `command`, `concept`, `claim`,
   `metric`, `test`, `evidence`, `generated_artifact`, `code_symbol`,
-  `endpoint`, `data_model`) and 13 edge kinds (`contains`, `defines`,
+  `endpoint`, `data_model`) and all 15 edge kinds (`contains`, `defines`,
   `mentions`, `suggests`, `describes`, `verifies`, `supports`,
   `generates`, `supersedes`, `depends_on`, `implements`, `expects`,
-  `contradicts`). The Markdown semantic hash ignores prose typos but flips
+  `contradicts`, `mirrors`, `invalidates`). The Markdown semantic hash ignores prose typos but flips
   on heading/link/frontmatter/code-fence-language edits. Foundation for
   drift scoring and the deferred CB-008/011/013/014/015 scenarios.
 - `./bin/coherence diff [--base=path] [--json]` compares the current

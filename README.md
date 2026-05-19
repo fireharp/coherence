@@ -350,7 +350,7 @@ Node and edge kinds shipped today:
 
 | Node kinds   | `file`, `directory`, `doc`, `user_story`, `adr`, `idr`, `rule`, `command`, `concept`, `claim`, `metric`, `test`, `evidence`, `generated_artifact`, `code_symbol`, `endpoint`, `data_model` |
 | ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Edge kinds   | `contains`, `defines`, `mentions`, `suggests`, `describes`, `verifies`, `supports`, `generates`, `supersedes`, `depends_on`, `implements`, `expects`, `contradicts`                         |
+| Edge kinds   | `contains`, `defines`, `mentions`, `suggests`, `describes`, `verifies`, `supports`, `generates`, `supersedes`, `depends_on`, `implements`, `expects`, `contradicts`, `mirrors`, `invalidates` |
 
 `rule` and `command` nodes come from `ontology.yml`: every rule becomes a
 `rule:<id>` node; every entry under top-level `commands:` and every
@@ -447,17 +447,19 @@ surface. Multi-file packages produce one edge per importing file (the
 provenance shows which import resolved). Repos without `go.mod` emit
 no `depends_on` edges.
 
-`supersedes` and `contradicts` edges both come from typed-id frontmatter
-fields. Scalar (`supersedes: ADR-007`) and inline-list
-(`contradicts: [ADR-001, US-022]`) forms both parse, and a single doc
-can declare both. Cross-kind references work (`ADR-020 supersedes: IDR-005`),
-self-references are filtered, and edges emit even when the target id
-isn't tracked — dangling claims surface as useful telemetry. Together
-they encode deliberate decision lineage: `supersedes` is "this replaces
-that"; `contradicts` is "this asserts something incompatible with that".
-The LLM-driven flavor of contradiction findings still flows into the
-`drift.contradiction` meter; the graph edge captures the deterministic
-authored claim.
+`supersedes`, `contradicts`, `mirrors`, and `invalidates` edges all come
+from typed-id frontmatter fields. Scalar (`supersedes: ADR-007`) and
+inline-list (`contradicts: [ADR-001, US-022]`) forms both parse, and a
+single doc can declare any combination of the four. Cross-kind references
+work (`ADR-020 supersedes: IDR-005`), self-references are filtered, and
+edges emit even when the target id isn't tracked — dangling claims
+surface as useful telemetry. Together they encode deliberate decision
+lineage: `supersedes` is "this replaces that"; `contradicts` is "this
+asserts something incompatible with that"; `mirrors` is "this restates
+that in another scope"; `invalidates` is "this declares that no longer
+applies". The LLM-driven flavor of contradiction findings still flows
+into the `drift.contradiction` meter; the graph edge captures the
+deterministic authored claim.
 
 `data_model` nodes come from schema-file regex detection across three
 formats: `.sql` (CREATE TABLE / VIEW / TYPE / MATERIALIZED VIEW, with
@@ -468,14 +470,11 @@ dedup'd across sources — defining the same entity in both `.proto` and
 `.graphql` (a common cross-tier pattern) produces one node with two
 `defines` edges. Meta carries `source_kind` for downstream filtering.
 
-**M3 catalogue complete:** all 17 node kinds from GOAL.md's
-"Knowledge graph ontology" section are now shipping.
-
-The deeper GOAL.md catalogue (`claim`, `metric`, `test`,
-`generated_artifact`, `evidence`, `code_symbol`, `data_model`, `endpoint`,
-plus edges like `implements`/`verifies`/`generates`/`supersedes`/
-`contradicts`) is still deferred. Subsequent iterations will add Makefile/
-shell + shallow code extractors. `coherence status` shows the per-run node/edge count breakdown
+**M3 catalogue complete:** all 17 node kinds AND all 15 edge kinds from
+GOAL.md's "Knowledge graph ontology" section are now shipping. The
+remaining work for M3 is breadth — better Makefile / shell extractors,
+deeper per-language code coverage, and richer per-rule expectation
+mining. `coherence status` shows the per-run node/edge count breakdown
 under "Graph Coverage".
 
 `coherence diff` now reports a graph delta alongside the file-level diff:
