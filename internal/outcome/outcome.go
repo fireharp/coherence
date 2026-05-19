@@ -63,6 +63,11 @@ type Input struct {
 	// converted to outcome.Regression so outcome doesn't import drift.
 	// Empty/nil means no regressions or no drift run.
 	DriftRegressions []Regression
+	// BaselineMissing is set by callers when `.coherence/graph.json`
+	// (or its snapshot pair) isn't on disk yet. Tells the outcome to
+	// surface `coherence index` as the recommended next step so
+	// first-time users see the explicit fix.
+	BaselineMissing bool
 }
 
 // Compute returns the Outcome for the supplied input.
@@ -112,6 +117,9 @@ func Compute(in Input) Outcome {
 	}
 	if len(in.DriftRegressions) > 0 {
 		o.DriftRegressions = append([]Regression{}, in.DriftRegressions...)
+	}
+	if in.BaselineMissing && o.RecommendedNextCommand == "" {
+		o.RecommendedNextCommand = "coherence index"
 	}
 	if in.DriftVerdict != "" {
 		o.DriftVerdict = in.DriftVerdict

@@ -235,6 +235,31 @@ func TestPureTelemetryDoesNotRecommendReview(t *testing.T) {
 	}
 }
 
+func TestBaselineMissingSurfacesIndexHint(t *testing.T) {
+	o := Compute(Input{
+		Subcommand:      "review",
+		DriftVerdict:    "clean",
+		BaselineMissing: true,
+	})
+	if o.RecommendedNextCommand != "coherence index" {
+		t.Errorf("expected coherence index hint, got %q", o.RecommendedNextCommand)
+	}
+}
+
+func TestBaselineMissingDoesNotOverrideExistingHint(t *testing.T) {
+	// If review_recommended already set the next-command, baseline-missing
+	// shouldn't clobber it — coherence review is more actionable than index.
+	o := Compute(Input{
+		Subcommand:        "scan",
+		Findings:          []rules.Finding{{Severity: "warn"}},
+		TrackedDirtyCount: 1,
+		BaselineMissing:   true,
+	})
+	if o.RecommendedNextCommand == "coherence index" {
+		t.Errorf("review hint should take priority over index, got %q", o.RecommendedNextCommand)
+	}
+}
+
 func TestEmptyDriftRegressionsOmitted(t *testing.T) {
 	o := Compute(Input{
 		Subcommand:   "review",

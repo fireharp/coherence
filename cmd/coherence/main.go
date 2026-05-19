@@ -35,7 +35,7 @@ import (
 )
 
 const usage = `coherence <subcommand> [flags]
-  init [--template=generic] [--force] [--skill-install=auto|native|off] [--json]
+  init [--template=generic] [--force] [--skill-install=auto|native|off] [--no-baseline] [--json]
                                           scaffold ontology.yml + hook + .gitignore
   scan --staged [--json] [--llm] [--ontology=path]
                                           evaluate staged files (pre-commit gate)
@@ -51,11 +51,17 @@ const usage = `coherence <subcommand> [flags]
         [--json] [--write-report]          run shipped scenario / eval suites
   index [--json]                          write .coherence/snapshot.json (Merkle + semantic hashes)
   diff [--base=path] [--json]             compare current snapshot to base
-  drift [--json] [--strict]               compute drift meters → .coherence/drift.json (--strict: exit 1 on telemetry too)
+  drift [--json|--summary] [--strict]     compute drift meters → .coherence/drift.json (--summary: 1-line; --strict: exit 1 on telemetry)
   report                                  print the last report JSON
   status [--json] [--ontology=path]       rewrite .coherence/STATUS.md (or emit JSON payload)
 
   templates                               list available init templates
+
+exit codes:
+  0 — clean (no actionable findings)
+  1 — actionable: warn-severity rule, drift verdict=warn, or --strict on telemetry
+  2 — fatal error (bad args, IO failure, missing prerequisite)
+
 env:
   COHERENCE_OFF=1          skip all checks, exit 0
   COHERENCE_LLM=1          enable LLM semantic pass (requires GROQ_API_KEY)
@@ -408,6 +414,7 @@ func runEvaluation(sub string, fs fileSet, args parsedArgs, rootDir, ontPath str
 
 	driftRegressionCount := 0
 	var driftRegressions []outcome.Regression
+	baselineMissing := false
 	if driftReport != nil {
 		driftRegressionCount = driftReport.Regressions.Count
 		for _, e := range driftReport.Regressions.Entries {
@@ -417,6 +424,7 @@ func runEvaluation(sub string, fs fileSet, args parsedArgs, rootDir, ontPath str
 				SuggestedAction: e.SuggestedAction,
 			})
 		}
+		baselineMissing = !driftReport.NeighborhoodDrift.BaseAvailable
 	}
 	oc := outcome.Compute(outcome.Input{
 		Subcommand:           sub,
@@ -428,6 +436,7 @@ func runEvaluation(sub string, fs fileSet, args parsedArgs, rootDir, ontPath str
 		DriftVerdict:         driftVerdict,
 		DriftRegressionCount: driftRegressionCount,
 		DriftRegressions:     driftRegressions,
+		BaselineMissing:      baselineMissing,
 	})
 
 	suggested := rules.AggregateSuggestedCommands(findings)
@@ -641,6 +650,7 @@ func run() int {
 			Template:     chosen,
 			Force:        boolFlag(args, "force"),
 			SkillInstall: stringFlag(args, "skill-install", initcmd.SkillInstallAuto),
+			NoBaseline:   boolFlag(args, "no-baseline"),
 		}
 		res, err := initcmd.Run(rootDir, opts)
 		if err != nil {
@@ -807,6 +817,8 @@ func run() int {
 				fmt.Fprintln(os.Stderr, "coherence: fatal:", err)
 				return 2
 			}
+		} else if boolFlag(args, "summary") {
+			fmt.Print(drift.HumanSummary(rep))
 		} else {
 			fmt.Print(drift.Human(rep))
 		}

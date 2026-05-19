@@ -191,12 +191,16 @@ type UnimplementedStories struct {
 // promotion. Diff transitions still promote since they imply prior
 // test coverage.
 type OrphanEndpoints struct {
-	Score                  int      `json:"score"`
-	Orphans                []string `json:"orphan_endpoints"`
-	Convention             bool     `json:"convention"`
-	BaseAvailable          bool     `json:"base_available"`
-	NewlyOrphanedEndpoints []string `json:"newly_orphaned_endpoints"`
-	NewlyCoveredEndpoints  []string `json:"newly_covered_endpoints"`
+	Score   int      `json:"score"`
+	Orphans []string `json:"orphan_endpoints"`
+	// OrphanSources maps each orphan endpoint id to its defining file
+	// (the file the agent should add a test alongside). Empty when
+	// Score=0.
+	OrphanSources          map[string]string `json:"orphan_sources,omitempty"`
+	Convention             bool              `json:"convention"`
+	BaseAvailable          bool              `json:"base_available"`
+	NewlyOrphanedEndpoints []string          `json:"newly_orphaned_endpoints"`
+	NewlyCoveredEndpoints  []string          `json:"newly_covered_endpoints"`
 }
 
 // DependencyCycles is the 12th drift meter. It runs DFS over the
@@ -414,7 +418,13 @@ type Report struct {
 	// individual gates fired. Lets agents triage at a glance without
 	// inspecting per-meter scores. Mirrors the verdict-promotion logic
 	// in computeVerdict.
-	ActiveMeters     []string `json:"active_meters"`
+	ActiveMeters []string `json:"active_meters"`
+	// SilencedMeters lists convention-gated meters whose score is
+	// non-zero but verdict promotion was skipped because the repo
+	// doesn't use the chain pattern yet. Surfaces the "would fire
+	// once the convention is in use" signal so agents can guide users
+	// toward adding tests/evidence/endpoints when ready.
+	SilencedMeters   []string `json:"silenced_meters"`
 	Explanations     []string `json:"explanations"`
 	SuggestedActions []string `json:"suggested_actions"`
 }
@@ -528,10 +538,30 @@ func ComputeWith(rootDir, ontologyPath string, opts ComputeOptions) (Report, err
 
 	report.Regressions = aggregateRegressions(report)
 	report.ActiveMeters = activeMeters(report)
+	report.SilencedMeters = silencedMeters(report)
 	report.Verdict = computeVerdict(report)
 	report.Explanations = renderExplanations(report)
 	report.SuggestedActions = renderActions(report)
 	return report, nil
+}
+
+// silencedMeters returns the names of convention-gated meters that have
+// non-zero scores but are silenced from verdict promotion because the
+// repo doesn't use the chain pattern yet. Mirrors the Convention=false
+// branches of computeVerdict so agents can see "this signal would fire
+// once you adopt the pattern".
+func silencedMeters(r Report) []string {
+	out := []string{}
+	if r.PathLoss.TotalConcepts > 0 && !r.PathLoss.Convention && r.PathLoss.Score >= pathLossFloor {
+		out = append(out, "path_loss")
+	}
+	if r.ClaimSupport.TotalClaims > 0 && !r.ClaimSupport.Convention && r.ClaimSupport.Score >= claimSupportFloor {
+		out = append(out, "claim_support")
+	}
+	if r.OrphanEndpoints.Score > 0 && !r.OrphanEndpoints.Convention {
+		out = append(out, "orphan_endpoints")
+	}
+	return out
 }
 
 // activeMeters returns the names of meters whose individual gate fires
@@ -2088,12 +2118,51 @@ func Write(rootDir string, r Report) error {
 	return os.WriteFile(dst, buf, 0o644)
 }
 
+// HumanSummary renders a drift report as a compact 1-3 line summary —
+// useful for shell prompts, status bars, or quick scans. Drops the
+// per-meter list, explanations, and actions; keeps only the header
+// (verdict, regressions, active, silenced) plus the regressions
+// section if non-empty plus a next-step hint when one applies.
+func HumanSummary(r Report) string {
+	var b strings.Builder
+	fmt.Fprintf(&b, "coherence drift: verdict=%s", r.Verdict)
+	if r.Regressions.Count > 0 {
+		fmt.Fprintf(&b, " (regressions=%d)", r.Regressions.Count)
+	}
+	if len(r.ActiveMeters) > 0 {
+		fmt.Fprintf(&b, " (active: %s)", strings.Join(r.ActiveMeters, ", "))
+	}
+	if len(r.SilencedMeters) > 0 {
+		fmt.Fprintf(&b, " (silenced: %s)", strings.Join(r.SilencedMeters, ", "))
+	}
+	fmt.Fprintln(&b)
+	if r.Regressions.Count > 0 {
+		for _, e := range r.Regressions.Entries {
+			fmt.Fprintf(&b, "  [%s] %s\n", e.Kind, e.ID)
+		}
+	}
+	// Next-step hint: prefer specific actions over generic ones.
+	switch {
+	case !r.NeighborhoodDrift.BaseAvailable:
+		fmt.Fprintln(&b, "next: coherence index   # build initial baseline")
+	case r.Regressions.Count > 0:
+		fmt.Fprintln(&b, "next: review the regression entries above")
+	}
+	return b.String()
+}
+
 // Human renders a drift report as readable lines.
 func Human(r Report) string {
 	var b strings.Builder
 	fmt.Fprintf(&b, "coherence drift: verdict=%s", r.Verdict)
 	if r.Regressions.Count > 0 {
 		fmt.Fprintf(&b, " (regressions=%d)", r.Regressions.Count)
+	}
+	if len(r.ActiveMeters) > 0 {
+		fmt.Fprintf(&b, " (active: %s)", strings.Join(r.ActiveMeters, ", "))
+	}
+	if len(r.SilencedMeters) > 0 {
+		fmt.Fprintf(&b, " (silenced: %s)", strings.Join(r.SilencedMeters, ", "))
 	}
 	fmt.Fprintln(&b)
 	fmt.Fprintln(&b)
