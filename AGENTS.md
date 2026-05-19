@@ -71,8 +71,10 @@ Use Go 1.22 or newer.
   file has no incoming verifies edge from any test),
   `unimplemented_stories` (user_story nodes with no incoming implements
   claim — gated by convention detection so it stays silent in repos that
-  don't use the annotation), and `broken_links` (markdown re-scan flagging
-  inline links to paths not in the tracked set). The top-level `verdict` is
+  don't use the annotation), `broken_links` (markdown re-scan flagging
+  inline links to paths not in the tracked set), and
+  `unknown_id_references` (typed-id mentions in code without a defining
+  doc; lifted from the original IDs scanner). The top-level `verdict` is
   `warn` (actionable findings) / `telemetry` (movement only) / `clean`
   (nothing). Exit 1 only on `warn`. `review` automatically embeds the
   drift report inline under the `drift` key and surfaces

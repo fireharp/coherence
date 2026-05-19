@@ -212,7 +212,7 @@ scenario is a self-contained directory under
   scenarios (CB-004/006/008/011..015) are shipped as stubs so the suite is
   honest about scope. Each stub records the milestone that would enable it.
 
-The shipped totals are: **15 scenarios, 11 pass, 0 fail, 4 skipped** —
+The shipped totals are: **15 scenarios, 12 pass, 0 fail, 3 skipped** —
 matching M1's "at least 8 internal scenarios exist" bar.
 
 ### Scored scenarios (Files mode)
@@ -254,10 +254,14 @@ Graduated scored scenarios so far:
   the source change alone, and the ontology's severity=error rule fires
   via `required_edge_breakage`. Verdict bumps to `warn`.
 
-Skipped scenarios that still need graduation work (CB-004 unknown-id,
-CB-006 LLM contradiction, CB-008 metric rename, CB-012 stale test) can
-join via the same materializer once their specific meter or extractor
-exists.
+- **CB-004** ("code references US-999 but no story exists") — files-only
+  scenario; the `unknown_id_references` meter scans non-Markdown tracked
+  files for typed-id mentions and flags those without a corresponding
+  node in the graph. Verdict bumps to `telemetry`.
+
+Skipped scenarios that still need graduation work (CB-006 LLM
+contradiction, CB-008 metric rename, CB-012 stale test) can join via the
+same materializer once their specific meter or extractor exists.
 
 ## Index and snapshots
 
@@ -525,6 +529,7 @@ meters today:
 | `orphan_endpoints`        | `defines` (reverse) + `verifies`     | count of HTTP endpoints whose source file has no test           |
 | `unimplemented_stories`   | user_story nodes + `implements`      | stories with no incoming implements claim (gated on convention) |
 | `broken_links`            | markdown re-scan of tracked .md      | inline links pointing to paths not in the tracked set           |
+| `unknown_id_references`   | typed-id regex over non-Markdown     | code mentions of US/ADR/IDR ids not defined in the graph        |
 
 Each meter also contributes to a top-level `verdict`:
 
@@ -534,11 +539,11 @@ Each meter also contributes to a top-level `verdict`:
   in the JSON outcome contract).
 - `clean` — nothing to do.
 
-All 9 GOAL.md M4 meters are now shipping, plus six extra graph-traversal
-and link-integrity meters: `stale_decision_links`,
+All 9 GOAL.md M4 meters are now shipping, plus seven extra graph-traversal,
+link-integrity, and id-reference meters: `stale_decision_links`,
 `broken_implements_chains`, `dependency_cycles`, `orphan_endpoints`,
-`unimplemented_stories`, and `broken_links`. Together that's 15 meters
-today. The cycle meter promotes to
+`unimplemented_stories`, `broken_links`, and `unknown_id_references`.
+Together that's 16 meters today. The cycle meter promotes to
 `warn`; convention-gated meters (like `unimplemented_stories`) stay
 silent unless the repo actually uses the annotation, avoiding false
 positives on repos that don't. The deterministic 8 always run;

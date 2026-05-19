@@ -43,8 +43,8 @@ func TestRunAllPassesDeterministicAndSkipsRest(t *testing.T) {
 	if suite.Counts.Pass < 7 {
 		t.Errorf("expected >=7 deterministic passes, got %d", suite.Counts.Pass)
 	}
-	if suite.Counts.Skipped < 3 {
-		t.Errorf("expected >=3 skipped (graph/semantic deferred), got %d", suite.Counts.Skipped)
+	if suite.Counts.Skipped < 2 {
+		t.Errorf("expected >=2 skipped (graph/semantic deferred), got %d", suite.Counts.Skipped)
 	}
 }
 
@@ -71,6 +71,22 @@ func TestCB011IsDeterministicAndPasses(t *testing.T) {
 	}
 	if !r.Pass {
 		t.Errorf("CB-011 should pass, got missing=%v extra=%v", r.Missing, r.Extra)
+	}
+}
+
+func TestCB004IsDeterministicAndPasses(t *testing.T) {
+	// CB-004 graduated via the unknown_id_references drift meter that
+	// scans non-Markdown tracked files for typed-id references whose
+	// graph nodes aren't present.
+	r := Run("CB-004")
+	if r.Skipped {
+		t.Fatal("CB-004 should be deterministic, not skipped")
+	}
+	if r.Error != "" {
+		t.Fatalf("CB-004 errored: %s", r.Error)
+	}
+	if !r.Pass {
+		t.Errorf("CB-004 should pass, got missing=%v extra=%v", r.Missing, r.Extra)
 	}
 }
 

@@ -1144,6 +1144,9 @@ func computeVerdict(r Report) string {
 	if r.BrokenLinks.Score > 0 {
 		return VerdictTelemetry
 	}
+	if r.UnknownIDReferences.Score > 0 {
+		return VerdictTelemetry
+	}
 	return VerdictClean
 }
 
@@ -1253,6 +1256,15 @@ func renderExplanations(r Report) []string {
 			"broken links: %d markdown link(s) point to untracked paths (%s).",
 			r.BrokenLinks.Score, joinShort(sources, 3)))
 	}
+	if r.UnknownIDReferences.Score > 0 {
+		ids := make([]string, 0, len(r.UnknownIDReferences.UnknownRefs))
+		for _, r := range r.UnknownIDReferences.UnknownRefs {
+			ids = append(ids, r.ID)
+		}
+		out = append(out, fmt.Sprintf(
+			"unknown id references: %d typed-id mention(s) in code without a defining doc (%s).",
+			r.UnknownIDReferences.Score, joinShort(ids, 4)))
+	}
 	return out
 }
 
@@ -1308,6 +1320,9 @@ func renderActions(r Report) []string {
 	}
 	if r.BrokenLinks.Score > 0 {
 		out = append(out, "fix or remove the broken markdown links to untracked paths")
+	}
+	if r.UnknownIDReferences.Score > 0 {
+		out = append(out, "define the referenced ids (under docs/user-stories or docs/decisions), or remove the references from code")
 	}
 	if len(out) == 0 {
 		out = append(out, "no action needed")
@@ -1410,6 +1425,7 @@ func Human(r Report) string {
 		fmt.Fprintln(&b, "  unimplemented_stories:  n/a (repo doesn't use implements convention)")
 	}
 	fmt.Fprintf(&b, "  broken_links:           %d markdown link(s) to untracked paths\n", r.BrokenLinks.Score)
+	fmt.Fprintf(&b, "  unknown_id_refs:        %d typed-id mention(s) in code without a defining doc\n", r.UnknownIDReferences.Score)
 	if len(r.Explanations) > 0 {
 		fmt.Fprintln(&b, "\nexplanations:")
 		for _, e := range r.Explanations {
