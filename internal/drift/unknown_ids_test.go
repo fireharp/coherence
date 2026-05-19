@@ -146,7 +146,7 @@ func TestUnknownIDReferencesFlagsProductionCodeWhenFixturesPresent(t *testing.T)
 	// Mixed repo: fixture files PLUS a real production-code reference.
 	// The production reference should still surface; fixtures should not.
 	dir := idsGitInit(t, map[string]string{
-		"src/main.go":                                           "// uses US-555\n",
+		"src/main.go": "// uses US-555\n",
 		"internal/coherencebench/scenarios/CB-001/scenario.yml": "refs: US-999\n",
 	})
 	r := computeUnknownIDReferences(dir, graph.Graph{})
@@ -155,6 +155,43 @@ func TestUnknownIDReferencesFlagsProductionCodeWhenFixturesPresent(t *testing.T)
 	}
 	if r.UnknownRefs[0].File != "src/main.go" {
 		t.Errorf("expected src/main.go, got %s", r.UnknownRefs[0].File)
+	}
+}
+
+func TestUnknownIDReferencesSkipsBacktickInlineCode(t *testing.T) {
+	// IDs wrapped in backticks inside doc comments are inline-code
+	// examples (Go convention), not real references.
+	dir := idsGitInit(t, map[string]string{
+		"src/main.go": "package main\n\n// covers `US-001` as an inline example\n// and `ADR-007` too\n",
+	})
+	r := computeUnknownIDReferences(dir, graph.Graph{})
+	if r.Score != 0 {
+		t.Errorf("backtick-wrapped IDs should be skipped, got %+v", r.UnknownRefs)
+	}
+}
+
+func TestUnknownIDReferencesSkipsRawStringFixtures(t *testing.T) {
+	// IDs embedded in a multi-line Go raw-string literal (sample fixture
+	// data) should be skipped — they're embedded test material, not
+	// references the meter should complain about.
+	dir := idsGitInit(t, map[string]string{
+		"internal/samples.go": "package samples\n\nvar Sample = map[string]string{\n\t\"docs/US-007.md\": `---\nid: US-007\n---\n# US-007 — Monthly invoicing\n`,\n}\n",
+	})
+	r := computeUnknownIDReferences(dir, graph.Graph{})
+	if r.Score != 0 {
+		t.Errorf("raw-string-embedded IDs should be skipped, got %+v", r.UnknownRefs)
+	}
+}
+
+func TestUnknownIDReferencesStillFlagsBareCodeMentions(t *testing.T) {
+	// A bare comment mention (no backticks) should still surface. This
+	// guards against the backtick-skip logic over-relaxing the meter.
+	dir := idsGitInit(t, map[string]string{
+		"src/main.go": "package main\n\n// implements US-999\n",
+	})
+	r := computeUnknownIDReferences(dir, graph.Graph{})
+	if r.Score != 1 || r.UnknownRefs[0].ID != "US-999" {
+		t.Errorf("bare comment mention should still flag, got %+v", r.UnknownRefs)
 	}
 }
 

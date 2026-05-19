@@ -401,6 +401,29 @@ func Auth() {}
 	}
 }
 
+func TestExtractImplementsSkipsBacktickInlineCode(t *testing.T) {
+	// A doc comment that *describes* the implements convention rather
+	// than *making* a claim should not emit an edge. The convention is
+	// marked by wrapping the example in backticks (Go doc convention
+	// for inline code).
+	dir := gitInit(t, map[string]string{
+		"pkg/notes.go": `package pkg
+
+// FooConvention documents the convention. The annotation looks like
+// ` + "`// implements US-999`" + ` — but this comment is not itself a claim.
+func FooConvention() {}
+`,
+	})
+	g, err := Build(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if hasEdge(g, CodeSymbolNodeID("pkg", "FooConvention"),
+		IDNodeID("US", "US-999"), EdgeImplements) {
+		t.Error("backtick-wrapped example should not emit an implements edge")
+	}
+}
+
 func TestExtractImplementsCaseInsensitiveAndColon(t *testing.T) {
 	dir := gitInit(t, map[string]string{
 		"pkg/auth.go": `package pkg
