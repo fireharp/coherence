@@ -78,10 +78,16 @@ func Compute(rootDir string) (Snapshot, error) {
 		content := sha256.Sum256(body)
 		contentHash := hex.EncodeToString(content[:])
 		semantic := contentHash
-		if kind == KindMarkdown {
+		ext := strings.ToLower(filepath.Ext(rel))
+		switch {
+		case kind == KindMarkdown:
 			semantic = markdownSemantic(body)
-		} else if strings.HasSuffix(rel, ".go") {
+		case ext == ".go":
 			if h, ok := goSemantic(body); ok {
+				semantic = h
+			}
+		default:
+			if h, ok := codeSemantic(body, ext); ok {
 				semantic = h
 			}
 		}
