@@ -180,6 +180,37 @@ func TestZeroRegressionCountIsOmitted(t *testing.T) {
 	}
 }
 
+func TestDriftRegressionsSurfaceAtTopLevel(t *testing.T) {
+	entries := []Regression{
+		{Kind: "newly_orphaned_concept", ID: "concept:auth", SuggestedAction: "restore"},
+		{Kind: "newly_uncovered_story", ID: "us:US-001", SuggestedAction: "re-link"},
+	}
+	o := Compute(Input{
+		Subcommand:           "review",
+		DriftVerdict:         "telemetry",
+		DriftRegressionCount: 2,
+		DriftRegressions:     entries,
+	})
+	if len(o.DriftRegressions) != 2 {
+		t.Fatalf("len = %d, want 2", len(o.DriftRegressions))
+	}
+	// Mutating input slice must not affect outcome (Compute should clone).
+	entries[0].ID = "MUTATED"
+	if o.DriftRegressions[0].ID == "MUTATED" {
+		t.Error("outcome must clone input slice, not alias it")
+	}
+}
+
+func TestEmptyDriftRegressionsOmitted(t *testing.T) {
+	o := Compute(Input{
+		Subcommand:   "review",
+		DriftVerdict: "clean",
+	})
+	if o.DriftRegressions != nil {
+		t.Errorf("DriftRegressions should be nil when no entries, got %+v", o.DriftRegressions)
+	}
+}
+
 func TestCheckIncludingUntrackedDoesNotExclude(t *testing.T) {
 	o := Compute(Input{
 		Subcommand:         "check",

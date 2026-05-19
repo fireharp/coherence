@@ -4,6 +4,16 @@ package outcome
 
 import "coherence/internal/rules"
 
+// Regression mirrors drift.RegressionEntry for the top-level outcome
+// surface so an agent reading just the outcome can iterate regressions
+// without descending into the full drift report. The shape is
+// intentionally identical to drift.RegressionEntry — same JSON tags.
+type Regression struct {
+	Kind            string `json:"kind"`
+	ID              string `json:"id"`
+	SuggestedAction string `json:"suggested_action"`
+}
+
 // Outcome is the high-level vocabulary shared by every JSON command. It is
 // designed so an agent or pre-commit consumer can decide what to do next from
 // these fields alone.
@@ -24,6 +34,11 @@ type Outcome struct {
 	// newly_orphaned_endpoints). Lets agents gate on "did this commit
 	// regress anything?" without descending into drift.regressions.
 	DriftRegressionCount int `json:"drift_regression_count,omitempty"`
+	// DriftRegressions is the flat list of regression entries
+	// (kind+id+suggested_action) — same data as
+	// drift.regressions.entries, surfaced here so an agent gating on the
+	// outcome contract can iterate regressions directly.
+	DriftRegressions []Regression `json:"drift_regressions,omitempty"`
 }
 
 // Input captures everything Compute needs. The caller is responsible for
@@ -44,6 +59,10 @@ type Input struct {
 	// Zero is the default (no drift run, or no regressions). Set by callers
 	// that ran drift.
 	DriftRegressionCount int
+	// DriftRegressions is the optional drift.Report.Regressions.Entries
+	// converted to outcome.Regression so outcome doesn't import drift.
+	// Empty/nil means no regressions or no drift run.
+	DriftRegressions []Regression
 }
 
 // Compute returns the Outcome for the supplied input.
@@ -90,6 +109,9 @@ func Compute(in Input) Outcome {
 
 	if in.DriftRegressionCount > 0 {
 		o.DriftRegressionCount = in.DriftRegressionCount
+	}
+	if len(in.DriftRegressions) > 0 {
+		o.DriftRegressions = append([]Regression{}, in.DriftRegressions...)
 	}
 	if in.DriftVerdict != "" {
 		o.DriftVerdict = in.DriftVerdict

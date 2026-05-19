@@ -823,6 +823,59 @@ func TestAggregateRegressionsCombinesAllFourMeters(t *testing.T) {
 	}
 }
 
+func TestAggregateRegressionsEmitsTypedEntries(t *testing.T) {
+	r := Report{
+		PathLoss: PathLoss{
+			NewlyOrphanedConcepts: []string{"concept:auth"},
+		},
+		ClaimSupport: ClaimSupport{
+			NewlyUnsupportedClaims: []string{"claim:abc"},
+		},
+		TraceCoverage: TraceCoverage{
+			NewlyUncoveredStories: []string{"us:US-001"},
+		},
+		OrphanEndpoints: OrphanEndpoints{
+			NewlyOrphanedEndpoints: []string{"endpoint:GET:/x"},
+		},
+	}
+	reg := aggregateRegressions(r)
+	if len(reg.Entries) != 4 {
+		t.Fatalf("Entries len = %d, want 4", len(reg.Entries))
+	}
+	wantKinds := map[string]string{
+		"concept:auth":    "newly_orphaned_concept",
+		"claim:abc":       "newly_unsupported_claim",
+		"us:US-001":       "newly_uncovered_story",
+		"endpoint:GET:/x": "newly_orphaned_endpoint",
+	}
+	for _, e := range reg.Entries {
+		want, ok := wantKinds[e.ID]
+		if !ok {
+			t.Errorf("unexpected entry ID %q", e.ID)
+			continue
+		}
+		if e.Kind != want {
+			t.Errorf("entry %s: kind = %q, want %q", e.ID, e.Kind, want)
+		}
+		if e.SuggestedAction == "" {
+			t.Errorf("entry %s missing SuggestedAction", e.ID)
+		}
+		if !strings.Contains(e.SuggestedAction, e.ID) {
+			t.Errorf("entry %s SuggestedAction should reference the id, got %q", e.ID, e.SuggestedAction)
+		}
+	}
+}
+
+func TestAggregateRegressionsEmptyEntriesNotNil(t *testing.T) {
+	reg := aggregateRegressions(Report{})
+	if reg.Entries == nil {
+		t.Error("Entries should be []RegressionEntry{}, not nil")
+	}
+	if len(reg.Entries) != 0 {
+		t.Errorf("empty report should produce 0 entries, got %d", len(reg.Entries))
+	}
+}
+
 func TestAggregateRegressionsEmptyMetersStaysZero(t *testing.T) {
 	r := Report{}
 	reg := aggregateRegressions(r)
