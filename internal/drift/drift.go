@@ -155,9 +155,11 @@ type BrokenLink struct {
 }
 
 // BrokenLinks is the 15th drift meter. It scans tracked Markdown files
-// for inline links pointing to paths that aren't in the tracked set —
-// removed-file references, typos, or stale targets. External URLs are
-// ignored; only intra-repo paths flag.
+// for inline links pointing to paths that are absent from the
+// filesystem entirely — typos, deletions, stale references.
+// Untracked-but-on-disk targets (e.g., `.gitignore`d LOCAL.md notes)
+// are NOT flagged because the link still resolves for the user's
+// working tree. External URLs are also ignored.
 type BrokenLinks struct {
 	Score int          `json:"score"`
 	Links []BrokenLink `json:"links"`
@@ -1959,7 +1961,7 @@ func renderExplanations(r Report) []string {
 			sources = append(sources, l.Source+"→"+l.Target)
 		}
 		out = append(out, fmt.Sprintf(
-			"broken links: %d markdown link(s) point to untracked paths (%s).",
+			"broken links: %d markdown link(s) point to missing files (%s).",
 			r.BrokenLinks.Score, joinShort(sources, 3)))
 	}
 	if r.UnknownIDReferences.Score > 0 {
@@ -2099,7 +2101,7 @@ func renderActions(r Report) []string {
 		for _, l := range r.BrokenLinks.Links {
 			pairs = append(pairs, l.Source+"→"+l.Target)
 		}
-		out = append(out, "fix or remove the broken markdown links to untracked paths: "+
+		out = append(out, "fix or remove the broken markdown links to missing files: "+
 			joinShort(pairs, 3))
 	}
 	if r.UnknownIDReferences.Score > 0 {
@@ -2318,7 +2320,7 @@ func Human(r Report) string {
 	} else {
 		fmt.Fprintln(&b, "  unimplemented_stories:  n/a (repo doesn't use implements convention)")
 	}
-	fmt.Fprintf(&b, "  broken_links:           %d markdown link(s) to untracked paths\n", r.BrokenLinks.Score)
+	fmt.Fprintf(&b, "  broken_links:           %d markdown link(s) to missing files\n", r.BrokenLinks.Score)
 	fmt.Fprintf(&b, "  unknown_id_refs:        %d typed-id mention(s) in code without a defining doc\n", r.UnknownIDReferences.Score)
 	fmt.Fprintf(&b, "  stale_tests:            %d test(s) with changed source but no test edit\n", r.StaleTests.Score)
 	fmt.Fprintf(&b, "  orphaned_metric_aliases:%d frontend reference(s) to renamed/removed metric(s)\n", r.OrphanedMetricAliases.Score)
