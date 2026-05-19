@@ -75,14 +75,16 @@ var (
 	backtickSpanRe = regexp.MustCompile("(?s)`[^`]*`")
 )
 
-// sanitizeIDSearchText replaces the content of backtick-delimited spans
+// SanitizeIDSearchText replaces the content of backtick-delimited spans
 // and double-quoted string literals with spaces, preserving byte
 // offsets so error messages still report sane positions. The intent:
 // `unknown-us-id` and friends should fire on real comment/code
 // references, not on the typed-id literals embedded in doc examples
 // ("use `// implements US-001`") or in `"docs/.../US-007.md"` fixture
-// data.
-func sanitizeIDSearchText(s string) string {
+// data. Exported so the drift `unknown_id_references` meter and the
+// graph `code_mentions_extractor` (Pass 14) can apply the same
+// bootstrap-friendly filter.
+func SanitizeIDSearchText(s string) string {
 	// First strip multi-line backtick spans.
 	stripped := backtickSpanRe.ReplaceAllStringFunc(s, func(span string) string {
 		out := make([]byte, len(span))
@@ -192,7 +194,7 @@ func Scan(addedByPath map[string]string, fileOrder []string, idx *Index) []Unkno
 		if !ok || text == "" {
 			continue
 		}
-		searchText := sanitizeIDSearchText(text)
+		searchText := SanitizeIDSearchText(text)
 		for _, pat := range idPatterns {
 			seen := map[string]bool{}
 			for _, m := range pat.Re.FindAllString(searchText, -1) {
