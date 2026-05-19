@@ -27,6 +27,7 @@ var fixtureDirSegments = []string{
 	"fixtures/",
 	"testdata/",
 	"golden/",
+	"eval/",
 }
 
 func isFixturePath(rel string) bool {

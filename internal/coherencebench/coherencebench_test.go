@@ -14,7 +14,7 @@ func TestIDsShipsAllExpectedScenarios(t *testing.T) {
 		"CB-001", "CB-002", "CB-003", "CB-004", "CB-005",
 		"CB-006", "CB-007", "CB-008", "CB-009", "CB-010",
 		"CB-011", "CB-012", "CB-013", "CB-014", "CB-015",
-		"CB-016", "CB-017", "CB-018",
+		"CB-016", "CB-017", "CB-018", "CB-019", "CB-020",
 	}
 	gotSet := map[string]bool{}
 	for _, n := range got {
@@ -38,11 +38,11 @@ func TestRunAllPassesDeterministicAndSkipsRest(t *testing.T) {
 		}
 		t.Fatal("suite did not pass")
 	}
-	if suite.Counts.Total != 18 {
-		t.Errorf("total = %d, want 18", suite.Counts.Total)
+	if suite.Counts.Total != 20 {
+		t.Errorf("total = %d, want 20", suite.Counts.Total)
 	}
-	if suite.Counts.Pass < 10 {
-		t.Errorf("expected >=10 deterministic passes, got %d", suite.Counts.Pass)
+	if suite.Counts.Pass < 12 {
+		t.Errorf("expected >=12 deterministic passes, got %d", suite.Counts.Pass)
 	}
 	if suite.Counts.Skipped < 1 {
 		t.Errorf("expected >=1 skipped (LLM-only deferred), got %d", suite.Counts.Skipped)
@@ -230,6 +230,44 @@ func TestCB018IsDeterministicAndPasses(t *testing.T) {
 	}
 	if r.Scenario.Expected.Drift == nil || r.Scenario.Expected.Drift.Verdict != "telemetry" {
 		t.Errorf("CB-018 should assert drift verdict=telemetry, got %+v", r.Scenario.Expected.Drift)
+	}
+}
+
+func TestCB019IsDeterministicAndPasses(t *testing.T) {
+	// CB-019 exercises the diff-aware trace_coverage path: a story
+	// loses its only `mentions` edge → trace_coverage warns →
+	// verdict=warn.
+	r := Run("CB-019")
+	if r.Skipped {
+		t.Fatal("CB-019 should be deterministic, not skipped")
+	}
+	if r.Error != "" {
+		t.Fatalf("CB-019 errored: %s", r.Error)
+	}
+	if !r.Pass {
+		t.Errorf("CB-019 should pass, got missing=%v extra=%v", r.Missing, r.Extra)
+	}
+	if r.Scenario.Expected.Drift == nil || r.Scenario.Expected.Drift.Verdict != "warn" {
+		t.Errorf("CB-019 should assert drift verdict=warn, got %+v", r.Scenario.Expected.Drift)
+	}
+}
+
+func TestCB020IsDeterministicAndPasses(t *testing.T) {
+	// CB-020 exercises the diff-aware orphan_endpoints path: an
+	// endpoint loses its verifying test → orphan_endpoints fires
+	// telemetry → verdict=telemetry.
+	r := Run("CB-020")
+	if r.Skipped {
+		t.Fatal("CB-020 should be deterministic, not skipped")
+	}
+	if r.Error != "" {
+		t.Fatalf("CB-020 errored: %s", r.Error)
+	}
+	if !r.Pass {
+		t.Errorf("CB-020 should pass, got missing=%v extra=%v", r.Missing, r.Extra)
+	}
+	if r.Scenario.Expected.Drift == nil || r.Scenario.Expected.Drift.Verdict != "telemetry" {
+		t.Errorf("CB-020 should assert drift verdict=telemetry, got %+v", r.Scenario.Expected.Drift)
 	}
 }
 

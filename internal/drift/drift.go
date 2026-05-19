@@ -393,8 +393,14 @@ type Report struct {
 	OrphanedMetricAliases  OrphanedMetricAliases  `json:"orphaned_metric_aliases"`
 	DanglingImports        DanglingImports        `json:"dangling_imports"`
 	Regressions            Regressions            `json:"regressions"`
-	Explanations           []string               `json:"explanations"`
-	SuggestedActions       []string               `json:"suggested_actions"`
+	// ActiveMeters is the canonical list of meter names that
+	// contributed signal to the verdict — exactly the meters whose
+	// individual gates fired. Lets agents triage at a glance without
+	// inspecting per-meter scores. Mirrors the verdict-promotion logic
+	// in computeVerdict.
+	ActiveMeters     []string `json:"active_meters"`
+	Explanations     []string `json:"explanations"`
+	SuggestedActions []string `json:"suggested_actions"`
 }
 
 // PathFor returns the canonical drift report path for the given repo root.
@@ -505,10 +511,79 @@ func ComputeWith(rootDir, ontologyPath string, opts ComputeOptions) (Report, err
 	report.DanglingImports = computeDanglingImports(rootDir)
 
 	report.Regressions = aggregateRegressions(report)
+	report.ActiveMeters = activeMeters(report)
 	report.Verdict = computeVerdict(report)
 	report.Explanations = renderExplanations(report)
 	report.SuggestedActions = renderActions(report)
 	return report, nil
+}
+
+// activeMeters returns the names of meters whose individual gate fires
+// in the current report. Mirrors computeVerdict's branches so agents
+// can see which meters contributed to the verdict without inferring
+// from per-meter scores. Empty slice means a clean report.
+func activeMeters(r Report) []string {
+	out := []string{}
+	if r.RequiredEdgeBreakage.BrokenCount > 0 {
+		out = append(out, "required_edge_breakage")
+	}
+	if r.TraceCoverage.StoriesTotal > 0 && len(r.TraceCoverage.UncoveredStories) > 0 {
+		out = append(out, "trace_coverage")
+	}
+	if r.NeighborhoodDrift.BaseAvailable && r.NeighborhoodDrift.Score >= telemetryFloor {
+		out = append(out, "neighborhood_drift")
+	}
+	if r.SemanticMovement.BaseAvailable && r.SemanticMovement.Score >= semanticMovementFloor {
+		out = append(out, "semantic_movement")
+	}
+	if (r.PathLoss.TotalConcepts > 0 && r.PathLoss.Score >= pathLossFloor) ||
+		len(r.PathLoss.NewlyOrphanedConcepts) > 0 {
+		out = append(out, "path_loss")
+	}
+	if r.BlastRadius.BaseAvailable && r.BlastRadius.Score >= blastRadiusFloor {
+		out = append(out, "blast_radius")
+	}
+	if r.Staleness.TotalFiles > 0 && r.Staleness.Score >= stalenessFloor {
+		out = append(out, "staleness")
+	}
+	if (r.ClaimSupport.TotalClaims > 0 && r.ClaimSupport.Score >= claimSupportFloor) ||
+		len(r.ClaimSupport.NewlyUnsupportedClaims) > 0 {
+		out = append(out, "claim_support")
+	}
+	if r.Contradiction.Enabled && r.Contradiction.ContradictionCount > 0 {
+		out = append(out, "contradiction")
+	}
+	if r.StaleDecisionLinks.Score > 0 {
+		out = append(out, "stale_decision_links")
+	}
+	if r.BrokenImplementsChains.Score > 0 {
+		out = append(out, "broken_implements_chains")
+	}
+	if r.DependencyCycles.Score > 0 {
+		out = append(out, "dependency_cycles")
+	}
+	if r.OrphanEndpoints.Score > 0 || len(r.OrphanEndpoints.NewlyOrphanedEndpoints) > 0 {
+		out = append(out, "orphan_endpoints")
+	}
+	if r.UnimplementedStories.Convention && r.UnimplementedStories.Score > 0 {
+		out = append(out, "unimplemented_stories")
+	}
+	if r.BrokenLinks.Score > 0 {
+		out = append(out, "broken_links")
+	}
+	if r.UnknownIDReferences.Score > 0 {
+		out = append(out, "unknown_id_references")
+	}
+	if r.StaleTests.Score > 0 {
+		out = append(out, "stale_tests")
+	}
+	if r.OrphanedMetricAliases.Score > 0 {
+		out = append(out, "orphaned_metric_aliases")
+	}
+	if r.DanglingImports.Score > 0 {
+		out = append(out, "dangling_imports")
+	}
+	return out
 }
 
 // aggregateRegressions copies the diff-aware `newly_*` lists from the
@@ -1823,38 +1898,75 @@ func renderActions(r Report) []string {
 		out = append(out, "inspect the candidates with `coherence report` for the cited contradictions")
 	}
 	if r.StaleDecisionLinks.Score > 0 {
-		out = append(out, "update stale decision links: docs citing superseded ADRs/IDRs without their successors")
+		ids := make([]string, 0, len(r.StaleDecisionLinks.StaleLinks))
+		for _, l := range r.StaleDecisionLinks.StaleLinks {
+			ids = append(ids, l.SupersededID)
+		}
+		out = append(out, "update stale decision links: docs citing superseded ADRs/IDRs without their successors ("+
+			joinShort(ids, 3)+")")
 	}
 	if r.BrokenImplementsChains.Score > 0 {
-		out = append(out, "add evidence packets for ids that code claims to implement (or remove the claim)")
+		targets := make([]string, 0, len(r.BrokenImplementsChains.BrokenChains))
+		for _, c := range r.BrokenImplementsChains.BrokenChains {
+			targets = append(targets, c.Target)
+		}
+		out = append(out, "add evidence packets for ids that code claims to implement (or remove the claim): "+
+			joinShort(targets, 3))
 	}
 	if r.DependencyCycles.Score > 0 {
 		out = append(out, "break the import cycle (refactor a shared interface to a third package)")
 	}
 	if r.OrphanEndpoints.Score > 0 {
-		out = append(out, "add a test alongside the source file containing the orphan endpoint(s)")
+		out = append(out, "add a test alongside the source file containing the orphan endpoint(s): "+
+			joinShort(r.OrphanEndpoints.Orphans, 3))
 	}
 	if len(r.OrphanEndpoints.NewlyOrphanedEndpoints) > 0 {
 		out = append(out, "restore test coverage for endpoint(s) that lost their verifies link since baseline: "+
 			joinShort(r.OrphanEndpoints.NewlyOrphanedEndpoints, 3))
 	}
 	if r.UnimplementedStories.Convention && r.UnimplementedStories.Score > 0 {
-		out = append(out, "add `// implements US-###` doc comments to code, or close out the unreferenced stories")
+		out = append(out, "add `// implements US-###` doc comments to code, or close out the unreferenced stories: "+
+			joinShort(r.UnimplementedStories.UnimplementedIDs, 3))
 	}
 	if r.BrokenLinks.Score > 0 {
-		out = append(out, "fix or remove the broken markdown links to untracked paths")
+		pairs := make([]string, 0, len(r.BrokenLinks.Links))
+		for _, l := range r.BrokenLinks.Links {
+			pairs = append(pairs, l.Source+"→"+l.Target)
+		}
+		out = append(out, "fix or remove the broken markdown links to untracked paths: "+
+			joinShort(pairs, 3))
 	}
 	if r.UnknownIDReferences.Score > 0 {
-		out = append(out, "define the referenced ids (under docs/user-stories or docs/decisions), or remove the references from code")
+		ids := make([]string, 0, len(r.UnknownIDReferences.UnknownRefs))
+		for _, u := range r.UnknownIDReferences.UnknownRefs {
+			ids = append(ids, u.ID)
+		}
+		out = append(out, "define the referenced ids (under docs/user-stories or docs/decisions), or remove the references from code: "+
+			joinShort(ids, 3))
 	}
 	if r.StaleTests.Score > 0 {
-		out = append(out, "update the test(s) whose source changed without them (or accept the verifies wiring is wrong)")
+		pairs := make([]string, 0, len(r.StaleTests.Stale))
+		for _, s := range r.StaleTests.Stale {
+			pairs = append(pairs, s.Test+"→"+s.Source)
+		}
+		out = append(out, "update the test(s) whose source changed without them (or accept the verifies wiring is wrong): "+
+			joinShort(pairs, 3))
 	}
 	if r.OrphanedMetricAliases.Score > 0 {
-		out = append(out, "update frontend references to the new metric name (or restore the old metric definition)")
+		names := make([]string, 0, len(r.OrphanedMetricAliases.Orphans))
+		for _, o := range r.OrphanedMetricAliases.Orphans {
+			names = append(names, o.OrphanName)
+		}
+		out = append(out, "update frontend references to the new metric name (or restore the old metric definition): "+
+			joinShort(names, 3))
 	}
 	if r.DanglingImports.Score > 0 {
-		out = append(out, "fix the dangling TS import path(s) or restore the deleted module")
+		specs := make([]string, 0, len(r.DanglingImports.Imports))
+		for _, di := range r.DanglingImports.Imports {
+			specs = append(specs, di.Source+"→"+di.Spec)
+		}
+		out = append(out, "fix the dangling TS/Py import path(s) or restore the deleted module: "+
+			joinShort(specs, 3))
 	}
 	if len(out) == 0 {
 		out = append(out, "no action needed")
