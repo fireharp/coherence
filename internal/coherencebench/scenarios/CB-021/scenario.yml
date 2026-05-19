@@ -1,0 +1,57 @@
+id: CB-021
+name: path_loss convention skip on kickoff project
+description: |
+  Validates iteration 97's convention gate. Baseline and current both
+  ship 3 markdown docs with H1 headings — 3 concepts emerge, none
+  reach a verifiable artifact (no tests, no evidence, no endpoints).
+  path_loss.Score = 1.0 (100% orphan).
+
+  Without the convention gate, this would fire telemetry and look
+  like a regression. With the gate, path_loss.Convention=false and
+  the verdict skips the score-based promotion. Movement-only meters
+  (neighborhood_drift, semantic_movement) may still bump verdict to
+  telemetry on real edits — so this scenario asserts that path_loss
+  itself is silent. Specifically: between base and current, ONE
+  doc receives a typo edit that doesn't change the semantic hash
+  (markdown comment vs visible content), so neighborhood_drift and
+  semantic_movement stay quiet and the verdict comes out clean.
+status: deterministic
+base_files:
+  docs/auth.md: |
+    ---
+    title: Auth
+    ---
+
+    # Authentication
+
+    Login flow lives here.
+  docs/billing.md: |
+    ---
+    title: Billing
+    ---
+
+    # Billing
+
+    Stripe handles charges.
+  docs/profile.md: |
+    ---
+    title: Profile
+    ---
+
+    # Profile
+
+    Per-user profile data.
+files:
+  docs/auth.md: |
+    ---
+    title: Auth
+    ---
+
+    # Authentication
+
+    Login flow lives here.
+expected:
+  fires: []
+  blocking_error: false
+  drift:
+    verdict: clean

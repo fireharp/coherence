@@ -728,9 +728,24 @@ func TestOrphanEndpointsCoTenancyInheritsVerification(t *testing.T) {
 }
 
 func TestVerdictTelemetryOnOrphanEndpoints(t *testing.T) {
-	r := Report{OrphanEndpoints: OrphanEndpoints{Score: 1, Orphans: []string{"endpoint:*:/x"}}}
+	r := Report{OrphanEndpoints: OrphanEndpoints{Score: 1, Orphans: []string{"endpoint:*:/x"}, Convention: true}}
 	if v := computeVerdict(r); v != VerdictTelemetry {
 		t.Errorf("expected telemetry, got %s", v)
+	}
+}
+
+func TestVerdictCleanWhenOrphanEndpointsWithoutConvention(t *testing.T) {
+	// Kickoff project: 20 endpoints, zero tests anywhere → Convention=false.
+	// Verdict should skip score-based promotion.
+	r := Report{
+		OrphanEndpoints: OrphanEndpoints{
+			Score:      20,
+			Orphans:    []string{"endpoint:GET:/x"},
+			Convention: false,
+		},
+	}
+	if v := computeVerdict(r); v != VerdictClean {
+		t.Errorf("orphan_endpoints without convention should not promote, got %s", v)
 	}
 }
 
@@ -1349,9 +1364,16 @@ func TestClaimSupportReachesTestVerifies(t *testing.T) {
 }
 
 func TestVerdictTelemetryOnUnsupportedClaims(t *testing.T) {
-	r := Report{ClaimSupport: ClaimSupport{TotalClaims: 2, Score: claimSupportFloor + 0.1}}
+	r := Report{ClaimSupport: ClaimSupport{TotalClaims: 2, Score: claimSupportFloor + 0.1, Convention: true}}
 	if v := computeVerdict(r); v != VerdictTelemetry {
 		t.Errorf("expected telemetry on unsupported claims, got %s", v)
+	}
+}
+
+func TestVerdictCleanWhenClaimSupportWithoutConvention(t *testing.T) {
+	r := Report{ClaimSupport: ClaimSupport{TotalClaims: 1, Score: 1.0, Convention: false}}
+	if v := computeVerdict(r); v != VerdictClean {
+		t.Errorf("claim_support without convention should not promote, got %s", v)
 	}
 }
 
@@ -1360,8 +1382,8 @@ func TestActiveMetersListsAllFiringMeters(t *testing.T) {
 		RequiredEdgeBreakage: EdgeBreakage{BrokenCount: 1, TotalRules: 5},
 		BrokenLinks:          BrokenLinks{Score: 2},
 		StaleTests:           StaleTests{Score: 1},
-		OrphanEndpoints:      OrphanEndpoints{Score: 3},
-		ClaimSupport:         ClaimSupport{TotalClaims: 1, Score: 1.0},
+		OrphanEndpoints:      OrphanEndpoints{Score: 3, Convention: true},
+		ClaimSupport:         ClaimSupport{TotalClaims: 1, Score: 1.0, Convention: true},
 		UnknownIDReferences:  UnknownIDReferences{Score: 7},
 		PathLoss:             PathLoss{TotalConcepts: 5, Score: 1.0, Convention: true},
 	}

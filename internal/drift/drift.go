@@ -184,9 +184,16 @@ type UnimplementedStories struct {
 // hand. The diff fields report endpoint transitions across base→current
 // when a base graph is on disk: NewlyOrphanedEndpoints is the actionable
 // "this commit removed the test for endpoint X" signal.
+//
+// `Convention` is true iff the current graph has any verifies edge —
+// proof the repo uses the test→source pattern. When Convention=false
+// (kickoff project, no test files yet) the verdict skips score-based
+// promotion. Diff transitions still promote since they imply prior
+// test coverage.
 type OrphanEndpoints struct {
 	Score                  int      `json:"score"`
 	Orphans                []string `json:"orphan_endpoints"`
+	Convention             bool     `json:"convention"`
 	BaseAvailable          bool     `json:"base_available"`
 	NewlyOrphanedEndpoints []string `json:"newly_orphaned_endpoints"`
 	NewlyCoveredEndpoints  []string `json:"newly_covered_endpoints"`
@@ -555,7 +562,7 @@ func activeMeters(r Report) []string {
 	if r.Staleness.TotalFiles > 0 && r.Staleness.Score >= stalenessFloor {
 		out = append(out, "staleness")
 	}
-	if (r.ClaimSupport.TotalClaims > 0 && r.ClaimSupport.Score >= claimSupportFloor) ||
+	if (r.ClaimSupport.TotalClaims > 0 && r.ClaimSupport.Convention && r.ClaimSupport.Score >= claimSupportFloor) ||
 		len(r.ClaimSupport.NewlyUnsupportedClaims) > 0 {
 		out = append(out, "claim_support")
 	}
@@ -571,7 +578,8 @@ func activeMeters(r Report) []string {
 	if r.DependencyCycles.Score > 0 {
 		out = append(out, "dependency_cycles")
 	}
-	if r.OrphanEndpoints.Score > 0 || len(r.OrphanEndpoints.NewlyOrphanedEndpoints) > 0 {
+	if (r.OrphanEndpoints.Convention && r.OrphanEndpoints.Score > 0) ||
+		len(r.OrphanEndpoints.NewlyOrphanedEndpoints) > 0 {
 		out = append(out, "orphan_endpoints")
 	}
 	if r.UnimplementedStories.Convention && r.UnimplementedStories.Score > 0 {
@@ -940,9 +948,22 @@ func computeOrphanEndpoints(base *graph.Graph, current graph.Graph) OrphanEndpoi
 	}
 	_ = hasEndpointInCurrent
 
+	// Convention: any verifies edge in current proves the repo uses
+	// the test→source pattern. (Base presence implies past coverage
+	// but the meter operates on current orphan count, so current-only
+	// check is correct.)
+	convention := false
+	for _, e := range current.Edges {
+		if e.Kind == graph.EdgeVerifies {
+			convention = true
+			break
+		}
+	}
+
 	return OrphanEndpoints{
 		Score:                  len(orphans),
 		Orphans:                orphans,
+		Convention:             convention,
 		BaseAvailable:          base != nil,
 		NewlyOrphanedEndpoints: newlyOrphaned,
 		NewlyCoveredEndpoints:  newlyCovered,
@@ -1682,7 +1703,7 @@ func computeVerdict(r Report) string {
 	if r.Staleness.TotalFiles > 0 && r.Staleness.Score >= stalenessFloor {
 		return VerdictTelemetry
 	}
-	if r.ClaimSupport.TotalClaims > 0 && r.ClaimSupport.Score >= claimSupportFloor {
+	if r.ClaimSupport.TotalClaims > 0 && r.ClaimSupport.Convention && r.ClaimSupport.Score >= claimSupportFloor {
 		return VerdictTelemetry
 	}
 	// Claim regressions (claim_support diff): a claim that lost backing
@@ -1700,12 +1721,13 @@ func computeVerdict(r Report) string {
 		// Import cycles are real build-breakers — promote to warn.
 		return VerdictWarn
 	}
-	if r.OrphanEndpoints.Score > 0 {
+	if r.OrphanEndpoints.Convention && r.OrphanEndpoints.Score > 0 {
 		return VerdictTelemetry
 	}
 	// Endpoint coverage regression: a test that covered an endpoint in
 	// base no longer covers it in current. Same diff-aware promotion
-	// pattern as concept/claim regressions.
+	// pattern as concept/claim regressions — runs regardless of
+	// convention since the regression itself proves prior coverage.
 	if len(r.OrphanEndpoints.NewlyOrphanedEndpoints) > 0 {
 		return VerdictTelemetry
 	}
@@ -1926,7 +1948,7 @@ func renderActions(r Report) []string {
 		out = append(out, "revisit or retire the oldest stale files: "+
 			joinShort(paths, 3))
 	}
-	if r.ClaimSupport.TotalClaims > 0 && r.ClaimSupport.Score >= claimSupportFloor {
+	if r.ClaimSupport.TotalClaims > 0 && r.ClaimSupport.Convention && r.ClaimSupport.Score >= claimSupportFloor {
 		out = append(out, "link unsupported claims from a referencing doc or evidence packet")
 	}
 	if len(r.ClaimSupport.NewlyUnsupportedClaims) > 0 {
@@ -2081,8 +2103,12 @@ func Human(r Report) string {
 		fmt.Fprintln(&b, "  semantic_movement:      n/a (no base snapshot)")
 	}
 	if r.PathLoss.TotalConcepts > 0 {
-		fmt.Fprintf(&b, "  path_loss:              %.2f (%d orphan / %d total concept(s))\n",
-			r.PathLoss.Score, len(r.PathLoss.OrphanConcepts), r.PathLoss.TotalConcepts)
+		conv := ""
+		if !r.PathLoss.Convention {
+			conv = " [no convention: no concept reaches an artifact, silenced]"
+		}
+		fmt.Fprintf(&b, "  path_loss:              %.2f (%d orphan / %d total concept(s))%s\n",
+			r.PathLoss.Score, len(r.PathLoss.OrphanConcepts), r.PathLoss.TotalConcepts, conv)
 		if r.PathLoss.BaseAvailable && (len(r.PathLoss.NewlyOrphanedConcepts) > 0 || len(r.PathLoss.NewlySupportedConcepts) > 0) {
 			fmt.Fprintf(&b, "                          newly_orphaned=%d, newly_supported=%d\n",
 				len(r.PathLoss.NewlyOrphanedConcepts), len(r.PathLoss.NewlySupportedConcepts))
@@ -2105,9 +2131,13 @@ func Human(r Report) string {
 		fmt.Fprintln(&b, "  staleness:              n/a (no tracked files)")
 	}
 	if r.ClaimSupport.TotalClaims > 0 {
-		fmt.Fprintf(&b, "  claim_support:          %.2f (%d unsupported / %d total claim(s))\n",
+		conv := ""
+		if !r.ClaimSupport.Convention {
+			conv = " [no convention: no claim reaches an artifact, silenced]"
+		}
+		fmt.Fprintf(&b, "  claim_support:          %.2f (%d unsupported / %d total claim(s))%s\n",
 			r.ClaimSupport.Score, len(r.ClaimSupport.UnsupportedClaims),
-			r.ClaimSupport.TotalClaims)
+			r.ClaimSupport.TotalClaims, conv)
 		if r.ClaimSupport.BaseAvailable && (len(r.ClaimSupport.NewlyUnsupportedClaims) > 0 || len(r.ClaimSupport.NewlySupportedClaims) > 0) {
 			fmt.Fprintf(&b, "                          newly_unsupported=%d, newly_supported=%d\n",
 				len(r.ClaimSupport.NewlyUnsupportedClaims), len(r.ClaimSupport.NewlySupportedClaims))
@@ -2124,7 +2154,13 @@ func Human(r Report) string {
 	fmt.Fprintf(&b, "  stale_decision_links:   %d stale citation(s)\n", r.StaleDecisionLinks.Score)
 	fmt.Fprintf(&b, "  broken_implements:      %d unsupported claim(s)\n", r.BrokenImplementsChains.Score)
 	fmt.Fprintf(&b, "  dependency_cycles:      %d cycle(s)\n", r.DependencyCycles.Score)
-	fmt.Fprintf(&b, "  orphan_endpoints:       %d untested route(s)\n", r.OrphanEndpoints.Score)
+	{
+		conv := ""
+		if !r.OrphanEndpoints.Convention && r.OrphanEndpoints.Score > 0 {
+			conv = " [no convention: no verifies edge, silenced]"
+		}
+		fmt.Fprintf(&b, "  orphan_endpoints:       %d untested route(s)%s\n", r.OrphanEndpoints.Score, conv)
+	}
 	if r.UnimplementedStories.Convention {
 		fmt.Fprintf(&b, "  unimplemented_stories:  %d story node(s) with no implements claim\n",
 			r.UnimplementedStories.Score)
