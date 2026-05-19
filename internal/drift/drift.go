@@ -175,10 +175,16 @@ type UnimplementedStories struct {
 
 // OrphanEndpoints is the 13th drift meter — HTTP endpoint nodes whose
 // defining file has no incoming `verifies` edge from any test node. The
-// agent gets "this route has no test" without parsing test files by hand.
+// agent gets "this route has no test" without parsing test files by
+// hand. The diff fields report endpoint transitions across base→current
+// when a base graph is on disk: NewlyOrphanedEndpoints is the actionable
+// "this commit removed the test for endpoint X" signal.
 type OrphanEndpoints struct {
-	Score   int      `json:"score"`
-	Orphans []string `json:"orphan_endpoints"`
+	Score                  int      `json:"score"`
+	Orphans                []string `json:"orphan_endpoints"`
+	BaseAvailable          bool     `json:"base_available"`
+	NewlyOrphanedEndpoints []string `json:"newly_orphaned_endpoints"`
+	NewlyCoveredEndpoints  []string `json:"newly_covered_endpoints"`
 }
 
 // DependencyCycles is the 12th drift meter. It runs DFS over the
@@ -442,7 +448,7 @@ func ComputeWith(rootDir, ontologyPath string, opts ComputeOptions) (Report, err
 	report.DependencyCycles = computeDependencyCycles(currentGraph)
 
 	// Meter 13: orphan endpoints (endpoint defining file lacks verifies).
-	report.OrphanEndpoints = computeOrphanEndpoints(currentGraph)
+	report.OrphanEndpoints = computeOrphanEndpoints(baseGraph, currentGraph)
 
 	// Meter 14: unimplemented stories (gated on implements convention).
 	report.UnimplementedStories = computeUnimplementedStories(currentGraph)
