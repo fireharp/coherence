@@ -104,7 +104,7 @@ Use Go 1.22 or newer.
   [--template=<name>] [--json] [--write-report]` runs the shipped scenario
   / evaluation suites. Templates is the v0.3 onboarding suite (38 scenarios
   across 11 templates). CoherenceBench is the M1 internal CB-### suite
-  (16 scenarios; 15 deterministic / 1 LLM-only deferred).
+  (17 scenarios; 16 deterministic / 1 LLM-only deferred).
   External is the M7 evaluation harness — 3 samples across swe-bench /
   tebench / doc-code categories, scored via precision/recall/F1 against
   gold impact sets.

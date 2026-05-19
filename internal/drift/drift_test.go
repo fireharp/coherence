@@ -1,6 +1,7 @@
 package drift
 
 import (
+	"strings"
 	"testing"
 
 	"coherence/internal/graph"
@@ -309,6 +310,124 @@ func TestPathLossEmptyGraphIsClean(t *testing.T) {
 	}
 	if pl.Score != 0 {
 		t.Errorf("expected score 0 on empty graph, got %v", pl.Score)
+	}
+}
+
+func TestPathLossDetectsNewlyOrphanedConcept(t *testing.T) {
+	// Base: concept reaches an evidence artifact via the standard chain.
+	// Current: the supports edge from evidence is removed, breaking the
+	// chain. The concept should appear in NewlyOrphanedConcepts.
+	base := graph.Graph{
+		Nodes: []graph.Node{
+			{ID: "concept:auth", Kind: graph.NodeConcept},
+			{ID: "doc:auth.md", Kind: graph.NodeDoc},
+			{ID: "adr:ADR-007", Kind: graph.NodeADR},
+			{ID: "evidence:auth", Kind: graph.NodeEvidence},
+		},
+		Edges: []graph.Edge{
+			{From: "doc:auth.md", To: "concept:auth", Kind: graph.EdgeDescribes},
+			{From: "doc:auth.md", To: "adr:ADR-007", Kind: graph.EdgeMentions},
+			{From: "evidence:auth", To: "adr:ADR-007", Kind: graph.EdgeSupports},
+		},
+	}
+	current := graph.Graph{
+		Nodes: []graph.Node{
+			{ID: "concept:auth", Kind: graph.NodeConcept},
+			{ID: "doc:auth.md", Kind: graph.NodeDoc},
+			{ID: "adr:ADR-007", Kind: graph.NodeADR},
+			{ID: "evidence:auth", Kind: graph.NodeEvidence},
+		},
+		Edges: []graph.Edge{
+			{From: "doc:auth.md", To: "concept:auth", Kind: graph.EdgeDescribes},
+			{From: "doc:auth.md", To: "adr:ADR-007", Kind: graph.EdgeMentions},
+			// supports edge removed.
+		},
+	}
+	pl := computePathLoss(&base, current)
+	if !pl.BaseAvailable {
+		t.Fatal("BaseAvailable should be true")
+	}
+	if len(pl.NewlyOrphanedConcepts) != 1 || pl.NewlyOrphanedConcepts[0] != "concept:auth" {
+		t.Errorf("NewlyOrphanedConcepts = %v, want [concept:auth]", pl.NewlyOrphanedConcepts)
+	}
+	if len(pl.NewlySupportedConcepts) != 0 {
+		t.Errorf("NewlySupportedConcepts should be empty, got %v", pl.NewlySupportedConcepts)
+	}
+}
+
+func TestPathLossDetectsNewlySupportedConcept(t *testing.T) {
+	// Base: concept orphan (no artifact reachable).
+	// Current: evidence node added → concept now supported.
+	base := graph.Graph{
+		Nodes: []graph.Node{
+			{ID: "concept:auth", Kind: graph.NodeConcept},
+			{ID: "doc:auth.md", Kind: graph.NodeDoc},
+			{ID: "adr:ADR-007", Kind: graph.NodeADR},
+		},
+		Edges: []graph.Edge{
+			{From: "doc:auth.md", To: "concept:auth", Kind: graph.EdgeDescribes},
+			{From: "doc:auth.md", To: "adr:ADR-007", Kind: graph.EdgeMentions},
+		},
+	}
+	current := graph.Graph{
+		Nodes: []graph.Node{
+			{ID: "concept:auth", Kind: graph.NodeConcept},
+			{ID: "doc:auth.md", Kind: graph.NodeDoc},
+			{ID: "adr:ADR-007", Kind: graph.NodeADR},
+			{ID: "evidence:auth", Kind: graph.NodeEvidence},
+		},
+		Edges: []graph.Edge{
+			{From: "doc:auth.md", To: "concept:auth", Kind: graph.EdgeDescribes},
+			{From: "doc:auth.md", To: "adr:ADR-007", Kind: graph.EdgeMentions},
+			{From: "evidence:auth", To: "adr:ADR-007", Kind: graph.EdgeSupports},
+		},
+	}
+	pl := computePathLoss(&base, current)
+	if len(pl.NewlySupportedConcepts) != 1 || pl.NewlySupportedConcepts[0] != "concept:auth" {
+		t.Errorf("NewlySupportedConcepts = %v, want [concept:auth]", pl.NewlySupportedConcepts)
+	}
+	if len(pl.NewlyOrphanedConcepts) != 0 {
+		t.Errorf("NewlyOrphanedConcepts should be empty, got %v", pl.NewlyOrphanedConcepts)
+	}
+}
+
+func TestPathLossNewConceptsNotCountedAsNewlySupported(t *testing.T) {
+	// A concept that exists only in current (no presence in base) is
+	// neither newly_orphaned nor newly_supported — it has no prior state
+	// to transition from.
+	base := graph.Graph{}
+	current := graph.Graph{
+		Nodes: []graph.Node{
+			{ID: "concept:new", Kind: graph.NodeConcept},
+			{ID: "doc:x.md", Kind: graph.NodeDoc},
+			{ID: "test:y_test.go", Kind: graph.NodeTest},
+			{ID: "file:y.go", Kind: graph.NodeFile},
+		},
+		Edges: []graph.Edge{
+			{From: "doc:x.md", To: "concept:new", Kind: graph.EdgeDescribes},
+			{From: "doc:x.md", To: "file:y.go", Kind: graph.EdgeMentions},
+			{From: "test:y_test.go", To: "file:y.go", Kind: graph.EdgeVerifies},
+		},
+	}
+	pl := computePathLoss(&base, current)
+	if len(pl.NewlySupportedConcepts) != 0 {
+		t.Errorf("new concept should not appear in NewlySupportedConcepts, got %v", pl.NewlySupportedConcepts)
+	}
+	if len(pl.NewlyOrphanedConcepts) != 0 {
+		t.Errorf("new concept should not appear in NewlyOrphanedConcepts, got %v", pl.NewlyOrphanedConcepts)
+	}
+}
+
+func TestPathLossDiffFieldsEmptyWhenNoBase(t *testing.T) {
+	g := graph.Graph{
+		Nodes: []graph.Node{{ID: "concept:x", Kind: graph.NodeConcept}},
+	}
+	pl := computePathLoss(nil, g)
+	if pl.BaseAvailable {
+		t.Error("BaseAvailable should be false")
+	}
+	if len(pl.NewlyOrphanedConcepts) != 0 || len(pl.NewlySupportedConcepts) != 0 {
+		t.Error("diff lists should be empty when no base supplied")
 	}
 }
 
@@ -833,7 +952,7 @@ func TestVerdictNotPromotedByLLMErrorOnly(t *testing.T) {
 }
 
 func TestClaimSupportNoClaimsIsClean(t *testing.T) {
-	cs := computeClaimSupport(graph.Graph{})
+	cs := computeClaimSupport(nil, graph.Graph{})
 	if cs.TotalClaims != 0 {
 		t.Errorf("expected 0 claims, got %d", cs.TotalClaims)
 	}
@@ -852,7 +971,7 @@ func TestClaimSupportUnsupportedWhenDefinerNotMentioned(t *testing.T) {
 			{From: "doc:spec.md", To: "claim:abc", Kind: graph.EdgeDefines},
 		},
 	}
-	cs := computeClaimSupport(g)
+	cs := computeClaimSupport(nil, g)
 	if cs.SupportedClaims != 0 {
 		t.Errorf("expected unsupported, got Supported=%d", cs.SupportedClaims)
 	}
@@ -877,7 +996,7 @@ func TestClaimSupportSupportedWhenChainReachesArtifact(t *testing.T) {
 			{From: "evidence:adr-bucket", To: "adr:ADR-001", Kind: graph.EdgeSupports},
 		},
 	}
-	cs := computeClaimSupport(g)
+	cs := computeClaimSupport(nil, g)
 	if cs.SupportedClaims != 1 {
 		t.Errorf("expected 1 supported claim, got %d", cs.SupportedClaims)
 	}
@@ -900,7 +1019,7 @@ func TestClaimSupportMentionOnlyNoLongerSuffices(t *testing.T) {
 			{From: "doc:overview.md", To: "doc:spec.md", Kind: graph.EdgeMentions},
 		},
 	}
-	cs := computeClaimSupport(g)
+	cs := computeClaimSupport(nil, g)
 	if cs.SupportedClaims != 0 {
 		t.Errorf("mention-only without artifact should leave claim unsupported, got Supported=%d", cs.SupportedClaims)
 	}
@@ -921,7 +1040,7 @@ func TestClaimSupportReachesTestVerifies(t *testing.T) {
 			{From: "test:auth_test.go", To: "file:auth.go", Kind: graph.EdgeVerifies},
 		},
 	}
-	cs := computeClaimSupport(g)
+	cs := computeClaimSupport(nil, g)
 	if cs.SupportedClaims != 1 {
 		t.Errorf("claim should reach test via verifies chain, got Supported=%d", cs.SupportedClaims)
 	}
@@ -931,6 +1050,203 @@ func TestVerdictTelemetryOnUnsupportedClaims(t *testing.T) {
 	r := Report{ClaimSupport: ClaimSupport{TotalClaims: 2, Score: claimSupportFloor + 0.1}}
 	if v := computeVerdict(r); v != VerdictTelemetry {
 		t.Errorf("expected telemetry on unsupported claims, got %s", v)
+	}
+}
+
+func TestVerdictTelemetryOnSingleNewlyOrphanedConcept(t *testing.T) {
+	// Overall score is below floor; a single transition still promotes.
+	r := Report{
+		PathLoss: PathLoss{
+			TotalConcepts:         10,
+			Score:                 0.01,
+			BaseAvailable:         true,
+			NewlyOrphanedConcepts: []string{"concept:auth"},
+		},
+	}
+	if v := computeVerdict(r); v != VerdictTelemetry {
+		t.Errorf("expected telemetry on regression, got %s", v)
+	}
+}
+
+func TestVerdictTelemetryOnSingleNewlyUnsupportedClaim(t *testing.T) {
+	r := Report{
+		ClaimSupport: ClaimSupport{
+			TotalClaims:            10,
+			Score:                  0.01,
+			BaseAvailable:          true,
+			NewlyUnsupportedClaims: []string{"claim:abc"},
+		},
+	}
+	if v := computeVerdict(r); v != VerdictTelemetry {
+		t.Errorf("expected telemetry on claim regression, got %s", v)
+	}
+}
+
+func TestVerdictCleanWhenOnlyTransitionsAreImprovements(t *testing.T) {
+	// Newly-supported on its own is good news; no telemetry promotion.
+	r := Report{
+		PathLoss: PathLoss{
+			TotalConcepts:          10,
+			Score:                  0.01,
+			BaseAvailable:          true,
+			NewlySupportedConcepts: []string{"concept:auth"},
+		},
+		ClaimSupport: ClaimSupport{
+			TotalClaims:          10,
+			Score:                0.01,
+			BaseAvailable:        true,
+			NewlySupportedClaims: []string{"claim:abc"},
+		},
+	}
+	if v := computeVerdict(r); v != VerdictClean {
+		t.Errorf("improvements alone should stay clean, got %s", v)
+	}
+}
+
+func TestRenderActionsIncludesRestoreSupportPath(t *testing.T) {
+	r := Report{
+		PathLoss: PathLoss{
+			NewlyOrphanedConcepts: []string{"concept:auth"},
+		},
+	}
+	actions := renderActions(r)
+	found := false
+	for _, a := range actions {
+		if strings.Contains(a, "restore the support path") && strings.Contains(a, "concept:auth") {
+			found = true
+			break
+		}
+	}
+	if !found {
+		t.Errorf("expected restore-support-path action, got %v", actions)
+	}
+}
+
+func TestRenderActionsIncludesRestoreClaimBacking(t *testing.T) {
+	r := Report{
+		ClaimSupport: ClaimSupport{
+			NewlyUnsupportedClaims: []string{"claim:abc"},
+		},
+	}
+	actions := renderActions(r)
+	found := false
+	for _, a := range actions {
+		if strings.Contains(a, "restore the backing") && strings.Contains(a, "claim:abc") {
+			found = true
+			break
+		}
+	}
+	if !found {
+		t.Errorf("expected restore-backing action, got %v", actions)
+	}
+}
+
+func TestClaimSupportDetectsNewlyUnsupportedClaim(t *testing.T) {
+	// Base: claim reaches evidence via ADR + supports chain.
+	// Current: supports edge removed; claim loses backing.
+	base := graph.Graph{
+		Nodes: []graph.Node{
+			{ID: "claim:abc", Kind: graph.NodeClaim},
+			{ID: "doc:spec.md", Kind: graph.NodeDoc},
+			{ID: "adr:ADR-001", Kind: graph.NodeADR},
+			{ID: "evidence:adr-bucket", Kind: graph.NodeEvidence},
+		},
+		Edges: []graph.Edge{
+			{From: "doc:spec.md", To: "claim:abc", Kind: graph.EdgeDefines},
+			{From: "doc:spec.md", To: "adr:ADR-001", Kind: graph.EdgeMentions},
+			{From: "evidence:adr-bucket", To: "adr:ADR-001", Kind: graph.EdgeSupports},
+		},
+	}
+	current := graph.Graph{
+		Nodes: []graph.Node{
+			{ID: "claim:abc", Kind: graph.NodeClaim},
+			{ID: "doc:spec.md", Kind: graph.NodeDoc},
+			{ID: "adr:ADR-001", Kind: graph.NodeADR},
+			{ID: "evidence:adr-bucket", Kind: graph.NodeEvidence},
+		},
+		Edges: []graph.Edge{
+			{From: "doc:spec.md", To: "claim:abc", Kind: graph.EdgeDefines},
+			{From: "doc:spec.md", To: "adr:ADR-001", Kind: graph.EdgeMentions},
+		},
+	}
+	cs := computeClaimSupport(&base, current)
+	if !cs.BaseAvailable {
+		t.Fatal("BaseAvailable should be true")
+	}
+	if len(cs.NewlyUnsupportedClaims) != 1 || cs.NewlyUnsupportedClaims[0] != "claim:abc" {
+		t.Errorf("NewlyUnsupportedClaims = %v, want [claim:abc]", cs.NewlyUnsupportedClaims)
+	}
+	if len(cs.NewlySupportedClaims) != 0 {
+		t.Errorf("NewlySupportedClaims should be empty, got %v", cs.NewlySupportedClaims)
+	}
+}
+
+func TestClaimSupportDetectsNewlySupportedClaim(t *testing.T) {
+	base := graph.Graph{
+		Nodes: []graph.Node{
+			{ID: "claim:abc", Kind: graph.NodeClaim},
+			{ID: "doc:spec.md", Kind: graph.NodeDoc},
+			{ID: "adr:ADR-001", Kind: graph.NodeADR},
+		},
+		Edges: []graph.Edge{
+			{From: "doc:spec.md", To: "claim:abc", Kind: graph.EdgeDefines},
+			{From: "doc:spec.md", To: "adr:ADR-001", Kind: graph.EdgeMentions},
+		},
+	}
+	current := graph.Graph{
+		Nodes: []graph.Node{
+			{ID: "claim:abc", Kind: graph.NodeClaim},
+			{ID: "doc:spec.md", Kind: graph.NodeDoc},
+			{ID: "adr:ADR-001", Kind: graph.NodeADR},
+			{ID: "evidence:adr-bucket", Kind: graph.NodeEvidence},
+		},
+		Edges: []graph.Edge{
+			{From: "doc:spec.md", To: "claim:abc", Kind: graph.EdgeDefines},
+			{From: "doc:spec.md", To: "adr:ADR-001", Kind: graph.EdgeMentions},
+			{From: "evidence:adr-bucket", To: "adr:ADR-001", Kind: graph.EdgeSupports},
+		},
+	}
+	cs := computeClaimSupport(&base, current)
+	if len(cs.NewlySupportedClaims) != 1 || cs.NewlySupportedClaims[0] != "claim:abc" {
+		t.Errorf("NewlySupportedClaims = %v, want [claim:abc]", cs.NewlySupportedClaims)
+	}
+	if len(cs.NewlyUnsupportedClaims) != 0 {
+		t.Errorf("NewlyUnsupportedClaims should be empty, got %v", cs.NewlyUnsupportedClaims)
+	}
+}
+
+func TestClaimSupportNewClaimsNotCountedAsTransition(t *testing.T) {
+	base := graph.Graph{}
+	current := graph.Graph{
+		Nodes: []graph.Node{
+			{ID: "claim:fresh", Kind: graph.NodeClaim},
+			{ID: "doc:x.md", Kind: graph.NodeDoc},
+			{ID: "test:y_test.go", Kind: graph.NodeTest},
+			{ID: "file:y.go", Kind: graph.NodeFile},
+		},
+		Edges: []graph.Edge{
+			{From: "doc:x.md", To: "claim:fresh", Kind: graph.EdgeDefines},
+			{From: "doc:x.md", To: "file:y.go", Kind: graph.EdgeMentions},
+			{From: "test:y_test.go", To: "file:y.go", Kind: graph.EdgeVerifies},
+		},
+	}
+	cs := computeClaimSupport(&base, current)
+	if len(cs.NewlyUnsupportedClaims) != 0 || len(cs.NewlySupportedClaims) != 0 {
+		t.Errorf("new claim should not be transition-counted: unsupported=%v supported=%v",
+			cs.NewlyUnsupportedClaims, cs.NewlySupportedClaims)
+	}
+}
+
+func TestClaimSupportDiffFieldsEmptyWhenNoBase(t *testing.T) {
+	g := graph.Graph{
+		Nodes: []graph.Node{{ID: "claim:x", Kind: graph.NodeClaim}},
+	}
+	cs := computeClaimSupport(nil, g)
+	if cs.BaseAvailable {
+		t.Error("BaseAvailable should be false")
+	}
+	if len(cs.NewlyUnsupportedClaims) != 0 || len(cs.NewlySupportedClaims) != 0 {
+		t.Error("diff lists should be empty when no base supplied")
 	}
 }
 

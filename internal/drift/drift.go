@@ -231,15 +231,20 @@ type Contradiction struct {
 	Candidates         []string `json:"candidates"`
 }
 
-// ClaimSupport scores the share of `claim` nodes whose defining doc has at
-// least one incoming `mentions` edge — i.e. the claim's source is itself
-// referenced from elsewhere in the repo. Same indirection pattern as
-// trace_coverage and path_loss, applied to assertive-bullet claims.
+// ClaimSupport scores the share of `claim` nodes that reach a
+// verifiable artifact via the typed-edge BFS — same multi-hop semantic
+// as path_loss applied to assertive-bullet claims. The diff fields
+// report claim transitions across base→current when a base graph is on
+// disk: a claim that flipped from supported to unsupported is the
+// actionable "this commit broke a claim's backing" signal.
 type ClaimSupport struct {
-	Score             float64  `json:"score"`
-	TotalClaims       int      `json:"total_claims"`
-	SupportedClaims   int      `json:"supported_claims"`
-	UnsupportedClaims []string `json:"unsupported_claims"`
+	Score                  float64  `json:"score"`
+	TotalClaims            int      `json:"total_claims"`
+	SupportedClaims        int      `json:"supported_claims"`
+	UnsupportedClaims      []string `json:"unsupported_claims"`
+	BaseAvailable          bool     `json:"base_available"`
+	NewlyUnsupportedClaims []string `json:"newly_unsupported_claims"`
+	NewlySupportedClaims   []string `json:"newly_supported_claims"`
 }
 
 // StaleFile records one file's age data, surfaced in the OldestStaleFiles
@@ -415,7 +420,7 @@ func ComputeWith(rootDir, ontologyPath string, opts ComputeOptions) (Report, err
 	report.Staleness = computeStaleness(rootDir, currentGraph, defaultStalenessClock(rootDir))
 
 	// Meter 8: claim support (defining-doc reachability).
-	report.ClaimSupport = computeClaimSupport(currentGraph)
+	report.ClaimSupport = computeClaimSupport(baseGraph, currentGraph)
 
 	// Meter 9: contradiction (LLM-driven, optional).
 	report.Contradiction = computeContradiction(opts.LLMFindings)
@@ -953,32 +958,73 @@ const claimSupportFloor = 0.5
 // artifact via the typed-edge undirected BFS. The defining-doc
 // `EdgeDefines` is part of the traversable set, so claims reach their
 // docs naturally and then continue through mentions/implements/etc.
-func computeClaimSupport(g graph.Graph) ClaimSupport {
+//
+// When a base graph is supplied, reports claim transitions:
+// NewlyUnsupportedClaims = claims that were supported in base but
+// lost their chain in current; NewlySupportedClaims = the reverse.
+// Claims that exist only in current (no base presence) are not
+// counted in either transition list — they have no prior state.
+func computeClaimSupport(base *graph.Graph, current graph.Graph) ClaimSupport {
 	claims := []graph.Node{}
-	for _, n := range g.Nodes {
+	for _, n := range current.Nodes {
 		if n.Kind == graph.NodeClaim {
 			claims = append(claims, n)
 		}
 	}
 	if len(claims) == 0 {
-		return ClaimSupport{UnsupportedClaims: []string{}}
+		return ClaimSupport{
+			UnsupportedClaims:      []string{},
+			NewlyUnsupportedClaims: []string{},
+			NewlySupportedClaims:   []string{},
+			BaseAvailable:          base != nil,
+		}
 	}
-	reaches, _ := supportPathReacher(g)
+	currentReaches, _ := supportPathReacher(current)
 	unsupported := []string{}
 	supported := 0
+	currentlySupported := map[string]bool{}
 	for _, c := range claims {
-		if reaches(c.ID) {
+		if currentReaches(c.ID) {
 			supported++
+			currentlySupported[c.ID] = true
 		} else {
 			unsupported = append(unsupported, c.ID)
 		}
 	}
 	sort.Strings(unsupported)
+
+	newlyUnsupported := []string{}
+	newlySupported := []string{}
+	if base != nil {
+		baseReaches, _ := supportPathReacher(*base)
+		baseHasClaim := map[string]bool{}
+		for _, n := range base.Nodes {
+			if n.Kind == graph.NodeClaim {
+				baseHasClaim[n.ID] = true
+			}
+		}
+		for _, c := range claims {
+			baseSupported := baseHasClaim[c.ID] && baseReaches(c.ID)
+			nowSupported := currentlySupported[c.ID]
+			switch {
+			case baseSupported && !nowSupported:
+				newlyUnsupported = append(newlyUnsupported, c.ID)
+			case !baseSupported && nowSupported && baseHasClaim[c.ID]:
+				newlySupported = append(newlySupported, c.ID)
+			}
+		}
+		sort.Strings(newlyUnsupported)
+		sort.Strings(newlySupported)
+	}
+
 	return ClaimSupport{
-		Score:             float64(len(unsupported)) / float64(len(claims)),
-		TotalClaims:       len(claims),
-		SupportedClaims:   supported,
-		UnsupportedClaims: unsupported,
+		Score:                  float64(len(unsupported)) / float64(len(claims)),
+		TotalClaims:            len(claims),
+		SupportedClaims:        supported,
+		UnsupportedClaims:      unsupported,
+		BaseAvailable:          base != nil,
+		NewlyUnsupportedClaims: newlyUnsupported,
+		NewlySupportedClaims:   newlySupported,
 	}
 }
 
@@ -1288,6 +1334,12 @@ func computeVerdict(r Report) string {
 	if r.PathLoss.TotalConcepts > 0 && r.PathLoss.Score >= pathLossFloor {
 		return VerdictTelemetry
 	}
+	// Concept regressions (path_loss diff): any concept that lost its
+	// chain to a verifiable artifact since baseline is actionable, even
+	// if the overall orphan share stays below the floor.
+	if len(r.PathLoss.NewlyOrphanedConcepts) > 0 {
+		return VerdictTelemetry
+	}
 	if r.BlastRadius.BaseAvailable && r.BlastRadius.Score >= blastRadiusFloor {
 		return VerdictTelemetry
 	}
@@ -1295,6 +1347,11 @@ func computeVerdict(r Report) string {
 		return VerdictTelemetry
 	}
 	if r.ClaimSupport.TotalClaims > 0 && r.ClaimSupport.Score >= claimSupportFloor {
+		return VerdictTelemetry
+	}
+	// Claim regressions (claim_support diff): a claim that lost backing
+	// is the symmetric signal to a newly-orphaned concept.
+	if len(r.ClaimSupport.NewlyUnsupportedClaims) > 0 {
 		return VerdictTelemetry
 	}
 	if r.StaleDecisionLinks.Score > 0 {
@@ -1367,6 +1424,12 @@ func renderExplanations(r Report) []string {
 			"path loss: %d of %d concept(s) lack a support path (orphans: %s).",
 			len(r.PathLoss.OrphanConcepts), r.PathLoss.TotalConcepts,
 			joinShort(r.PathLoss.OrphanConcepts, 4)))
+		if len(r.PathLoss.NewlyOrphanedConcepts) > 0 {
+			out = append(out, fmt.Sprintf(
+				"path loss: %d concept(s) lost support since baseline (%s).",
+				len(r.PathLoss.NewlyOrphanedConcepts),
+				joinShort(r.PathLoss.NewlyOrphanedConcepts, 4)))
+		}
 	}
 	if r.BlastRadius.BaseAvailable {
 		out = append(out, fmt.Sprintf(
@@ -1383,6 +1446,12 @@ func renderExplanations(r Report) []string {
 			"claim support: %d of %d claim(s) lack a referencing doc (unsupported: %s).",
 			len(r.ClaimSupport.UnsupportedClaims), r.ClaimSupport.TotalClaims,
 			joinShort(r.ClaimSupport.UnsupportedClaims, 4)))
+		if len(r.ClaimSupport.NewlyUnsupportedClaims) > 0 {
+			out = append(out, fmt.Sprintf(
+				"claim support: %d claim(s) lost backing since baseline (%s).",
+				len(r.ClaimSupport.NewlyUnsupportedClaims),
+				joinShort(r.ClaimSupport.NewlyUnsupportedClaims, 4)))
+		}
 	}
 	if r.Contradiction.Enabled {
 		if r.Contradiction.ContradictionCount > 0 {
@@ -1495,6 +1564,10 @@ func renderActions(r Report) []string {
 	if r.PathLoss.TotalConcepts > 0 && r.PathLoss.Score >= pathLossFloor {
 		out = append(out, "link orphan concepts from a supporting doc (or accept them as standalone)")
 	}
+	if len(r.PathLoss.NewlyOrphanedConcepts) > 0 {
+		out = append(out, "restore the support path(s) lost since baseline for: "+
+			joinShort(r.PathLoss.NewlyOrphanedConcepts, 3))
+	}
 	if r.BlastRadius.BaseAvailable && r.BlastRadius.Score >= blastRadiusFloor {
 		out = append(out, "review impacted neighbors of top changed nodes: "+
 			joinShort(r.BlastRadius.TopImpactedChangedNodes, 3))
@@ -1509,6 +1582,10 @@ func renderActions(r Report) []string {
 	}
 	if r.ClaimSupport.TotalClaims > 0 && r.ClaimSupport.Score >= claimSupportFloor {
 		out = append(out, "link unsupported claims from a referencing doc or evidence packet")
+	}
+	if len(r.ClaimSupport.NewlyUnsupportedClaims) > 0 {
+		out = append(out, "restore the backing for claim(s) that lost support since baseline: "+
+			joinShort(r.ClaimSupport.NewlyUnsupportedClaims, 3))
 	}
 	if r.Contradiction.Enabled && r.Contradiction.ContradictionCount > 0 {
 		out = append(out, "inspect the candidates with `coherence report` for the cited contradictions")
@@ -1603,6 +1680,10 @@ func Human(r Report) string {
 	if r.PathLoss.TotalConcepts > 0 {
 		fmt.Fprintf(&b, "  path_loss:              %.2f (%d orphan / %d total concept(s))\n",
 			r.PathLoss.Score, len(r.PathLoss.OrphanConcepts), r.PathLoss.TotalConcepts)
+		if r.PathLoss.BaseAvailable && (len(r.PathLoss.NewlyOrphanedConcepts) > 0 || len(r.PathLoss.NewlySupportedConcepts) > 0) {
+			fmt.Fprintf(&b, "                          newly_orphaned=%d, newly_supported=%d\n",
+				len(r.PathLoss.NewlyOrphanedConcepts), len(r.PathLoss.NewlySupportedConcepts))
+		}
 	} else {
 		fmt.Fprintln(&b, "  path_loss:              n/a (no concept nodes)")
 	}
@@ -1624,6 +1705,10 @@ func Human(r Report) string {
 		fmt.Fprintf(&b, "  claim_support:          %.2f (%d unsupported / %d total claim(s))\n",
 			r.ClaimSupport.Score, len(r.ClaimSupport.UnsupportedClaims),
 			r.ClaimSupport.TotalClaims)
+		if r.ClaimSupport.BaseAvailable && (len(r.ClaimSupport.NewlyUnsupportedClaims) > 0 || len(r.ClaimSupport.NewlySupportedClaims) > 0) {
+			fmt.Fprintf(&b, "                          newly_unsupported=%d, newly_supported=%d\n",
+				len(r.ClaimSupport.NewlyUnsupportedClaims), len(r.ClaimSupport.NewlySupportedClaims))
+		}
 	} else {
 		fmt.Fprintln(&b, "  claim_support:          n/a (no claim nodes)")
 	}

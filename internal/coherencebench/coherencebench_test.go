@@ -14,7 +14,7 @@ func TestIDsShipsAllExpectedScenarios(t *testing.T) {
 		"CB-001", "CB-002", "CB-003", "CB-004", "CB-005",
 		"CB-006", "CB-007", "CB-008", "CB-009", "CB-010",
 		"CB-011", "CB-012", "CB-013", "CB-014", "CB-015",
-		"CB-016",
+		"CB-016", "CB-017",
 	}
 	gotSet := map[string]bool{}
 	for _, n := range got {
@@ -38,11 +38,11 @@ func TestRunAllPassesDeterministicAndSkipsRest(t *testing.T) {
 		}
 		t.Fatal("suite did not pass")
 	}
-	if suite.Counts.Total != 16 {
-		t.Errorf("total = %d, want 16", suite.Counts.Total)
+	if suite.Counts.Total != 17 {
+		t.Errorf("total = %d, want 17", suite.Counts.Total)
 	}
-	if suite.Counts.Pass < 8 {
-		t.Errorf("expected >=8 deterministic passes, got %d", suite.Counts.Pass)
+	if suite.Counts.Pass < 9 {
+		t.Errorf("expected >=9 deterministic passes, got %d", suite.Counts.Pass)
 	}
 	if suite.Counts.Skipped < 1 {
 		t.Errorf("expected >=1 skipped (LLM-only deferred), got %d", suite.Counts.Skipped)
@@ -190,6 +190,26 @@ func TestCB016IsDeterministicAndPasses(t *testing.T) {
 	}
 	if r.Scenario.Expected.Drift == nil || r.Scenario.Expected.Drift.Verdict != "telemetry" {
 		t.Errorf("CB-016 should assert drift verdict=telemetry, got %+v", r.Scenario.Expected.Drift)
+	}
+}
+
+func TestCB017IsDeterministicAndPasses(t *testing.T) {
+	// CB-017 validates iteration 67's verdict promotion: a single
+	// concept regression below the path_loss floor still promotes to
+	// telemetry via NewlyOrphanedConcepts. Baseline supports 3 concepts;
+	// current removes the test backing one of them.
+	r := Run("CB-017")
+	if r.Skipped {
+		t.Fatal("CB-017 should be deterministic, not skipped")
+	}
+	if r.Error != "" {
+		t.Fatalf("CB-017 errored: %s", r.Error)
+	}
+	if !r.Pass {
+		t.Errorf("CB-017 should pass, got missing=%v extra=%v", r.Missing, r.Extra)
+	}
+	if r.Scenario.Expected.Drift == nil || r.Scenario.Expected.Drift.Verdict != "telemetry" {
+		t.Errorf("CB-017 should assert drift verdict=telemetry, got %+v", r.Scenario.Expected.Drift)
 	}
 }
 

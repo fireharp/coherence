@@ -225,7 +225,7 @@ var (
 	// (`<key>: ADR-001`) and inline-list (`<key>: [ADR-001, ADR-002]`)
 	// forms. The first capture group is the key name; the second is the
 	// comma-joined value text.
-	relationLineRe = regexp.MustCompile(`(?m)^(supersedes|contradicts|mirrors|invalidates):\s*(.+?)\s*$`)
+	relationLineRe = regexp.MustCompile(`(?m)^(supersedes|contradicts|mirrors|invalidates|implements):\s*(.+?)\s*$`)
 	supersedesIDRe = regexp.MustCompile(`(US|ADR|IDR)-\d{3}`)
 	headingRe      = regexp.MustCompile(`(?m)^#\s+(.+)$`)
 	// headingLeveledRe captures any markdown heading and exposes its level
@@ -339,6 +339,8 @@ func emitSupersedesEdges(b *Builder, rel string, data []byte, currentLabel, curr
 			kind = EdgeMirrors
 		case "invalidates":
 			kind = EdgeInvalidates
+		case "implements":
+			kind = EdgeImplements
 		default:
 			kind = EdgeSupersedes
 		}

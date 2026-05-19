@@ -1,0 +1,75 @@
+id: CB-017
+name: single concept regression promotes verdict below floor
+description: |
+  Validates iteration 67's diff-aware verdict promotion. Baseline ships
+  three concepts (`Login`, `Auth`, `Profile`), all reaching verifiable
+  artifacts through the typed-edge BFS. Current removes the test that
+  was the only support path for the `Profile` concept — leaving 2/3
+  concepts still supported.
+
+  Overall path_loss score = 1/3 ≈ 0.333, which is below pathLossFloor
+  (0.5). Under the pre-iteration-67 logic the verdict would have stayed
+  `clean` ("orphan share below floor, no need to mention"). Under the
+  diff-aware logic, the single regression in `NewlyOrphanedConcepts`
+  promotes verdict to `telemetry`, with a suggested action naming the
+  lost concept. This scenario asserts the new behavior end-to-end.
+status: deterministic
+base_files:
+  docs/login.md: |
+    ---
+    title: Login Spec
+    ---
+
+    # Login
+
+    See [auth tests](../tests/login_test.go) for verification.
+  docs/auth.md: |
+    ---
+    title: Auth Spec
+    ---
+
+    # Auth
+
+    Implementation in [tests/auth_test.go](../tests/auth_test.go).
+  docs/profile.md: |
+    ---
+    title: Profile Spec
+    ---
+
+    # Profile
+
+    Implementation in [tests/profile_test.go](../tests/profile_test.go).
+  tests/login_test.go: |
+    package tests
+
+    import "testing"
+
+    func TestLogin(t *testing.T) {}
+  tests/auth_test.go: |
+    package tests
+
+    import "testing"
+
+    func TestAuth(t *testing.T) {}
+  tests/profile_test.go: |
+    package tests
+
+    import "testing"
+
+    func TestProfile(t *testing.T) {}
+files:
+  docs/profile.md: |
+    ---
+    title: Profile Spec
+    ---
+
+    # Profile
+
+    Implementation removed; test file deleted in the current change set.
+removed_files:
+  - tests/profile_test.go
+expected:
+  fires: []
+  blocking_error: false
+  drift:
+    verdict: telemetry

@@ -218,7 +218,7 @@ scenario is a self-contained directory under
   scenarios (CB-004/006/008/011..015) are shipped as stubs so the suite is
   honest about scope. Each stub records the milestone that would enable it.
 
-The shipped totals are: **16 scenarios, 15 pass, 0 fail, 1 skipped** —
+The shipped totals are: **17 scenarios, 16 pass, 0 fail, 1 skipped** —
 matching M1's "at least 8 internal scenarios exist" bar.
 
 ### Scored scenarios (Files mode)
@@ -633,10 +633,10 @@ meters today:
 | `trace_coverage`          | `.coherence/graph.json`              | user_story nodes referenced (via defining doc) / total      |
 | `neighborhood_drift`      | base + current graph                 | weighted Δ over added/removed nodes and edges               |
 | `semantic_movement`       | base + current snapshot              | markdown_semantic_changed / markdown_total (noop excluded)  |
-| `path_loss`               | BFS over typed edges from each concept | concepts that don't reach a `test`/`evidence`/`endpoint`/`generated_artifact` via chain |
+| `path_loss`               | BFS over typed edges from each concept (base + current) | concepts that don't reach a `test`/`evidence`/`endpoint`/`generated_artifact` via chain; reports `newly_orphaned_concepts` and `newly_supported_concepts` when a base graph is on disk |
 | `blast_radius`            | base + current graph                 | unique 1-hop neighbors of touched nodes (`Score`/`ImpactedNeighbors`) + `CentralityWeight` = sum of touched-node degree (GOAL.md centrality contribution) |
 | `staleness`               | `git log` per tracked file + graph concept-importance | concept-weighted stale-file share (threshold: 90 days); `weighted=false` falls back to uniform `stale_files / total_files` |
-| `claim_support`           | BFS over typed edges from each claim | claims that don't reach a `test`/`evidence`/`endpoint`/`generated_artifact` via chain |
+| `claim_support`           | BFS over typed edges from each claim (base + current) | claims that don't reach a `test`/`evidence`/`endpoint`/`generated_artifact` via chain; reports `newly_unsupported_claims` and `newly_supported_claims` when a base graph is on disk |
 | `contradiction`           | optional LLM findings (`--llm`)      | count of `llm-contradiction` findings; disabled without LLM    |
 | `stale_decision_links`    | `supersedes` + `mentions` traversal  | count of docs citing a superseded id without naming the new one |
 | `broken_implements_chains`| `implements` + `supports` traversal  | count of code symbols implementing ids with no evidence packet  |
@@ -652,9 +652,13 @@ meters today:
 Each meter also contributes to a top-level `verdict`:
 
 - `warn` — actionable findings (broken rules or uncovered stories).
-- `telemetry` — neighborhood drift exceeded the noise floor but nothing
-  hard-fires; informative only (matches the `telemetry_only_movement` flag
-  in the JSON outcome contract).
+- `telemetry` — neighborhood drift exceeded the noise floor, or a
+  support-path regression was detected (any `newly_orphaned_concepts`
+  or `newly_unsupported_claims` since baseline); informative only
+  (matches the `telemetry_only_movement` flag in the JSON outcome
+  contract). A single transition flips the verdict even when the
+  overall score stays below the floor — the suggested action lists the
+  specific concept / claim that lost support.
 - `clean` — nothing to do.
 
 All 9 GOAL.md M4 meters are now shipping, plus ten extra graph-traversal,
