@@ -79,6 +79,9 @@ func Build(rootDir string) (Graph, error) {
 	// Pass 11: code_symbol + depends_on from TypeScript shallow scan.
 	extractTSSymbols(b, rootDir, tracked)
 
+	// Pass 12: code_symbol + depends_on from Python shallow scan.
+	extractPythonSymbols(b, rootDir, tracked)
+
 	return b.Build(), nil
 }
 
