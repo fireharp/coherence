@@ -1338,6 +1338,45 @@ func TestVerdictTelemetryOnUnsupportedClaims(t *testing.T) {
 	}
 }
 
+func TestHumanRendersRegressionsSection(t *testing.T) {
+	r := Report{
+		Verdict: VerdictTelemetry,
+		Regressions: Regressions{
+			Count: 2,
+			Entries: []RegressionEntry{
+				{Kind: "newly_orphaned_concept", ID: "concept:auth", SuggestedAction: "restore the support path"},
+				{Kind: "newly_uncovered_story", ID: "us:US-001", SuggestedAction: "re-link from a spec"},
+			},
+		},
+	}
+	out := Human(r)
+	if !strings.Contains(out, "(regressions=2)") {
+		t.Error("header should include regression count")
+	}
+	if !strings.Contains(out, "regressions since baseline:") {
+		t.Error("missing regressions section header")
+	}
+	if !strings.Contains(out, "[newly_orphaned_concept] concept:auth") {
+		t.Error("missing first entry render")
+	}
+	if !strings.Contains(out, "→ restore the support path") {
+		t.Error("missing indented action for first entry")
+	}
+	if !strings.Contains(out, "[newly_uncovered_story] us:US-001") {
+		t.Error("missing second entry render")
+	}
+}
+
+func TestHumanOmitsRegressionsSectionWhenEmpty(t *testing.T) {
+	out := Human(Report{Verdict: VerdictClean})
+	if strings.Contains(out, "regressions since baseline:") {
+		t.Error("regressions section should be absent when count=0")
+	}
+	if strings.Contains(out, "(regressions=") {
+		t.Error("regression count should not appear in header when 0")
+	}
+}
+
 func TestVerdictTelemetryOnSingleNewlyOrphanedConcept(t *testing.T) {
 	// Overall score is below floor; a single transition still promotes.
 	r := Report{

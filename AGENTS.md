@@ -129,14 +129,48 @@ Agents that consume `coherence` output should read the `--json` outcome
 contract rather than the human prose: `safe_to_commit`, `review_recommended`,
 `blocking_error`, `telemetry_only_movement`, `staged`, `worktree`,
 `untracked_files_excluded`, `untracked_file_count`,
-`recommended_next_command`, `drift_verdict`, and `drift_regression_count`
-(the count of diff-aware regression entries — gate on
-`drift_regression_count > 0` for a single-key "did anything regress?"
-check; omitted when 0). The same vocabulary appears at the top level of
+`recommended_next_command`, `drift_verdict`, `drift_regression_count`,
+and `drift_regressions`. The same vocabulary appears at the top level of
 `.coherence/last-report.json`. Ontology rules may carry `suggested_commands:`
 which are surfaced both per-finding and aggregated under top-level
 `suggested_commands` in the JSON payload — agents should prefer those over
 parsing prose messages.
+
+### Regression contract for agents
+
+The diff-aware regression surface is the most actionable signal for
+review automation. Four meters track support-path transitions
+(`path_loss`, `claim_support`, `trace_coverage`, `orphan_endpoints`)
+and their `newly_*` lists feed a top-level `drift.regressions`
+aggregator. The same data surfaces inline in the outcome contract:
+
+| Field | Type | Use |
+| --- | --- | --- |
+| `drift_regression_count` | int (omit 0) | gate: `> 0` ⇒ commit regressed something |
+| `drift_regressions` | `[{kind, id, suggested_action}, …]` (omit empty) | iterate each regression directly |
+
+Regression `kind` is one of:
+
+| Kind | Source meter | Meaning |
+| --- | --- | --- |
+| `newly_orphaned_concept` | `path_loss` | concept's chain to a verifiable artifact was broken since baseline |
+| `newly_unsupported_claim` | `claim_support` | claim's chain to evidence/test/endpoint was broken |
+| `newly_uncovered_story` | `trace_coverage` | user_story lost the only `mentions` edge from a referencing doc |
+| `newly_orphaned_endpoint` | `orphan_endpoints` | endpoint's source file lost its `verifies` link from a test |
+
+Each entry's `suggested_action` is a short imperative string with the
+specific node id baked in (e.g. `"restore a support path to concept:auth
+(add/restore the test, evidence, or implements link that backed it)"`),
+so agents iterating `drift_regressions` get the WHAT and the HOW
+together — no cross-reference into the top-level `suggested_actions`
+list needed.
+
+CI gates that want zero-drift commits should pass `--strict` to
+`coherence drift`, `coherence review`, or `coherence watch --once`. The
+flag promotes a `telemetry` verdict to exit 1 and writes
+`coherence: --strict promoted telemetry → exit 1 (N regression(s) detected)`
+to stderr so the failure reason is grep-able. The live `coherence watch`
+loop ignores `--strict` (no single exit code to promote).
 
 ## Coding Style & Naming Conventions
 
