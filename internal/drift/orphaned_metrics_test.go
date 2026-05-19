@@ -78,8 +78,8 @@ func TestOrphanedMetricsNoOrphanWhenNamePreserved(t *testing.T) {
 
 func TestOrphanedMetricsSkipsNonFrontendFiles(t *testing.T) {
 	dir := metricGitInit(t, map[string]string{
-		"docs/notes.md":      `Reference to success_rate metric.`,
-		"internal/main.go":   `package main; const M = "success_rate"`,
+		"docs/notes.md":    `Reference to success_rate metric.`,
+		"internal/main.go": `package main; const M = "success_rate"`,
 	})
 	base := &graph.Graph{Nodes: []graph.Node{
 		{ID: "metric:success-rate", Kind: graph.NodeMetric, Label: "success_rate"},

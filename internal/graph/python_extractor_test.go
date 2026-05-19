@@ -146,7 +146,7 @@ func TestPyRelativeImportSameDir(t *testing.T) {
 
 func TestPyRelativeImportPackageInit(t *testing.T) {
 	dir := gitInit(t, map[string]string{
-		"app/auth.py":         `from .session import Session`,
+		"app/auth.py":             `from .session import Session`,
 		"app/session/__init__.py": `class Session: pass`,
 	})
 	g, err := Build(dir)
@@ -178,9 +178,9 @@ func TestPyRelativeImportParentPackage(t *testing.T) {
 
 func TestPyRelativeImportDotOnly(t *testing.T) {
 	dir := gitInit(t, map[string]string{
-		"app/auth.py": `from . import session`,
+		"app/auth.py":     `from . import session`,
 		"app/__init__.py": ``,
-		"app/session.py": `class Session: pass`,
+		"app/session.py":  `class Session: pass`,
 	})
 	g, err := Build(dir)
 	if err != nil {

@@ -85,7 +85,9 @@ Use Go 1.22 or newer.
   `unimplemented_stories` (user_story nodes with no incoming implements
   claim — gated by convention detection so it stays silent in repos that
   don't use the annotation), `broken_links` (markdown re-scan flagging
-  inline links to paths not in the tracked set), and
+  inline links to targets missing from disk — `.gitignore`d-but-present
+  targets are intentionally not flagged since they still resolve in
+  the user's working tree), and
   `unknown_id_references` (typed-id mentions in code without a defining
   doc; lifted from the original IDs scanner), `stale_tests` (tests
   unchanged while their `verifies`-linked source changed between

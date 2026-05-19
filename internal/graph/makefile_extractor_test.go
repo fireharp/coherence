@@ -75,8 +75,8 @@ func TestMakefileSkipsPatternRules(t *testing.T) {
 
 func TestMakefileHandlesMkIncludeFiles(t *testing.T) {
 	dir := gitInit(t, map[string]string{
-		"Makefile":      "include rules.mk\n\nall: lint test\n",
-		"rules.mk":      "lint:\n\tgolangci-lint run\n\ntest:\n\tgo test ./...\n",
+		"Makefile": "include rules.mk\n\nall: lint test\n",
+		"rules.mk": "lint:\n\tgolangci-lint run\n\ntest:\n\tgo test ./...\n",
 	})
 	g, err := Build(dir)
 	if err != nil {

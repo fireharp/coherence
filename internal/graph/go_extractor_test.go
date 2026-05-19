@@ -279,7 +279,7 @@ func Run() {}
 
 func TestExtractGoDependsOnSkipsStdlib(t *testing.T) {
 	dir := gitInit(t, map[string]string{
-		"go.mod":  "module example.com/proj\n\ngo 1.22\n",
+		"go.mod": "module example.com/proj\n\ngo 1.22\n",
 		"main.go": `package main
 
 import (
@@ -320,7 +320,7 @@ func TestExtractGoDependsOnSkipsExternalImport(t *testing.T) {
 
 func TestExtractGoDependsOnNoGoMod(t *testing.T) {
 	dir := gitInit(t, map[string]string{
-		"main.go": "package main\n\nimport \"example.com/proj/internal/util\"\n\nfunc main(){}\n",
+		"main.go":               "package main\n\nimport \"example.com/proj/internal/util\"\n\nfunc main(){}\n",
 		"internal/util/util.go": "package util\n",
 	})
 	// No go.mod — extractor should silently not emit depends_on edges.
@@ -337,9 +337,9 @@ func TestExtractGoDependsOnNoGoMod(t *testing.T) {
 
 func TestExtractGoDependsOnMultipleFilesPerEdge(t *testing.T) {
 	dir := gitInit(t, map[string]string{
-		"go.mod":      "module example.com/proj\n\ngo 1.22\n",
-		"a/a.go":      `package a; import _ "example.com/proj/internal/util"`,
-		"b/b.go":      `package b; import _ "example.com/proj/internal/util"`,
+		"go.mod":                "module example.com/proj\n\ngo 1.22\n",
+		"a/a.go":                `package a; import _ "example.com/proj/internal/util"`,
+		"b/b.go":                `package b; import _ "example.com/proj/internal/util"`,
 		"internal/util/util.go": "package util\n",
 	})
 	g, err := Build(dir)
