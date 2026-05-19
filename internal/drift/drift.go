@@ -1784,10 +1784,14 @@ func renderExplanations(r Report) []string {
 			r.SemanticMovement.MarkdownNoopChanges))
 	}
 	if r.PathLoss.TotalConcepts > 0 {
+		conv := ""
+		if !r.PathLoss.Convention {
+			conv = " — repo doesn't use the chain pattern yet, so silenced from verdict"
+		}
 		out = append(out, fmt.Sprintf(
-			"path loss: %d of %d concept(s) lack a support path (orphans: %s).",
+			"path loss: %d of %d concept(s) lack a support path%s (orphans: %s).",
 			len(r.PathLoss.OrphanConcepts), r.PathLoss.TotalConcepts,
-			joinShort(r.PathLoss.OrphanConcepts, 4)))
+			conv, joinShort(r.PathLoss.OrphanConcepts, 4)))
 		if len(r.PathLoss.NewlyOrphanedConcepts) > 0 {
 			out = append(out, fmt.Sprintf(
 				"path loss: %d concept(s) lost support since baseline (%s).",
@@ -1806,10 +1810,14 @@ func renderExplanations(r Report) []string {
 			r.Staleness.StaleFiles, r.Staleness.TotalFiles, r.Staleness.ThresholdDays))
 	}
 	if r.ClaimSupport.TotalClaims > 0 {
+		conv := ""
+		if !r.ClaimSupport.Convention {
+			conv = " — repo doesn't use the claim-backing pattern yet, so silenced from verdict"
+		}
 		out = append(out, fmt.Sprintf(
-			"claim support: %d of %d claim(s) lack a referencing doc (unsupported: %s).",
+			"claim support: %d of %d claim(s) lack a referencing doc%s (unsupported: %s).",
 			len(r.ClaimSupport.UnsupportedClaims), r.ClaimSupport.TotalClaims,
-			joinShort(r.ClaimSupport.UnsupportedClaims, 4)))
+			conv, joinShort(r.ClaimSupport.UnsupportedClaims, 4)))
 		if len(r.ClaimSupport.NewlyUnsupportedClaims) > 0 {
 			out = append(out, fmt.Sprintf(
 				"claim support: %d claim(s) lost backing since baseline (%s).",

@@ -201,6 +201,40 @@ func TestDriftRegressionsSurfaceAtTopLevel(t *testing.T) {
 	}
 }
 
+func TestTelemetryWithRegressionsTriggersReviewRecommended(t *testing.T) {
+	o := Compute(Input{
+		Subcommand:           "review",
+		DriftVerdict:         "telemetry",
+		DriftRegressionCount: 2,
+		DriftRegressions: []Regression{
+			{Kind: "newly_orphaned_concept", ID: "concept:auth", SuggestedAction: "restore"},
+		},
+	})
+	if !o.ReviewRecommended {
+		t.Error("telemetry+regressions should set review_recommended")
+	}
+	if !o.TelemetryOnlyMovement {
+		t.Error("telemetry should still set telemetry_only_movement")
+	}
+	if o.RecommendedNextCommand != "coherence drift --json" {
+		t.Errorf("expected recommended drift command, got %q", o.RecommendedNextCommand)
+	}
+}
+
+func TestPureTelemetryDoesNotRecommendReview(t *testing.T) {
+	o := Compute(Input{
+		Subcommand:           "review",
+		DriftVerdict:         "telemetry",
+		DriftRegressionCount: 0,
+	})
+	if o.ReviewRecommended {
+		t.Error("pure telemetry without regressions should not recommend review")
+	}
+	if !o.TelemetryOnlyMovement {
+		t.Error("telemetry_only_movement should still be set")
+	}
+}
+
 func TestEmptyDriftRegressionsOmitted(t *testing.T) {
 	o := Compute(Input{
 		Subcommand:   "review",

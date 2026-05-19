@@ -120,6 +120,16 @@ func Compute(in Input) Outcome {
 			o.ReviewRecommended = true
 		case "telemetry":
 			o.TelemetryOnlyMovement = true
+			// A telemetry verdict driven by diff-aware regressions is
+			// more actionable than pure movement — recommend that the
+			// agent surface the specifics. The drift report (or its
+			// inlined drift_regressions list) names them.
+			if in.DriftRegressionCount > 0 {
+				o.ReviewRecommended = true
+				if o.RecommendedNextCommand == "" {
+					o.RecommendedNextCommand = "coherence drift --json"
+				}
+			}
 		}
 	}
 
