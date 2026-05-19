@@ -82,6 +82,9 @@ func Build(rootDir string) (Graph, error) {
 	// Pass 12: code_symbol + depends_on from Python shallow scan.
 	extractPythonSymbols(b, rootDir, tracked)
 
+	// Pass 13: command nodes from shell scripts (.sh/.bash/.zsh + shebang).
+	extractShellCommands(b, rootDir, tracked)
+
 	return b.Build(), nil
 }
 
