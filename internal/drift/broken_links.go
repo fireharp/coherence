@@ -60,6 +60,14 @@ func computeBrokenLinks(rootDir string) BrokenLinks {
 			if trackedSet[target] {
 				continue
 			}
+			// Untracked-but-on-disk paths (e.g., `.gitignore`d LOCAL.md
+			// notes the user references intentionally) aren't broken
+			// for the user's working tree. Only flag links whose target
+			// is missing from the filesystem entirely — those are real
+			// 404s: typos, deletions, or stale references.
+			if _, statErr := os.Stat(filepath.Join(rootDir, target)); statErr == nil {
+				continue
+			}
 			key := rel + "|" + target
 			if seen[key] {
 				continue
