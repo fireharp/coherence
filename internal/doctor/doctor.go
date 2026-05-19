@@ -15,11 +15,11 @@ import (
 
 // Check is a single doctor result.
 type Check struct {
-	ID       string `json:"id"`
-	Status   string `json:"status"` // "ok" | "warn" | "fail"
-	Message  string `json:"message"`
-	Detail   string `json:"detail,omitempty"`
-	Fix      string `json:"fix,omitempty"`
+	ID      string `json:"id"`
+	Status  string `json:"status"` // "ok" | "warn" | "fail"
+	Message string `json:"message"`
+	Detail  string `json:"detail,omitempty"`
+	Fix     string `json:"fix,omitempty"`
 }
 
 // Report is the doctor result aggregate.
@@ -37,6 +37,10 @@ func Run(rootDir, ontPath string) Report {
 	out.Checks = append(out.Checks, checkHook(rootDir))
 	out.Checks = append(out.Checks, checkGitIgnore(rootDir))
 	out.Checks = append(out.Checks, checkCoherenceState(rootDir))
+	out.Checks = append(out.Checks, checkAgentSkill(rootDir))
+	if c, ok := checkLegacySkill(rootDir); ok {
+		out.Checks = append(out.Checks, c)
+	}
 
 	failed := false
 	for _, c := range out.Checks {
@@ -151,6 +155,75 @@ func checkCoherenceState(rootDir string) Check {
 		ID: "state", Status: "ok",
 		Message: ".coherence/ directory present",
 	}
+}
+
+func checkAgentSkill(rootDir string) Check {
+	skillPath := filepath.Join(rootDir, ".agents", "skills", "coherence", "SKILL.md")
+	body, err := os.ReadFile(skillPath)
+	if err != nil {
+		return Check{
+			ID: "agent-skill", Status: "warn",
+			Message: "no .agents/skills/coherence/SKILL.md found",
+			Fix:     "run `coherence init --skill-install=auto`",
+		}
+	}
+	fields, ok := skillFrontmatter(string(body))
+	if !ok {
+		return Check{
+			ID: "agent-skill", Status: "warn",
+			Message: "coherence agent skill frontmatter is invalid",
+			Fix:     "rerun `coherence init --skill-install=auto --force`",
+		}
+	}
+	missing := []string{}
+	for _, k := range []string{"name", "description"} {
+		if strings.TrimSpace(fields[k]) == "" {
+			missing = append(missing, k)
+		}
+	}
+	if len(missing) > 0 {
+		return Check{
+			ID: "agent-skill", Status: "warn",
+			Message: "coherence agent skill frontmatter missing " + strings.Join(missing, ", "),
+			Fix:     "rerun `coherence init --skill-install=auto --force`",
+		}
+	}
+	return Check{
+		ID: "agent-skill", Status: "ok",
+		Message: ".agents/skills/coherence/SKILL.md present",
+	}
+}
+
+func checkLegacySkill(rootDir string) (Check, bool) {
+	legacyPath := filepath.Join(rootDir, ".coherence", "skills", "agent.md")
+	if _, err := os.Stat(legacyPath); err != nil {
+		return Check{}, false
+	}
+	return Check{
+		ID: "legacy-skill", Status: "warn",
+		Message: "legacy .coherence/skills/agent.md found",
+		Fix:     "remove it and run `coherence init --skill-install=auto`",
+	}, true
+}
+
+func skillFrontmatter(body string) (map[string]string, bool) {
+	scanner := bufio.NewScanner(strings.NewReader(body))
+	if !scanner.Scan() || strings.TrimSpace(scanner.Text()) != "---" {
+		return nil, false
+	}
+	fields := map[string]string{}
+	for scanner.Scan() {
+		line := scanner.Text()
+		if strings.TrimSpace(line) == "---" {
+			return fields, true
+		}
+		if i := strings.IndexByte(line, ':'); i >= 0 {
+			key := strings.TrimSpace(line[:i])
+			value := strings.Trim(strings.TrimSpace(line[i+1:]), `"'`)
+			fields[key] = value
+		}
+	}
+	return nil, false
 }
 
 // Human renders a doctor report as readable lines.

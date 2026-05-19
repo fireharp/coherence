@@ -3,6 +3,7 @@ package doctor
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -30,6 +31,7 @@ func TestRunHappyPath(t *testing.T) {
 	writeFile(t, filepath.Join(dir, "ontology.yml"), validOntology, 0o644)
 	writeFile(t, filepath.Join(dir, ".githooks", "pre-commit"), "#!/bin/sh\ncoherence scan --staged\n", 0o755)
 	writeFile(t, filepath.Join(dir, ".gitignore"), ".coherence/\n", 0o644)
+	writeFile(t, filepath.Join(dir, ".agents", "skills", "coherence", "SKILL.md"), "---\nname: coherence\ndescription: Review repository coherence.\n---\n", 0o644)
 
 	rep := Run(dir, filepath.Join(dir, "ontology.yml"))
 	if !rep.OK {
@@ -40,6 +42,59 @@ func TestRunHappyPath(t *testing.T) {
 			t.Errorf("check %s failed: %s", c.ID, c.Message)
 		}
 	}
+}
+
+func TestRunWarnsOnMissingSkill(t *testing.T) {
+	dir := t.TempDir()
+	writeFile(t, filepath.Join(dir, "ontology.yml"), validOntology, 0o644)
+	writeFile(t, filepath.Join(dir, ".githooks", "pre-commit"), "#!/bin/sh\n", 0o755)
+	writeFile(t, filepath.Join(dir, ".gitignore"), ".coherence/\n", 0o644)
+
+	rep := Run(dir, filepath.Join(dir, "ontology.yml"))
+	c := findCheck(t, rep, "agent-skill")
+	if c.Status != "warn" {
+		t.Fatalf("expected agent-skill warn, got %+v", c)
+	}
+}
+
+func TestRunWarnsOnInvalidSkillFrontmatter(t *testing.T) {
+	dir := t.TempDir()
+	writeFile(t, filepath.Join(dir, "ontology.yml"), validOntology, 0o644)
+	writeFile(t, filepath.Join(dir, ".githooks", "pre-commit"), "#!/bin/sh\n", 0o755)
+	writeFile(t, filepath.Join(dir, ".gitignore"), ".coherence/\n", 0o644)
+	writeFile(t, filepath.Join(dir, ".agents", "skills", "coherence", "SKILL.md"), "---\nname: coherence\n---\n", 0o644)
+
+	rep := Run(dir, filepath.Join(dir, "ontology.yml"))
+	c := findCheck(t, rep, "agent-skill")
+	if c.Status != "warn" || !strings.Contains(c.Message, "description") {
+		t.Fatalf("expected description warning, got %+v", c)
+	}
+}
+
+func TestRunWarnsOnLegacySkillPath(t *testing.T) {
+	dir := t.TempDir()
+	writeFile(t, filepath.Join(dir, "ontology.yml"), validOntology, 0o644)
+	writeFile(t, filepath.Join(dir, ".githooks", "pre-commit"), "#!/bin/sh\n", 0o755)
+	writeFile(t, filepath.Join(dir, ".gitignore"), ".coherence/\n", 0o644)
+	writeFile(t, filepath.Join(dir, ".agents", "skills", "coherence", "SKILL.md"), "---\nname: coherence\ndescription: Review repository coherence.\n---\n", 0o644)
+	writeFile(t, filepath.Join(dir, ".coherence", "skills", "agent.md"), "# legacy\n", 0o644)
+
+	rep := Run(dir, filepath.Join(dir, "ontology.yml"))
+	c := findCheck(t, rep, "legacy-skill")
+	if c.Status != "warn" {
+		t.Fatalf("expected legacy-skill warn, got %+v", c)
+	}
+}
+
+func findCheck(t *testing.T, rep Report, id string) Check {
+	t.Helper()
+	for _, c := range rep.Checks {
+		if c.ID == id {
+			return c
+		}
+	}
+	t.Fatalf("missing check %q in %+v", id, rep.Checks)
+	return Check{}
 }
 
 func TestRunFlagsBadOntology(t *testing.T) {

@@ -1,15 +1,20 @@
 package initcmd
 
 import (
+	"errors"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
 )
 
+func withoutSkillInstall() string {
+	return SkillInstallOff
+}
+
 func TestRunCreatesAllArtifacts(t *testing.T) {
 	dir := t.TempDir()
-	res, err := Run(dir, Options{Template: "go-cli"})
+	res, err := Run(dir, Options{Template: "go-cli", SkillInstall: SkillInstallNative})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -30,6 +35,12 @@ func TestRunCreatesAllArtifacts(t *testing.T) {
 	if !strings.Contains(string(gi), ".coherence/") {
 		t.Errorf(".gitignore missing .coherence/: %q", string(gi))
 	}
+	if _, err := os.Stat(filepath.Join(dir, ".agents", "skills", "coherence", "SKILL.md")); err != nil {
+		t.Errorf("coherence skill missing: %v", err)
+	}
+	if _, err := os.Stat(filepath.Join(dir, ".coherence", "skills", "agent.md")); !os.IsNotExist(err) {
+		t.Errorf("legacy .coherence skill should not exist: %v", err)
+	}
 }
 
 func TestRunSkipsExistingFilesWithoutForce(t *testing.T) {
@@ -37,7 +48,7 @@ func TestRunSkipsExistingFilesWithoutForce(t *testing.T) {
 	if err := os.WriteFile(filepath.Join(dir, "ontology.yml"), []byte("preserved: true\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	res, err := Run(dir, Options{Template: "generic"})
+	res, err := Run(dir, Options{Template: "generic", SkillInstall: withoutSkillInstall()})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -61,7 +72,7 @@ func TestRunForceOverwrites(t *testing.T) {
 	if err := os.WriteFile(filepath.Join(dir, "ontology.yml"), []byte("preserved: true\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := Run(dir, Options{Template: "generic", Force: true}); err != nil {
+	if _, err := Run(dir, Options{Template: "generic", Force: true, SkillInstall: withoutSkillInstall()}); err != nil {
 		t.Fatal(err)
 	}
 	body, _ := os.ReadFile(filepath.Join(dir, "ontology.yml"))
@@ -75,7 +86,7 @@ func TestRunPreservesExistingGitignoreEntry(t *testing.T) {
 	if err := os.WriteFile(filepath.Join(dir, ".gitignore"), []byte("node_modules/\n.coherence/\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	res, err := Run(dir, Options{Template: "generic"})
+	res, err := Run(dir, Options{Template: "generic", SkillInstall: withoutSkillInstall()})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -99,11 +110,110 @@ func TestRunAppendsToGitignoreWhenEntryMissing(t *testing.T) {
 	if err := os.WriteFile(filepath.Join(dir, ".gitignore"), []byte("node_modules/\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := Run(dir, Options{Template: "generic"}); err != nil {
+	if _, err := Run(dir, Options{Template: "generic", SkillInstall: withoutSkillInstall()}); err != nil {
 		t.Fatal(err)
 	}
 	body, _ := os.ReadFile(filepath.Join(dir, ".gitignore"))
 	if !strings.Contains(string(body), "node_modules/") || !strings.Contains(string(body), ".coherence/") {
 		t.Errorf("expected both entries, got %q", string(body))
+	}
+}
+
+func TestRunDefaultInstallsSkillWithNativeFallback(t *testing.T) {
+	dir := t.TempDir()
+	old := runSkillsInstaller
+	runSkillsInstaller = func(_, _ string) error {
+		return errors.New("fake npx failed")
+	}
+	t.Cleanup(func() { runSkillsInstaller = old })
+
+	res, err := Run(dir, Options{Template: "generic"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	body, err := os.ReadFile(filepath.Join(dir, ".agents", "skills", "coherence", "SKILL.md"))
+	if err != nil {
+		t.Fatalf("coherence skill missing: %v", err)
+	}
+	if !strings.Contains(string(body), "name: coherence") {
+		t.Fatalf("unexpected skill body: %q", string(body))
+	}
+	if _, err := os.Stat(filepath.Join(dir, ".coherence", "skills", "agent.md")); !os.IsNotExist(err) {
+		t.Fatalf("legacy .coherence skill should not exist: %v", err)
+	}
+	saw := false
+	for _, a := range res.Actions {
+		if a.Path == ".agents/skills/coherence/" && a.Status == "created" && strings.Contains(a.Detail, "native fallback: fake npx failed") {
+			saw = true
+		}
+	}
+	if !saw {
+		t.Fatalf("expected fallback skill action, got %+v", res.Actions)
+	}
+}
+
+func TestRunSkillInstallOffSkipsSkill(t *testing.T) {
+	dir := t.TempDir()
+	res, err := Run(dir, Options{Template: "generic", SkillInstall: SkillInstallOff})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := os.Stat(filepath.Join(dir, ".agents", "skills", "coherence", "SKILL.md")); !os.IsNotExist(err) {
+		t.Fatalf("expected no skill with --skill-install=off, got %v", err)
+	}
+	saw := false
+	for _, a := range res.Actions {
+		if a.Path == ".agents/skills/coherence/" && a.Status == "skipped" && strings.Contains(a.Detail, "--skill-install=off") {
+			saw = true
+		}
+	}
+	if !saw {
+		t.Fatalf("expected skipped skill action, got %+v", res.Actions)
+	}
+}
+
+func TestRunSkipsExistingSkillWithoutForce(t *testing.T) {
+	dir := t.TempDir()
+	skillPath := filepath.Join(dir, ".agents", "skills", "coherence", "SKILL.md")
+	if err := os.MkdirAll(filepath.Dir(skillPath), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(skillPath, []byte("preserved\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	res, err := Run(dir, Options{Template: "generic", SkillInstall: SkillInstallNative})
+	if err != nil {
+		t.Fatal(err)
+	}
+	body, _ := os.ReadFile(skillPath)
+	if string(body) != "preserved\n" {
+		t.Fatalf("skill was overwritten without force: %q", string(body))
+	}
+	saw := false
+	for _, a := range res.Actions {
+		if a.Path == ".agents/skills/coherence/" && a.Status == "updated" && strings.Contains(a.Detail, "existing file") {
+			saw = true
+		}
+	}
+	if !saw {
+		t.Fatalf("expected mixed update action for missing reference file, got %+v", res.Actions)
+	}
+}
+
+func TestRunForceOverwritesSkill(t *testing.T) {
+	dir := t.TempDir()
+	skillPath := filepath.Join(dir, ".agents", "skills", "coherence", "SKILL.md")
+	if err := os.MkdirAll(filepath.Dir(skillPath), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(skillPath, []byte("preserved\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := Run(dir, Options{Template: "generic", SkillInstall: SkillInstallNative, Force: true}); err != nil {
+		t.Fatal(err)
+	}
+	body, _ := os.ReadFile(skillPath)
+	if !strings.Contains(string(body), "name: coherence") {
+		t.Fatalf("skill was not overwritten with force: %q", string(body))
 	}
 }

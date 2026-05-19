@@ -1,0 +1,65 @@
+id: CB-016
+name: code-level typed-id mention chain breaks on removal
+description: |
+  Exercises Pass 14 (code-level typed-id mentions) end-to-end via the
+  multi-hop path_loss BFS. Baseline has a concept node ("Authentication"
+  H1) whose only chain to a verifiable artifact runs through:
+
+      concept:authentication
+        ↔ doc:docs/specs/auth.md (describes)
+        ↔ doc:docs/user-stories/US-001.md (markdown link mentions)
+        ↔ us:US-001 (defines)
+        ↔ file:auth.go (Pass 14 typed-id mentions edge)
+        → endpoint:*:/login (defines)
+
+  Current removes the `US-001` token from auth.go's comment, dropping
+  the Pass 14 edge. The chain breaks and the concept becomes orphan
+  under path_loss. Verdict promotes to telemetry. Confirms the new edge
+  contributes to verifiable-artifact reachability and that removal is
+  detected by the deterministic drift pipeline.
+status: deterministic
+base_files:
+  docs/specs/auth.md: |
+    ---
+    title: Auth Spec
+    ---
+
+    # Authentication
+
+    See [the login story](../user-stories/US-001.md) for the auth flow.
+  docs/user-stories/US-001.md: |
+    ---
+    id: US-001
+    ---
+
+    # Login flow
+
+    A user can authenticate via username + password.
+  auth.go: |
+    package auth
+
+    import "net/http"
+
+    // Login handler. See US-001 for the requirements.
+    func Login(w http.ResponseWriter, r *http.Request) {}
+
+    func init() {
+        http.HandleFunc("/login", Login)
+    }
+files:
+  auth.go: |
+    package auth
+
+    import "net/http"
+
+    // Login handler. Refactored comment without the typed-id token.
+    func Login(w http.ResponseWriter, r *http.Request) {}
+
+    func init() {
+        http.HandleFunc("/login", Login)
+    }
+expected:
+  fires: []
+  blocking_error: false
+  drift:
+    verdict: telemetry
