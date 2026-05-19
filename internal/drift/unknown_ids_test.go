@@ -4,6 +4,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"coherence/internal/graph"
@@ -97,6 +98,63 @@ func TestUnknownIDReferencesCrossKind(t *testing.T) {
 	r := computeUnknownIDReferences(dir, g)
 	if r.Score != 2 {
 		t.Fatalf("expected 2 unknowns (ADR-007, IDR-005), got %d: %+v", r.Score, r.UnknownRefs)
+	}
+}
+
+func TestUnknownIDReferencesSkipsTestFiles(t *testing.T) {
+	// Test files often use fixture typed-ids; they should not contribute
+	// to the unknown-id meter even though they reference unresolvable ids.
+	dir := idsGitInit(t, map[string]string{
+		"src/main_test.go":   "// references US-999 (fixture)\n",
+		"src/util.test.ts":   "const ref = 'US-998'; // fixture\n",
+		"tests/test_auth.py": "# fixture for US-997\n",
+		"__tests__/x.tsx":    "const id = 'US-996';\n",
+	})
+	r := computeUnknownIDReferences(dir, graph.Graph{})
+	if r.Score != 0 {
+		t.Errorf("test-file fixtures should not flag, got Score=%d (%v)", r.Score, r.UnknownRefs)
+	}
+}
+
+func TestUnknownIDReferencesSkipsAgentsDir(t *testing.T) {
+	dir := idsGitInit(t, map[string]string{
+		".agents/skills/coherence/SKILL.md.fixture": "US-001 not defined anywhere\n",
+		".agents/skills/coherence/notes.go":         "// US-001\n",
+	})
+	r := computeUnknownIDReferences(dir, graph.Graph{})
+	for _, ref := range r.UnknownRefs {
+		if strings.HasPrefix(ref.File, ".agents/") {
+			t.Errorf("agent-skill file should be skipped: %+v", ref)
+		}
+	}
+}
+
+func TestUnknownIDReferencesSkipsFixturePaths(t *testing.T) {
+	dir := idsGitInit(t, map[string]string{
+		"internal/coherencebench/scenarios/CB-001/scenario.yml": "id: CB-001\nrefs: US-999\n",
+		"templates/fixtures/spec.yml":                           "expected: ADR-007\n",
+		"pkg/testdata/golden.txt":                               "// US-996 fixture\n",
+		"src/golden/output.json":                                "{\"id\":\"IDR-005\"}\n",
+	})
+	r := computeUnknownIDReferences(dir, graph.Graph{})
+	if r.Score != 0 {
+		t.Errorf("fixture-dir refs should not flag, got %d (%v)", r.Score, r.UnknownRefs)
+	}
+}
+
+func TestUnknownIDReferencesFlagsProductionCodeWhenFixturesPresent(t *testing.T) {
+	// Mixed repo: fixture files PLUS a real production-code reference.
+	// The production reference should still surface; fixtures should not.
+	dir := idsGitInit(t, map[string]string{
+		"src/main.go":                                           "// uses US-555\n",
+		"internal/coherencebench/scenarios/CB-001/scenario.yml": "refs: US-999\n",
+	})
+	r := computeUnknownIDReferences(dir, graph.Graph{})
+	if r.Score != 1 {
+		t.Fatalf("expected 1 production-code ref, got %d (%v)", r.Score, r.UnknownRefs)
+	}
+	if r.UnknownRefs[0].File != "src/main.go" {
+		t.Errorf("expected src/main.go, got %s", r.UnknownRefs[0].File)
 	}
 }
 

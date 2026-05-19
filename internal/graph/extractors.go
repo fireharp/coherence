@@ -497,28 +497,38 @@ func emitMentionsEdges(b *Builder, rel string, data []byte, trackedSet map[strin
 	}
 }
 
-// isTestFile recognizes test-file path conventions across the main
+// IsTestFile recognizes test-file path conventions across the main
 // languages we extract today. Tight set chosen to avoid false positives
 // on non-test code that happens to mention "test" in the filename.
+// Exported so the drift package can filter test fixtures from noise-
+// prone meters (e.g. unknown_id_references).
+func IsTestFile(p string) bool { return isTestFile(p) }
+
 func isTestFile(p string) bool {
 	base := filepath.Base(p)
 	ext := strings.ToLower(filepath.Ext(base))
 	stem := strings.TrimSuffix(base, filepath.Ext(base))
 
+	// Filename-pattern check first.
 	switch ext {
 	case ".go":
-		return strings.HasSuffix(stem, "_test")
+		if strings.HasSuffix(stem, "_test") {
+			return true
+		}
 	case ".py":
-		return strings.HasPrefix(stem, "test_") || strings.HasSuffix(stem, "_test")
+		if strings.HasPrefix(stem, "test_") || strings.HasSuffix(stem, "_test") {
+			return true
+		}
 	case ".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs":
 		// foo.test.ts, foo.spec.ts
 		secondaryExt := strings.ToLower(filepath.Ext(stem))
-		return secondaryExt == ".test" || secondaryExt == ".spec"
-	case ".rs":
-		// Rust tests are typically under tests/ dir at the crate root,
-		// not by filename pattern. Defer to directory check below.
+		if secondaryExt == ".test" || secondaryExt == ".spec" {
+			return true
+		}
 	}
 	// Directory-based fallbacks for the common test-folder conventions.
+	// Run unconditionally so a TS file living under `__tests__/` that
+	// doesn't carry `.test`/`.spec` in the filename still counts.
 	pfx := func(s string) bool { return strings.HasPrefix(p, s) }
 	if pfx("tests/") || pfx("test/") {
 		switch ext {

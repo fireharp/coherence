@@ -1,7 +1,12 @@
-// Package drift implements the GOAL.md M4 drift-scoring layer. MVP ships
-// three meters; the remaining six (semantic_movement, claim_support,
-// contradiction, staleness, blast_radius, path_loss) are deferred until the
-// relevant extractors land.
+// Package drift implements the GOAL.md M4 drift-scoring layer. All 9
+// GOAL.md meters ship today (required_edge_breakage, trace_coverage,
+// neighborhood_drift, semantic_movement, claim_support, contradiction,
+// staleness, blast_radius, path_loss) plus 10 extras: stale_decision_links,
+// broken_implements_chains, dependency_cycles, orphan_endpoints,
+// unimplemented_stories, broken_links, unknown_id_references, stale_tests,
+// orphaned_metric_aliases, dangling_imports. Four meters expose diff-aware
+// `newly_*` transitions aggregated under `Report.Regressions`; the verdict
+// promotion path treats any regression as actionable telemetry.
 package drift
 
 import (

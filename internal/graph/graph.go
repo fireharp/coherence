@@ -1,9 +1,16 @@
-// Package graph implements the GOAL.md M3 knowledge-graph MVP. It models
-// repository concepts as typed nodes connected by typed edges, using
-// deterministic extractors over a small set of file shapes. The full GOAL.md
-// catalogue (concept, claim, metric, command, test, generated_artifact,
-// evidence, code_symbol, data_model, endpoint) is intentionally not yet
-// covered — this is the minimal slice that proves the architecture.
+// Package graph implements the GOAL.md M3 knowledge-graph layer. It
+// models repository concepts as typed nodes connected by typed edges,
+// using deterministic extractors over a defined set of file shapes.
+// All 17 node kinds and all 15 edge kinds from the GOAL.md ontology
+// ship today (file, directory, doc, user_story, adr, idr, rule, command,
+// concept, claim, metric, test, evidence, generated_artifact,
+// code_symbol, endpoint, data_model; contains, defines, mentions,
+// suggests, describes, verifies, supports, generates, supersedes,
+// depends_on, implements, expects, contradicts, mirrors, invalidates).
+// Extraction runs in 16 ordered passes spanning Markdown, ontology,
+// metric files, test/evidence path conventions, Go AST, schemas,
+// Makefile, TypeScript, Python, shell scripts, code-level typed-id
+// references, metric-name string literals, and quoted path literals.
 package graph
 
 import (
@@ -17,8 +24,7 @@ import (
 	"time"
 )
 
-// NodeKind values used in this MVP. See GOAL.md "Knowledge graph ontology"
-// for the full catalogue; values not listed here are deferred.
+// NodeKind enumerates the 17 GOAL.md knowledge-graph node kinds.
 type NodeKind string
 
 const (
@@ -41,7 +47,7 @@ const (
 	NodeDataModel         NodeKind = "data_model"
 )
 
-// EdgeKind values used in this MVP.
+// EdgeKind enumerates the 15 GOAL.md knowledge-graph edge kinds.
 type EdgeKind string
 
 const (
