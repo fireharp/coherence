@@ -115,17 +115,22 @@ type UnknownIDReferences struct {
 }
 
 // DanglingImport is one (source file, unresolved import spec) pair.
+// `Lang` distinguishes the source language so agents can group by
+// extractor: "ts" for TypeScript-family files, "py" for Python.
 type DanglingImport struct {
 	Source string `json:"source"`
 	Spec   string `json:"spec"`
+	Lang   string `json:"lang"`
 }
 
-// DanglingImports is the 19th drift meter — TypeScript source files whose
-// relative-path imports don't resolve to any tracked file. Mirrors
-// `broken_links` for code: a deleted file leaves callers pointing at a
-// nonexistent path; the build will fail but coherence surfaces it before
-// commit. Score is the count of unresolved imports. Bare module
-// specifiers and `.d.ts`/test/spec files are excluded.
+// DanglingImports is the 19th drift meter — source files whose
+// relative-path imports don't resolve to any tracked file, across the
+// TypeScript and Python extractor families. Mirrors `broken_links` for
+// code: a deleted file leaves callers pointing at a nonexistent path;
+// the build will fail but coherence surfaces it before commit. Score
+// is the total count of unresolved imports across both languages.
+// Bare/absolute module specifiers and test/spec/declaration files are
+// excluded; only explicit relative imports (`./x`, `from .x`) count.
 type DanglingImports struct {
 	Score   int              `json:"score"`
 	Imports []DanglingImport `json:"imports"`

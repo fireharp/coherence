@@ -409,12 +409,12 @@ rules dedupes to one node with multiple `generates` edges. Concrete
 paths and wildcards both work; expected paths missing from the tracked
 set are skipped.
 
-`code_symbol` nodes come from two shallow extractors today. (1) A Go AST
-scan over tracked `*.go` files (`_test.go` skipped). Exported top-level
-declarations emit one symbol per name: funcs, types, consts, vars. ID
-format `code_symbol:<pkg>.<Name>` groups symbols across files in the
-same package. Methods are skipped — only package-scope functions and
-value declarations are captured. Each node carries `go_kind`
+`code_symbol` nodes come from three shallow extractors today. (1) A Go
+AST scan over tracked `*.go` files (`_test.go` skipped). Exported
+top-level declarations emit one symbol per name: funcs, types, consts,
+vars. ID format `code_symbol:<pkg>.<Name>` groups symbols across files
+in the same package. Methods are skipped — only package-scope functions
+and value declarations are captured. Each node carries `go_kind`
 (`func`/`type`/`const`/`var`) and `package` meta. (2) A TypeScript
 regex-driven scan over `*.ts`/`*.tsx`/`*.mts`/`*.cts` files (test/spec
 files and `*.d.ts` declarations skipped). Captures `export function`,
@@ -426,16 +426,37 @@ since they don't introduce a fresh symbol. ID format uses the file path
 stem as module: `code_symbol:src/api/auth.User`. Imports of relative
 specifiers (`./b`, `../shared/x`) that resolve to a tracked file emit
 `depends_on` edges; bare module specifiers (`react`, `@scope/pkg`) are
-ignored. A `defines` edge wires from the source file to each symbol.
+ignored. (3) A Python regex scan over `*.py` files (test_*/_test
+filenames skipped via the same isTestFile rule used by the test node
+pass). Captures column-0 `def`, `async def`, `class`, and
+`UPPER_CASE = …` constants. Nested defs/classes and instance
+assignments inside methods are intentionally skipped — the import
+surface is top-level names. Comments and triple-quoted blocks are
+stripped before scanning. ID format mirrors TS: file stem as module
+(`code_symbol:app/auth.Session`). Relative imports (`from .session`,
+`from ..config`, `from . import x`) that resolve to a tracked `.py`
+file emit `depends_on` edges; absolute imports (`from os import path`,
+`import json`) are not resolved. A `defines` edge wires from the source
+file to each symbol.
 
-`endpoint` nodes come from the same Go AST scan walking all `CallExpr`
-nodes for HTTP route registrations. Recognized patterns: stdlib
-`http.HandleFunc(path, h)` and `http.Handle(path, h)` (method `*`,
+`endpoint` nodes come from three shallow scans today. (1) Go AST walks
+all `CallExpr` for HTTP route registrations: stdlib
+`http.HandleFunc(path, h)` / `http.Handle(path, h)` (method `*`,
 catch-all), plus chi/gorilla/fiber-style `<recv>.Get(path, h)` /
 `.Post` / `.Put` / `.Delete` / `.Patch` / `.Head` / `.Options` (method
-from the call name). The path must be a string literal — dynamic
-expressions are skipped. ID format `endpoint:<METHOD>:<path>`. `defines`
-edge from the source file. Meta carries `http_method` + `http_path`.
+from the call name). (2) TypeScript regex picks up Express/Fastify/
+Hono-style `<obj>.get('/x', …)` / `.post` / `.put` / `.delete` /
+`.patch` / `.head` / `.options`. `.use`/`.all`/`.any` are intentionally
+skipped — they bind router-wide middleware, not single endpoints.
+Single-quoted, double-quoted, and template-literal paths are accepted;
+dynamic paths (`PREFIX + "/items"`, `getPath()`) are skipped. (3) Python
+regex picks up Flask / FastAPI decorators: `@<obj>.get('/x')` /
+`.post` / `.put` / `.delete` / `.patch` / `.head` / `.options`, plus
+`@<obj>.route('/x')` (catch-all `*`) and `@<obj>.route('/x', methods=
+['GET','POST'])` (one endpoint per listed method). The path must be the
+first positional string literal; non-literal first args skip.
+Everything shares the format `endpoint:<METHOD>:<path>`, the `defines`
+edge from the source file, and `http_method` + `http_path` meta.
 
 `expects` edges are the symmetric complement to `generates`. For each
 ontology rule, the `when` globs are expanded against the tracked file
@@ -579,7 +600,7 @@ meters today:
 | `unknown_id_references`   | typed-id regex over non-Markdown     | code mentions of US/ADR/IDR ids not defined in the graph        |
 | `stale_tests`             | `verifies` + base/current snapshot   | tests unchanged while their `verifies`-linked source changed    |
 | `orphaned_metric_aliases` | base+current metric diff + frontend scan | frontend string refs to metric names removed/renamed in current |
-| `dangling_imports`        | TS source re-scan + relative-path resolution | count of TS imports whose relative target isn't in the tracked set (warn-level — breaks the build) |
+| `dangling_imports`        | TS + Python source re-scan + relative-path resolution | count of `./x` (TS) or `from .x` (Py) imports whose target isn't in the tracked set (warn-level — breaks the build); entries carry `lang: "ts"` / `lang: "py"` |
 
 Each meter also contributes to a top-level `verdict`:
 

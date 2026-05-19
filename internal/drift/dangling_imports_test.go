@@ -59,7 +59,7 @@ export const y = x`,
 	}
 	if len(r.Imports) > 0 {
 		got := r.Imports[0]
-		if got.Source != "src/a.ts" || got.Spec != "./gone" {
+		if got.Source != "src/a.ts" || got.Spec != "./gone" || got.Lang != "ts" {
 			t.Errorf("unexpected entry: %+v", got)
 		}
 	}
@@ -147,5 +147,84 @@ func TestDanglingImportsCleanVerdictWhenEmpty(t *testing.T) {
 	}
 	if v := computeVerdict(r); v != VerdictClean {
 		t.Errorf("no findings should produce clean verdict, got %q", v)
+	}
+}
+
+func TestDanglingImportsPythonResolvedIgnored(t *testing.T) {
+	dir := danglingGitInit(t, map[string]string{
+		"app/__init__.py": ``,
+		"app/auth.py":     `from .session import Session`,
+		"app/session.py":  `class Session: pass`,
+	})
+	r := computeDanglingImports(dir)
+	if r.Score != 0 {
+		t.Errorf("resolved python import should not flag: %+v", r.Imports)
+	}
+}
+
+func TestDanglingImportsPythonUnresolvedFlagged(t *testing.T) {
+	dir := danglingGitInit(t, map[string]string{
+		"app/auth.py": `from .gone import Thing`,
+	})
+	r := computeDanglingImports(dir)
+	if r.Score != 1 {
+		t.Fatalf("expected one dangling python import, got %d (%+v)", r.Score, r.Imports)
+	}
+	got := r.Imports[0]
+	if got.Source != "app/auth.py" || got.Spec != ".gone" || got.Lang != "py" {
+		t.Errorf("unexpected entry: %+v", got)
+	}
+}
+
+func TestDanglingImportsPythonParentPackageUnresolved(t *testing.T) {
+	dir := danglingGitInit(t, map[string]string{
+		"app/sub/util.py": `from ..gone import x`,
+		"app/__init__.py": ``,
+	})
+	r := computeDanglingImports(dir)
+	if r.Score != 1 {
+		t.Fatalf("expected one dangling parent-relative python import, got %+v", r.Imports)
+	}
+}
+
+func TestDanglingImportsPythonAbsoluteIgnored(t *testing.T) {
+	dir := danglingGitInit(t, map[string]string{
+		"app/auth.py": `from os import path
+from collections import defaultdict
+import json
+`,
+	})
+	r := computeDanglingImports(dir)
+	if r.Score != 0 {
+		t.Errorf("absolute python imports should not flag: %+v", r.Imports)
+	}
+}
+
+func TestDanglingImportsPythonTestFilesSkipped(t *testing.T) {
+	dir := danglingGitInit(t, map[string]string{
+		"tests/test_auth.py": `from .gone import x`,
+		"app/auth_test.py":   `from ..missing import y`,
+	})
+	r := computeDanglingImports(dir)
+	if r.Score != 0 {
+		t.Errorf("python test files should be skipped, got %+v", r.Imports)
+	}
+}
+
+func TestDanglingImportsMixedTSAndPythonCounted(t *testing.T) {
+	dir := danglingGitInit(t, map[string]string{
+		"src/a.ts":    `import { x } from "./gone"; export const y = x`,
+		"app/auth.py": `from .gone import Thing`,
+	})
+	r := computeDanglingImports(dir)
+	if r.Score != 2 {
+		t.Fatalf("expected 2 dangling (1 ts + 1 py), got %d (%+v)", r.Score, r.Imports)
+	}
+	langs := map[string]bool{}
+	for _, di := range r.Imports {
+		langs[di.Lang] = true
+	}
+	if !langs["ts"] || !langs["py"] {
+		t.Errorf("expected both ts and py langs, got %v", langs)
 	}
 }

@@ -55,7 +55,12 @@ Use Go 1.22 or newer.
   TypeScript shallow extraction over `*.ts`/`*.tsx`/`*.mts`/`*.cts`
   files (skipping `*.test.*`/`*.spec.*` and `*.d.ts`): exported
   declarations become `code_symbol` nodes (`code_symbol:<file-stem>.<Name>`),
-  and relative in-repo imports emit `depends_on` edges. The Markdown
+  and relative in-repo imports emit `depends_on` edges. Pass 12 adds
+  Python shallow extraction over `*.py` (test_*/_test files skipped):
+  top-level `def`/`async def`/`class`/`UPPER_CONST` become `code_symbol`
+  nodes; explicit-relative imports (`from .x`, `from ..y`, `from .`)
+  that resolve to a tracked `.py` (or `__init__.py` package) emit
+  `depends_on` edges. The Markdown
   semantic hash ignores prose typos but flips
   on heading/link/frontmatter/code-fence-language edits. Foundation for
   drift scoring and the deferred CB-008/011/013/014/015 scenarios.
@@ -86,8 +91,9 @@ Use Go 1.22 or newer.
   unchanged while their `verifies`-linked source changed between
   baseline and current snapshots), `orphaned_metric_aliases` (frontend
   string refs to metric names that vanished between base and current
-  graphs), and `dangling_imports` (TS relative-path imports that don't
-  resolve to a tracked file; warn-level since the build would break).
+  graphs), and `dangling_imports` (TS + Python relative-path imports
+  that don't resolve to a tracked file; entries are tagged
+  `lang: "ts"`/`lang: "py"`; warn-level since the build would break).
   The top-level `verdict` is
   `warn` (actionable findings) / `telemetry` (movement only) / `clean`
   (nothing). Exit 1 only on `warn`. `review` automatically embeds the

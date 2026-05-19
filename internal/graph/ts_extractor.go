@@ -83,6 +83,32 @@ func extractTSSymbols(b *Builder, rootDir string, tracked []string) {
 		pkg := TSPackageID(rel)
 		emitTSExports(b, rel, pkg, src)
 		emitTSImports(b, rel, src, trackedSet)
+		emitTSEndpoints(b, rel, src)
+	}
+}
+
+// tsEndpointRe captures Express/Fastify/Hono-style HTTP route
+// registrations: `<obj>.get('/x', …)`, `<obj>.post(…)`, etc. The path
+// must be a string literal (single or double quotes, or a template
+// literal with no interpolation). The receiver name itself is
+// captured but unused — we only care about the method + path.
+//
+// Method names are restricted to the HTTP verbs that map cleanly to a
+// single HTTP method. `use`/`all`/`any` are intentionally excluded —
+// they don't describe a single endpoint; surfacing them would noise up
+// the graph with router-wide middleware bindings.
+var tsEndpointRe = regexp.MustCompile(
+	`(?m)\b(\w+)\.(get|post|put|delete|patch|head|options)\s*\(\s*` +
+		"[`'\"]([^`'\"]+)[`'\"]")
+
+func emitTSEndpoints(b *Builder, rel, src string) {
+	for _, m := range tsEndpointRe.FindAllStringSubmatch(src, -1) {
+		method := strings.ToUpper(m[2])
+		path := m[3]
+		if path == "" {
+			continue
+		}
+		emitEndpoint(b, rel, method, path)
 	}
 }
 
