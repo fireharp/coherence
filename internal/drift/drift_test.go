@@ -152,9 +152,9 @@ func TestSemanticMovementCountsSemanticAndNoop(t *testing.T) {
 		mdFile("c.md", "C3", "S3"),
 	)
 	current := snapshotFromFiles(
-		mdFile("a.md", "C1", "S1"),        // unchanged
-		mdFile("b.md", "C2-new", "S2"),    // typo: content differs, semantic same → noop
-		mdFile("c.md", "C3-new", "S3-new"),// real edit
+		mdFile("a.md", "C1", "S1"),         // unchanged
+		mdFile("b.md", "C2-new", "S2"),     // typo: content differs, semantic same → noop
+		mdFile("c.md", "C3-new", "S3-new"), // real edit
 	)
 	sm := computeSemanticMovement(&base, current)
 	if sm.MarkdownTotal != 3 {
@@ -855,7 +855,34 @@ func TestClaimSupportUnsupportedWhenDefinerNotMentioned(t *testing.T) {
 	}
 }
 
-func TestClaimSupportCountsSupportedWhenDefinerMentioned(t *testing.T) {
+func TestClaimSupportSupportedWhenChainReachesArtifact(t *testing.T) {
+	// Claim ← defines ← doc → mentions → ID ← supports ← evidence:
+	// BFS reaches an evidence artifact, claim is supported.
+	g := graph.Graph{
+		Nodes: []graph.Node{
+			{ID: "claim:abc", Kind: graph.NodeClaim},
+			{ID: "doc:spec.md", Kind: graph.NodeDoc},
+			{ID: "adr:ADR-001", Kind: graph.NodeADR},
+			{ID: "evidence:adr-bucket", Kind: graph.NodeEvidence},
+		},
+		Edges: []graph.Edge{
+			{From: "doc:spec.md", To: "claim:abc", Kind: graph.EdgeDefines},
+			{From: "doc:spec.md", To: "adr:ADR-001", Kind: graph.EdgeMentions},
+			{From: "evidence:adr-bucket", To: "adr:ADR-001", Kind: graph.EdgeSupports},
+		},
+	}
+	cs := computeClaimSupport(g)
+	if cs.SupportedClaims != 1 {
+		t.Errorf("expected 1 supported claim, got %d", cs.SupportedClaims)
+	}
+	if cs.Score != 0 {
+		t.Errorf("expected score 0 with full support, got %v", cs.Score)
+	}
+}
+
+func TestClaimSupportMentionOnlyNoLongerSuffices(t *testing.T) {
+	// Defining doc has incoming mentions but no artifact reachable —
+	// under the multi-hop semantic this is unsupported.
 	g := graph.Graph{
 		Nodes: []graph.Node{
 			{ID: "claim:abc", Kind: graph.NodeClaim},
@@ -868,11 +895,29 @@ func TestClaimSupportCountsSupportedWhenDefinerMentioned(t *testing.T) {
 		},
 	}
 	cs := computeClaimSupport(g)
-	if cs.SupportedClaims != 1 {
-		t.Errorf("expected 1 supported claim, got %d", cs.SupportedClaims)
+	if cs.SupportedClaims != 0 {
+		t.Errorf("mention-only without artifact should leave claim unsupported, got Supported=%d", cs.SupportedClaims)
 	}
-	if cs.Score != 0 {
-		t.Errorf("expected score 0 with full support, got %v", cs.Score)
+}
+
+func TestClaimSupportReachesTestVerifies(t *testing.T) {
+	// claim ← defines ← doc → mentions → file:auth.go ← verifies ← test
+	g := graph.Graph{
+		Nodes: []graph.Node{
+			{ID: "claim:xyz", Kind: graph.NodeClaim},
+			{ID: "doc:auth.md", Kind: graph.NodeDoc},
+			{ID: "file:auth.go", Kind: graph.NodeFile},
+			{ID: "test:auth_test.go", Kind: graph.NodeTest},
+		},
+		Edges: []graph.Edge{
+			{From: "doc:auth.md", To: "claim:xyz", Kind: graph.EdgeDefines},
+			{From: "doc:auth.md", To: "file:auth.go", Kind: graph.EdgeMentions},
+			{From: "test:auth_test.go", To: "file:auth.go", Kind: graph.EdgeVerifies},
+		},
+	}
+	cs := computeClaimSupport(g)
+	if cs.SupportedClaims != 1 {
+		t.Errorf("claim should reach test via verifies chain, got Supported=%d", cs.SupportedClaims)
 	}
 }
 
@@ -970,6 +1015,74 @@ func TestVerdictTelemetryOnHighBlastRadius(t *testing.T) {
 	r := Report{BlastRadius: BlastRadius{BaseAvailable: true, Score: blastRadiusFloor + 1}}
 	if v := computeVerdict(r); v != VerdictTelemetry {
 		t.Errorf("expected telemetry on high blast radius, got %s", v)
+	}
+}
+
+func TestBlastRadiusCentralityReflectsTouchedDegree(t *testing.T) {
+	// Touched node x has degree 4 in current graph (4 outgoing edges).
+	// Centrality contribution = 4. d also touched, degree 1. Total = 5.
+	base := graph.Graph{
+		Nodes: []graph.Node{{ID: "x"}, {ID: "a"}, {ID: "b"}, {ID: "c"}},
+		Edges: []graph.Edge{
+			{From: "x", To: "a", Kind: graph.EdgeMentions},
+			{From: "x", To: "b", Kind: graph.EdgeMentions},
+			{From: "x", To: "c", Kind: graph.EdgeMentions},
+		},
+	}
+	current := graph.Graph{
+		Nodes: []graph.Node{{ID: "x"}, {ID: "a"}, {ID: "b"}, {ID: "c"}, {ID: "d"}},
+		Edges: []graph.Edge{
+			{From: "x", To: "a", Kind: graph.EdgeMentions},
+			{From: "x", To: "b", Kind: graph.EdgeMentions},
+			{From: "x", To: "c", Kind: graph.EdgeMentions},
+			{From: "x", To: "d", Kind: graph.EdgeMentions},
+		},
+	}
+	br := computeBlastRadius(&base, current)
+	if br.CentralityWeight != 5 {
+		t.Errorf("CentralityWeight = %d, want 5 (x=4 + d=1)", br.CentralityWeight)
+	}
+}
+
+func TestBlastRadiusCentralityHigherForCentralNode(t *testing.T) {
+	// Compare two graphs where the same number of edges change but
+	// touch different-centrality nodes. Higher centrality → higher weight.
+	mkBase := func() graph.Graph {
+		return graph.Graph{
+			Nodes: []graph.Node{{ID: "hub"}, {ID: "a"}, {ID: "b"}, {ID: "c"}, {ID: "leaf"}, {ID: "z"}},
+			Edges: []graph.Edge{
+				{From: "hub", To: "a", Kind: graph.EdgeMentions},
+				{From: "hub", To: "b", Kind: graph.EdgeMentions},
+				{From: "hub", To: "c", Kind: graph.EdgeMentions},
+				{From: "leaf", To: "z", Kind: graph.EdgeMentions},
+			},
+		}
+	}
+	hubChange := mkBase()
+	hubChange.Nodes = append(hubChange.Nodes, graph.Node{ID: "new"})
+	hubChange.Edges = append(hubChange.Edges, graph.Edge{From: "hub", To: "new", Kind: graph.EdgeMentions})
+
+	leafChange := mkBase()
+	leafChange.Nodes = append(leafChange.Nodes, graph.Node{ID: "new"})
+	leafChange.Edges = append(leafChange.Edges, graph.Edge{From: "leaf", To: "new", Kind: graph.EdgeMentions})
+
+	base := mkBase()
+	brHub := computeBlastRadius(&base, hubChange)
+	brLeaf := computeBlastRadius(&base, leafChange)
+	if brHub.CentralityWeight <= brLeaf.CentralityWeight {
+		t.Errorf("hub change should weight higher than leaf change: hub=%d leaf=%d",
+			brHub.CentralityWeight, brLeaf.CentralityWeight)
+	}
+}
+
+func TestBlastRadiusCentralityZeroOnNoChange(t *testing.T) {
+	g := graph.Graph{
+		Nodes: []graph.Node{{ID: "a"}, {ID: "b"}},
+		Edges: []graph.Edge{{From: "a", To: "b", Kind: graph.EdgeMentions}},
+	}
+	br := computeBlastRadius(&g, g)
+	if br.CentralityWeight != 0 {
+		t.Errorf("CentralityWeight should be 0 on identical graphs, got %d", br.CentralityWeight)
 	}
 }
 

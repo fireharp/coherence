@@ -362,7 +362,12 @@ from the source Makefile. `.PHONY`/`.DEFAULT_GOAL` and other `.`-prefixed
 special targets are skipped, as are variable assignments (`name = value`,
 `:=`, `?=`, `+=`, `!=`) and pattern rules (`%.o: %.c`). The canonical
 filenames `Makefile`, `makefile`, `GNUmakefile`, plus any `*.mk` include
-file, are scanned.
+file, are scanned. Shell scripts also surface as commands:
+`*.sh`/`*.bash`/`*.zsh` files (and extensionless files with a
+`#!/.../sh`/`bash`/`zsh` shebang) emit `command:bash <relpath>` nodes
+wired back via `defines` edges. Non-shell shebangs (`python`, `node`,
+etc.) are not promoted. Recipe parsing (the sub-commands a script
+invokes) is deferred — Pass 13 surfaces existence + path only.
 
 `concept` nodes come from the first H1 in each Markdown doc, slugified
 (lowercased, non-alphanumeric → hyphen). Multiple docs whose H1 slugifies
@@ -597,10 +602,10 @@ meters today:
 | `trace_coverage`          | `.coherence/graph.json`              | user_story nodes referenced (via defining doc) / total      |
 | `neighborhood_drift`      | base + current graph                 | weighted Δ over added/removed nodes and edges               |
 | `semantic_movement`       | base + current snapshot              | markdown_semantic_changed / markdown_total (noop excluded)  |
-| `path_loss`               | current graph (concept ↔ doc edges)  | orphan_concepts / total_concepts                            |
-| `blast_radius`            | base + current graph                 | unique 1-hop neighbors of nodes touched by added/removed edges |
+| `path_loss`               | BFS over typed edges from each concept | concepts that don't reach a `test`/`evidence`/`endpoint`/`generated_artifact` via chain |
+| `blast_radius`            | base + current graph                 | unique 1-hop neighbors of touched nodes (`Score`/`ImpactedNeighbors`) + `CentralityWeight` = sum of touched-node degree (GOAL.md centrality contribution) |
 | `staleness`               | `git log` per tracked file + graph concept-importance | concept-weighted stale-file share (threshold: 90 days); `weighted=false` falls back to uniform `stale_files / total_files` |
-| `claim_support`           | current graph (claim ↔ doc edges)    | unsupported_claims / total_claims (defining-doc reachability)  |
+| `claim_support`           | BFS over typed edges from each claim | claims that don't reach a `test`/`evidence`/`endpoint`/`generated_artifact` via chain |
 | `contradiction`           | optional LLM findings (`--llm`)      | count of `llm-contradiction` findings; disabled without LLM    |
 | `stale_decision_links`    | `supersedes` + `mentions` traversal  | count of docs citing a superseded id without naming the new one |
 | `broken_implements_chains`| `implements` + `supports` traversal  | count of code symbols implementing ids with no evidence packet  |
@@ -633,12 +638,18 @@ silent unless the repo actually uses the annotation, avoiding false
 positives on repos that don't. The deterministic 8 always run;
 `contradiction` is fed by the optional Groq LLM pass — when `review --llm`
 runs, llm.Run's findings flow into `drift.ComputeWith(opts)` and populate
-the meter. The `path_loss`, `blast_radius`, and `claim_support` meters
-shipped here are MVP definitions: `path_loss` is "orphan concepts"
-rather than multi-hop support-path traversal, and `blast_radius` is
-"untouched 1-hop neighbors" rather than centrality × required-path
-weighting. `staleness` now applies GOAL.md's `concept_importance`
-weighting: each concept's importance = its incoming `describes`-edge
+the meter. `path_loss` and `claim_support` share GOAL.md's multi-hop
+reachability: undirected BFS from each concept/claim node over the
+typed {describes, mentions, defines, implements, supports, verifies,
+depends_on, generates, expects} edge set; supported iff the BFS reaches
+a verifiable artifact (`test` / `evidence` / `endpoint` /
+`generated_artifact`). `blast_radius` exposes both the raw 1-hop
+impacted-neighbor count (`Score` / `ImpactedNeighbors`) and the
+GOAL.md-aligned `CentralityWeight`: sum of degree(touched_node) over
+distinct touched nodes in the current graph — changes that touch
+highly-connected nodes weight higher even if the 1-hop count is the
+same.
+`staleness` now applies GOAL.md's `concept_importance` weighting: each concept's importance = its incoming `describes`-edge
 count, each file's weight = the max importance over the concepts its
 doc describes (non-markdown defaults to 1). The JSON `weighted` flag
 reports whether the graph had any concept nodes — when zero, the score

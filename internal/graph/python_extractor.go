@@ -300,7 +300,7 @@ func joinPyPath(a, b string) string {
 
 // StripPythonComments removes `#` line comments and triple-quoted
 // docstrings so they don't pollute the regex passes. Triple-quoted
-// blocks are recognized via either `"""` or `'''` delimiters. Strings
+// blocks are recognized via either `"""` or `”'` delimiters. Strings
 // containing `#` could be falsely stripped — acceptable for shallow
 // extraction.
 func StripPythonComments(src string) string {
@@ -333,7 +333,7 @@ func StripPythonComments(src string) string {
 }
 
 // stripTripleQuoted removes blocks delimited by `delim` (either `"""`
-// or `'''`). Greedy non-overlapping scan; preserves newlines inside
+// or `”'`). Greedy non-overlapping scan; preserves newlines inside
 // stripped regions as blank lines so subsequent line-anchored regexes
 // align with the original line numbers.
 func stripTripleQuoted(src, delim string) string {

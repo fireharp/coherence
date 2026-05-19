@@ -273,10 +273,16 @@ type Staleness struct {
 // (centrality * changed_edges * failing_required_paths) is sharpened over
 // time; this MVP is the simplest signal computable from the existing graph.
 type BlastRadius struct {
-	Score                   int      `json:"score"`
-	BaseAvailable           bool     `json:"base_available"`
-	ChangedNodeCount        int      `json:"changed_node_count"`
-	ImpactedNeighbors       int      `json:"impacted_neighbors"`
+	Score             int  `json:"score"`
+	BaseAvailable     bool `json:"base_available"`
+	ChangedNodeCount  int  `json:"changed_node_count"`
+	ImpactedNeighbors int  `json:"impacted_neighbors"`
+	// CentralityWeight is the GOAL.md-aligned centrality contribution
+	// of the change set: sum of degree(touched_node) over distinct
+	// touched nodes in the current graph. Higher = the change touched
+	// more-connected nodes, so the latent blast is larger even when
+	// `ImpactedNeighbors` is unchanged.
+	CentralityWeight        int      `json:"centrality_weight"`
 	TopImpactedChangedNodes []string `json:"top_impacted_changed_nodes"`
 }
 
@@ -937,6 +943,11 @@ func computeStaleDecisionLinks(g graph.Graph) StaleDecisionLinks {
 // claims, the verdict bumps from clean to telemetry.
 const claimSupportFloor = 0.5
 
+// computeClaimSupport applies the same multi-hop BFS used by
+// computePathLoss: a claim is supported iff it reaches a verifiable
+// artifact via the typed-edge undirected BFS. The defining-doc
+// `EdgeDefines` is part of the traversable set, so claims reach their
+// docs naturally and then continue through mentions/implements/etc.
 func computeClaimSupport(g graph.Graph) ClaimSupport {
 	claims := []graph.Node{}
 	for _, n := range g.Nodes {
@@ -947,31 +958,11 @@ func computeClaimSupport(g graph.Graph) ClaimSupport {
 	if len(claims) == 0 {
 		return ClaimSupport{UnsupportedClaims: []string{}}
 	}
-	// Claim → defining doc(s).
-	definers := map[string][]string{}
-	for _, e := range g.Edges {
-		if e.Kind == graph.EdgeDefines {
-			definers[e.To] = append(definers[e.To], e.From)
-		}
-	}
-	// Doc → has incoming mention.
-	docMentioned := map[string]bool{}
-	for _, e := range g.Edges {
-		if e.Kind == graph.EdgeMentions {
-			docMentioned[e.To] = true
-		}
-	}
+	reaches, _ := supportPathReacher(g)
 	unsupported := []string{}
 	supported := 0
 	for _, c := range claims {
-		ok := false
-		for _, d := range definers[c.ID] {
-			if docMentioned[d] {
-				ok = true
-				break
-			}
-		}
-		if ok {
+		if reaches(c.ID) {
 			supported++
 		} else {
 			unsupported = append(unsupported, c.ID)
@@ -1057,22 +1048,31 @@ func computeBlastRadius(base *graph.Graph, current graph.Graph) BlastRadius {
 	if top == nil {
 		top = []string{}
 	}
+	// Sum the degree centrality of every distinct touched node.
+	// `adj` is the undirected neighborhood map built above; len(adj[id])
+	// is the node's degree in the current graph.
+	centralityWeight := 0
+	for tid := range touched {
+		centralityWeight += len(adj[tid])
+	}
 	return BlastRadius{
 		Score:                   len(impacted),
 		BaseAvailable:           true,
 		ChangedNodeCount:        len(touched),
 		ImpactedNeighbors:       len(impacted),
+		CentralityWeight:        centralityWeight,
 		TopImpactedChangedNodes: top,
 	}
 }
 
-// pathLossEdgeKinds is the set of typed edges we traverse (undirected)
-// when checking whether a concept reaches a verifiable artifact. Chosen
-// to mirror GOAL.md's "chain of typed edges from a concept to a
+// supportPathEdgeKinds is the set of typed edges we traverse
+// (undirected) when checking whether a graph node reaches a verifiable
+// artifact. Chosen to mirror GOAL.md's "chain of typed edges to a
 // verifiable artifact" — only the typed relations that carry actual
 // support semantics. `contains`/`suggests` are intentionally excluded:
 // directory containment and ontology suggestions aren't path-of-support.
-var pathLossEdgeKinds = map[graph.EdgeKind]bool{
+// Shared by path_loss and claim_support meters.
+var supportPathEdgeKinds = map[graph.EdgeKind]bool{
 	graph.EdgeDescribes:  true,
 	graph.EdgeMentions:   true,
 	graph.EdgeDefines:    true,
@@ -1084,50 +1084,40 @@ var pathLossEdgeKinds = map[graph.EdgeKind]bool{
 	graph.EdgeExpects:    true,
 }
 
-// pathLossArtifactKinds is the set of node kinds that count as a
-// verifiable artifact terminus. Reaching any of these from a concept
-// (via pathLossEdgeKinds) marks the concept as "supported".
-var pathLossArtifactKinds = map[graph.NodeKind]bool{
+// supportPathArtifactKinds is the set of node kinds that count as a
+// verifiable artifact terminus. Reaching any of these via the typed
+// edge set marks the source as "supported".
+var supportPathArtifactKinds = map[graph.NodeKind]bool{
 	graph.NodeTest:              true,
 	graph.NodeEvidence:          true,
 	graph.NodeEndpoint:          true,
 	graph.NodeGeneratedArtifact: true,
 }
 
-// computePathLoss is GOAL.md M4 meter 2: count concepts that have no
-// chain of typed edges to a verifiable artifact. Implementation is an
-// undirected BFS from each concept node, traversing the
-// pathLossEdgeKinds set, looking for any node whose kind belongs to
-// pathLossArtifactKinds. A concept with no describing doc, or with
-// describing docs that lead nowhere, scores as an orphan.
-func computePathLoss(g graph.Graph) PathLoss {
-	concepts := []graph.Node{}
+// supportPathReacher returns a closure that reports whether a given
+// node id reaches any supportPathArtifactKinds node via undirected BFS
+// over supportPathEdgeKinds. Builds the adjacency list once so multiple
+// source nodes can be checked cheaply.
+func supportPathReacher(g graph.Graph) (func(string) bool, map[string]graph.NodeKind) {
 	kinds := map[string]graph.NodeKind{}
 	for _, n := range g.Nodes {
 		kinds[n.ID] = n.Kind
-		if n.Kind == graph.NodeConcept {
-			concepts = append(concepts, n)
-		}
 	}
-	if len(concepts) == 0 {
-		return PathLoss{OrphanConcepts: []string{}, Score: 0}
-	}
-	// Build undirected adjacency over the relevant edge kinds.
 	adj := map[string][]string{}
 	for _, e := range g.Edges {
-		if !pathLossEdgeKinds[e.Kind] {
+		if !supportPathEdgeKinds[e.Kind] {
 			continue
 		}
 		adj[e.From] = append(adj[e.From], e.To)
 		adj[e.To] = append(adj[e.To], e.From)
 	}
-	reaches := func(start string) bool {
+	return func(start string) bool {
 		visited := map[string]bool{start: true}
 		queue := []string{start}
 		for len(queue) > 0 {
 			cur := queue[0]
 			queue = queue[1:]
-			if pathLossArtifactKinds[kinds[cur]] {
+			if supportPathArtifactKinds[kinds[cur]] {
 				return true
 			}
 			for _, n := range adj[cur] {
@@ -1138,7 +1128,26 @@ func computePathLoss(g graph.Graph) PathLoss {
 			}
 		}
 		return false
+	}, kinds
+}
+
+// computePathLoss is GOAL.md M4 meter 2: count concepts that have no
+// chain of typed edges to a verifiable artifact. Implementation is an
+// undirected BFS from each concept node, traversing the
+// supportPathEdgeKinds set, looking for any node whose kind belongs to
+// supportPathArtifactKinds. A concept with no describing doc, or with
+// describing docs that lead nowhere, scores as an orphan.
+func computePathLoss(g graph.Graph) PathLoss {
+	concepts := []graph.Node{}
+	for _, n := range g.Nodes {
+		if n.Kind == graph.NodeConcept {
+			concepts = append(concepts, n)
+		}
 	}
+	if len(concepts) == 0 {
+		return PathLoss{OrphanConcepts: []string{}, Score: 0}
+	}
+	reaches, _ := supportPathReacher(g)
 	orphans := []string{}
 	supported := 0
 	for _, c := range concepts {
@@ -1548,9 +1557,9 @@ func Human(r Report) string {
 		fmt.Fprintln(&b, "  path_loss:              n/a (no concept nodes)")
 	}
 	if r.BlastRadius.BaseAvailable {
-		fmt.Fprintf(&b, "  blast_radius:           %d (touched=%d, impacted_neighbors=%d)\n",
+		fmt.Fprintf(&b, "  blast_radius:           %d (touched=%d, impacted_neighbors=%d, centrality=%d)\n",
 			r.BlastRadius.Score, r.BlastRadius.ChangedNodeCount,
-			r.BlastRadius.ImpactedNeighbors)
+			r.BlastRadius.ImpactedNeighbors, r.BlastRadius.CentralityWeight)
 	} else {
 		fmt.Fprintln(&b, "  blast_radius:           n/a (no base graph)")
 	}
