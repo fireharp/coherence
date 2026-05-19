@@ -85,6 +85,14 @@ func Build(rootDir string) (Graph, error) {
 	// Pass 13: command nodes from shell scripts (.sh/.bash/.zsh + shebang).
 	extractShellCommands(b, rootDir, tracked)
 
+	// Pass 14: code-level typed-id mentions (must run after Pass 2 so
+	// the typed-id node set is complete).
+	extractCodeMentions(b, rootDir, tracked)
+
+	// Pass 15: code-level metric-name mentions (must run after Pass 4
+	// so the metric node set is complete).
+	extractMetricMentions(b, rootDir, tracked)
+
 	return b.Build(), nil
 }
 

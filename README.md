@@ -129,18 +129,23 @@ to load a non-default ontology.
 
 ## Init and templates
 
-`coherence init [--template=<name>] [--force] [--json]` scaffolds a fresh
-repository:
+`coherence init [--template=<name>] [--force] [--skill-install=auto|native|off] [--json]`
+scaffolds a fresh repository:
 
 - writes `ontology.yml` (template-specific rules + `commands:` + per-rule
   `suggested_commands`),
 - writes `.githooks/pre-commit` (executable; finds the binary on PATH or
   falls back to `$HOME/go/bin/coherence`),
 - ensures `.coherence/` is listed in `.gitignore`,
-- creates the local `.coherence/` state directory.
+- creates the local `.coherence/` state directory,
+- installs the Codex project skill at `.agents/skills/coherence/SKILL.md`.
 
 It is idempotent: existing files are skipped without `--force`. After init,
 run `git config core.hooksPath .githooks` and `coherence doctor` to verify.
+Skill installation defaults to `auto`, which tries
+`npx --yes skills add ... --agent codex --copy -y` and falls back to native
+file writes. Use `--skill-install=native` to skip `npx`, or
+`--skill-install=off` to skip the skill.
 
 Available templates (`coherence templates`):
 
@@ -213,7 +218,7 @@ scenario is a self-contained directory under
   scenarios (CB-004/006/008/011..015) are shipped as stubs so the suite is
   honest about scope. Each stub records the milestone that would enable it.
 
-The shipped totals are: **15 scenarios, 14 pass, 0 fail, 1 skipped** —
+The shipped totals are: **16 scenarios, 15 pass, 0 fail, 1 skipped** —
 matching M1's "at least 8 internal scenarios exist" bar.
 
 ### Scored scenarios (Files mode)
@@ -344,7 +349,15 @@ nodes (label = frontmatter title or first heading). Files under
 `IDR-###` ids in their frontmatter (or filename) emit typed
 `user_story` / `adr` / `idr` nodes connected back via `defines` edges.
 Inline Markdown links from one doc to another tracked file emit `mentions`
-edges with provenance.
+edges with provenance. Code-level typed-id references add a second flavor
+of `mentions`: when a non-markdown tracked file contains `US-###` /
+`ADR-###` / `IDR-###` tokens in comments or string literals, a
+`mentions` edge wires `file:<rel>` → the typed-id node. Unknown ids
+(no defining doc) are intentionally skipped here so the `unknown_id_references`
+drift meter still surfaces them as actionable findings. The new edge
+broadens the multi-hop reachability used by `path_loss` and
+`claim_support` — a concept whose doc mentions a story now reaches code
+that names the same story, even without a markdown link.
 
 Node and edge kinds shipped today:
 
@@ -386,7 +399,12 @@ the `claim_support` drift meter.
 the slugified filename (`metric:success-rate` from
 `rill/metrics/success_rate.yaml`). Per-`measures[]` extraction is a
 follow-up — the current MVP covers the common "one metric per file"
-convention.
+convention. Code-level metric references add `mentions` edges: when a
+non-markdown tracked file contains a quoted occurrence (single, double,
+or backtick) of a known metric label, a `mentions` edge wires
+`file:<rel>` → `metric:<slug>`. Closes the GOAL.md "string-literal
+metric names" extraction note. The defining metric YAML itself is
+skipped (its `defines` edge already represents the relationship).
 
 `test` nodes come from path-pattern detection: Go `*_test.go`, Python
 `test_*.py` / `*_test.py`, JS/TS `*.test.{ts,tsx,js,jsx}` and
@@ -681,9 +699,10 @@ coherence doctor --json       # machine-readable
 ```
 
 It validates that `ontology.yml` loads, `.githooks/pre-commit` is present and
-executable, `.coherence/` is gitignored, and the local state directory is
-healthy. Exit code is `1` only when a check is `fail`; `warn` issues are
-reported but do not block.
+executable, `.coherence/` is gitignored, the local state directory is healthy,
+and `.agents/skills/coherence/SKILL.md` has valid skill frontmatter. It also
+warns on legacy `.coherence/skills/agent.md`. Exit code is `1` only when a
+check is `fail`; `warn` issues are reported but do not block.
 
 ## LLM pass
 

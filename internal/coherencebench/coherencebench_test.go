@@ -14,6 +14,7 @@ func TestIDsShipsAllExpectedScenarios(t *testing.T) {
 		"CB-001", "CB-002", "CB-003", "CB-004", "CB-005",
 		"CB-006", "CB-007", "CB-008", "CB-009", "CB-010",
 		"CB-011", "CB-012", "CB-013", "CB-014", "CB-015",
+		"CB-016",
 	}
 	gotSet := map[string]bool{}
 	for _, n := range got {
@@ -37,11 +38,11 @@ func TestRunAllPassesDeterministicAndSkipsRest(t *testing.T) {
 		}
 		t.Fatal("suite did not pass")
 	}
-	if suite.Counts.Total != 15 {
-		t.Errorf("total = %d, want 15", suite.Counts.Total)
+	if suite.Counts.Total != 16 {
+		t.Errorf("total = %d, want 16", suite.Counts.Total)
 	}
-	if suite.Counts.Pass < 7 {
-		t.Errorf("expected >=7 deterministic passes, got %d", suite.Counts.Pass)
+	if suite.Counts.Pass < 8 {
+		t.Errorf("expected >=8 deterministic passes, got %d", suite.Counts.Pass)
 	}
 	if suite.Counts.Skipped < 1 {
 		t.Errorf("expected >=1 skipped (LLM-only deferred), got %d", suite.Counts.Skipped)
@@ -170,6 +171,25 @@ func TestCB014IsDeterministicAndPasses(t *testing.T) {
 	}
 	if r.Scenario.Expected.Drift == nil || r.Scenario.Expected.Drift.Verdict != "telemetry" {
 		t.Errorf("CB-014 should assert drift verdict=telemetry, got %+v", r.Scenario.Expected.Drift)
+	}
+}
+
+func TestCB016IsDeterministicAndPasses(t *testing.T) {
+	// CB-016 exercises Pass 14 (code-level typed-id mentions) end-to-end.
+	// Baseline reaches an endpoint via the new edge; current removes the
+	// typed-id token from code, breaking the chain and tripping path_loss.
+	r := Run("CB-016")
+	if r.Skipped {
+		t.Fatal("CB-016 should be deterministic, not skipped")
+	}
+	if r.Error != "" {
+		t.Fatalf("CB-016 errored: %s", r.Error)
+	}
+	if !r.Pass {
+		t.Errorf("CB-016 should pass, got missing=%v extra=%v", r.Missing, r.Extra)
+	}
+	if r.Scenario.Expected.Drift == nil || r.Scenario.Expected.Drift.Verdict != "telemetry" {
+		t.Errorf("CB-016 should assert drift verdict=telemetry, got %+v", r.Scenario.Expected.Drift)
 	}
 }
 

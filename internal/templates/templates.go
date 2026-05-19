@@ -6,8 +6,10 @@ package templates
 import (
 	"embed"
 	"fmt"
+	"io/fs"
 	"path"
 	"sort"
+	"strings"
 )
 
 //go:embed all:assets
@@ -21,6 +23,13 @@ type Template struct {
 	Name          string
 	Ontology      []byte
 	PreCommitHook []byte
+	SkillFiles    []AssetFile
+}
+
+// AssetFile is a file embedded in a template asset bundle.
+type AssetFile struct {
+	Path string
+	Data []byte
 }
 
 // ScenariosFor returns the raw eval/scenarios.yml bytes for the named
@@ -68,9 +77,43 @@ func Resolve(name string) (Template, error) {
 	if err != nil {
 		return Template{}, fmt.Errorf("template assets missing shared pre-commit: %w", err)
 	}
+	skillFiles, err := sharedSkillFiles()
+	if err != nil {
+		return Template{}, err
+	}
 	return Template{
 		Name:          name,
 		Ontology:      ontology,
 		PreCommitHook: hook,
+		SkillFiles:    skillFiles,
 	}, nil
+}
+
+func sharedSkillFiles() ([]AssetFile, error) {
+	const root = "assets/_shared/skills/coherence"
+	files := []AssetFile{}
+	if err := fs.WalkDir(assets, root, func(p string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if d.IsDir() {
+			return nil
+		}
+		data, err := assets.ReadFile(p)
+		if err != nil {
+			return err
+		}
+		files = append(files, AssetFile{
+			Path: strings.TrimPrefix(p, root+"/"),
+			Data: data,
+		})
+		return nil
+	}); err != nil {
+		return nil, fmt.Errorf("template assets missing shared coherence skill: %w", err)
+	}
+	sort.Slice(files, func(i, j int) bool { return files[i].Path < files[j].Path })
+	if len(files) == 0 {
+		return nil, fmt.Errorf("template assets missing shared coherence skill files")
+	}
+	return files, nil
 }

@@ -35,7 +35,7 @@ import (
 )
 
 const usage = `coherence <subcommand> [flags]
-  init [--template=generic] [--force] [--json]
+  init [--template=generic] [--force] [--skill-install=auto|native|off] [--json]
                                           scaffold ontology.yml + hook + .gitignore
   scan --staged [--json] [--llm] [--ontology=path]
                                           evaluate staged files (pre-commit gate)
@@ -124,11 +124,11 @@ func severityRank(s string) int {
 // fileSet captures the file list a command analyzed plus the worktree counts
 // needed to compute the outcome contract.
 type fileSet struct {
-	files              []string
-	stagedCount        int
-	trackedDirtyCount  int
-	untrackedCount     int
-	includeUntracked   bool
+	files             []string
+	stagedCount       int
+	trackedDirtyCount int
+	untrackedCount    int
+	includeUntracked  bool
 }
 
 func collectScanFiles(args parsedArgs, rootDir string) fileSet {
@@ -579,8 +579,9 @@ func run() int {
 
 	case "init":
 		opts := initcmd.Options{
-			Template: stringFlag(args, "template", templates.Default),
-			Force:    boolFlag(args, "force"),
+			Template:     stringFlag(args, "template", templates.Default),
+			Force:        boolFlag(args, "force"),
+			SkillInstall: stringFlag(args, "skill-install", initcmd.SkillInstallAuto),
 		}
 		res, err := initcmd.Run(rootDir, opts)
 		if err != nil {
@@ -676,13 +677,13 @@ func run() int {
 					enc := json.NewEncoder(os.Stdout)
 					enc.SetIndent("", "  ")
 					_ = enc.Encode(map[string]any{
-						"initialized":    true,
-						"snapshot_path":  filepath.Join(".coherence", "snapshot.json"),
-						"graph_path":     filepath.Join(".coherence", "graph.json"),
-						"root_hash":      current.RootHash,
-						"file_count":     current.FileCount,
-						"graph_nodes":    currentGraph.Counts.TotalNodes,
-						"graph_edges":    currentGraph.Counts.TotalEdges,
+						"initialized":   true,
+						"snapshot_path": filepath.Join(".coherence", "snapshot.json"),
+						"graph_path":    filepath.Join(".coherence", "graph.json"),
+						"root_hash":     current.RootHash,
+						"file_count":    current.FileCount,
+						"graph_nodes":   currentGraph.Counts.TotalNodes,
+						"graph_edges":   currentGraph.Counts.TotalEdges,
 					})
 				} else {
 					fmt.Printf("coherence: no base snapshot found; wrote %s and %s as the initial baseline\n",
