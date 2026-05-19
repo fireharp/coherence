@@ -82,11 +82,14 @@ Use Go 1.22 or newer.
   drift report inline under the `drift` key and surfaces
   `drift_verdict` + `telemetry_only_movement` at the top of the outcome
   contract. `scan` and `check` skip drift to keep pre-commit fast.
-- `./bin/coherence bench [--suite=templates|coherencebench|all]
+- `./bin/coherence bench [--suite=templates|coherencebench|external|all]
   [--template=<name>] [--json] [--write-report]` runs the shipped scenario
-  suites. Templates is the v0.3 onboarding suite (38 scenarios across 11
-  templates). CoherenceBench is the M1 internal CB-### suite (15 scenarios:
-  7 deterministic + 8 deferred to graph/semantic milestones).
+  / evaluation suites. Templates is the v0.3 onboarding suite (38 scenarios
+  across 11 templates). CoherenceBench is the M1 internal CB-### suite
+  (15 scenarios; 13 pass / 2 deferred to LLM + string-literal scanning).
+  External is the M7 evaluation harness — 3 samples across swe-bench /
+  tebench / doc-code categories, scored via precision/recall/F1 against
+  gold impact sets.
   `--write-report` emits `.coherence/runs/YYYY-MM-DD/index.md`. Exit 1 on
   any scenario failure. The catalog includes two **overlay** templates
   (`markdown-index`, `privacy-collectors`) that are domain-specific

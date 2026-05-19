@@ -171,15 +171,16 @@ that the `coherence bench` runner uses to guard against regression.
 
 ## Bench
 
-`coherence bench` runs one or both shipped scenario suites:
+`coherence bench` runs any of the shipped scenario or evaluation suites:
 
 ```bash
 coherence bench                                # default: template eval suite
 coherence bench --suite=templates              # explicit
 coherence bench --suite=coherencebench         # the CB-### internal suite
-coherence bench --suite=all --write-report     # both + Markdown report
+coherence bench --suite=external               # M7 external-style evaluations
+coherence bench --suite=all --write-report     # internal + Markdown report
 coherence bench --template=go-cli              # single template shortcut
-coherence bench --suite=all --json             # machine-readable
+coherence bench --suite=external --json        # machine-readable
 ```
 
 Exit code is `1` when any scenario fails. `--write-report` writes a
@@ -269,7 +270,25 @@ Skipped scenarios that still need graduation work (CB-006 LLM
 contradiction, CB-008 metric rename) can join via the same materializer
 once their specific meter or extractor exists.
 
-## Index and snapshots
+### External-style evaluations (M7)
+
+`coherence bench --suite=external` runs the M7 evaluation harness. Per
+GOAL.md three categories are supported, with at least one sample shipped
+in each:
+
+| Category | Sample | What it asks |
+| --- | --- | --- |
+| `swe-bench`  | EXT-SWE-001 | Given a changed source file, predict the test + spec doc that should be inspected |
+| `tebench`    | EXT-TEB-001 | Given a modified source file, predict the tests likely needing updates |
+| `doc-code`   | EXT-DOC-001 | Given a spec doc, recover the user-story doc it implements |
+
+Each sample materializes a tiny synthetic repo, runs `graph.Build`, then
+calls a 1-hop graph predictor over the seed. Predictions are scored
+against gold via precision / recall / F1; per-category averages roll up.
+The harness is intentionally minimal — extending it with real SWE-bench
+tasks (issue text + base-commit repo + gold patch) only requires more
+samples, not more plumbing. Results are reported **separately from the
+internal CB suite**, matching M7's acceptance criterion.
 
 `coherence index` walks the tracked file set (`git ls-files`) and writes
 `.coherence/snapshot.json`. Each file gets:
