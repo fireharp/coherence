@@ -349,15 +349,22 @@ nodes (label = frontmatter title or first heading). Files under
 `IDR-###` ids in their frontmatter (or filename) emit typed
 `user_story` / `adr` / `idr` nodes connected back via `defines` edges.
 Inline Markdown links from one doc to another tracked file emit `mentions`
-edges with provenance. Code-level typed-id references add a second flavor
-of `mentions`: when a non-markdown tracked file contains `US-###` /
-`ADR-###` / `IDR-###` tokens in comments or string literals, a
-`mentions` edge wires `file:<rel>` → the typed-id node. Unknown ids
-(no defining doc) are intentionally skipped here so the `unknown_id_references`
-drift meter still surfaces them as actionable findings. The new edge
-broadens the multi-hop reachability used by `path_loss` and
+edges with provenance. Code adds two more `mentions` flavors. (a)
+Typed-id references: when a non-markdown tracked file contains
+`US-###` / `ADR-###` / `IDR-###` tokens, a `mentions` edge wires
+`file:<rel>` → the typed-id node. Unknown ids are intentionally skipped
+here so the `unknown_id_references` drift meter still surfaces them as
+actionable findings. (b) Quoted path literals: a non-markdown file
+with `"some/path.json"`, `'./schemas/user.proto'`, or `` `config.yml` ``
+that resolves to a tracked file emits a `mentions` edge from source to
+target. The "must resolve to tracked" filter eliminates almost all
+noise — random string literals that aren't real repo paths never emit
+edges. URLs (`http://...`), absolute paths (`/etc/...`), and bare
+identifiers without a `/` or extension are rejected. Together these
+broaden the multi-hop reachability used by `path_loss` and
 `claim_support` — a concept whose doc mentions a story now reaches code
-that names the same story, even without a markdown link.
+that names the same story or references a config file the story
+depends on, even without an explicit markdown link.
 
 Node and edge kinds shipped today:
 
@@ -382,10 +389,16 @@ wired back via `defines` edges. Non-shell shebangs (`python`, `node`,
 etc.) are not promoted. Recipe parsing (the sub-commands a script
 invokes) is deferred — Pass 13 surfaces existence + path only.
 
-`concept` nodes come from the first H1 in each Markdown doc, slugified
-(lowercased, non-alphanumeric → hyphen). Multiple docs whose H1 slugifies
-to the same value share **one** concept node — each contributing its own
-`describes` edge.
+`concept` nodes come from H1 + H2 headings in each Markdown doc,
+slugified (lowercased, non-alphanumeric → hyphen). Each captured heading
+emits one concept node + `describes` edge from the source doc. H3+ are
+intentionally skipped — they typically denote sub-sub-topics that
+inflate the concept graph without adding meaningful coverage signal.
+Cross-doc dedup applies: two docs whose headings slugify to the same
+value share **one** concept node, each contributing its own `describes`
+edge. Per-doc dedup also applies — a doc with multiple H2s sharing a
+slug emits a single describes edge. Each node carries `level` meta
+(`H1` / `H2`) for downstream filtering.
 
 `claim` nodes come from Markdown bullet items beginning with an assertive
 verb (`must`, `should`, `shall`, `requires`, `ensures`, `guarantees`,

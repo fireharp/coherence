@@ -93,6 +93,9 @@ func Build(rootDir string) (Graph, error) {
 	// so the metric node set is complete).
 	extractMetricMentions(b, rootDir, tracked)
 
+	// Pass 16: file-references via quoted path literals in code.
+	extractFileReferences(b, rootDir, tracked)
+
 	return b.Build(), nil
 }
 
@@ -225,11 +228,17 @@ var (
 	relationLineRe = regexp.MustCompile(`(?m)^(supersedes|contradicts|mirrors|invalidates):\s*(.+?)\s*$`)
 	supersedesIDRe = regexp.MustCompile(`(US|ADR|IDR)-\d{3}`)
 	headingRe      = regexp.MustCompile(`(?m)^#\s+(.+)$`)
-	titleFrontRe   = regexp.MustCompile(`(?m)^title:\s*(.+?)\s*$`)
-	mdLinkRe       = regexp.MustCompile(`\[[^\]]*\]\(([^)\s#]+)(?:#[^)]*)?\)`)
-	schemeRe       = regexp.MustCompile(`^[a-zA-Z][a-zA-Z0-9+.\-]*:`)
-	slugStripRe    = regexp.MustCompile(`[^a-z0-9]+`)
-	bulletRe       = regexp.MustCompile(`(?m)^\s*[-*+]\s+(.+)$`)
+	// headingLeveledRe captures any markdown heading and exposes its level
+	// (length of the leading `#` run). Used by concept extraction to emit
+	// nodes for H1 + H2 while skipping H3+. Kept separate from
+	// `headingRe` so `docTitle()` continues to use the H1-only matcher
+	// for the title fallback.
+	headingLeveledRe = regexp.MustCompile(`(?m)^(#+)\s+(.+)$`)
+	titleFrontRe     = regexp.MustCompile(`(?m)^title:\s*(.+?)\s*$`)
+	mdLinkRe         = regexp.MustCompile(`\[[^\]]*\]\(([^)\s#]+)(?:#[^)]*)?\)`)
+	schemeRe         = regexp.MustCompile(`^[a-zA-Z][a-zA-Z0-9+.\-]*:`)
+	slugStripRe      = regexp.MustCompile(`[^a-z0-9]+`)
+	bulletRe         = regexp.MustCompile(`(?m)^\s*[-*+]\s+(.+)$`)
 )
 
 // claimVerbs is the closed set of leading modal/assertive verbs that mark a
@@ -362,30 +371,45 @@ func idKindFromLabel(label string) NodeKind {
 	return ""
 }
 
-// emitConceptNode derives a concept from the first H1 heading in a markdown
-// document. Multiple docs whose H1 slugifies to the same value share one
-// concept node and each contributes its own `describes` edge.
+// emitConceptNode derives concepts from H1 + H2 markdown headings. Each
+// captured heading emits one concept node + one `describes` edge from
+// the source doc. H3+ are intentionally skipped — they typically denote
+// sub-sub-topics that inflate the concept graph without adding
+// meaningful coverage signal. Cross-doc dedup is unchanged: two docs
+// whose headings slugify to the same value share one concept node.
+// Per-doc dedup also applies — a doc with multiple H2s sharing a slug
+// emits only one describes edge for that concept. Node meta carries
+// `level` (`H1` / `H2`) for downstream filtering.
 func emitConceptNode(b *Builder, rel string, data []byte) {
-	m := headingRe.FindSubmatch(data)
-	if m == nil {
-		return
+	seenInDoc := map[string]bool{}
+	for _, m := range headingLeveledRe.FindAllSubmatch(data, -1) {
+		level := len(m[1])
+		if level > 2 {
+			continue
+		}
+		label := strings.TrimSpace(string(m[2]))
+		slug := slugify(label)
+		if slug == "" {
+			continue
+		}
+		if seenInDoc[slug] {
+			continue
+		}
+		seenInDoc[slug] = true
+		levelTag := "H" + string(rune('0'+level))
+		b.AddNode(Node{
+			ID:    ConceptNodeID(slug),
+			Kind:  NodeConcept,
+			Label: label,
+			Meta:  map[string]string{"level": levelTag},
+		})
+		b.AddEdge(Edge{
+			From:       DocNodeID(rel),
+			To:         ConceptNodeID(slug),
+			Kind:       EdgeDescribes,
+			Provenance: rel + " (" + levelTag + ")",
+		})
 	}
-	label := strings.TrimSpace(string(m[1]))
-	slug := slugify(label)
-	if slug == "" {
-		return
-	}
-	b.AddNode(Node{
-		ID:    ConceptNodeID(slug),
-		Kind:  NodeConcept,
-		Label: label,
-	})
-	b.AddEdge(Edge{
-		From:       DocNodeID(rel),
-		To:         ConceptNodeID(slug),
-		Kind:       EdgeDescribes,
-		Provenance: rel + " (H1)",
-	})
 }
 
 // emitClaimNodes scans a markdown document for bullet lines beginning with

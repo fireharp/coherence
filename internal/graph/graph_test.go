@@ -51,9 +51,9 @@ func hasEdge(g Graph, from, to string, kind EdgeKind) bool {
 
 func TestBuildEmitsFileAndDirectoryNodes(t *testing.T) {
 	dir := gitInit(t, map[string]string{
-		"README.md":          "# top\n",
-		"docs/notes.md":      "# notes\n",
-		"src/a/b/leaf.go":    "package leaf\n",
+		"README.md":       "# top\n",
+		"docs/notes.md":   "# notes\n",
+		"src/a/b/leaf.go": "package leaf\n",
 	})
 	g, err := Build(dir)
 	if err != nil {
@@ -205,6 +205,93 @@ func TestBuildEmitsConceptFromH1(t *testing.T) {
 	}
 }
 
+func TestBuildEmitsConceptFromH2(t *testing.T) {
+	dir := gitInit(t, map[string]string{
+		"docs/auth.md": "# Auth\n\n## Login flow\n\nbody.\n## Logout flow\n\nmore body.\n",
+	})
+	g, err := Build(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, slug := range []string{"auth", "login-flow", "logout-flow"} {
+		if _, ok := findNode(g, ConceptNodeID(slug)); !ok {
+			t.Errorf("missing concept node for %q", slug)
+		}
+		if !hasEdge(g, DocNodeID("docs/auth.md"),
+			ConceptNodeID(slug), EdgeDescribes) {
+			t.Errorf("missing describes edge for %q", slug)
+		}
+	}
+}
+
+func TestBuildSkipsH3AndDeeperHeadings(t *testing.T) {
+	dir := gitInit(t, map[string]string{
+		"docs/auth.md": "# Auth\n\n## Section\n\n### Subsection\n\n#### Deeper\n",
+	})
+	g, err := Build(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, slug := range []string{"auth", "section"} {
+		if _, ok := findNode(g, ConceptNodeID(slug)); !ok {
+			t.Errorf("expected H1/H2 concept %q present", slug)
+		}
+	}
+	for _, slug := range []string{"subsection", "deeper"} {
+		if _, ok := findNode(g, ConceptNodeID(slug)); ok {
+			t.Errorf("H3+ heading should not emit concept node: %q", slug)
+		}
+	}
+}
+
+func TestBuildConceptMetaCarriesLevel(t *testing.T) {
+	dir := gitInit(t, map[string]string{
+		"docs/spec.md": "# Top\n\n## Sub\n",
+	})
+	g, err := Build(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, c := range []struct {
+		slug  string
+		level string
+	}{
+		{"top", "H1"},
+		{"sub", "H2"},
+	} {
+		n, ok := findNode(g, ConceptNodeID(c.slug))
+		if !ok {
+			t.Errorf("missing concept %q", c.slug)
+			continue
+		}
+		if n.Meta["level"] != c.level {
+			t.Errorf("concept %q level = %q, want %q", c.slug, n.Meta["level"], c.level)
+		}
+	}
+}
+
+func TestBuildDedupsRepeatedH2SlugInOneDoc(t *testing.T) {
+	dir := gitInit(t, map[string]string{
+		// Two H2s with identical slug — should emit one describes edge.
+		"docs/auth.md": "# Top\n\n## Login flow\n\ntext\n\n## Login Flow\n\nmore\n",
+	})
+	g, err := Build(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	count := 0
+	for _, e := range g.Edges {
+		if e.Kind == EdgeDescribes &&
+			e.From == DocNodeID("docs/auth.md") &&
+			e.To == ConceptNodeID("login-flow") {
+			count++
+		}
+	}
+	if count != 1 {
+		t.Errorf("expected single describes edge for repeated H2 slug, got %d", count)
+	}
+}
+
 func TestBuildDedupsConceptsAcrossDocs(t *testing.T) {
 	dir := gitInit(t, map[string]string{
 		"a.md": "# Authentication\n\nbody A\n",
@@ -252,15 +339,15 @@ func TestBuildSkipsConceptWhenNoH1(t *testing.T) {
 
 func TestSlugifyNormalizesText(t *testing.T) {
 	cases := map[string]string{
-		"Authentication":              "authentication",
-		"User Stories!":               "user-stories",
-		"Already-Hyphenated":          "already-hyphenated",
-		"   Trim Me   ":               "trim-me",
-		"Multiple   spaces":           "multiple-spaces",
-		"Unicode café":                "unicode-caf",
-		"// Leading punctuation":      "leading-punctuation",
-		"":                            "",
-		"---":                         "",
+		"Authentication":         "authentication",
+		"User Stories!":          "user-stories",
+		"Already-Hyphenated":     "already-hyphenated",
+		"   Trim Me   ":          "trim-me",
+		"Multiple   spaces":      "multiple-spaces",
+		"Unicode café":           "unicode-caf",
+		"// Leading punctuation": "leading-punctuation",
+		"":                       "",
+		"---":                    "",
 	}
 	for in, want := range cases {
 		if got := slugify(in); got != want {
@@ -474,9 +561,9 @@ func TestBuildEmitsTestNodeForSpecTSXFallbacksToTS(t *testing.T) {
 
 func TestBuildSkipsNonTestFiles(t *testing.T) {
 	dir := gitInit(t, map[string]string{
-		"pkg/foo.go":     "package pkg\n",
-		"pkg/helper.go":  "package pkg\n",
-		"README.md":      "# x\n",
+		"pkg/foo.go":    "package pkg\n",
+		"pkg/helper.go": "package pkg\n",
+		"README.md":     "# x\n",
 	})
 	g, err := Build(dir)
 	if err != nil {
@@ -506,8 +593,8 @@ func TestBuildEmitsTestForPythonTestPrefix(t *testing.T) {
 
 func TestBuildEmitsEvidenceForTypedBucketWithSupportsEdge(t *testing.T) {
 	dir := gitInit(t, map[string]string{
-		"docs/user-stories/US-001.md":     "---\nid: US-001\n---\n# US-001\n",
-		"docs/evidence/US-001/README.md":  "# Evidence\n",
+		"docs/user-stories/US-001.md":      "---\nid: US-001\n---\n# US-001\n",
+		"docs/evidence/US-001/README.md":   "# Evidence\n",
 		"docs/evidence/US-001/output.json": "{}\n",
 	})
 	g, err := Build(dir)
@@ -578,8 +665,8 @@ rules:
     severity: error
     message: regenerate fixtures
 `,
-		"src/fixture-gen.go":                        "package src\n",
-		"frontend/public/fixtures/dashboard.json":   "{}\n",
+		"src/fixture-gen.go":                      "package src\n",
+		"frontend/public/fixtures/dashboard.json": "{}\n",
 	})
 	g, err := Build(dir)
 	if err != nil {
@@ -605,9 +692,9 @@ rules:
     severity: warn
     message: pair spec with ADR
 `,
-		"docs/specs/auth.md":         "# auth spec\n",
-		"docs/decisions/ADR-001.md":  "# ADR-001\n",
-		"docs/decisions/ADR-002.md":  "# ADR-002\n",
+		"docs/specs/auth.md":        "# auth spec\n",
+		"docs/decisions/ADR-001.md": "# ADR-001\n",
+		"docs/decisions/ADR-002.md": "# ADR-002\n",
 	})
 	g, err := Build(dir)
 	if err != nil {
@@ -640,8 +727,8 @@ rules:
     severity: warn
     message: m
 `,
-		"src/a.go":      "package src\n",
-		"src/b.go":      "package src\n",
+		"src/a.go":       "package src\n",
+		"src/b.go":       "package src\n",
 		"docs/shared.md": "# shared\n",
 	})
 	g, err := Build(dir)
@@ -814,9 +901,9 @@ rules:
     severity: warn
     message: m
 `,
-		"docs/specs/auth.md":         "# auth\n",
-		"docs/specs/billing.md":      "# billing\n",
-		"docs/decisions/ADR-001.md":  "# ADR-001\n",
+		"docs/specs/auth.md":        "# auth\n",
+		"docs/specs/billing.md":     "# billing\n",
+		"docs/decisions/ADR-001.md": "# ADR-001\n",
 	})
 	g, err := Build(dir)
 	if err != nil {
@@ -842,8 +929,8 @@ rules:
     severity: warn
     message: m
 `,
-		"src/fixture-gen.go":                       "package src\n",
-		"frontend/public/fixtures/dashboard.json":  "{}\n",
+		"src/fixture-gen.go":                      "package src\n",
+		"frontend/public/fixtures/dashboard.json": "{}\n",
 	})
 	g, err := Build(dir)
 	if err != nil {

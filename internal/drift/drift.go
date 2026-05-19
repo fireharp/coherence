@@ -286,16 +286,21 @@ type BlastRadius struct {
 	TopImpactedChangedNodes []string `json:"top_impacted_changed_nodes"`
 }
 
-// PathLoss measures the share of concept nodes that lack a support path —
-// MVP definition: at least one doc describing the concept has an incoming
-// `mentions` edge from a different doc. Concepts whose describing docs are
-// all referenced count as supported; the remainder are orphans. The score
-// is the fraction of concepts that are orphans (higher = worse).
+// PathLoss measures the share of concept nodes that lack a chain of
+// typed edges to a verifiable artifact (per the GOAL.md M4 spec). The
+// undirected BFS over `supportPathEdgeKinds` looks for any reachable
+// `test`/`evidence`/`endpoint`/`generated_artifact` node. The diff
+// fields below report concept transitions across base→current when a
+// base graph is on disk: a concept that flipped from supported to
+// orphan is the actionable "this commit lost a support path" signal.
 type PathLoss struct {
-	Score             float64  `json:"score"`
-	TotalConcepts     int      `json:"total_concepts"`
-	SupportedConcepts int      `json:"supported_concepts"`
-	OrphanConcepts    []string `json:"orphan_concepts"`
+	Score                  float64  `json:"score"`
+	TotalConcepts          int      `json:"total_concepts"`
+	SupportedConcepts      int      `json:"supported_concepts"`
+	OrphanConcepts         []string `json:"orphan_concepts"`
+	BaseAvailable          bool     `json:"base_available"`
+	NewlyOrphanedConcepts  []string `json:"newly_orphaned_concepts"`
+	NewlySupportedConcepts []string `json:"newly_supported_concepts"`
 }
 
 // SemanticMovement measures how many Markdown files have a different
@@ -401,7 +406,7 @@ func ComputeWith(rootDir, ontologyPath string, opts ComputeOptions) (Report, err
 	report.SemanticMovement = computeSemanticMovement(baseSnap, currentSnap)
 
 	// Meter 5: path loss (concept support).
-	report.PathLoss = computePathLoss(currentGraph)
+	report.PathLoss = computePathLoss(baseGraph, currentGraph)
 
 	// Meter 6: blast radius (impacted neighbor count).
 	report.BlastRadius = computeBlastRadius(baseGraph, currentGraph)
@@ -1137,32 +1142,77 @@ func supportPathReacher(g graph.Graph) (func(string) bool, map[string]graph.Node
 // supportPathEdgeKinds set, looking for any node whose kind belongs to
 // supportPathArtifactKinds. A concept with no describing doc, or with
 // describing docs that lead nowhere, scores as an orphan.
-func computePathLoss(g graph.Graph) PathLoss {
+//
+// When a base graph is supplied the meter also reports concept
+// transitions: NewlyOrphanedConcepts are concepts that were supported
+// in base but lost their chain in current ("this commit lost a support
+// path" — the actionable diagnostic); NewlySupportedConcepts went the
+// other direction (a chain was added). Concepts that exist only in
+// current are eligible to appear in either list; concepts removed from
+// the graph are not reported (they're a node-removal signal, not a
+// path_loss one).
+func computePathLoss(base *graph.Graph, current graph.Graph) PathLoss {
 	concepts := []graph.Node{}
-	for _, n := range g.Nodes {
+	for _, n := range current.Nodes {
 		if n.Kind == graph.NodeConcept {
 			concepts = append(concepts, n)
 		}
 	}
 	if len(concepts) == 0 {
-		return PathLoss{OrphanConcepts: []string{}, Score: 0}
+		return PathLoss{
+			OrphanConcepts:         []string{},
+			NewlyOrphanedConcepts:  []string{},
+			NewlySupportedConcepts: []string{},
+			Score:                  0,
+			BaseAvailable:          base != nil,
+		}
 	}
-	reaches, _ := supportPathReacher(g)
+	currentReaches, _ := supportPathReacher(current)
 	orphans := []string{}
 	supported := 0
+	currentlySupported := map[string]bool{}
 	for _, c := range concepts {
-		if reaches(c.ID) {
+		if currentReaches(c.ID) {
 			supported++
+			currentlySupported[c.ID] = true
 		} else {
 			orphans = append(orphans, c.ID)
 		}
 	}
 	sort.Strings(orphans)
+
+	newlyOrphaned := []string{}
+	newlySupported := []string{}
+	if base != nil {
+		baseReaches, _ := supportPathReacher(*base)
+		baseHasConcept := map[string]bool{}
+		for _, n := range base.Nodes {
+			if n.Kind == graph.NodeConcept {
+				baseHasConcept[n.ID] = true
+			}
+		}
+		for _, c := range concepts {
+			baseSupported := baseHasConcept[c.ID] && baseReaches(c.ID)
+			nowSupported := currentlySupported[c.ID]
+			switch {
+			case baseSupported && !nowSupported:
+				newlyOrphaned = append(newlyOrphaned, c.ID)
+			case !baseSupported && nowSupported && baseHasConcept[c.ID]:
+				newlySupported = append(newlySupported, c.ID)
+			}
+		}
+		sort.Strings(newlyOrphaned)
+		sort.Strings(newlySupported)
+	}
+
 	return PathLoss{
-		Score:             float64(len(orphans)) / float64(len(concepts)),
-		TotalConcepts:     len(concepts),
-		SupportedConcepts: supported,
-		OrphanConcepts:    orphans,
+		Score:                  float64(len(orphans)) / float64(len(concepts)),
+		TotalConcepts:          len(concepts),
+		SupportedConcepts:      supported,
+		OrphanConcepts:         orphans,
+		BaseAvailable:          base != nil,
+		NewlyOrphanedConcepts:  newlyOrphaned,
+		NewlySupportedConcepts: newlySupported,
 	}
 }
 

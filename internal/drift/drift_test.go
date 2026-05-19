@@ -190,7 +190,7 @@ func TestPathLossOrphanWhenDescribingDocUnreferenced(t *testing.T) {
 			{From: "doc:auth.md", To: "concept:auth", Kind: graph.EdgeDescribes},
 		},
 	}
-	pl := computePathLoss(g)
+	pl := computePathLoss(nil, g)
 	if pl.TotalConcepts != 1 || pl.SupportedConcepts != 0 {
 		t.Errorf("expected 1 total / 0 supported, got %d/%d", pl.TotalConcepts, pl.SupportedConcepts)
 	}
@@ -218,7 +218,7 @@ func TestPathLossSupportedWhenChainReachesEvidence(t *testing.T) {
 			{From: "evidence:auth-bucket", To: "adr:ADR-007", Kind: graph.EdgeSupports},
 		},
 	}
-	pl := computePathLoss(g)
+	pl := computePathLoss(nil, g)
 	if pl.SupportedConcepts != 1 {
 		t.Errorf("expected supported=1, got %d", pl.SupportedConcepts)
 	}
@@ -241,7 +241,7 @@ func TestPathLossMentionOnlyNoLongerSuffices(t *testing.T) {
 			{From: "doc:overview.md", To: "doc:auth.md", Kind: graph.EdgeMentions},
 		},
 	}
-	pl := computePathLoss(g)
+	pl := computePathLoss(nil, g)
 	if pl.SupportedConcepts != 0 {
 		t.Errorf("mention-only without artifact terminus should not support concept, got supported=%d", pl.SupportedConcepts)
 	}
@@ -265,7 +265,7 @@ func TestPathLossSupportedViaImplementsEndpointChain(t *testing.T) {
 			{From: "file:cart.go", To: "code_symbol:cart.Charge", Kind: graph.EdgeDefines},
 		},
 	}
-	pl := computePathLoss(g)
+	pl := computePathLoss(nil, g)
 	if pl.SupportedConcepts != 1 {
 		t.Errorf("multi-hop chain to endpoint should support concept, got %d", pl.SupportedConcepts)
 	}
@@ -287,14 +287,20 @@ func TestPathLossSupportedWhenDescribingDocReachesTest(t *testing.T) {
 			{From: "test:billing_test.go", To: "file:billing.go", Kind: graph.EdgeVerifies},
 		},
 	}
-	pl := computePathLoss(g)
+	pl := computePathLoss(nil, g)
 	if pl.SupportedConcepts != 1 {
 		t.Errorf("doc→mentions→file←verifies←test chain should support, got %d", pl.SupportedConcepts)
 	}
 }
 
 func TestPathLossEmptyGraphIsClean(t *testing.T) {
-	pl := computePathLoss(graph.Graph{})
+	pl := computePathLoss(nil, graph.Graph{})
+	if pl.BaseAvailable {
+		t.Error("BaseAvailable should be false when base is nil")
+	}
+	if pl.NewlyOrphanedConcepts == nil || pl.NewlySupportedConcepts == nil {
+		t.Error("diff lists should be []string{}, not nil")
+	}
 	if pl.TotalConcepts != 0 {
 		t.Errorf("expected zero concepts")
 	}
