@@ -80,6 +80,10 @@ func Compute(rootDir string) (Snapshot, error) {
 		semantic := contentHash
 		if kind == KindMarkdown {
 			semantic = markdownSemantic(body)
+		} else if strings.HasSuffix(rel, ".go") {
+			if h, ok := goSemantic(body); ok {
+				semantic = h
+			}
 		}
 		files = append(files, FileEntry{
 			Path:         rel,
