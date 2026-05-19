@@ -212,7 +212,7 @@ scenario is a self-contained directory under
   scenarios (CB-004/006/008/011..015) are shipped as stubs so the suite is
   honest about scope. Each stub records the milestone that would enable it.
 
-The shipped totals are: **15 scenarios, 12 pass, 0 fail, 3 skipped** —
+The shipped totals are: **15 scenarios, 13 pass, 0 fail, 2 skipped** —
 matching M1's "at least 8 internal scenarios exist" bar.
 
 ### Scored scenarios (Files mode)
@@ -259,9 +259,15 @@ Graduated scored scenarios so far:
   files for typed-id mentions and flags those without a corresponding
   node in the graph. Verdict bumps to `telemetry`.
 
+- **CB-012** ("test passes but no longer validates changed behavior") —
+  base+current+commit scenario. The new `stale_tests` meter walks the
+  `verifies` edge wired by the Go test extractor, compares baseline +
+  current snapshot content_hashes, and flags the unchanged test whose
+  source did change.
+
 Skipped scenarios that still need graduation work (CB-006 LLM
-contradiction, CB-008 metric rename, CB-012 stale test) can join via the
-same materializer once their specific meter or extractor exists.
+contradiction, CB-008 metric rename) can join via the same materializer
+once their specific meter or extractor exists.
 
 ## Index and snapshots
 
@@ -530,6 +536,7 @@ meters today:
 | `unimplemented_stories`   | user_story nodes + `implements`      | stories with no incoming implements claim (gated on convention) |
 | `broken_links`            | markdown re-scan of tracked .md      | inline links pointing to paths not in the tracked set           |
 | `unknown_id_references`   | typed-id regex over non-Markdown     | code mentions of US/ADR/IDR ids not defined in the graph        |
+| `stale_tests`             | `verifies` + base/current snapshot   | tests unchanged while their `verifies`-linked source changed    |
 
 Each meter also contributes to a top-level `verdict`:
 
@@ -539,11 +546,12 @@ Each meter also contributes to a top-level `verdict`:
   in the JSON outcome contract).
 - `clean` — nothing to do.
 
-All 9 GOAL.md M4 meters are now shipping, plus seven extra graph-traversal,
-link-integrity, and id-reference meters: `stale_decision_links`,
-`broken_implements_chains`, `dependency_cycles`, `orphan_endpoints`,
-`unimplemented_stories`, `broken_links`, and `unknown_id_references`.
-Together that's 16 meters today. The cycle meter promotes to
+All 9 GOAL.md M4 meters are now shipping, plus eight extra graph-traversal,
+link-integrity, id-reference, and test-staleness meters:
+`stale_decision_links`, `broken_implements_chains`, `dependency_cycles`,
+`orphan_endpoints`, `unimplemented_stories`, `broken_links`,
+`unknown_id_references`, and `stale_tests`. Together that's 17 meters
+today. The cycle meter promotes to
 `warn`; convention-gated meters (like `unimplemented_stories`) stay
 silent unless the repo actually uses the annotation, avoiding false
 positives on repos that don't. The deterministic 8 always run;

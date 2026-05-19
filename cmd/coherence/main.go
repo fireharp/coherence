@@ -18,6 +18,7 @@ import (
 	"coherence/internal/coherencebench"
 	"coherence/internal/doctor"
 	"coherence/internal/drift"
+	"coherence/internal/exteval"
 	"coherence/internal/git"
 	"coherence/internal/graph"
 	"coherence/internal/ids"
@@ -46,8 +47,8 @@ const usage = `coherence <subcommand> [flags]
                                           live worktree signal loop
                                           (--once = single fire; default = streaming)
   doctor [--json] [--ontology=path]       validate ontology, hook, .gitignore
-  bench [--suite=templates|coherencebench|all] [--template=<name>]
-        [--json] [--write-report]          run shipped scenario suites
+  bench [--suite=templates|coherencebench|external|all] [--template=<name>]
+        [--json] [--write-report]          run shipped scenario / eval suites
   index [--json]                          write .coherence/snapshot.json (Merkle + semantic hashes)
   diff [--base=path] [--json]             compare current snapshot to base
   drift [--json]                          compute drift meters → .coherence/drift.json
@@ -876,6 +877,20 @@ func runBench(args parsedArgs, rootDir string) int {
 		}
 		if !cb.Pass {
 			return 1
+		}
+		return 0
+
+	case "external", "ext":
+		ext := exteval.RunAll()
+		if jsonOut {
+			enc := json.NewEncoder(os.Stdout)
+			enc.SetIndent("", "  ")
+			if err := enc.Encode(ext); err != nil {
+				fmt.Fprintln(os.Stderr, "coherence: fatal:", err)
+				return 2
+			}
+		} else {
+			fmt.Print(exteval.Human(ext))
 		}
 		return 0
 
