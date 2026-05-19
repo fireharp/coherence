@@ -1,0 +1,31 @@
+version: 1
+rules:
+  - id: metrics-yaml-needs-fixture-refresh
+    when:
+      - "rill/metrics/*.yaml"
+    expect_any:
+      - "frontend/public/fixtures/dashboard.json"
+    severity: warn
+    message: "Metric def changed; regenerate frontend fixtures."
+    suggested_commands:
+      - node frontend/scripts/build-fixtures.mjs
+
+  - id: metrics-yaml-needs-glossary-touch
+    when:
+      - "rill/metrics/*.yaml"
+    expect_any:
+      - "docs/specs/metrics-glossary.md"
+    severity: warn
+    message: "Metric def changed; refresh metrics glossary."
+    suggested_commands:
+      - 'grep -F "$(basename ${file%.yaml})" docs/specs/metrics-glossary.md'
+
+  - id: metric-needs-evidence-packet
+    when:
+      - "rill/metrics/*.yaml"
+    expect_any:
+      - "docs/evidence/*/README.md"
+    severity: warn
+    message: "Metric changed; ensure an evidence packet documents the change."
+    suggested_commands:
+      - ls docs/evidence/ | tail -5

@@ -1,0 +1,13 @@
+id: CB-007
+name: telemetry contract changes without metrics alignment
+description: |
+  The telemetry contract spec changed but neither the metrics glossary nor
+  the Rill metric definitions were co-staged. Engine should detect the
+  path loss from contract to metric implementation.
+status: deterministic
+changed_files:
+  - docs/specs/telemetry-contract.md
+expected:
+  fires:
+    - telemetry-contract-needs-metrics-alignment
+  blocking_error: false

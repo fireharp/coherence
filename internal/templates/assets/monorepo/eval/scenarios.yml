@@ -1,0 +1,21 @@
+scenarios:
+  - id: workspace-manifest-without-lockfile
+    description: pnpm-workspace.yaml changed without lockfile
+    changed_files:
+      - pnpm-workspace.yaml
+    expect_fires:
+      - workspace-manifest-change-needs-lockfile
+
+  - id: workspace-manifest-with-lockfile-passes
+    description: coherent workspace manifest + lockfile update
+    changed_files:
+      - pnpm-workspace.yaml
+      - pnpm-lock.yaml
+    expect_fires: []
+
+  - id: package-src-without-tests
+    description: package source changed without colocated test
+    changed_files:
+      - packages/shared/src/index.ts
+    expect_fires:
+      - package-source-needs-test

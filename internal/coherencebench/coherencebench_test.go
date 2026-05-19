@@ -1,0 +1,188 @@
+package coherencebench
+
+import (
+	"os"
+	"path/filepath"
+	"strings"
+	"testing"
+	"time"
+)
+
+func TestIDsShipsAllExpectedScenarios(t *testing.T) {
+	got := IDs()
+	want := []string{
+		"CB-001", "CB-002", "CB-003", "CB-004", "CB-005",
+		"CB-006", "CB-007", "CB-008", "CB-009", "CB-010",
+		"CB-011", "CB-012", "CB-013", "CB-014", "CB-015",
+	}
+	gotSet := map[string]bool{}
+	for _, n := range got {
+		gotSet[n] = true
+	}
+	for _, w := range want {
+		if !gotSet[w] {
+			t.Errorf("missing scenario %s", w)
+		}
+	}
+}
+
+func TestRunAllPassesDeterministicAndSkipsRest(t *testing.T) {
+	suite := RunAll()
+	if !suite.Pass {
+		for _, r := range suite.Results {
+			if !r.Pass && !r.Skipped {
+				t.Errorf("FAIL %s: missing=%v extra=%v err=%s",
+					r.Scenario.ID, r.Missing, r.Extra, r.Error)
+			}
+		}
+		t.Fatal("suite did not pass")
+	}
+	if suite.Counts.Total != 15 {
+		t.Errorf("total = %d, want 15", suite.Counts.Total)
+	}
+	if suite.Counts.Pass < 7 {
+		t.Errorf("expected >=7 deterministic passes, got %d", suite.Counts.Pass)
+	}
+	if suite.Counts.Skipped < 3 {
+		t.Errorf("expected >=3 skipped (graph/semantic deferred), got %d", suite.Counts.Skipped)
+	}
+}
+
+func TestRunSkipScenarioReturnsSkippedResult(t *testing.T) {
+	r := Run("CB-008")
+	if !r.Skipped {
+		t.Errorf("CB-008 should be skipped, got %+v", r)
+	}
+	if !r.Pass {
+		t.Errorf("skipped scenarios should report pass=true")
+	}
+}
+
+func TestCB011IsDeterministicAndPasses(t *testing.T) {
+	// CB-011 uses base_files + files to exercise semantic_movement's
+	// noop classification. A prose typo only flips content_hash, not
+	// semantic_hash, so verdict stays clean.
+	r := Run("CB-011")
+	if r.Skipped {
+		t.Fatal("CB-011 should be deterministic, not skipped")
+	}
+	if r.Error != "" {
+		t.Fatalf("CB-011 errored: %s", r.Error)
+	}
+	if !r.Pass {
+		t.Errorf("CB-011 should pass, got missing=%v extra=%v", r.Missing, r.Extra)
+	}
+}
+
+func TestCB013IsDeterministicAndPasses(t *testing.T) {
+	// CB-013 needs the baseline-commit materializer extension so
+	// `git diff HEAD` returns the modified source. required_edge_breakage
+	// then fires via the severity=error rule, bumping verdict to warn.
+	r := Run("CB-013")
+	if r.Skipped {
+		t.Fatal("CB-013 should be deterministic, not skipped")
+	}
+	if r.Error != "" {
+		t.Fatalf("CB-013 errored: %s", r.Error)
+	}
+	if !r.Pass {
+		t.Errorf("CB-013 should pass, got missing=%v extra=%v", r.Missing, r.Extra)
+	}
+}
+
+func TestCB015IsDeterministicAndPasses(t *testing.T) {
+	// CB-015 graduated via the broken_links drift meter.
+	r := Run("CB-015")
+	if r.Skipped {
+		t.Fatal("CB-015 should be deterministic, not skipped")
+	}
+	if r.Error != "" {
+		t.Fatalf("CB-015 errored: %s", r.Error)
+	}
+	if !r.Pass {
+		t.Errorf("CB-015 should pass, got missing=%v extra=%v", r.Missing, r.Extra)
+	}
+}
+
+func TestCB014IsDeterministicAndPasses(t *testing.T) {
+	// CB-014 graduated from skip → deterministic via Files-mode
+	// materialization + drift verdict assertion. Regression-guard the
+	// graduation so we don't accidentally re-skip it.
+	r := Run("CB-014")
+	if r.Skipped {
+		t.Fatal("CB-014 should be deterministic, not skipped")
+	}
+	if r.Error != "" {
+		t.Fatalf("CB-014 errored: %s", r.Error)
+	}
+	if !r.Pass {
+		t.Errorf("CB-014 should pass, got missing=%v extra=%v", r.Missing, r.Extra)
+	}
+	if r.Scenario.Expected.Drift == nil || r.Scenario.Expected.Drift.Verdict != "telemetry" {
+		t.Errorf("CB-014 should assert drift verdict=telemetry, got %+v", r.Scenario.Expected.Drift)
+	}
+}
+
+func TestExistingScenariosUnaffectedByFilesMode(t *testing.T) {
+	// Path-list scenarios (CB-001..CB-010 etc.) shouldn't regress —
+	// they don't set Files and continue to use rules.Evaluate.
+	for _, id := range []string{"CB-001", "CB-005", "CB-010"} {
+		r := Run(id)
+		if r.Error != "" {
+			t.Errorf("%s errored: %s", id, r.Error)
+		}
+		if !r.Pass {
+			t.Errorf("%s should still pass under path-list mode", id)
+		}
+	}
+}
+
+func TestLoadUnknownReturnsError(t *testing.T) {
+	if _, _, err := Load("CB-999"); err == nil {
+		t.Fatal("expected error for unknown scenario")
+	}
+}
+
+func TestWriteMarkdownProducesIndexFile(t *testing.T) {
+	dir := t.TempDir()
+	rep := CombinedReport{
+		GeneratedAt:       time.Date(2026, 5, 19, 15, 0, 0, 0, time.UTC),
+		TemplateScenarios: 38,
+		TemplatePass:      38,
+		TemplateFail:      0,
+		CoherenceBenchSuite: Suite{
+			Pass: true,
+			Counts: Counts{Total: 15, Pass: 7, Skipped: 8},
+			Results: []Result{
+				{Scenario: Scenario{ID: "CB-001", Name: "test", Status: "deterministic"}, Pass: true},
+				{Scenario: Scenario{ID: "CB-008", Name: "skip", Status: "skip"}, Pass: true, Skipped: true},
+			},
+		},
+		KnownLimitations: []string{"a limitation"},
+	}
+	out, err := WriteMarkdown(dir, rep)
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := filepath.Join(dir, ".coherence", "runs", "2026-05-19", "index.md")
+	if out != want {
+		t.Errorf("path = %q, want %q", out, want)
+	}
+	body, err := os.ReadFile(out)
+	if err != nil {
+		t.Fatal(err)
+	}
+	s := string(body)
+	for _, frag := range []string{
+		"Template eval suite",
+		"CoherenceBench",
+		"| CB-001 | deterministic | ok |",
+		"| CB-008 | skip | skip |",
+		"Known limitations",
+		"a limitation",
+	} {
+		if !strings.Contains(s, frag) {
+			t.Errorf("report missing fragment %q\n---\n%s", frag, s)
+		}
+	}
+}

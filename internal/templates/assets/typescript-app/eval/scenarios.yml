@@ -1,0 +1,21 @@
+scenarios:
+  - id: package-json-without-lockfile
+    description: package.json changed without pnpm-lock.yaml/npm/yarn lock
+    changed_files:
+      - package.json
+    expect_fires:
+      - package-json-change-needs-lockfile
+
+  - id: package-json-with-pnpm-lock-passes
+    description: coherent package.json + pnpm-lock.yaml update
+    changed_files:
+      - package.json
+      - pnpm-lock.yaml
+    expect_fires: []
+
+  - id: src-without-tests
+    description: ts source changed without test or *.test.ts edit
+    changed_files:
+      - src/components/Button.tsx
+    expect_fires:
+      - src-change-needs-tests

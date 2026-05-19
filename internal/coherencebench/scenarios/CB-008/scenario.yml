@@ -1,0 +1,14 @@
+id: CB-008
+name: metric renamed in frontend only
+description: |
+  A metric was renamed in frontend code but the canonical Rill definition
+  was not touched. Detecting concept split / orphaned alias requires the
+  knowledge-graph layer (M3) — both files would map to the same
+  metric:<name> node and the rename would split that node.
+status: skip
+changed_files:
+  - frontend/src/charts/success_rate.tsx
+expected:
+  fires:
+    - orphaned-metric-alias
+  blocking_error: false

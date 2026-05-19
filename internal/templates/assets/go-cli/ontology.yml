@@ -1,0 +1,49 @@
+version: 1
+# Go CLI template — assumes cmd/<binary>/main.go + internal/<pkg>/ layout.
+
+commands:
+  test:
+    - go test ./...
+  build:
+    - go build ./...
+  lint:
+    - go vet ./...
+
+rules:
+  - id: cli-cmd-change-needs-build-validation
+    when:
+      - "cmd/**/*.go"
+    expect_any:
+      - "go.mod"
+      - "Makefile"
+      - ".github/workflows/**/*.yml"
+      - ".github/workflows/**/*.yaml"
+    severity: warn
+    message: "Command code changed; confirm build/test pipeline references stay aligned."
+    suggested_commands:
+      - go vet ./...
+      - go test ./...
+      - go build ./...
+
+  - id: cli-readme-needs-refresh-on-flag-change
+    when:
+      - "cmd/**/main.go"
+      - "internal/cli/**/*.go"
+    expect_any:
+      - "README.md"
+      - "docs/**/*.md"
+    severity: warn
+    message: "CLI entrypoint changed; verify README CLI usage + flag list still match."
+    suggested_commands:
+      - go run ./cmd/... --help
+
+  - id: gomod-change-needs-sum
+    when:
+      - "go.mod"
+    expect_any:
+      - "go.sum"
+    severity: error
+    message: "go.mod changed but go.sum was not co-staged."
+    suggested_commands:
+      - go mod tidy
+      - git add go.sum

@@ -1,0 +1,14 @@
+id: CB-012
+name: test passes but no longer validates changed behavior
+description: |
+  Production code change shifted the behavior, but the existing test still
+  passes (and was not touched). Detecting stale tests requires the
+  evidence/claim support layer (M4) so the engine can flag passing-but-stale
+  tests via claim support delta.
+status: skip
+changed_files:
+  - src/auth/policy.go
+expected:
+  fires:
+    - stale-test-risk
+  blocking_error: false

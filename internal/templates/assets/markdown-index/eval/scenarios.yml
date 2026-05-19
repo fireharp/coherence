@@ -1,0 +1,36 @@
+scenarios:
+  - id: new-content-without-index-touch
+    description: new content/*.md added without _index.md update
+    changed_files:
+      - content/notes/2026-05-19.md
+    expect_fires:
+      - content-add-needs-index-entry
+
+  - id: new-content-with-index-passes
+    description: coherent content + _index.md update
+    changed_files:
+      - content/notes/2026-05-19.md
+      - content/_index.md
+    expect_fires: []
+
+  - id: batch-change-without-batch-index
+    description: batch entry changed without parent batch index touch
+    changed_files:
+      - content/batches/2026-Q2/item-001.md
+    expect_fires:
+      - content-add-needs-index-entry
+      - batch-checklist-needs-parent-index
+
+  - id: batch-change-with-batch-index-passes
+    description: batch entry + batches index update together
+    changed_files:
+      - content/batches/2026-Q2/item-001.md
+      - content/batches/_index.md
+    expect_fires: []
+
+  - id: frontmatter-schema-change-without-doc
+    description: frontmatter schema changed; needs docs/_index update
+    changed_files:
+      - schemas/frontmatter.yml
+    expect_fires:
+      - frontmatter-schema-change-needs-doc

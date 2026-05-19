@@ -1,0 +1,12 @@
+version: 1
+rules:
+  - id: telemetry-contract-needs-metrics-alignment
+    when:
+      - "docs/specs/telemetry-contract.md"
+    expect_any:
+      - "docs/specs/metrics-glossary.md"
+      - "rill/metrics/*.yaml"
+    severity: warn
+    message: "Telemetry contract changed; confirm glossary / Rill metric defs still align."
+    suggested_commands:
+      - diff docs/specs/telemetry-contract.md docs/specs/metrics-glossary.md

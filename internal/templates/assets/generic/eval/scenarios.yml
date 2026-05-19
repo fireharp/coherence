@@ -1,0 +1,14 @@
+scenarios:
+  - id: source-without-docs
+    description: src/* changed but no README/docs/CHANGELOG touch
+    changed_files:
+      - src/lib/auth.ts
+    expect_fires:
+      - readme-needs-touch-on-major-change
+
+  - id: source-with-readme-passes
+    description: coherent source + README update
+    changed_files:
+      - src/lib/auth.ts
+      - README.md
+    expect_fires: []

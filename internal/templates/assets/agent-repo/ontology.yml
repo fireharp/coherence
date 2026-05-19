@@ -1,0 +1,52 @@
+version: 1
+# Agent repository template — repos where AI/automation agents read/write
+# tasks, traces, and outputs. Emphasis on traceability + evidence.
+
+commands:
+  test:
+    - 'echo "agent repo - define a smoke check under commands.test"'
+  build:
+    - 'echo "agent repo - define a packaging step under commands.build"'
+
+rules:
+  - id: agent-task-change-needs-evidence
+    when:
+      - ".agents/tasks/**/*.md"
+      - "agents/tasks/**/*.md"
+    expect_any:
+      - "docs/evidence/**/*.md"
+      - ".agents/runs/**/*.md"
+      - "docs/runs/**/*.md"
+    severity: warn
+    message: "Agent task spec changed; pair it with an evidence packet or run note."
+    suggested_commands:
+      - ls docs/evidence/ | tail -5
+
+  - id: prompt-change-needs-doc
+    when:
+      - "prompts/**/*"
+      - "agents/prompts/**/*"
+      - ".agents/prompts/**/*"
+    expect_any:
+      - "docs/**/*.md"
+      - "README.md"
+      - "AGENTS.md"
+    severity: warn
+    message: "Prompt changed; document the new behavior so reviewers understand intent."
+    suggested_commands:
+      - git diff -- prompts/
+
+  - id: tool-config-change-needs-decision
+    when:
+      - ".agents/tools/**/*"
+      - "agents/tools/**/*"
+      - "agent.json"
+      - "agents.json"
+    expect_any:
+      - "docs/decisions/ADR-*.md"
+      - "docs/decisions/IDR-*.md"
+      - "AGENTS.md"
+    severity: warn
+    message: "Agent tool config changed; capture the decision in AGENTS.md or an ADR."
+    suggested_commands:
+      - git log -1 -- .agents/tools/

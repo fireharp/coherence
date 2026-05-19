@@ -1,0 +1,13 @@
+id: CB-006
+name: markdown claim contradicts cited markdown context
+description: |
+  Requires the LLM contradiction pass. Deterministic engine cannot detect
+  contradiction; ships shipped as skipped until M6 wires LLM findings into
+  the bench harness.
+status: skip
+changed_files:
+  - docs/specs/auth.md
+expected:
+  fires:
+    - llm-contradiction
+  blocking_error: false

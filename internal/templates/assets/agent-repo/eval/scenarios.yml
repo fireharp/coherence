@@ -1,0 +1,21 @@
+scenarios:
+  - id: agent-task-without-evidence
+    description: agent task markdown changed without evidence/run pair
+    changed_files:
+      - .agents/tasks/TASK-001.md
+    expect_fires:
+      - agent-task-change-needs-evidence
+
+  - id: agent-task-with-evidence-passes
+    description: coherent agent task + evidence packet update
+    changed_files:
+      - .agents/tasks/TASK-001.md
+      - docs/evidence/TASK-001/README.md
+    expect_fires: []
+
+  - id: prompt-change-without-doc
+    description: prompt changed without doc/README/AGENTS update
+    changed_files:
+      - prompts/system.md
+    expect_fires:
+      - prompt-change-needs-doc

@@ -1,0 +1,29 @@
+id: CB-014
+name: ADR superseded but old docs still link as active
+description: |
+  ADR-007 is superseded by ADR-014 via frontmatter. The auth spec still
+  cites ADR-007 inline without referencing ADR-014. The drift pipeline's
+  `stale_decision_links` meter should detect this and bump the verdict
+  to telemetry.
+status: deterministic
+files:
+  docs/decisions/ADR-007.md: |
+    ---
+    id: ADR-007
+    ---
+    # ADR-007 — Old auth approach
+  docs/decisions/ADR-014.md: |
+    ---
+    id: ADR-014
+    supersedes: ADR-007
+    ---
+    # ADR-014 — New auth approach
+  docs/specs/auth.md: |
+    # Auth Spec
+
+    Per [ADR-007](../decisions/ADR-007.md), authentication is handled X.
+expected:
+  fires: []
+  blocking_error: false
+  drift:
+    verdict: telemetry

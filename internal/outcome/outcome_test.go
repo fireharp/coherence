@@ -1,0 +1,171 @@
+package outcome
+
+import (
+	"testing"
+
+	"coherence/internal/rules"
+)
+
+func TestScanCleanStagedDirtyWorktreeRecommendsReview(t *testing.T) {
+	o := Compute(Input{
+		Subcommand:        "scan",
+		StagedFileCount:   0,
+		TrackedDirtyCount: 2,
+	})
+	if !o.SafeToCommit {
+		t.Fatalf("safe_to_commit: got false, want true (no findings, nothing staged)")
+	}
+	if !o.ReviewRecommended {
+		t.Fatalf("review_recommended: got false, want true")
+	}
+	if o.Staged != "clean" || o.Worktree != "dirty" {
+		t.Fatalf("staged/worktree: got %q/%q, want clean/dirty", o.Staged, o.Worktree)
+	}
+	if o.RecommendedNextCommand == "" {
+		t.Fatalf("recommended_next_command: got empty, want review hint")
+	}
+}
+
+func TestScanCleanStagedCleanWorktreeIsQuiet(t *testing.T) {
+	o := Compute(Input{Subcommand: "scan"})
+	if !o.SafeToCommit || o.ReviewRecommended || o.BlockingError {
+		t.Fatalf("clean state should be safe+quiet: %+v", o)
+	}
+	if o.RecommendedNextCommand != "" {
+		t.Fatalf("recommended_next_command should be empty on clean state, got %q", o.RecommendedNextCommand)
+	}
+}
+
+func TestErrorFindingBlocksCommit(t *testing.T) {
+	o := Compute(Input{
+		Subcommand:      "scan",
+		StagedFileCount: 1,
+		Findings:        []rules.Finding{{Rule: "x", Severity: "error", Message: "m"}},
+	})
+	if o.SafeToCommit {
+		t.Fatalf("safe_to_commit: got true, want false")
+	}
+	if !o.BlockingError {
+		t.Fatalf("blocking_error: got false, want true")
+	}
+}
+
+func TestWarnFindingsRecommendReviewButPassGate(t *testing.T) {
+	o := Compute(Input{
+		Subcommand:      "scan",
+		StagedFileCount: 1,
+		Findings: []rules.Finding{
+			{Rule: "x", Severity: "warn", Message: "m"},
+		},
+	})
+	if !o.SafeToCommit {
+		t.Fatalf("safe_to_commit: got false, want true on warn-only")
+	}
+	if !o.ReviewRecommended {
+		t.Fatalf("review_recommended: got false, want true")
+	}
+	if o.BlockingError {
+		t.Fatalf("blocking_error: got true, want false")
+	}
+}
+
+func TestCheckUntrackedExcludedRecommendsReview(t *testing.T) {
+	o := Compute(Input{
+		Subcommand:         "check",
+		TrackedDirtyCount:  3,
+		UntrackedFileCount: 17,
+	})
+	if !o.UntrackedFilesExcluded {
+		t.Fatalf("untracked_files_excluded: got false, want true")
+	}
+	if o.UntrackedFileCount != 17 {
+		t.Fatalf("untracked_file_count: got %d, want 17", o.UntrackedFileCount)
+	}
+	if !o.ReviewRecommended {
+		t.Fatalf("review_recommended: got false, want true")
+	}
+	if o.RecommendedNextCommand == "" {
+		t.Fatalf("recommended_next_command: should suggest review when untracked excluded")
+	}
+}
+
+func TestDriftWarnPromotesReviewRecommended(t *testing.T) {
+	o := Compute(Input{
+		Subcommand:   "review",
+		DriftVerdict: "warn",
+	})
+	if !o.ReviewRecommended {
+		t.Errorf("drift=warn should set review_recommended=true")
+	}
+	if o.DriftVerdict != "warn" {
+		t.Errorf("drift_verdict not propagated, got %q", o.DriftVerdict)
+	}
+}
+
+func TestDriftTelemetrySetsTelemetryOnlyMovement(t *testing.T) {
+	o := Compute(Input{
+		Subcommand:   "review",
+		DriftVerdict: "telemetry",
+	})
+	if !o.TelemetryOnlyMovement {
+		t.Errorf("drift=telemetry should set telemetry_only_movement=true")
+	}
+	if o.ReviewRecommended {
+		t.Errorf("drift=telemetry alone should NOT set review_recommended=true (review is for actionable findings only)")
+	}
+	if o.DriftVerdict != "telemetry" {
+		t.Errorf("drift_verdict not propagated, got %q", o.DriftVerdict)
+	}
+}
+
+func TestDriftCleanDoesNotChangeOutcome(t *testing.T) {
+	o := Compute(Input{
+		Subcommand:   "review",
+		DriftVerdict: "clean",
+	})
+	if o.TelemetryOnlyMovement || o.ReviewRecommended {
+		t.Errorf("drift=clean should not flip review/telemetry flags: %+v", o)
+	}
+	if o.DriftVerdict != "clean" {
+		t.Errorf("drift_verdict not propagated, got %q", o.DriftVerdict)
+	}
+}
+
+func TestWatchSubcommandUsesSameContract(t *testing.T) {
+	// watch and review share the outcome wiring; this test guards that
+	// the subcommand label flows through without changing behaviour.
+	o := Compute(Input{
+		Subcommand:        "watch",
+		StagedFileCount:   0,
+		TrackedDirtyCount: 1,
+		DriftVerdict:      "telemetry",
+	})
+	if o.Staged != "clean" || o.Worktree != "dirty" {
+		t.Errorf("staged/worktree wrong: %+v", o)
+	}
+	if !o.TelemetryOnlyMovement {
+		t.Errorf("drift=telemetry should still propagate under watch")
+	}
+	if o.DriftVerdict != "telemetry" {
+		t.Errorf("DriftVerdict should be preserved under watch")
+	}
+}
+
+func TestEmptyDriftVerdictOmittedFromOutcome(t *testing.T) {
+	o := Compute(Input{Subcommand: "scan"})
+	if o.DriftVerdict != "" {
+		t.Errorf("empty drift verdict should stay empty for omitempty, got %q", o.DriftVerdict)
+	}
+}
+
+func TestCheckIncludingUntrackedDoesNotExclude(t *testing.T) {
+	o := Compute(Input{
+		Subcommand:         "check",
+		TrackedDirtyCount:  3,
+		UntrackedFileCount: 4,
+		IncludeUntracked:   true,
+	})
+	if o.UntrackedFilesExcluded {
+		t.Fatalf("untracked_files_excluded: got true, want false when caller folded them in")
+	}
+}

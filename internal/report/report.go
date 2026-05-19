@@ -7,7 +7,9 @@ import (
 	"path/filepath"
 	"time"
 
+	"coherence/internal/drift"
 	"coherence/internal/llm"
+	"coherence/internal/outcome"
 	"coherence/internal/rules"
 )
 
@@ -38,15 +40,20 @@ func FromResult(r llm.Result) LLM {
 // JSON shape.
 type Finding = rules.Finding
 
-// Payload is the on-disk report shape.
+// Payload is the on-disk report shape. The embedded outcome.Outcome surfaces
+// the shared scan/check/review/watch/drift vocabulary at the top level of the
+// JSON document.
 type Payload struct {
-	Subcommand  string         `json:"subcommand"`
-	Flags       map[string]any `json:"flags"`
-	Files       []string       `json:"files"`
-	RuleCount   int            `json:"ruleCount"`
-	LLM         LLM            `json:"llm"`
-	Findings    []Finding      `json:"findings"`
-	GeneratedAt string         `json:"generated_at"`
+	outcome.Outcome
+	Subcommand        string         `json:"subcommand"`
+	Flags             map[string]any `json:"flags"`
+	Files             []string       `json:"files"`
+	RuleCount         int            `json:"ruleCount"`
+	LLM               LLM            `json:"llm"`
+	Findings          []Finding      `json:"findings"`
+	SuggestedCommands []string       `json:"suggested_commands"`
+	Drift             *drift.Report  `json:"drift,omitempty"`
+	GeneratedAt       string         `json:"generated_at"`
 }
 
 // Now returns the current time in millisecond-precision UTC with a Z suffix.
@@ -70,6 +77,9 @@ func Write(rootDir string, p Payload) error {
 	}
 	if p.Flags == nil {
 		p.Flags = map[string]any{}
+	}
+	if p.SuggestedCommands == nil {
+		p.SuggestedCommands = []string{}
 	}
 	dst := Path(rootDir)
 	if err := os.MkdirAll(filepath.Dir(dst), 0o755); err != nil {

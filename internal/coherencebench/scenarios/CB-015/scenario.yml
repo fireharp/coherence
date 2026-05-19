@@ -1,0 +1,22 @@
+id: CB-015
+name: removed file still referenced by docs
+description: |
+  A doc has an inline markdown link to a file that is not in the tracked
+  set — either deleted, never created, or a typo. The `broken_links`
+  drift meter scans tracked .md files and flags the dangling reference.
+  Verdict bumps to telemetry.
+status: deterministic
+files:
+  docs/index.md: |
+    ---
+    title: Project Docs
+    ---
+
+    Project docs entry point.
+
+    See [the removed spec](specs/removed.md) for details.
+expected:
+  fires: []
+  blocking_error: false
+  drift:
+    verdict: telemetry

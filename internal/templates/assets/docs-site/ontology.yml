@@ -1,0 +1,52 @@
+version: 1
+# Docs-site template — markdown-heavy repos with an index/nav file.
+
+commands:
+  test:
+    - npx markdown-link-check --quiet $(git ls-files '*.md')
+  build:
+    - npx vitepress build docs
+  lint:
+    - npx markdownlint '**/*.md'
+
+rules:
+  - id: new-doc-needs-index-entry
+    when:
+      - "docs/*.md"
+      - "docs/guides/**/*.md"
+    expect_any:
+      - "docs/index.md"
+      - "docs/README.md"
+      - "docs/_sidebar.md"
+      - "mkdocs.yml"
+      - "docusaurus.config.js"
+    severity: warn
+    message: "Doc changed; verify the nav/index still lists it (or update the index)."
+    suggested_commands:
+      - 'grep -rn "$(basename ${file%.md})" docs/index.md docs/_sidebar.md 2>/dev/null'
+
+  - id: nav-config-change-needs-build
+    when:
+      - "mkdocs.yml"
+      - "docusaurus.config.js"
+      - "docs/_sidebar.md"
+    expect_any:
+      - "package.json"
+      - "package-lock.json"
+      - "pnpm-lock.yaml"
+    severity: warn
+    message: "Site navigation/config changed; run a build to confirm pages still render."
+    suggested_commands:
+      - npx vitepress build docs
+
+  - id: spec-change-needs-decision-or-evidence
+    when:
+      - "docs/specs/**/*.md"
+    expect_any:
+      - "docs/decisions/ADR-*.md"
+      - "docs/decisions/IDR-*.md"
+      - "docs/evidence/**/*.md"
+    severity: warn
+    message: "Spec changed without a paired ADR/IDR or evidence packet."
+    suggested_commands:
+      - ls docs/decisions/ | tail -5

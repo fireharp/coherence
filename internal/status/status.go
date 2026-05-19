@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"coherence/internal/git"
+	"coherence/internal/graph"
 	"coherence/internal/ontology"
 	"coherence/internal/report"
 	"coherence/internal/rules"
@@ -25,7 +26,8 @@ func Write(rootDir string, ont *ontology.Ontology) (string, error) {
 	last := report.Load(rootDir)
 	snapshots := listSnapshots(rootDir)
 	live := computeLive(ont, rootDir)
-	out := render(ont, last, snapshots, live)
+	g, gErr := graph.Load(rootDir)
+	out := render(ont, last, snapshots, live, gErr == nil, g)
 	dst := Path(rootDir)
 	if err := os.MkdirAll(filepath.Dir(dst), 0o755); err != nil {
 		return "", err
@@ -45,7 +47,7 @@ type snapshot struct {
 var (
 	dateDirRe   = regexp.MustCompile(`^\d{4}-\d{2}-\d{2}$`)
 	verdictRe   = regexp.MustCompile(`(?im)^- \*\*Suite verdict:\*\*\s*` + "`?" + `([a-z]+)` + "`?")
-	tableRowRe  = regexp.MustCompile(`(?m)^\|\s*\d`)
+	tableRowRe  = regexp.MustCompile(`(?m)^\|\s*[A-Za-z0-9]`)
 )
 
 func listSnapshots(rootDir string) []snapshot {
@@ -140,7 +142,7 @@ func findingsTable(findings []rules.Finding) []string {
 func render(ont *ontology.Ontology, last *report.Payload, snapshots []snapshot, live struct {
 	Last     liveSection
 	Worktree liveSection
-}) string {
+}, hasGraph bool, g graph.Graph) string {
 	var lines []string
 	push := func(s ...string) { lines = append(lines, s...) }
 
@@ -190,6 +192,41 @@ func render(ont *ontology.Ontology, last *report.Payload, snapshots []snapshot, 
 			}
 			for _, s := range limit {
 				push(fmt.Sprintf("| %s | %s | %d | [open](./%s/index.md) |", s.Date, s.Verdict, s.ScenarioCount, s.Date))
+			}
+		}
+	}
+	push("")
+
+	push("## Graph Coverage", "")
+	push("_Knowledge-graph MVP — from `coherence index` (see `.coherence/graph.json`)._", "")
+	if !hasGraph {
+		push("_No graph on disk yet. Run `coherence index` to build one._")
+	} else {
+		push(fmt.Sprintf("- Nodes: **%d total**", g.Counts.TotalNodes))
+		push(fmt.Sprintf("- Edges: **%d total**", g.Counts.TotalEdges))
+		push(fmt.Sprintf("- Generated: %s", g.GeneratedAt))
+		push("")
+		if len(g.Counts.NodesByKind) > 0 {
+			push("| Node kind | Count |", "| --- | --- |")
+			kinds := make([]string, 0, len(g.Counts.NodesByKind))
+			for k := range g.Counts.NodesByKind {
+				kinds = append(kinds, string(k))
+			}
+			sort.Strings(kinds)
+			for _, k := range kinds {
+				push(fmt.Sprintf("| `%s` | %d |", k, g.Counts.NodesByKind[graph.NodeKind(k)]))
+			}
+			push("")
+		}
+		if len(g.Counts.EdgesByKind) > 0 {
+			push("| Edge kind | Count |", "| --- | --- |")
+			kinds := make([]string, 0, len(g.Counts.EdgesByKind))
+			for k := range g.Counts.EdgesByKind {
+				kinds = append(kinds, string(k))
+			}
+			sort.Strings(kinds)
+			for _, k := range kinds {
+				push(fmt.Sprintf("| `%s` | %d |", k, g.Counts.EdgesByKind[graph.EdgeKind(k)]))
 			}
 		}
 	}

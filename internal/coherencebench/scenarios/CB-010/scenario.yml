@@ -1,0 +1,15 @@
+id: CB-010
+name: coherent multi-file metric update passes
+description: |
+  Metric yaml + dashboard fixture + glossary + evidence packet are all
+  updated together. Engine must NOT fire — this is the "happy path" guard
+  against over-eager rules.
+status: deterministic
+changed_files:
+  - rill/metrics/org_metrics.yaml
+  - frontend/public/fixtures/dashboard.json
+  - docs/specs/metrics-glossary.md
+  - docs/evidence/2026-05-19/README.md
+expected:
+  fires: []
+  blocking_error: false

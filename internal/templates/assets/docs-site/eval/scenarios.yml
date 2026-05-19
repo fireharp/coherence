@@ -1,0 +1,14 @@
+scenarios:
+  - id: spec-without-decision-or-evidence
+    description: spec changed without ADR/IDR/evidence pair
+    changed_files:
+      - docs/specs/auth.md
+    expect_fires:
+      - spec-change-needs-decision-or-evidence
+
+  - id: spec-with-adr-passes
+    description: coherent spec + ADR update
+    changed_files:
+      - docs/specs/auth.md
+      - docs/decisions/ADR-007.md
+    expect_fires: []

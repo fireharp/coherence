@@ -1,0 +1,15 @@
+id: CB-004
+name: code references US-999 but no story exists
+description: |
+  Non-Markdown staged addition mentions an undefined US-### id. The IDs
+  scanner detects this in `coherence scan`/`check`, but it reads added diff
+  content rather than only path lists, so this CB suite (which runs against
+  file-name lists only) cannot exercise it today. Reaching deterministic
+  status requires extending the scenario format to embed file content.
+status: skip
+changed_files:
+  - src/handlers/auth.go
+expected:
+  fires:
+    - unknown-us-id
+  blocking_error: false

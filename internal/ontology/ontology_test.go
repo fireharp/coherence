@@ -86,6 +86,40 @@ func TestLoadRejectsMissingFields(t *testing.T) {
 	}
 }
 
+func TestParseSuggestedCommandsAndCommands(t *testing.T) {
+	src := []byte(`
+version: 1
+commands:
+  test:
+    - go test ./...
+  build:
+    - go build ./cmd/coherence
+rules:
+  - id: cli-docs-need-build-validation
+    when: ["cmd/**/*"]
+    expect_any: ["go.mod"]
+    severity: warn
+    message: "Build validation required."
+    suggested_commands:
+      - go test ./...
+      - go build ./cmd/coherence
+`)
+	ont, err := Parse(src, "<test>")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(ont.Commands["test"]) != 1 || ont.Commands["test"][0] != "go test ./..." {
+		t.Errorf("commands.test = %v", ont.Commands["test"])
+	}
+	r := ont.Rules[0]
+	if len(r.SuggestedCommands) != 2 {
+		t.Fatalf("suggested_commands len = %d, want 2", len(r.SuggestedCommands))
+	}
+	if r.SuggestedCommands[0] != "go test ./..." {
+		t.Errorf("suggested_commands[0] = %q", r.SuggestedCommands[0])
+	}
+}
+
 func TestParseRealOntology(t *testing.T) {
 	// the repo's own ontology.yml must still load
 	wd, _ := os.Getwd()

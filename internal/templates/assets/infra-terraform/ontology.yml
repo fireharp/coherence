@@ -1,0 +1,54 @@
+version: 1
+# Infra/Terraform template — .tf modules, plans, and runbooks.
+
+commands:
+  test:
+    - terraform validate
+  build:
+    - terraform plan -lock=false
+  lint:
+    - terraform fmt -check -recursive
+    - tflint
+
+rules:
+  - id: tf-change-needs-plan-or-runbook
+    when:
+      - "**/*.tf"
+      - "**/*.tfvars"
+    expect_any:
+      - "docs/runbooks/**/*.md"
+      - "docs/plans/**/*.md"
+      - "docs/decisions/ADR-*.md"
+      - "modules/**/README.md"
+      - "CHANGELOG.md"
+    severity: warn
+    message: "Terraform changed; capture the plan/runbook/ADR update so on-call knows the new shape."
+    suggested_commands:
+      - terraform fmt -recursive
+      - terraform validate
+      - terraform plan -lock=false
+
+  - id: module-change-needs-variable-doc
+    when:
+      - "modules/**/variables.tf"
+      - "modules/**/outputs.tf"
+    expect_any:
+      - "modules/**/README.md"
+      - "docs/modules/**/*.md"
+    severity: warn
+    message: "Module inputs/outputs changed; refresh the module README."
+    suggested_commands:
+      - terraform-docs markdown modules/
+
+  - id: tf-state-config-needs-review
+    when:
+      - "backend.tf"
+      - "**/backend.tf"
+      - "providers.tf"
+    expect_any:
+      - "docs/decisions/ADR-*.md"
+      - "docs/runbooks/**/*.md"
+    severity: error
+    message: "Backend/provider config changed; require a paired ADR or runbook update."
+    suggested_commands:
+      - terraform init -reconfigure

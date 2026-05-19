@@ -1,0 +1,50 @@
+version: 1
+# Monorepo template — packages/* + apps/* layout (pnpm/turbo/nx style).
+
+commands:
+  test:
+    - pnpm -r test
+  build:
+    - pnpm -r build
+  lint:
+    - pnpm -r lint
+
+rules:
+  - id: package-source-needs-test
+    when:
+      - "packages/*/src/**/*"
+    expect_any:
+      - "packages/*/tests/**/*"
+      - "packages/*/src/**/*.test.*"
+      - "packages/*/src/**/*.spec.*"
+    severity: warn
+    message: "Workspace package source changed without a colocated test edit."
+    suggested_commands:
+      - pnpm --filter ./packages/* test
+
+  - id: app-change-needs-shared-package-or-doc
+    when:
+      - "apps/*/src/**/*"
+    expect_any:
+      - "packages/**/*"
+      - "apps/*/README.md"
+      - "docs/**/*.md"
+    severity: warn
+    message: "App changed; verify shared-package boundary or app README stays accurate."
+    suggested_commands:
+      - pnpm -r build
+
+  - id: workspace-manifest-change-needs-lockfile
+    when:
+      - "pnpm-workspace.yaml"
+      - "turbo.json"
+      - "nx.json"
+      - "package.json"
+    expect_any:
+      - "pnpm-lock.yaml"
+      - "package-lock.json"
+    severity: error
+    message: "Workspace manifest changed; lockfile must be co-staged."
+    suggested_commands:
+      - pnpm install
+      - git add pnpm-lock.yaml

@@ -1,0 +1,39 @@
+id: CB-013
+name: generated artifact older than generator/source
+description: |
+  The baseline has a generator source and its generated artifact both
+  committed. The current state modifies only the generator source — the
+  artifact is left stale (its content_hash unchanged). Because the
+  baseline now lives as a real `HEAD` commit, `git diff HEAD` surfaces
+  only the source change. The ontology's severity=error rule fires via
+  `required_edge_breakage` (changed source without changed artifact in
+  the same set), and the verdict bumps to `warn`.
+status: deterministic
+base_files:
+  ontology.yml: |
+    version: 1
+    rules:
+      - id: fixture-source-needs-output
+        when: ["src/build-fixtures.go"]
+        expect_any: ["fixtures/dashboard.json"]
+        severity: error
+        message: "Fixture source changed; regenerate fixtures/dashboard.json."
+  src/build-fixtures.go: |
+    package fixtures
+
+    func Build() string { return "v1" }
+  fixtures/dashboard.json: |
+    {
+      "version": "v1",
+      "metrics": ["a", "b"]
+    }
+files:
+  src/build-fixtures.go: |
+    package fixtures
+
+    func Build() string { return "v2-with-changes" }
+expected:
+  fires: []
+  blocking_error: false
+  drift:
+    verdict: warn

@@ -1,3 +1,5 @@
 .coherence/
 bin/
 .DS_Store
+repomix*.*
+.env

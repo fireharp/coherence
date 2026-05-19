@@ -1,0 +1,12 @@
+id: CB-005
+name: spec changes without ADR/IDR/evidence pair
+description: |
+  Spec markdown changed without a decision (ADR/IDR) or evidence packet
+  co-staged. Engine should warn about the missing decision/evidence link.
+status: deterministic
+changed_files:
+  - docs/specs/auth.md
+expected:
+  fires:
+    - spec-change-needs-decision-or-evidence
+  blocking_error: false
