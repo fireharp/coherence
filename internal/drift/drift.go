@@ -730,15 +730,56 @@ func computeUnimplementedStories(g graph.Graph) UnimplementedStories {
 // nodes and checks whether each endpoint's source file has any incoming
 // `verifies` edge from a test. Endpoints whose source isn't verified are
 // the orphans — actionable signal: "this route has no test coverage".
-func computeOrphanEndpoints(g graph.Graph) OrphanEndpoints {
-	// endpoint_id → defining file_id
+// When a base graph is supplied, also reports endpoint transitions:
+// NewlyOrphanedEndpoints are endpoints whose covering test was removed
+// since baseline (the actionable "you uncovered this route" signal).
+// NewlyCoveredEndpoints went the other direction.
+func computeOrphanEndpoints(base *graph.Graph, current graph.Graph) OrphanEndpoints {
+	orphans, coveredSet, hasEndpointInCurrent := endpointCoverageState(current)
+	sort.Strings(orphans)
+
+	newlyOrphaned := []string{}
+	newlyCovered := []string{}
+	if base != nil {
+		_, baseCoveredSet, hasEndpointInBase := endpointCoverageState(*base)
+		_ = hasEndpointInBase
+		for _, ep := range allEndpoints(current) {
+			if !endpointPresentInBase(*base, ep) {
+				continue
+			}
+			wasCovered := baseCoveredSet[ep]
+			nowCovered := coveredSet[ep]
+			switch {
+			case wasCovered && !nowCovered:
+				newlyOrphaned = append(newlyOrphaned, ep)
+			case !wasCovered && nowCovered:
+				newlyCovered = append(newlyCovered, ep)
+			}
+		}
+		sort.Strings(newlyOrphaned)
+		sort.Strings(newlyCovered)
+	}
+	_ = hasEndpointInCurrent
+
+	return OrphanEndpoints{
+		Score:                  len(orphans),
+		Orphans:                orphans,
+		BaseAvailable:          base != nil,
+		NewlyOrphanedEndpoints: newlyOrphaned,
+		NewlyCoveredEndpoints:  newlyCovered,
+	}
+}
+
+// endpointCoverageState returns (orphans, coveredSet, hasAnyEndpoint)
+// for the graph: orphans is the slice of endpoint ids whose defining
+// file has no incoming verifies edge; coveredSet is the inverse.
+func endpointCoverageState(g graph.Graph) ([]string, map[string]bool, bool) {
 	source := map[string]string{}
 	for _, e := range g.Edges {
 		if e.Kind == graph.EdgeDefines && strings.HasPrefix(e.To, "endpoint:") {
 			source[e.To] = e.From
 		}
 	}
-	// file_id → has any incoming verifies
 	verified := map[string]bool{}
 	for _, e := range g.Edges {
 		if e.Kind == graph.EdgeVerifies {
@@ -746,16 +787,38 @@ func computeOrphanEndpoints(g graph.Graph) OrphanEndpoints {
 		}
 	}
 	orphans := []string{}
+	covered := map[string]bool{}
 	for ep, src := range source {
-		if !verified[src] {
+		if verified[src] {
+			covered[ep] = true
+		} else {
 			orphans = append(orphans, ep)
 		}
 	}
-	sort.Strings(orphans)
-	if orphans == nil {
-		orphans = []string{}
+	return orphans, covered, len(source) > 0
+}
+
+// allEndpoints returns the list of endpoint node ids in the graph.
+func allEndpoints(g graph.Graph) []string {
+	out := []string{}
+	for _, n := range g.Nodes {
+		if n.Kind == graph.NodeEndpoint {
+			out = append(out, n.ID)
+		}
 	}
-	return OrphanEndpoints{Score: len(orphans), Orphans: orphans}
+	return out
+}
+
+// endpointPresentInBase reports whether an endpoint node id exists in
+// the base graph. Used to avoid counting brand-new endpoints as
+// transitions.
+func endpointPresentInBase(base graph.Graph, id string) bool {
+	for _, n := range base.Nodes {
+		if n.Kind == graph.NodeEndpoint && n.ID == id {
+			return true
+		}
+	}
+	return false
 }
 
 // computeDependencyCycles runs DFS over the dir→dir adjacency derived
@@ -1429,6 +1492,12 @@ func computeVerdict(r Report) string {
 		return VerdictWarn
 	}
 	if r.OrphanEndpoints.Score > 0 {
+		return VerdictTelemetry
+	}
+	// Endpoint coverage regression: a test that covered an endpoint in
+	// base no longer covers it in current. Same diff-aware promotion
+	// pattern as concept/claim regressions.
+	if len(r.OrphanEndpoints.NewlyOrphanedEndpoints) > 0 {
 		return VerdictTelemetry
 	}
 	if r.UnimplementedStories.Convention && r.UnimplementedStories.Score > 0 {
