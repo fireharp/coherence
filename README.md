@@ -637,8 +637,8 @@ what surfaces "a new ADR appeared" without re-parsing prose.
 
 `coherence drift` reads the current ontology, snapshot, and graph (building
 fresh internally and loading `.coherence/{snapshot,graph}.json` as baselines),
-computes drift meters, and writes `.coherence/drift.json`. M4 MVP ships four
-meters today:
+computes drift meters, and writes `.coherence/drift.json`. Ships 19 meters
+today (all 9 GOAL.md M4 meters plus 10 extras):
 
 | Meter                     | Reads                                | Today's signal                                              |
 | ------------------------- | ------------------------------------ | ----------------------------------------------------------- |

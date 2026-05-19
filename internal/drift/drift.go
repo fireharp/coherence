@@ -2068,13 +2068,17 @@ func renderActions(r Report) []string {
 		out = append(out, "break the import cycle (refactor a shared interface to a third package)")
 	}
 	if r.OrphanEndpoints.Score > 0 {
-		// Format orphans as "endpoint→source" pairs when sources are
-		// known, so the agent sees both the route and the file the
-		// test belongs alongside.
+		// Format orphans as "endpoint→source→suggested-test-path"
+		// triples when known, so the agent sees the route AND the
+		// concrete test file it should create.
 		labels := make([]string, 0, len(r.OrphanEndpoints.Orphans))
 		for _, ep := range r.OrphanEndpoints.Orphans {
 			if src, ok := r.OrphanEndpoints.OrphanSources[ep]; ok && src != "" {
-				labels = append(labels, ep+" (in "+src+")")
+				if tp := graph.SuggestTestFilePath(src); tp != "" {
+					labels = append(labels, ep+" (add "+tp+")")
+				} else {
+					labels = append(labels, ep+" (in "+src+")")
+				}
 			} else {
 				labels = append(labels, ep)
 			}
@@ -2129,6 +2133,13 @@ func renderActions(r Report) []string {
 		}
 		out = append(out, "fix the dangling TS/Py import path(s) or restore the deleted module: "+
 			joinShort(specs, 3))
+	}
+	// Silenced meters: a one-line "how to activate this signal"
+	// nudge. Only when there's nothing higher-priority going on (no
+	// actions queued) — otherwise the immediate fixes take priority.
+	if len(out) == 0 && len(r.SilencedMeters) > 0 {
+		out = append(out, "to activate "+strings.Join(r.SilencedMeters, ", ")+
+			": link a concept/claim/endpoint to a verifiable artifact (test, evidence, or implements claim from code)")
 	}
 	if len(out) == 0 {
 		out = append(out, "no action needed")

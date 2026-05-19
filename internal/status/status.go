@@ -387,7 +387,7 @@ func render(ont *ontology.Ontology, last *report.Payload, snapshots []snapshot, 
 	push("")
 
 	push("## Graph Coverage", "")
-	push("_Knowledge-graph MVP — from `coherence index` (see `.coherence/graph.json`)._", "")
+	push("_Knowledge graph snapshot from `coherence index` (see `.coherence/graph.json`)._", "")
 	if !hasGraph {
 		push("_No graph on disk yet. Run `coherence index` to build one._")
 	} else {

@@ -49,13 +49,13 @@ const usage = `coherence <subcommand> [flags]
   doctor [--json] [--ontology=path]       validate ontology, hook, .gitignore
   bench [--suite=templates|coherencebench|external|all] [--template=<name>]
         [--json] [--write-report]          run shipped scenario / eval suites
-  index [--json]                          write .coherence/snapshot.json (Merkle + semantic hashes)
+  index [--json] [--dry-run]              write .coherence/snapshot.json (Merkle + semantic hashes)
   diff [--base=path] [--json]             compare current snapshot to base
   drift [--json|--summary] [--strict]     compute drift meters → .coherence/drift.json (--summary: 1-line; --strict: exit 1 on telemetry)
   report                                  print the last report JSON
   status [--json] [--ontology=path]       rewrite .coherence/STATUS.md (or emit JSON payload)
 
-  templates                               list available init templates
+  templates [--json]                      list available init templates with kind + description
 
 exit codes:
   0 — clean (no actionable findings)
@@ -670,8 +670,25 @@ func run() int {
 		return 0
 
 	case "templates":
-		for _, n := range templates.Names() {
-			fmt.Println(n)
+		if boolFlag(args, "json") {
+			enc := json.NewEncoder(os.Stdout)
+			enc.SetIndent("", "  ")
+			if err := enc.Encode(templates.Catalogue()); err != nil {
+				fmt.Fprintln(os.Stderr, "coherence: fatal:", err)
+				return 2
+			}
+			return 0
+		}
+		entries := templates.Catalogue()
+		// Calculate column widths for tidy alignment.
+		maxName := 0
+		for _, e := range entries {
+			if len(e.Name) > maxName {
+				maxName = len(e.Name)
+			}
+		}
+		for _, e := range entries {
+			fmt.Printf("  %-*s  %-7s  %s\n", maxName, e.Name, e.Kind, e.Description)
 		}
 		return 0
 
@@ -679,23 +696,28 @@ func run() int {
 		return runBench(args, rootDir)
 
 	case "index":
+		dryRun := boolFlag(args, "dry-run")
 		snap, err := snapshot.Compute(rootDir)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, "coherence: fatal:", err)
 			return 2
 		}
-		if err := snapshot.Write(rootDir, snap); err != nil {
-			fmt.Fprintln(os.Stderr, "coherence: fatal:", err)
-			return 2
+		if !dryRun {
+			if err := snapshot.Write(rootDir, snap); err != nil {
+				fmt.Fprintln(os.Stderr, "coherence: fatal:", err)
+				return 2
+			}
 		}
 		g, err := graph.Build(rootDir)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, "coherence: fatal:", err)
 			return 2
 		}
-		if err := graph.Write(rootDir, g); err != nil {
-			fmt.Fprintln(os.Stderr, "coherence: fatal:", err)
-			return 2
+		if !dryRun {
+			if err := graph.Write(rootDir, g); err != nil {
+				fmt.Fprintln(os.Stderr, "coherence: fatal:", err)
+				return 2
+			}
 		}
 		if boolFlag(args, "json") {
 			enc := json.NewEncoder(os.Stdout)
@@ -703,14 +725,19 @@ func run() int {
 			combined := map[string]any{
 				"snapshot": snap,
 				"graph":    g,
+				"dry_run":  dryRun,
 			}
 			if err := enc.Encode(combined); err != nil {
 				fmt.Fprintln(os.Stderr, "coherence: fatal:", err)
 				return 2
 			}
 		} else {
-			fmt.Printf("coherence: wrote %s\n", filepath.Join(".coherence", "snapshot.json"))
-			fmt.Printf("coherence: wrote %s\n", filepath.Join(".coherence", "graph.json"))
+			if dryRun {
+				fmt.Println("coherence: --dry-run (no files written)")
+			} else {
+				fmt.Printf("coherence: wrote %s\n", filepath.Join(".coherence", "snapshot.json"))
+				fmt.Printf("coherence: wrote %s\n", filepath.Join(".coherence", "graph.json"))
+			}
 			fmt.Printf("coherence: indexed %d file(s), %d dir(s), root=%s\n",
 				snap.FileCount, len(snap.Directories), snap.RootHash[:12])
 			fmt.Printf("coherence: graph: %d node(s), %d edge(s)\n",
