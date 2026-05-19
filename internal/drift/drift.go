@@ -1861,9 +1861,14 @@ func renderExplanations(r Report) []string {
 			r.DependencyCycles.Score, strings.Join(first, " → ")))
 	}
 	if r.OrphanEndpoints.Score > 0 {
+		conv := ""
+		if !r.OrphanEndpoints.Convention {
+			conv = " — no verifies edges in repo, so silenced from verdict"
+		}
 		out = append(out, fmt.Sprintf(
-			"orphan endpoints: %d route(s) defined in files with no test coverage (%s).",
-			r.OrphanEndpoints.Score, joinShort(r.OrphanEndpoints.Orphans, 4)))
+			"orphan endpoints: %d route(s) defined in files with no test coverage%s (%s).",
+			r.OrphanEndpoints.Score, conv,
+			joinShort(r.OrphanEndpoints.Orphans, 4)))
 	}
 	if r.UnimplementedStories.Convention && r.UnimplementedStories.Score > 0 {
 		out = append(out, fmt.Sprintf(
