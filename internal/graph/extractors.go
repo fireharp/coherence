@@ -73,6 +73,9 @@ func Build(rootDir string) (Graph, error) {
 	// Pass 9: data_model nodes from SQL/proto/GraphQL schema files.
 	extractSchemas(b, rootDir, tracked)
 
+	// Pass 10: command nodes from Makefile / *.mk target declarations.
+	extractMakefile(b, rootDir, tracked)
+
 	return b.Build(), nil
 }
 
@@ -204,12 +207,12 @@ var (
 	// comma-joined value text.
 	relationLineRe = regexp.MustCompile(`(?m)^(supersedes|contradicts|mirrors|invalidates):\s*(.+?)\s*$`)
 	supersedesIDRe = regexp.MustCompile(`(US|ADR|IDR)-\d{3}`)
-	headingRe       = regexp.MustCompile(`(?m)^#\s+(.+)$`)
-	titleFrontRe    = regexp.MustCompile(`(?m)^title:\s*(.+?)\s*$`)
-	mdLinkRe        = regexp.MustCompile(`\[[^\]]*\]\(([^)\s#]+)(?:#[^)]*)?\)`)
-	schemeRe        = regexp.MustCompile(`^[a-zA-Z][a-zA-Z0-9+.\-]*:`)
-	slugStripRe     = regexp.MustCompile(`[^a-z0-9]+`)
-	bulletRe        = regexp.MustCompile(`(?m)^\s*[-*+]\s+(.+)$`)
+	headingRe      = regexp.MustCompile(`(?m)^#\s+(.+)$`)
+	titleFrontRe   = regexp.MustCompile(`(?m)^title:\s*(.+?)\s*$`)
+	mdLinkRe       = regexp.MustCompile(`\[[^\]]*\]\(([^)\s#]+)(?:#[^)]*)?\)`)
+	schemeRe       = regexp.MustCompile(`^[a-zA-Z][a-zA-Z0-9+.\-]*:`)
+	slugStripRe    = regexp.MustCompile(`[^a-z0-9]+`)
+	bulletRe       = regexp.MustCompile(`(?m)^\s*[-*+]\s+(.+)$`)
 )
 
 // claimVerbs is the closed set of leading modal/assertive verbs that mark a
@@ -219,7 +222,7 @@ var (
 var claimVerbs = map[string]bool{
 	"must": true, "should": true, "shall": true,
 	"requires": true, "require": true,
-	"ensures":  true, "ensure": true,
+	"ensures": true, "ensure": true,
 	"guarantees": true, "guarantee": true,
 	"cannot": true, "will": true,
 }
