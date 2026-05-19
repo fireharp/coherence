@@ -98,6 +98,20 @@ func stringFlag(args parsedArgs, name, fallback string) string {
 	return fallback
 }
 
+// strictPromotionMessage returns the stderr line emitted when --strict
+// flips a telemetry verdict to exit 1. When regression_count > 0 the
+// message names the count specifically so the user knows the drift
+// included actual diff-aware regressions (newly_orphaned_concepts etc.)
+// rather than just movement above the noise floor.
+func strictPromotionMessage(regressionCount int) string {
+	if regressionCount > 0 {
+		return fmt.Sprintf(
+			"coherence: --strict promoted telemetry → exit 1 (%d regression(s) detected)",
+			regressionCount)
+	}
+	return "coherence: --strict promoted telemetry → exit 1 (drift movement detected)"
+}
+
 func resolveOntologyPath(rootDir string, args parsedArgs) string {
 	raw, _ := args.flags["ontology"].(string)
 	if raw == "" {
@@ -393,8 +407,16 @@ func runEvaluation(sub string, fs fileSet, args parsedArgs, rootDir, ontPath str
 	}
 
 	driftRegressionCount := 0
+	var driftRegressions []outcome.Regression
 	if driftReport != nil {
 		driftRegressionCount = driftReport.Regressions.Count
+		for _, e := range driftReport.Regressions.Entries {
+			driftRegressions = append(driftRegressions, outcome.Regression{
+				Kind:            e.Kind,
+				ID:              e.ID,
+				SuggestedAction: e.SuggestedAction,
+			})
+		}
 	}
 	oc := outcome.Compute(outcome.Input{
 		Subcommand:           sub,
@@ -405,6 +427,7 @@ func runEvaluation(sub string, fs fileSet, args parsedArgs, rootDir, ontPath str
 		IncludeUntracked:     fs.includeUntracked,
 		DriftVerdict:         driftVerdict,
 		DriftRegressionCount: driftRegressionCount,
+		DriftRegressions:     driftRegressions,
 	})
 
 	suggested := rules.AggregateSuggestedCommands(findings)
@@ -573,7 +596,7 @@ func run() int {
 		// Mirrors `coherence drift --strict` so CI gates can require
 		// zero-drift on the full review flow too.
 		if exit == 0 && boolFlag(args, "strict") && payload.DriftVerdict == drift.VerdictTelemetry {
-			fmt.Fprintln(os.Stderr, "coherence: --strict promoted telemetry → exit 1 (drift movement detected)")
+			fmt.Fprintln(os.Stderr, strictPromotionMessage(payload.DriftRegressionCount))
 			exit = 1
 		}
 		return exit
@@ -595,7 +618,7 @@ func run() int {
 				return 2
 			}
 			if exit == 0 && boolFlag(args, "strict") && payload.DriftVerdict == drift.VerdictTelemetry {
-				fmt.Fprintln(os.Stderr, "coherence: --strict promoted telemetry → exit 1 (drift movement detected)")
+				fmt.Fprintln(os.Stderr, strictPromotionMessage(payload.DriftRegressionCount))
 				exit = 1
 			}
 			return exit
@@ -781,7 +804,7 @@ func run() int {
 			return 1
 		}
 		if boolFlag(args, "strict") && rep.Verdict == drift.VerdictTelemetry {
-			fmt.Fprintln(os.Stderr, "coherence: --strict promoted telemetry → exit 1 (drift movement detected)")
+			fmt.Fprintln(os.Stderr, strictPromotionMessage(rep.Regressions.Count))
 			return 1
 		}
 		return 0

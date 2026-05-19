@@ -708,16 +708,34 @@ field aggregating the four diff-aware `newly_*` lists
 `newly_uncovered_stories`, `newly_orphaned_endpoints`) plus a `count`
 total. A single check on `drift.regressions.count > 0` answers "did this
 commit regress anything?" without navigating four nested meter blocks.
+`drift.regressions.entries` is the preferred iteration surface: a flat
+`[{kind, id, suggested_action}, …]` list (kinds: `newly_orphaned_concept` /
+`newly_unsupported_claim` / `newly_uncovered_story` /
+`newly_orphaned_endpoint`). Each entry carries its own
+`suggested_action` string with the specific node id baked in, so an
+agent looping the entries gets both the WHAT and the HOW in one pass —
+no separate cross-reference into the top-level `suggested_actions`
+list needed.
 
 ### `review` now includes drift
 
 `coherence review` automatically runs drift after the rules engine and
 embeds the full drift report in its JSON payload under the `drift` key. The
-top-level outcome contract gains two fields:
+top-level outcome contract gains three fields:
 
 - `drift_verdict` — `clean` / `telemetry` / `warn`,
 - `telemetry_only_movement` — set to `true` when drift is `telemetry`
-  (matching the JSON outcome contract spec).
+  (matching the JSON outcome contract spec),
+- `drift_regression_count` — total entries across the four diff-aware
+  regression lists (`newly_orphaned_concepts` + `newly_unsupported_claims` +
+  `newly_uncovered_stories` + `newly_orphaned_endpoints`). Omitted when 0.
+  Agents can gate on `drift_regression_count > 0` for a single-key
+  regression check.
+- `drift_regressions` — the full typed list of regressions
+  (`[{kind, id, suggested_action}, …]`) inline in the outcome contract.
+  Omitted when empty. Lets an agent reading just the outcome JSON act
+  on the WHAT and the HOW without descending into the full drift
+  report.
 
 `scan` and `check` deliberately skip drift to stay fast — they're the
 pre-commit gate. `review` is where the full picture comes together.

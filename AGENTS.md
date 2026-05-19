@@ -128,8 +128,11 @@ flow into `drift.contradiction` and bump the verdict to `warn` when count
 Agents that consume `coherence` output should read the `--json` outcome
 contract rather than the human prose: `safe_to_commit`, `review_recommended`,
 `blocking_error`, `telemetry_only_movement`, `staged`, `worktree`,
-`untracked_files_excluded`, `untracked_file_count`, and
-`recommended_next_command`. The same vocabulary appears at the top level of
+`untracked_files_excluded`, `untracked_file_count`,
+`recommended_next_command`, `drift_verdict`, and `drift_regression_count`
+(the count of diff-aware regression entries — gate on
+`drift_regression_count > 0` for a single-key "did anything regress?"
+check; omitted when 0). The same vocabulary appears at the top level of
 `.coherence/last-report.json`. Ontology rules may carry `suggested_commands:`
 which are surfaced both per-finding and aggregated under top-level
 `suggested_commands` in the JSON payload — agents should prefer those over

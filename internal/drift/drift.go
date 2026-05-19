@@ -334,18 +334,34 @@ type SemanticMovement struct {
 	ChangedDocs            []string `json:"changed_docs"`
 }
 
+// RegressionEntry is one transition in the diff-aware suite. Kind is
+// one of `newly_orphaned_concept` / `newly_unsupported_claim` /
+// `newly_uncovered_story` / `newly_orphaned_endpoint`; ID is the node
+// id (`concept:auth`, `us:US-001`, etc.). SuggestedAction is a short
+// imperative string the agent can act on or surface to a human. Lets
+// agents iterate every regression in a single loop and get the
+// what-and-how in one place.
+type RegressionEntry struct {
+	Kind            string `json:"kind"`
+	ID              string `json:"id"`
+	SuggestedAction string `json:"suggested_action"`
+}
+
 // Regressions aggregates the diff-aware `newly_*` lists from the four
 // meters that track support transitions. Surfaced at the top level of
 // the drift report so agents can answer "did this commit regress
 // anything?" with a single navigation rather than four nested checks.
 // Count is the total number of regression entries across all four
-// lists — non-zero means at least one transition was detected.
+// lists — non-zero means at least one transition was detected. Entries
+// is a flat typed list — preferred for new code; the per-kind lists
+// remain for backwards compatibility.
 type Regressions struct {
-	Count                  int      `json:"count"`
-	NewlyOrphanedConcepts  []string `json:"newly_orphaned_concepts"`
-	NewlyUnsupportedClaims []string `json:"newly_unsupported_claims"`
-	NewlyUncoveredStories  []string `json:"newly_uncovered_stories"`
-	NewlyOrphanedEndpoints []string `json:"newly_orphaned_endpoints"`
+	Count                  int               `json:"count"`
+	Entries                []RegressionEntry `json:"entries"`
+	NewlyOrphanedConcepts  []string          `json:"newly_orphaned_concepts"`
+	NewlyUnsupportedClaims []string          `json:"newly_unsupported_claims"`
+	NewlyUncoveredStories  []string          `json:"newly_uncovered_stories"`
+	NewlyOrphanedEndpoints []string          `json:"newly_orphaned_endpoints"`
 }
 
 // Report is the on-disk shape of `.coherence/drift.json`.
@@ -493,7 +509,9 @@ func ComputeWith(rootDir, ontologyPath string, opts ComputeOptions) (Report, err
 // aggregateRegressions copies the diff-aware `newly_*` lists from the
 // four meters that track support transitions into a single navigable
 // surface. `Count` is the sum of entries across all four. Empty lists
-// stay as `[]` (not nil) so the JSON shape is stable.
+// stay as `[]` (not nil) so the JSON shape is stable. `Entries` is a
+// flat typed list (Kind + ID) — the preferred iteration surface for
+// new agents; the per-kind lists remain for backwards compatibility.
 func aggregateRegressions(r Report) Regressions {
 	out := Regressions{
 		NewlyOrphanedConcepts:  cloneList(r.PathLoss.NewlyOrphanedConcepts),
@@ -505,6 +523,35 @@ func aggregateRegressions(r Report) Regressions {
 		len(out.NewlyUnsupportedClaims) +
 		len(out.NewlyUncoveredStories) +
 		len(out.NewlyOrphanedEndpoints)
+	out.Entries = make([]RegressionEntry, 0, out.Count)
+	for _, id := range out.NewlyOrphanedConcepts {
+		out.Entries = append(out.Entries, RegressionEntry{
+			Kind:            "newly_orphaned_concept",
+			ID:              id,
+			SuggestedAction: "restore a support path to " + id + " (add/restore the test, evidence, or implements link that backed it)",
+		})
+	}
+	for _, id := range out.NewlyUnsupportedClaims {
+		out.Entries = append(out.Entries, RegressionEntry{
+			Kind:            "newly_unsupported_claim",
+			ID:              id,
+			SuggestedAction: "restore backing for " + id + " (add an evidence packet or restore the verifying test/code)",
+		})
+	}
+	for _, id := range out.NewlyUncoveredStories {
+		out.Entries = append(out.Entries, RegressionEntry{
+			Kind:            "newly_uncovered_story",
+			ID:              id,
+			SuggestedAction: "re-link " + id + " from a spec, README, or evidence packet so the trace coverage holds",
+		})
+	}
+	for _, id := range out.NewlyOrphanedEndpoints {
+		out.Entries = append(out.Entries, RegressionEntry{
+			Kind:            "newly_orphaned_endpoint",
+			ID:              id,
+			SuggestedAction: "add or restore a test that verifies the source file defining " + id,
+		})
+	}
 	return out
 }
 
@@ -1840,6 +1887,18 @@ func Human(r Report) string {
 	}
 	fmt.Fprintln(&b)
 	fmt.Fprintln(&b)
+	// Surface regressions prominently after the header so human readers
+	// can answer "what just broke?" without scanning the 19-meter list.
+	if r.Regressions.Count > 0 {
+		fmt.Fprintln(&b, "regressions since baseline:")
+		for _, e := range r.Regressions.Entries {
+			fmt.Fprintf(&b, "  [%s] %s\n", e.Kind, e.ID)
+			if e.SuggestedAction != "" {
+				fmt.Fprintf(&b, "    → %s\n", e.SuggestedAction)
+			}
+		}
+		fmt.Fprintln(&b)
+	}
 	fmt.Fprintf(&b, "  required_edge_breakage: %.2f (broken=%d/%d)\n",
 		r.RequiredEdgeBreakage.Score,
 		r.RequiredEdgeBreakage.BrokenCount, r.RequiredEdgeBreakage.TotalRules)

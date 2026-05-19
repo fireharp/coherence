@@ -82,8 +82,8 @@ func TestComputeSurfacesOntologyRuleCount(t *testing.T) {
 
 func TestComputeReadsGraphCountsWhenAvailable(t *testing.T) {
 	dir := gitInit(t, map[string]string{
-		"docs/auth.md":      "# Authentication\n\n## Login flow\n",
-		"src/server.go":     "package main\nfunc main() {}\n",
+		"docs/auth.md":  "# Authentication\n\n## Login flow\n",
+		"src/server.go": "package main\nfunc main() {}\n",
 	})
 	// Build the graph via index.
 	indexAndWrite(t, dir)
