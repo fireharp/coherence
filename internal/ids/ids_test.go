@@ -84,6 +84,32 @@ func TestScanStillFiresOnBareReference(t *testing.T) {
 	}
 }
 
+func TestSanitizeIDSearchTextBacktickInsideDoubleQuote(t *testing.T) {
+	// Backticks inside a `"..."` string literal (e.g., a regex pattern
+	// being passed to MustCompile) must not pair with later real
+	// raw-string backticks. The sanitizer's quote-pass MUST run first
+	// to neutralize them. Regression guard: prior ordering broke
+	// SanitizeIDSearchText on files like internal/ids/ids.go itself.
+	src := "// covers `US-001` example\n" +
+		"var re = regexp.MustCompile(\"(?s)`[^`]*`\")\n" +
+		"// also `US-002` example\n"
+	got := SanitizeIDSearchText(src)
+	for _, want := range []string{"US-001", "US-002"} {
+		if strings.Contains(got, want) {
+			t.Errorf("sanitize should have stripped %s when backticks-in-quotes are present, got: %q", want, got)
+		}
+	}
+}
+
+func TestSanitizeIDSearchTextLeavesBareReferences(t *testing.T) {
+	// Bare references outside any quote/backtick span must survive.
+	src := "// implements US-999\n"
+	got := SanitizeIDSearchText(src)
+	if !strings.Contains(got, "US-999") {
+		t.Errorf("bare comment reference should survive sanitize, got %q", got)
+	}
+}
+
 func TestScanDedupesPerFile(t *testing.T) {
 	idx := &Index{
 		US: map[string]struct{}{}, ADR: map[string]struct{}{}, IDR: map[string]struct{}{},

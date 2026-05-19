@@ -85,20 +85,12 @@ var (
 // graph `code_mentions_extractor` (Pass 14) can apply the same
 // bootstrap-friendly filter.
 func SanitizeIDSearchText(s string) string {
-	// First strip multi-line backtick spans.
-	stripped := backtickSpanRe.ReplaceAllStringFunc(s, func(span string) string {
-		out := make([]byte, len(span))
-		for i := range out {
-			if span[i] == '\n' {
-				out[i] = '\n'
-			} else {
-				out[i] = ' '
-			}
-		}
-		return string(out)
-	})
-	// Then blank `"..."` content on each line (single-line scope).
-	out := []byte(stripped)
+	// FIRST blank `"..."` content per line. Go interpreted strings don't
+	// span lines, so this is single-line scope. Doing this pass first
+	// neutralizes any backticks that live INSIDE a `"..."` literal
+	// (e.g., a regex pattern string like `"(?s)`[^`]*`"`) — otherwise
+	// they'd mis-pair the multi-line backtick scan below.
+	out := []byte(s)
 	inQuote := false
 	escape := false
 	for i := 0; i < len(out); i++ {
@@ -127,7 +119,19 @@ func SanitizeIDSearchText(s string) string {
 			out[i] = ' '
 		}
 	}
-	return string(out)
+	// THEN strip multi-line backtick spans (Go raw-string literals, JS
+	// template literals, Markdown-style inline-code in doc comments).
+	return backtickSpanRe.ReplaceAllStringFunc(string(out), func(span string) string {
+		buf := make([]byte, len(span))
+		for i := range buf {
+			if span[i] == '\n' {
+				buf[i] = '\n'
+			} else {
+				buf[i] = ' '
+			}
+		}
+		return string(buf)
+	})
 }
 
 // Build returns an Index of defined IDs. Mirrors lib/ids.mjs:buildIdIndex.
