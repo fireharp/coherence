@@ -1,15 +1,35 @@
 id: CB-004
 name: code references US-999 but no story exists
 description: |
-  Non-Markdown staged addition mentions an undefined US-### id. The IDs
-  scanner detects this in `coherence scan`/`check`, but it reads added diff
-  content rather than only path lists, so this CB suite (which runs against
-  file-name lists only) cannot exercise it today. Reaching deterministic
-  status requires extending the scenario format to embed file content.
-status: skip
-changed_files:
-  - src/handlers/auth.go
+  A Go file references US-999 in its doc comment, but no
+  docs/user-stories/US-999.md exists in the repo. The
+  `unknown_id_references` drift meter scans tracked non-Markdown files
+  for `US-###`/`ADR-###`/`IDR-###` patterns and flags any whose typed-id
+  node isn't present in the graph. US-001 is defined as a control;
+  US-999 is the unknown one and is the only id flagged.
+status: deterministic
+files:
+  docs/user-stories/US-001.md: |
+    ---
+    id: US-001
+    ---
+    # US-001 — Login
+  docs/specs/auth.md: |
+    # Auth Spec
+
+    Implements [US-001](../user-stories/US-001.md).
+  internal/auth/auth.go: |
+    package auth
+
+    // Login authenticates a user.
+    // implements US-001
+    func Login() {}
+
+    // Audit emits an audit record.
+    // references US-999 for compliance follow-up
+    func Audit() {}
 expected:
-  fires:
-    - unknown-us-id
+  fires: []
   blocking_error: false
+  drift:
+    verdict: telemetry
