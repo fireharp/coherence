@@ -9,9 +9,12 @@ import (
 )
 
 // computeStaleTests walks `verifies` edges (test:<path> → file:<path>) and
-// compares baseline + current snapshot content_hashes for the pair. When
-// the source content changed but the test file didn't, the test is flagged
-// as stale — its assertions may no longer reflect production behavior.
+// compares baseline + current snapshot semantic_hashes for the pair.
+// When the source content changed semantically but the test file
+// didn't, the test is flagged as stale — its assertions may no longer
+// reflect production behavior. Using SemanticHash (which strips
+// comments and reformats for Go files; normalizes frontmatter for
+// Markdown) means comment-only edits don't trip the meter.
 //
 // Returns silently (Score=0, empty list) when baseline isn't available;
 // without a base there's nothing to diff against.
@@ -33,7 +36,7 @@ func computeStaleTests(base *snapshot.Snapshot, current snapshot.Snapshot, g gra
 		if !hasBase || !hasCurrent {
 			return false
 		}
-		return b.ContentHash != c.ContentHash
+		return b.SemanticHash != c.SemanticHash
 	}
 
 	stale := []StaleTest{}

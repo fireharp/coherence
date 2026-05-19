@@ -22,8 +22,8 @@ func TestStaleTestsNoBaselineSilent(t *testing.T) {
 }
 
 func TestStaleTestsNoVerifiesEdgesIsZero(t *testing.T) {
-	base := staleSnap(snapshot.FileEntry{Path: "pkg/x.go", ContentHash: "h1"})
-	curr := staleSnap(snapshot.FileEntry{Path: "pkg/x.go", ContentHash: "h2"})
+	base := staleSnap(snapshot.FileEntry{Path: "pkg/x.go", SemanticHash: "h1"})
+	curr := staleSnap(snapshot.FileEntry{Path: "pkg/x.go", SemanticHash: "h2"})
 	r := computeStaleTests(&base, curr, graph.Graph{})
 	if r.Score != 0 {
 		t.Errorf("no verifies edges → no flags, got %+v", r.Stale)
@@ -32,12 +32,12 @@ func TestStaleTestsNoVerifiesEdgesIsZero(t *testing.T) {
 
 func TestStaleTestsSourceChangedTestDidNotFlagged(t *testing.T) {
 	base := staleSnap(
-		snapshot.FileEntry{Path: "pkg/x.go", ContentHash: "src-1"},
-		snapshot.FileEntry{Path: "pkg/x_test.go", ContentHash: "test-1"},
+		snapshot.FileEntry{Path: "pkg/x.go", SemanticHash: "src-1"},
+		snapshot.FileEntry{Path: "pkg/x_test.go", SemanticHash: "test-1"},
 	)
 	curr := staleSnap(
-		snapshot.FileEntry{Path: "pkg/x.go", ContentHash: "src-2"}, // source changed
-		snapshot.FileEntry{Path: "pkg/x_test.go", ContentHash: "test-1"}, // test unchanged
+		snapshot.FileEntry{Path: "pkg/x.go", SemanticHash: "src-2"},       // source changed
+		snapshot.FileEntry{Path: "pkg/x_test.go", SemanticHash: "test-1"}, // test unchanged
 	)
 	g := graph.Graph{Edges: []graph.Edge{
 		{From: "test:pkg/x_test.go", To: "file:pkg/x.go", Kind: graph.EdgeVerifies},
@@ -53,12 +53,12 @@ func TestStaleTestsSourceChangedTestDidNotFlagged(t *testing.T) {
 
 func TestStaleTestsBothChangedNotFlagged(t *testing.T) {
 	base := staleSnap(
-		snapshot.FileEntry{Path: "pkg/x.go", ContentHash: "src-1"},
-		snapshot.FileEntry{Path: "pkg/x_test.go", ContentHash: "test-1"},
+		snapshot.FileEntry{Path: "pkg/x.go", SemanticHash: "src-1"},
+		snapshot.FileEntry{Path: "pkg/x_test.go", SemanticHash: "test-1"},
 	)
 	curr := staleSnap(
-		snapshot.FileEntry{Path: "pkg/x.go", ContentHash: "src-2"},
-		snapshot.FileEntry{Path: "pkg/x_test.go", ContentHash: "test-2"},
+		snapshot.FileEntry{Path: "pkg/x.go", SemanticHash: "src-2"},
+		snapshot.FileEntry{Path: "pkg/x_test.go", SemanticHash: "test-2"},
 	)
 	g := graph.Graph{Edges: []graph.Edge{
 		{From: "test:pkg/x_test.go", To: "file:pkg/x.go", Kind: graph.EdgeVerifies},
@@ -71,12 +71,12 @@ func TestStaleTestsBothChangedNotFlagged(t *testing.T) {
 
 func TestStaleTestsSourceUnchangedNotFlagged(t *testing.T) {
 	base := staleSnap(
-		snapshot.FileEntry{Path: "pkg/x.go", ContentHash: "src-1"},
-		snapshot.FileEntry{Path: "pkg/x_test.go", ContentHash: "test-1"},
+		snapshot.FileEntry{Path: "pkg/x.go", SemanticHash: "src-1"},
+		snapshot.FileEntry{Path: "pkg/x_test.go", SemanticHash: "test-1"},
 	)
 	curr := staleSnap(
-		snapshot.FileEntry{Path: "pkg/x.go", ContentHash: "src-1"},
-		snapshot.FileEntry{Path: "pkg/x_test.go", ContentHash: "test-2"},
+		snapshot.FileEntry{Path: "pkg/x.go", SemanticHash: "src-1"},
+		snapshot.FileEntry{Path: "pkg/x_test.go", SemanticHash: "test-2"},
 	)
 	g := graph.Graph{Edges: []graph.Edge{
 		{From: "test:pkg/x_test.go", To: "file:pkg/x.go", Kind: graph.EdgeVerifies},
@@ -84,6 +84,28 @@ func TestStaleTestsSourceUnchangedNotFlagged(t *testing.T) {
 	r := computeStaleTests(&base, curr, g)
 	if r.Score != 0 {
 		t.Errorf("unchanged source shouldn't flag, got %+v", r.Stale)
+	}
+}
+
+func TestStaleTestsCommentOnlyChangeNotFlagged(t *testing.T) {
+	// When the only diff between baseline and current is a comment, the
+	// semantic hash stays equal (Go semantic hash strips comments), so
+	// stale_tests should NOT fire. Headline win from switching
+	// ContentHash → SemanticHash.
+	base := staleSnap(
+		snapshot.FileEntry{Path: "pkg/x.go", SemanticHash: "semantic-1", ContentHash: "content-1"},
+		snapshot.FileEntry{Path: "pkg/x_test.go", SemanticHash: "test-1", ContentHash: "test-1"},
+	)
+	curr := staleSnap(
+		snapshot.FileEntry{Path: "pkg/x.go", SemanticHash: "semantic-1", ContentHash: "content-2"},
+		snapshot.FileEntry{Path: "pkg/x_test.go", SemanticHash: "test-1", ContentHash: "test-1"},
+	)
+	g := graph.Graph{Edges: []graph.Edge{
+		{From: "test:pkg/x_test.go", To: "file:pkg/x.go", Kind: graph.EdgeVerifies},
+	}}
+	r := computeStaleTests(&base, curr, g)
+	if r.Score != 0 {
+		t.Errorf("comment-only source change should not flag stale_tests, got %+v", r.Stale)
 	}
 }
 
