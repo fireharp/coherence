@@ -34,6 +34,7 @@ coherence doctor                                     # validate ontology + hook 
 coherence index                                      # write .coherence/snapshot.json (Merkle + hashes)
 coherence diff                                       # compare current snapshot vs baseline
 coherence drift                                      # compute drift meters → .coherence/drift.json
+coherence drift --strict                             # same, but exit 1 on telemetry too (zero-drift CI gate)
 coherence status                                     # rewrite .coherence/STATUS.md
 coherence report                                     # print the last stored report
 coherence help                                       # usage
@@ -218,7 +219,7 @@ scenario is a self-contained directory under
   scenarios (CB-004/006/008/011..015) are shipped as stubs so the suite is
   honest about scope. Each stub records the milestone that would enable it.
 
-The shipped totals are: **17 scenarios, 16 pass, 0 fail, 1 skipped** —
+The shipped totals are: **18 scenarios, 17 pass, 0 fail, 1 skipped** —
 matching M1's "at least 8 internal scenarios exist" bar.
 
 ### Scored scenarios (Files mode)
@@ -531,19 +532,21 @@ surface. Multi-file packages produce one edge per importing file (the
 provenance shows which import resolved). Repos without `go.mod` emit
 no `depends_on` edges.
 
-`supersedes`, `contradicts`, `mirrors`, and `invalidates` edges all come
-from typed-id frontmatter fields. Scalar (`supersedes: ADR-007`) and
-inline-list (`contradicts: [ADR-001, US-022]`) forms both parse, and a
-single doc can declare any combination of the four. Cross-kind references
-work (`ADR-020 supersedes: IDR-005`), self-references are filtered, and
-edges emit even when the target id isn't tracked — dangling claims
-surface as useful telemetry. Together they encode deliberate decision
-lineage: `supersedes` is "this replaces that"; `contradicts` is "this
-asserts something incompatible with that"; `mirrors` is "this restates
-that in another scope"; `invalidates` is "this declares that no longer
-applies". The LLM-driven flavor of contradiction findings still flows
-into the `drift.contradiction` meter; the graph edge captures the
-deterministic authored claim.
+`supersedes`, `contradicts`, `mirrors`, `invalidates`, and `implements`
+edges all come from typed-id frontmatter fields. Scalar (`supersedes:
+ADR-007`) and inline-list (`contradicts: [ADR-001, US-022]`) forms both
+parse, and a single doc can declare any combination. Cross-kind
+references work (`ADR-020 supersedes: IDR-005`), self-references are
+filtered, and edges emit even when the target id isn't tracked —
+dangling claims surface as useful telemetry. Together they encode
+deliberate decision lineage: `supersedes` is "this replaces that";
+`contradicts` is "this asserts something incompatible with that";
+`mirrors` is "this restates that in another scope"; `invalidates` is
+"this declares that no longer applies"; `implements` is "this decision
+fulfills that story / fixes that requirement" (symmetric with code-level
+`// implements US-###` annotations). The LLM-driven flavor of
+contradiction findings still flows into the `drift.contradiction`
+meter; the graph edges here capture the deterministic authored claim.
 
 `data_model` nodes come from schema-file regex detection across three
 formats: `.sql` (CREATE TABLE / VIEW / TYPE / MATERIALIZED VIEW, with
@@ -630,7 +633,7 @@ meters today:
 | Meter                     | Reads                                | Today's signal                                              |
 | ------------------------- | ------------------------------------ | ----------------------------------------------------------- |
 | `required_edge_breakage`  | `ontology.yml` + worktree diff       | broken_rules / total_rules                                  |
-| `trace_coverage`          | `.coherence/graph.json`              | user_story nodes referenced (via defining doc) / total      |
+| `trace_coverage`          | base + current graph                 | user_story nodes referenced (via defining doc) / total; reports `newly_uncovered_stories` + `newly_covered_stories` when a base graph is on disk |
 | `neighborhood_drift`      | base + current graph                 | weighted Δ over added/removed nodes and edges               |
 | `semantic_movement`       | base + current snapshot              | markdown_semantic_changed / markdown_total (noop excluded)  |
 | `path_loss`               | BFS over typed edges from each concept (base + current) | concepts that don't reach a `test`/`evidence`/`endpoint`/`generated_artifact` via chain; reports `newly_orphaned_concepts` and `newly_supported_concepts` when a base graph is on disk |
@@ -690,7 +693,11 @@ doc describes (non-markdown defaults to 1). The JSON `weighted` flag
 reports whether the graph had any concept nodes — when zero, the score
 degrades to the uniform `stale_files / total_files` share.
 
-Exit code: `1` only on `warn`; `telemetry`/`clean` are 0.
+Exit code: `1` only on `warn`; `telemetry`/`clean` are 0. Pass
+`--strict` to `coherence drift` to also exit 1 on `telemetry` —
+useful for CI gates that want zero-drift commits, where any
+movement (including diff-aware regressions like `newly_orphaned_concepts`)
+should block the merge.
 
 ### `review` now includes drift
 

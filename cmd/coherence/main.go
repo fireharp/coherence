@@ -51,7 +51,7 @@ const usage = `coherence <subcommand> [flags]
         [--json] [--write-report]          run shipped scenario / eval suites
   index [--json]                          write .coherence/snapshot.json (Merkle + semantic hashes)
   diff [--base=path] [--json]             compare current snapshot to base
-  drift [--json]                          compute drift meters → .coherence/drift.json
+  drift [--json] [--strict]               compute drift meters → .coherence/drift.json (--strict: exit 1 on telemetry too)
   report                                  print the last report JSON
   status [--ontology=path]                rewrite .coherence/STATUS.md
 
@@ -752,6 +752,9 @@ func run() int {
 			fmt.Print(drift.Human(rep))
 		}
 		if rep.Verdict == drift.VerdictWarn {
+			return 1
+		}
+		if boolFlag(args, "strict") && rep.Verdict == drift.VerdictTelemetry {
 			return 1
 		}
 		return 0

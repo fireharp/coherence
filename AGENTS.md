@@ -72,7 +72,7 @@ Use Go 1.22 or newer.
   `edges_removed`) — so agents can see "a new ADR appeared" or "the
   `rule:r1 → command:go test ./…` edge disappeared" without re-parsing
   prose. JSON shape: `{snapshot: {...}, graph: {...}}`.
-- `./bin/coherence drift [--json]` writes `.coherence/drift.json` with the
+- `./bin/coherence drift [--json] [--strict]` writes `.coherence/drift.json` with the
   All 9 GOAL.md M4 meters: `required_edge_breakage`, `trace_coverage`,
   `neighborhood_drift`, `semantic_movement`, `path_loss`, `blast_radius`,
   `staleness`, `claim_support`, `contradiction` (LLM-fed; disabled
@@ -104,7 +104,7 @@ Use Go 1.22 or newer.
   [--template=<name>] [--json] [--write-report]` runs the shipped scenario
   / evaluation suites. Templates is the v0.3 onboarding suite (38 scenarios
   across 11 templates). CoherenceBench is the M1 internal CB-### suite
-  (17 scenarios; 16 deterministic / 1 LLM-only deferred).
+  (18 scenarios; 17 deterministic / 1 LLM-only deferred).
   External is the M7 evaluation harness — 3 samples across swe-bench /
   tebench / doc-code categories, scored via precision/recall/F1 against
   gold impact sets.
