@@ -35,8 +35,9 @@ import (
 )
 
 const usage = `coherence <subcommand> [flags]
-  init [--template=generic] [--force] [--skill-install=auto|native|off] [--no-baseline] [--json]
-                                          scaffold ontology.yml + hook + .gitignore
+  init [--template=generic] [--force] [--skill-install=auto|native|off]
+       [--no-baseline] [--no-hooks-config] [--json]
+                                          scaffold ontology.yml + hook + .gitignore + git core.hooksPath
   scan --staged [--json] [--llm] [--ontology=path]
                                           evaluate staged files (pre-commit gate)
   check [--ref=HEAD~1] [--include-untracked] [--json] [--ontology=path]
@@ -107,15 +108,43 @@ func stringFlag(args parsedArgs, name, fallback string) string {
 // strictPromotionMessage returns the stderr line emitted when --strict
 // flips a telemetry verdict to exit 1. When regression_count > 0 the
 // message names the count specifically so the user knows the drift
-// included actual diff-aware regressions (newly_orphaned_concepts etc.)
-// rather than just movement above the noise floor.
-func strictPromotionMessage(regressionCount int) string {
+// included actual diff-aware regressions. When activeMeters contains
+// non-movement meters (orphan_endpoints, broken_implements_chains,
+// etc.), the message lists them rather than saying "movement". Falls
+// back to "drift movement detected" when only movement meters fired.
+func strictPromotionMessage(regressionCount int, activeMeters []string) string {
 	if regressionCount > 0 {
 		return fmt.Sprintf(
 			"coherence: --strict promoted telemetry → exit 1 (%d regression(s) detected)",
 			regressionCount)
 	}
+	if real := nonMovementMeters(activeMeters); len(real) > 0 {
+		return fmt.Sprintf(
+			"coherence: --strict promoted telemetry → exit 1 (real meter(s) active: %s)",
+			strings.Join(real, ", "))
+	}
 	return "coherence: --strict promoted telemetry → exit 1 (drift movement detected)"
+}
+
+// movementMeters is the set of meters that report "things changed"
+// rather than "something's broken". Verdict promotion via these is
+// expected on any non-trivial commit and shouldn't be confused with
+// real findings when explaining strict-mode exits.
+var movementMeters = map[string]bool{
+	"neighborhood_drift": true,
+	"semantic_movement":  true,
+	"blast_radius":       true,
+	"staleness":          true,
+}
+
+func nonMovementMeters(active []string) []string {
+	out := []string{}
+	for _, m := range active {
+		if !movementMeters[m] {
+			out = append(out, m)
+		}
+	}
+	return out
 }
 
 func resolveOntologyPath(rootDir string, args parsedArgs) string {
@@ -605,7 +634,11 @@ func run() int {
 		// Mirrors `coherence drift --strict` so CI gates can require
 		// zero-drift on the full review flow too.
 		if exit == 0 && boolFlag(args, "strict") && payload.DriftVerdict == drift.VerdictTelemetry {
-			fmt.Fprintln(os.Stderr, strictPromotionMessage(payload.DriftRegressionCount))
+			var activeMeters []string
+			if payload.Drift != nil {
+				activeMeters = payload.Drift.ActiveMeters
+			}
+			fmt.Fprintln(os.Stderr, strictPromotionMessage(payload.DriftRegressionCount, activeMeters))
 			exit = 1
 		}
 		return exit
@@ -627,7 +660,11 @@ func run() int {
 				return 2
 			}
 			if exit == 0 && boolFlag(args, "strict") && payload.DriftVerdict == drift.VerdictTelemetry {
-				fmt.Fprintln(os.Stderr, strictPromotionMessage(payload.DriftRegressionCount))
+				var activeMeters []string
+				if payload.Drift != nil {
+					activeMeters = payload.Drift.ActiveMeters
+				}
+				fmt.Fprintln(os.Stderr, strictPromotionMessage(payload.DriftRegressionCount, activeMeters))
 				exit = 1
 			}
 			return exit
@@ -647,10 +684,11 @@ func run() int {
 			}
 		}
 		opts := initcmd.Options{
-			Template:     chosen,
-			Force:        boolFlag(args, "force"),
-			SkillInstall: stringFlag(args, "skill-install", initcmd.SkillInstallAuto),
-			NoBaseline:   boolFlag(args, "no-baseline"),
+			Template:      chosen,
+			Force:         boolFlag(args, "force"),
+			SkillInstall:  stringFlag(args, "skill-install", initcmd.SkillInstallAuto),
+			NoBaseline:    boolFlag(args, "no-baseline"),
+			NoHooksConfig: boolFlag(args, "no-hooks-config"),
 		}
 		res, err := initcmd.Run(rootDir, opts)
 		if err != nil {
@@ -853,7 +891,7 @@ func run() int {
 			return 1
 		}
 		if boolFlag(args, "strict") && rep.Verdict == drift.VerdictTelemetry {
-			fmt.Fprintln(os.Stderr, strictPromotionMessage(rep.Regressions.Count))
+			fmt.Fprintln(os.Stderr, strictPromotionMessage(rep.Regressions.Count, rep.ActiveMeters))
 			return 1
 		}
 		return 0

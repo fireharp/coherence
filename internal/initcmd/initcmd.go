@@ -35,6 +35,11 @@ type Options struct {
 	// otherwise runs as part of init. Useful for CI/test flows that
 	// build the baseline explicitly with `coherence index` later.
 	NoBaseline bool
+	// NoHooksConfig disables the auto `git config core.hooksPath
+	// .githooks` step that otherwise runs as part of init. Users who
+	// manage hooksPath themselves (e.g., via husky or a shared
+	// config) can opt out.
+	NoHooksConfig bool
 }
 
 // Action describes one filesystem effect.
@@ -112,13 +117,53 @@ func Run(rootDir string, opts Options) (Result, error) {
 		res.Actions = append(res.Actions, buildBaseline(rootDir, opts.Force))
 	}
 
+	if !opts.NoHooksConfig {
+		res.Actions = append(res.Actions, configureHooksPath(rootDir))
+	}
+
 	res.HintNext = []string{
-		"git config core.hooksPath .githooks",
 		"coherence doctor",
 		"coherence scan --staged",
 		"coherence index    # re-run after major changes to refresh the drift baseline",
 	}
 	return res, nil
+}
+
+// configureHooksPath runs `git config core.hooksPath .githooks` so the
+// pre-commit hook fires immediately after init. Idempotent: skips when
+// already set. Best-effort: any failure (no .git, no `git` on PATH)
+// produces a "skipped" action rather than a fatal error.
+func configureHooksPath(rootDir string) Action {
+	// Verify .git exists; outside a git work-tree the config write is
+	// meaningless.
+	if _, err := os.Stat(filepath.Join(rootDir, ".git")); err != nil {
+		return Action{Path: "git config core.hooksPath", Status: "skipped", Detail: "not a git work-tree"}
+	}
+	// Probe current value. Only write when unset or already
+	// .githooks — never overwrite a different user-chosen value
+	// (someone may be running husky, lefthook, or a shared config).
+	probe := exec.Command("git", "config", "core.hooksPath")
+	probe.Dir = rootDir
+	if out, err := probe.Output(); err == nil {
+		cur := strings.TrimSpace(string(out))
+		if cur == ".githooks" {
+			return Action{Path: "git config core.hooksPath", Status: "skipped", Detail: "already = .githooks"}
+		}
+		if cur != "" {
+			return Action{
+				Path:   "git config core.hooksPath",
+				Status: "skipped",
+				Detail: fmt.Sprintf("preserved existing value %q (run `coherence init --no-hooks-config` to suppress this check, or set core.hooksPath=.githooks manually)", cur),
+			}
+		}
+	}
+	// Write it.
+	cmd := exec.Command("git", "config", "core.hooksPath", ".githooks")
+	cmd.Dir = rootDir
+	if out, err := cmd.CombinedOutput(); err != nil {
+		return Action{Path: "git config core.hooksPath", Status: "skipped", Detail: "git config failed: " + strings.TrimSpace(string(out))}
+	}
+	return Action{Path: "git config core.hooksPath", Status: "created", Detail: "set to .githooks"}
 }
 
 // buildBaseline writes .coherence/snapshot.json + graph.json so the
