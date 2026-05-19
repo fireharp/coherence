@@ -466,13 +466,24 @@ the `generates` edges (from `expect_any` matches), this encodes the
 full rule constraint as graph edges: a rule's full semantics is
 "when these files change, expect those artifacts to follow".
 
-`implements` edges come from Go doc comments on exported declarations.
-The pattern `(?i)implements[\s:\-]*(US|ADR|IDR)-###` matches both
-`// implements US-001` and `// Implements: ADR-007` forms (case-insensitive).
-Edges emit from the `code_symbol` node to the matching typed-id node.
-Works for `FuncDecl`, `TypeSpec`, and `ValueSpec` doc comments; repeats
-within the same doc dedupe to one edge. Mere mentions like "see US-001"
-don't trigger — the `implements` keyword is required.
+`implements` edges come from three extractors today. (1) Go AST scan
+of doc comments on exported declarations. The pattern
+`(?i)implements[\s:\-]*(US|ADR|IDR)-###` matches both `// implements
+US-001` and `// Implements: ADR-007` forms. Works for `FuncDecl`,
+`TypeSpec`, and `ValueSpec` doc comments. (2) TypeScript line-based
+scan of raw source. Matches `// implements US-001`, JSDoc
+`/** @implements ADR-007 */` blocks, and same-line trailing comments
+(`export class Foo {} // implements IDR-002`). The TS keyword
+`implements` on `class Foo implements IBar` is rejected because `IBar`
+isn't a typed-id pattern. (3) Python line-based scan covering
+`# implements ADR-007` line comments, triple-quoted module/function
+docstrings, and same-line claims. Across all three: edges emit from
+the `code_symbol` node to the matching typed-id node, repeats within
+the same source dedupe to one edge, and mere mentions like "see
+US-001" don't trigger — the `implements` keyword is required. The
+line-based extractor attaches claims to the NEXT top-level symbol
+below them (so a JSDoc block above an export catches it correctly,
+while a claim above a class catches that class, not a later one).
 
 `depends_on` edges come from Go imports (Go-only MVP today). The
 extractor reads the repo's `go.mod`, captures the module path, then for
@@ -588,7 +599,7 @@ meters today:
 | `semantic_movement`       | base + current snapshot              | markdown_semantic_changed / markdown_total (noop excluded)  |
 | `path_loss`               | current graph (concept ↔ doc edges)  | orphan_concepts / total_concepts                            |
 | `blast_radius`            | base + current graph                 | unique 1-hop neighbors of nodes touched by added/removed edges |
-| `staleness`               | `git log` per tracked file           | stale_files / total_files (default threshold: 90 days)         |
+| `staleness`               | `git log` per tracked file + graph concept-importance | concept-weighted stale-file share (threshold: 90 days); `weighted=false` falls back to uniform `stale_files / total_files` |
 | `claim_support`           | current graph (claim ↔ doc edges)    | unsupported_claims / total_claims (defining-doc reachability)  |
 | `contradiction`           | optional LLM findings (`--llm`)      | count of `llm-contradiction` findings; disabled without LLM    |
 | `stale_decision_links`    | `supersedes` + `mentions` traversal  | count of docs citing a superseded id without naming the new one |
@@ -622,13 +633,16 @@ silent unless the repo actually uses the annotation, avoiding false
 positives on repos that don't. The deterministic 8 always run;
 `contradiction` is fed by the optional Groq LLM pass — when `review --llm`
 runs, llm.Run's findings flow into `drift.ComputeWith(opts)` and populate
-the meter. The `path_loss`, `blast_radius`, `staleness`, and
-`claim_support` meters shipped here are MVP definitions:
-`path_loss` is "orphan concepts" rather than multi-hop support-path
-traversal, `blast_radius` is "untouched 1-hop neighbors" rather than
-centrality × required-path weighting, and `staleness` drops GOAL.md's
-`concept_importance` factor for uniform weighting. All three sharpen as
-more node kinds become available.
+the meter. The `path_loss`, `blast_radius`, and `claim_support` meters
+shipped here are MVP definitions: `path_loss` is "orphan concepts"
+rather than multi-hop support-path traversal, and `blast_radius` is
+"untouched 1-hop neighbors" rather than centrality × required-path
+weighting. `staleness` now applies GOAL.md's `concept_importance`
+weighting: each concept's importance = its incoming `describes`-edge
+count, each file's weight = the max importance over the concepts its
+doc describes (non-markdown defaults to 1). The JSON `weighted` flag
+reports whether the graph had any concept nodes — when zero, the score
+degrades to the uniform `stale_files / total_files` share.
 
 Exit code: `1` only on `warn`; `telemetry`/`clean` are 0.
 

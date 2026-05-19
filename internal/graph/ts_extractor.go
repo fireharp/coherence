@@ -79,11 +79,13 @@ func extractTSSymbols(b *Builder, rootDir string, tracked []string) {
 		// approximate — a string containing `//` could mis-strip — but
 		// good enough for shallow extraction where false negatives are
 		// preferable to false positives.
-		src := StripTSComments(string(data))
+		raw := string(data)
+		src := StripTSComments(raw)
 		pkg := TSPackageID(rel)
 		emitTSExports(b, rel, pkg, src)
 		emitTSImports(b, rel, src, trackedSet)
 		emitTSEndpoints(b, rel, src)
+		emitTSImplementsFromSource(b, rel, pkg, raw)
 	}
 }
 

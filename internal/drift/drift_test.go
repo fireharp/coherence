@@ -202,7 +202,34 @@ func TestPathLossOrphanWhenDescribingDocUnreferenced(t *testing.T) {
 	}
 }
 
-func TestPathLossSupportedWhenDescribingDocMentioned(t *testing.T) {
+func TestPathLossSupportedWhenChainReachesEvidence(t *testing.T) {
+	// Concept → doc → mentions ADR → supports ← evidence:
+	// the BFS reaches an evidence node, so concept is supported.
+	g := graph.Graph{
+		Nodes: []graph.Node{
+			{ID: "concept:auth", Kind: graph.NodeConcept},
+			{ID: "doc:auth.md", Kind: graph.NodeDoc},
+			{ID: "adr:ADR-007", Kind: graph.NodeADR},
+			{ID: "evidence:auth-bucket", Kind: graph.NodeEvidence},
+		},
+		Edges: []graph.Edge{
+			{From: "doc:auth.md", To: "concept:auth", Kind: graph.EdgeDescribes},
+			{From: "doc:auth.md", To: "adr:ADR-007", Kind: graph.EdgeMentions},
+			{From: "evidence:auth-bucket", To: "adr:ADR-007", Kind: graph.EdgeSupports},
+		},
+	}
+	pl := computePathLoss(g)
+	if pl.SupportedConcepts != 1 {
+		t.Errorf("expected supported=1, got %d", pl.SupportedConcepts)
+	}
+	if pl.Score != 0 {
+		t.Errorf("expected score 0, got %v", pl.Score)
+	}
+}
+
+func TestPathLossMentionOnlyNoLongerSuffices(t *testing.T) {
+	// Doc has incoming mentions but no artifact reachable. Under the
+	// GOAL.md multi-hop semantic this should now be an orphan.
 	g := graph.Graph{
 		Nodes: []graph.Node{
 			{ID: "concept:auth", Kind: graph.NodeConcept},
@@ -215,32 +242,54 @@ func TestPathLossSupportedWhenDescribingDocMentioned(t *testing.T) {
 		},
 	}
 	pl := computePathLoss(g)
-	if pl.SupportedConcepts != 1 {
-		t.Errorf("expected supported=1, got %d", pl.SupportedConcepts)
-	}
-	if pl.Score != 0 {
-		t.Errorf("expected score 0, got %v", pl.Score)
+	if pl.SupportedConcepts != 0 {
+		t.Errorf("mention-only without artifact terminus should not support concept, got supported=%d", pl.SupportedConcepts)
 	}
 }
 
-func TestPathLossSharedConceptSupportedWhenAnyDescriberMentioned(t *testing.T) {
+func TestPathLossSupportedViaImplementsEndpointChain(t *testing.T) {
+	// concept → describes doc → mentions US-001 ← implements ← code_symbol → defines → endpoint.
 	g := graph.Graph{
 		Nodes: []graph.Node{
-			{ID: "concept:auth", Kind: graph.NodeConcept},
-			{ID: "doc:a.md", Kind: graph.NodeDoc},
-			{ID: "doc:b.md", Kind: graph.NodeDoc},
-			{ID: "doc:c.md", Kind: graph.NodeDoc},
+			{ID: "concept:checkout", Kind: graph.NodeConcept},
+			{ID: "doc:checkout.md", Kind: graph.NodeDoc},
+			{ID: "user_story:US-001", Kind: graph.NodeUserStory},
+			{ID: "code_symbol:cart.Charge", Kind: graph.NodeCodeSymbol},
+			{ID: "endpoint:POST:/charge", Kind: graph.NodeEndpoint},
 		},
 		Edges: []graph.Edge{
-			{From: "doc:a.md", To: "concept:auth", Kind: graph.EdgeDescribes},
-			{From: "doc:b.md", To: "concept:auth", Kind: graph.EdgeDescribes},
-			// Only b.md is mentioned — concept still counts as supported.
-			{From: "doc:c.md", To: "doc:b.md", Kind: graph.EdgeMentions},
+			{From: "doc:checkout.md", To: "concept:checkout", Kind: graph.EdgeDescribes},
+			{From: "doc:checkout.md", To: "user_story:US-001", Kind: graph.EdgeMentions},
+			{From: "code_symbol:cart.Charge", To: "user_story:US-001", Kind: graph.EdgeImplements},
+			{From: "file:cart.go", To: "endpoint:POST:/charge", Kind: graph.EdgeDefines},
+			{From: "file:cart.go", To: "code_symbol:cart.Charge", Kind: graph.EdgeDefines},
 		},
 	}
 	pl := computePathLoss(g)
 	if pl.SupportedConcepts != 1 {
-		t.Errorf("expected concept supported via at-least-one describer mention, got %d", pl.SupportedConcepts)
+		t.Errorf("multi-hop chain to endpoint should support concept, got %d", pl.SupportedConcepts)
+	}
+}
+
+func TestPathLossSupportedWhenDescribingDocReachesTest(t *testing.T) {
+	// doc describes concept, file is referenced by doc (mentions),
+	// and a test verifies that file.
+	g := graph.Graph{
+		Nodes: []graph.Node{
+			{ID: "concept:billing", Kind: graph.NodeConcept},
+			{ID: "doc:billing.md", Kind: graph.NodeDoc},
+			{ID: "file:billing.go", Kind: graph.NodeFile},
+			{ID: "test:billing_test.go", Kind: graph.NodeTest},
+		},
+		Edges: []graph.Edge{
+			{From: "doc:billing.md", To: "concept:billing", Kind: graph.EdgeDescribes},
+			{From: "doc:billing.md", To: "file:billing.go", Kind: graph.EdgeMentions},
+			{From: "test:billing_test.go", To: "file:billing.go", Kind: graph.EdgeVerifies},
+		},
+	}
+	pl := computePathLoss(g)
+	if pl.SupportedConcepts != 1 {
+		t.Errorf("doc→mentions→file←verifies←test chain should support, got %d", pl.SupportedConcepts)
 	}
 }
 

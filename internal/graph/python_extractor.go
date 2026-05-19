@@ -65,11 +65,13 @@ func extractPythonSymbols(b *Builder, rootDir string, tracked []string) {
 		if err != nil {
 			continue
 		}
-		src := StripPythonComments(string(data))
+		raw := string(data)
+		src := StripPythonComments(raw)
 		module := PyModuleID(rel)
 		emitPythonSymbols(b, rel, module, src)
 		emitPythonImports(b, rel, src, trackedSet)
 		emitPythonEndpoints(b, rel, src)
+		emitPythonImplementsFromSource(b, rel, module, raw)
 	}
 }
 

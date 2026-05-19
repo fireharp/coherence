@@ -2,9 +2,11 @@ package drift
 
 import (
 	"sort"
+	"strings"
 	"time"
 
 	"coherence/internal/git"
+	"coherence/internal/graph"
 )
 
 // stalenessThresholdDays is the default age above which a file is considered
@@ -41,7 +43,13 @@ func defaultStalenessClock(rootDir string) stalenessClock {
 // clock is the default one, rootDir is used to drive the underlying git
 // lookups; when injected by tests, rootDir is ignored and the clock's
 // callbacks are authoritative.
-func computeStaleness(rootDir string, c stalenessClock) Staleness {
+//
+// The `g` argument lets the meter weight files by concept_importance
+// (GOAL.md M4 spec). Importance per concept = number of incoming
+// `describes` edges; per file = max importance over the concepts that
+// file's doc describes (non-markdown files default to weight 1). When
+// the graph has zero concept nodes, weighting degrades to uniform.
+func computeStaleness(rootDir string, g graph.Graph, c stalenessClock) Staleness {
 	if c.tracked == nil {
 		c.tracked = func() []string { return git.LsFiles(rootDir) }
 	}
@@ -62,6 +70,7 @@ func computeStaleness(rootDir string, c stalenessClock) Staleness {
 
 	now := c.now()
 	threshold := stalenessThresholdDays * 24 * time.Hour
+	weights, weighted := fileWeights(g)
 
 	type aged struct {
 		path string
@@ -70,19 +79,29 @@ func computeStaleness(rootDir string, c stalenessClock) Staleness {
 	}
 	stale := []aged{}
 	total := 0
+	var staleWeight, totalWeight float64
+	weightFor := func(p string) float64 {
+		if w, ok := weights[p]; ok && w > 0 {
+			return w
+		}
+		return 1.0
+	}
 	for _, path := range tracked {
 		t, ok := c.lastCommit(path)
 		if !ok {
 			// No commit history yet — treat as fresh.
 			total++
+			totalWeight += weightFor(path)
 			continue
 		}
 		total++
+		totalWeight += weightFor(path)
 		age := now.Sub(t)
 		if age < threshold {
 			continue
 		}
 		stale = append(stale, aged{path: path, t: t, days: int(age.Hours() / 24)})
+		staleWeight += weightFor(path)
 	}
 
 	sort.Slice(stale, func(i, j int) bool {
@@ -106,14 +125,55 @@ func computeStaleness(rootDir string, c stalenessClock) Staleness {
 	}
 
 	score := 0.0
-	if total > 0 {
-		score = float64(len(stale)) / float64(total)
+	if totalWeight > 0 {
+		score = staleWeight / totalWeight
 	}
 	return Staleness{
 		Score:            score,
 		ThresholdDays:    stalenessThresholdDays,
 		TotalFiles:       total,
 		StaleFiles:       len(stale),
+		Weighted:         weighted,
 		OldestStaleFiles: oldest,
 	}
+}
+
+// fileWeights derives a per-file concept-importance weight from the
+// current graph. A concept's importance = number of incoming
+// `describes` edges. A file's weight = max importance over the
+// concepts its doc describes; files with no describes-out (non-markdown
+// or untitled) get the implicit baseline 1.0 from weightFor. The second
+// return value reports whether any concept nodes exist — when false,
+// weighting degrades to uniform and the JSON `weighted` flag is false.
+func fileWeights(g graph.Graph) (map[string]float64, bool) {
+	importance := map[string]int{}
+	hasConcept := false
+	for _, n := range g.Nodes {
+		if n.Kind == graph.NodeConcept {
+			hasConcept = true
+		}
+	}
+	if !hasConcept {
+		return map[string]float64{}, false
+	}
+	for _, e := range g.Edges {
+		if e.Kind == graph.EdgeDescribes {
+			importance[e.To]++
+		}
+	}
+	weight := map[string]float64{}
+	for _, e := range g.Edges {
+		if e.Kind != graph.EdgeDescribes {
+			continue
+		}
+		if !strings.HasPrefix(e.From, "doc:") {
+			continue
+		}
+		rel := strings.TrimPrefix(e.From, "doc:")
+		w := float64(importance[e.To])
+		if w > weight[rel] {
+			weight[rel] = w
+		}
+	}
+	return weight, true
 }

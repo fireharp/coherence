@@ -252,13 +252,16 @@ type StaleFile struct {
 
 // Staleness scores how much of the tracked file set hasn't been touched in
 // the last `ThresholdDays`. Score = stale_files / total_tracked_files.
-// MVP drops GOAL.md's concept_importance weighting — uniform weight is
-// honest for what the current graph can deduce.
+// Score is the GOAL.md-specified concept-importance-weighted share when
+// the current graph has any concept nodes; otherwise it degrades to the
+// uniform share of stale files / total files. `Weighted` reports which
+// regime was applied so agents can interpret the score.
 type Staleness struct {
 	Score            float64     `json:"score"`
 	ThresholdDays    int         `json:"threshold_days"`
 	TotalFiles       int         `json:"total_files"`
 	StaleFiles       int         `json:"stale_files"`
+	Weighted         bool        `json:"weighted"`
 	OldestStaleFiles []StaleFile `json:"oldest_stale_files"`
 }
 
@@ -398,7 +401,7 @@ func ComputeWith(rootDir, ontologyPath string, opts ComputeOptions) (Report, err
 	report.BlastRadius = computeBlastRadius(baseGraph, currentGraph)
 
 	// Meter 7: staleness (age since last commit per tracked file).
-	report.Staleness = computeStaleness(rootDir, defaultStalenessClock(rootDir))
+	report.Staleness = computeStaleness(rootDir, currentGraph, defaultStalenessClock(rootDir))
 
 	// Meter 8: claim support (defining-doc reachability).
 	report.ClaimSupport = computeClaimSupport(currentGraph)
@@ -1063,9 +1066,45 @@ func computeBlastRadius(base *graph.Graph, current graph.Graph) BlastRadius {
 	}
 }
 
+// pathLossEdgeKinds is the set of typed edges we traverse (undirected)
+// when checking whether a concept reaches a verifiable artifact. Chosen
+// to mirror GOAL.md's "chain of typed edges from a concept to a
+// verifiable artifact" — only the typed relations that carry actual
+// support semantics. `contains`/`suggests` are intentionally excluded:
+// directory containment and ontology suggestions aren't path-of-support.
+var pathLossEdgeKinds = map[graph.EdgeKind]bool{
+	graph.EdgeDescribes:  true,
+	graph.EdgeMentions:   true,
+	graph.EdgeDefines:    true,
+	graph.EdgeImplements: true,
+	graph.EdgeSupports:   true,
+	graph.EdgeVerifies:   true,
+	graph.EdgeDependsOn:  true,
+	graph.EdgeGenerates:  true,
+	graph.EdgeExpects:    true,
+}
+
+// pathLossArtifactKinds is the set of node kinds that count as a
+// verifiable artifact terminus. Reaching any of these from a concept
+// (via pathLossEdgeKinds) marks the concept as "supported".
+var pathLossArtifactKinds = map[graph.NodeKind]bool{
+	graph.NodeTest:              true,
+	graph.NodeEvidence:          true,
+	graph.NodeEndpoint:          true,
+	graph.NodeGeneratedArtifact: true,
+}
+
+// computePathLoss is GOAL.md M4 meter 2: count concepts that have no
+// chain of typed edges to a verifiable artifact. Implementation is an
+// undirected BFS from each concept node, traversing the
+// pathLossEdgeKinds set, looking for any node whose kind belongs to
+// pathLossArtifactKinds. A concept with no describing doc, or with
+// describing docs that lead nowhere, scores as an orphan.
 func computePathLoss(g graph.Graph) PathLoss {
 	concepts := []graph.Node{}
+	kinds := map[string]graph.NodeKind{}
 	for _, n := range g.Nodes {
+		kinds[n.ID] = n.Kind
 		if n.Kind == graph.NodeConcept {
 			concepts = append(concepts, n)
 		}
@@ -1073,31 +1112,37 @@ func computePathLoss(g graph.Graph) PathLoss {
 	if len(concepts) == 0 {
 		return PathLoss{OrphanConcepts: []string{}, Score: 0}
 	}
-	// Concept → list of describing doc node ids.
-	describers := map[string][]string{}
+	// Build undirected adjacency over the relevant edge kinds.
+	adj := map[string][]string{}
 	for _, e := range g.Edges {
-		if e.Kind == graph.EdgeDescribes {
-			describers[e.To] = append(describers[e.To], e.From)
+		if !pathLossEdgeKinds[e.Kind] {
+			continue
 		}
+		adj[e.From] = append(adj[e.From], e.To)
+		adj[e.To] = append(adj[e.To], e.From)
 	}
-	// Doc → has incoming mention.
-	docMentioned := map[string]bool{}
-	for _, e := range g.Edges {
-		if e.Kind == graph.EdgeMentions {
-			docMentioned[e.To] = true
+	reaches := func(start string) bool {
+		visited := map[string]bool{start: true}
+		queue := []string{start}
+		for len(queue) > 0 {
+			cur := queue[0]
+			queue = queue[1:]
+			if pathLossArtifactKinds[kinds[cur]] {
+				return true
+			}
+			for _, n := range adj[cur] {
+				if !visited[n] {
+					visited[n] = true
+					queue = append(queue, n)
+				}
+			}
 		}
+		return false
 	}
 	orphans := []string{}
 	supported := 0
 	for _, c := range concepts {
-		isSupported := false
-		for _, d := range describers[c.ID] {
-			if docMentioned[d] {
-				isSupported = true
-				break
-			}
-		}
-		if isSupported {
+		if reaches(c.ID) {
 			supported++
 		} else {
 			orphans = append(orphans, c.ID)
