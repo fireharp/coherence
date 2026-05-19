@@ -5,6 +5,8 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+
+	"coherence/internal/ids"
 )
 
 // Code-level typed-id mention extractor (Pass 14). Mirrors the markdown
@@ -44,7 +46,8 @@ func extractCodeMentions(b *Builder, rootDir string, tracked []string) {
 			continue
 		}
 		seenInFile := map[string]bool{}
-		for _, m := range codeMentionTypedIDRe.FindAllStringSubmatch(string(data), -1) {
+		text := ids.SanitizeIDSearchText(string(data))
+		for _, m := range codeMentionTypedIDRe.FindAllStringSubmatch(text, -1) {
 			label := m[1]
 			id := m[0]
 			nodeID := IDNodeID(label, id)

@@ -70,7 +70,7 @@ func TestCodeMentionsSkipsMarkdown(t *testing.T) {
 func TestCodeMentionsDedupedPerFile(t *testing.T) {
 	dir := gitInit(t, map[string]string{
 		"docs/user-stories/US-001.md": "---\nid: US-001\n---\n# Login\n",
-		"src/auth.go": "package auth\n// US-001\n// US-001 again\n// and US-001 once more\n",
+		"src/auth.go":                 "package auth\n// US-001\n// US-001 again\n// and US-001 once more\n",
 	})
 	g, err := Build(dir)
 	if err != nil {
@@ -106,6 +106,39 @@ func TestCodeMentionsRespectsBuilderEdgeIdempotency(t *testing.T) {
 	}
 	if !hasEdge(g, FileNodeID("main.go"), IDNodeID("ADR", "ADR-007"), EdgeMentions) {
 		t.Error("expected mentions edge from main.go → ADR-007")
+	}
+}
+
+func TestCodeMentionsSkipsBacktickInlineCode(t *testing.T) {
+	// A doc comment that quotes a typed-id in backticks is describing the
+	// convention, not actually mentioning the story. The mention edge
+	// shouldn't be emitted — it would mislead chain-based meters.
+	dir := gitInit(t, map[string]string{
+		"docs/user-stories/US-001.md": "---\nid: US-001\n---\n# Login\n",
+		"internal/notes.go":           "package notes\n// References to `US-001` in inline-code don't count.\n",
+	})
+	g, err := Build(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if hasEdge(g, FileNodeID("internal/notes.go"), IDNodeID("US", "US-001"), EdgeMentions) {
+		t.Error("backtick-wrapped ID should not emit mention edge")
+	}
+}
+
+func TestCodeMentionsSkipsQuotedFixturePaths(t *testing.T) {
+	// `"docs/.../US-001.md"` string literals are fixture path references,
+	// not real code mentions of the story.
+	dir := gitInit(t, map[string]string{
+		"docs/user-stories/US-001.md": "---\nid: US-001\n---\n# Login\n",
+		"internal/sample.go":          "package sample\nvar paths = []string{\"docs/user-stories/US-001.md\"}\n",
+	})
+	g, err := Build(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if hasEdge(g, FileNodeID("internal/sample.go"), IDNodeID("US", "US-001"), EdgeMentions) {
+		t.Error("quoted fixture-path ID should not emit mention edge")
 	}
 }
 
