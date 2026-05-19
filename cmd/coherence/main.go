@@ -902,6 +902,16 @@ func runBench(args parsedArgs, rootDir string) int {
 	jsonOut := boolFlag(args, "json")
 	suite := stringFlag(args, "suite", "templates")
 	writeMD := boolFlag(args, "write-report")
+	switch suite {
+	case "all", "coherencebench", "cb", "templates":
+		// supported
+	default:
+		if writeMD {
+			fmt.Fprintf(os.Stderr,
+				"coherence: --write-report only applies to --suite=all|coherencebench|templates (got %q); flag will be ignored\n",
+				suite)
+		}
+	}
 
 	// Single-template shortcut, kept for backward compat with the v0.3 surface.
 	if name := stringFlag(args, "template", ""); name != "" {
@@ -939,6 +949,19 @@ func runBench(args parsedArgs, rootDir string) int {
 		} else {
 			fmt.Print(coherencebench.Human(cb))
 		}
+		if writeMD {
+			rep := coherencebench.CombinedReport{
+				GeneratedAt:         time.Now(),
+				CoherenceBenchSuite: cb,
+			}
+			if out, err := coherencebench.WriteMarkdown(rootDir, rep); err == nil {
+				if rel, err := filepath.Rel(rootDir, out); err == nil {
+					fmt.Printf("coherence: wrote %s\n", rel)
+				}
+			} else {
+				fmt.Fprintln(os.Stderr, "coherence: warning: could not write Markdown report:", err)
+			}
+		}
 		if !cb.Pass {
 			return 1
 		}
@@ -973,6 +996,21 @@ func runBench(args parsedArgs, rootDir string) int {
 			}
 		} else {
 			fmt.Print(bench.Human(tpl))
+		}
+		if writeMD {
+			rep := coherencebench.CombinedReport{
+				GeneratedAt:       time.Now(),
+				TemplateScenarios: tpl.Counts.Total,
+				TemplatePass:      tpl.Counts.Pass,
+				TemplateFail:      tpl.Counts.Fail,
+			}
+			if out, err := coherencebench.WriteMarkdown(rootDir, rep); err == nil {
+				if rel, err := filepath.Rel(rootDir, out); err == nil {
+					fmt.Printf("coherence: wrote %s\n", rel)
+				}
+			} else {
+				fmt.Fprintln(os.Stderr, "coherence: warning: could not write Markdown report:", err)
+			}
 		}
 		if !tpl.Pass {
 			return 1

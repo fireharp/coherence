@@ -590,7 +590,7 @@ func TestUnimplementedStoriesNoConventionIsSilent(t *testing.T) {
 		},
 		// No implements edges at all — repo doesn't use the convention.
 	}
-	r := computeUnimplementedStories(g)
+	r := computeUnimplementedStories(nil, g)
 	if r.Convention {
 		t.Error("Convention should be false when no implements edges exist")
 	}
@@ -610,7 +610,7 @@ func TestUnimplementedStoriesDetectsGapsWhenConventionUsed(t *testing.T) {
 			{From: "code_symbol:pkg.A", To: "us:US-001", Kind: graph.EdgeImplements},
 		},
 	}
-	r := computeUnimplementedStories(g)
+	r := computeUnimplementedStories(nil, g)
 	if !r.Convention {
 		t.Error("Convention should be true when any implements edge exists")
 	}
@@ -639,7 +639,7 @@ func TestUnimplementedStoriesAllImplementedIsZero(t *testing.T) {
 			{From: "code_symbol:pkg.B", To: "us:US-002", Kind: graph.EdgeImplements},
 		},
 	}
-	r := computeUnimplementedStories(g)
+	r := computeUnimplementedStories(nil, g)
 	if r.Score != 0 {
 		t.Errorf("all-implemented should yield score 0, got %d", r.Score)
 	}
@@ -649,12 +649,33 @@ func TestUnimplementedStoriesAllImplementedIsZero(t *testing.T) {
 }
 
 func TestUnimplementedStoriesEmptyGraphSilent(t *testing.T) {
-	r := computeUnimplementedStories(graph.Graph{})
+	r := computeUnimplementedStories(nil, graph.Graph{})
 	if r.Convention {
 		t.Error("empty graph should report Convention=false")
 	}
 	if r.UnimplementedIDs == nil {
 		t.Error("UnimplementedIDs should be []string{} not nil")
+	}
+}
+
+func TestUnimplementedStoriesConventionDetectedViaBaseEvenIfCurrentLost(t *testing.T) {
+	// Base had implements edges → convention was in use. Current
+	// removed them all (regression). Meter should still fire, not
+	// silence itself.
+	base := graph.Graph{
+		Edges: []graph.Edge{
+			{From: "code_symbol:foo", To: "us:US-001", Kind: graph.EdgeImplements},
+		},
+	}
+	current := graph.Graph{
+		Nodes: []graph.Node{{ID: "us:US-001", Kind: graph.NodeUserStory}},
+	}
+	r := computeUnimplementedStories(&base, current)
+	if !r.Convention {
+		t.Error("convention should be detected from base even when current dropped implements")
+	}
+	if r.Score == 0 {
+		t.Error("should report US-001 as unimplemented in current")
 	}
 }
 

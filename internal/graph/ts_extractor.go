@@ -99,9 +99,17 @@ func extractTSSymbols(b *Builder, rootDir string, tracked []string) {
 // single HTTP method. `use`/`all`/`any` are intentionally excluded —
 // they don't describe a single endpoint; surfacing them would noise up
 // the graph with router-wide middleware bindings.
+//
+// The path must begin with `/` and there must be a comma after the
+// first string-literal argument (i.e. the call has a second arg, the
+// handler). This rejects two common false positives:
+//   - `URLSearchParams.get("debugMic")` and similar single-arg `.get`
+//     calls on non-router receivers (params, maps, sets);
+//   - `headers.get("Content-Type")` and other shape-aliased `.get`s
+//     that look like routes but aren't.
 var tsEndpointRe = regexp.MustCompile(
 	`(?m)\b(\w+)\.(get|post|put|delete|patch|head|options)\s*\(\s*` +
-		"[`'\"]([^`'\"]+)[`'\"]")
+		"[`'\"](/[^`'\"]*)[`'\"]\\s*,")
 
 func emitTSEndpoints(b *Builder, rel, src string) {
 	for _, m := range tsEndpointRe.FindAllStringSubmatch(src, -1) {

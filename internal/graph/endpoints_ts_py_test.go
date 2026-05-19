@@ -73,6 +73,33 @@ app.post(getPath(), handler);
 	}
 }
 
+func TestTSEndpointSkipsURLSearchParamsAndMapGet(t *testing.T) {
+	// Real-world false positive: URLSearchParams.get("foo") and
+	// headers.get("Content-Type") were being captured as endpoints
+	// because the regex didn't require a leading slash on the path or
+	// a second argument (the handler). Tighten so neither matches.
+	dir := gitInit(t, map[string]string{
+		"src/util.ts": `
+const params = new URLSearchParams(location.search);
+const debug = params.get("debugMic") === "raw";
+const ct = headers.get("Content-Type");
+const stored = cache.get("user:42");
+const real = app.get("/real", handler);
+`,
+	})
+	g, err := Build(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, n := range g.Nodes {
+		if n.Kind == NodeEndpoint {
+			if n.Label != "GET /real" {
+				t.Errorf("unexpected endpoint emitted: %+v", n)
+			}
+		}
+	}
+}
+
 func TestTSEndpointUseAndAllSkipped(t *testing.T) {
 	dir := gitInit(t, map[string]string{
 		"src/middleware.ts": `
