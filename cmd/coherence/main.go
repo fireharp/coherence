@@ -284,6 +284,13 @@ func evaluate(files []string, useLLM bool, rootDir, ontPath string, llmCandidate
 		if strings.HasSuffix(rel, ".md") {
 			continue
 		}
+		// Test files often carry fixture typed-ids (mocked stories,
+		// scenario data) — skipping mirrors the drift-meter behavior
+		// in unknown_id_references so the rule scanner doesn't fire
+		// on test-internal references.
+		if graph.IsTestFile(rel) {
+			continue
+		}
 		content := git.StagedAddedContent(rel, rootDir)
 		addedByPath[rel] = content
 		fileOrder = append(fileOrder, rel)

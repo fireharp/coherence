@@ -67,7 +67,66 @@ var (
 		"ADR": regexp.MustCompile(`(?m)^id:\s*(ADR-\d{3})\s*$`),
 		"IDR": regexp.MustCompile(`(?m)^id:\s*(IDR-\d{3})\s*$`),
 	}
+	// backtickSpanRe matches anything between paired backticks
+	// (multi-line). IDs found inside such spans are documentation
+	// examples (inline-code in Go doc comments, JS template literals,
+	// raw-string fixture data) and aren't real references — strip
+	// them before scanning.
+	backtickSpanRe = regexp.MustCompile("(?s)`[^`]*`")
 )
+
+// sanitizeIDSearchText replaces the content of backtick-delimited spans
+// and double-quoted string literals with spaces, preserving byte
+// offsets so error messages still report sane positions. The intent:
+// `unknown-us-id` and friends should fire on real comment/code
+// references, not on the typed-id literals embedded in doc examples
+// ("use `// implements US-001`") or in `"docs/.../US-007.md"` fixture
+// data.
+func sanitizeIDSearchText(s string) string {
+	// First strip multi-line backtick spans.
+	stripped := backtickSpanRe.ReplaceAllStringFunc(s, func(span string) string {
+		out := make([]byte, len(span))
+		for i := range out {
+			if span[i] == '\n' {
+				out[i] = '\n'
+			} else {
+				out[i] = ' '
+			}
+		}
+		return string(out)
+	})
+	// Then blank `"..."` content on each line (single-line scope).
+	out := []byte(stripped)
+	inQuote := false
+	escape := false
+	for i := 0; i < len(out); i++ {
+		c := out[i]
+		if c == '\n' {
+			inQuote = false
+			escape = false
+			continue
+		}
+		if escape {
+			escape = false
+			if inQuote {
+				out[i] = ' '
+			}
+			continue
+		}
+		if c == '\\' && inQuote {
+			escape = true
+			continue
+		}
+		if c == '"' {
+			inQuote = !inQuote
+			continue
+		}
+		if inQuote {
+			out[i] = ' '
+		}
+	}
+	return string(out)
+}
 
 // Build returns an Index of defined IDs. Mirrors lib/ids.mjs:buildIdIndex.
 func Build(rootDir string) *Index {
@@ -133,9 +192,10 @@ func Scan(addedByPath map[string]string, fileOrder []string, idx *Index) []Unkno
 		if !ok || text == "" {
 			continue
 		}
+		searchText := sanitizeIDSearchText(text)
 		for _, pat := range idPatterns {
 			seen := map[string]bool{}
-			for _, m := range pat.Re.FindAllString(text, -1) {
+			for _, m := range pat.Re.FindAllString(searchText, -1) {
 				if seen[m] {
 					continue
 				}
