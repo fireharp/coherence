@@ -967,6 +967,7 @@ func computeUnimplementedStories(base *graph.Graph, g graph.Graph) Unimplemented
 func computeOrphanEndpoints(base *graph.Graph, current graph.Graph) OrphanEndpoints {
 	orphans, coveredSet, hasEndpointInCurrent := endpointCoverageState(current)
 	sort.Strings(orphans)
+	orphanSources := endpointSources(current, orphans)
 
 	newlyOrphaned := []string{}
 	newlyCovered := []string{}
@@ -1006,11 +1007,38 @@ func computeOrphanEndpoints(base *graph.Graph, current graph.Graph) OrphanEndpoi
 	return OrphanEndpoints{
 		Score:                  len(orphans),
 		Orphans:                orphans,
+		OrphanSources:          orphanSources,
 		Convention:             convention,
 		BaseAvailable:          base != nil,
 		NewlyOrphanedEndpoints: newlyOrphaned,
 		NewlyCoveredEndpoints:  newlyCovered,
 	}
+}
+
+// endpointSources maps each endpoint id in the orphans list to its
+// defining file id (the file an agent should add a test alongside).
+// Returns nil when orphans is empty so the JSON shape stays clean
+// via omitempty.
+func endpointSources(g graph.Graph, orphans []string) map[string]string {
+	if len(orphans) == 0 {
+		return nil
+	}
+	source := map[string]string{}
+	for _, e := range g.Edges {
+		if e.Kind == graph.EdgeDefines && strings.HasPrefix(e.To, "endpoint:") {
+			source[e.To] = e.From
+		}
+	}
+	out := map[string]string{}
+	for _, ep := range orphans {
+		if src, ok := source[ep]; ok {
+			out[ep] = strings.TrimPrefix(src, "file:")
+		}
+	}
+	if len(out) == 0 {
+		return nil
+	}
+	return out
 }
 
 // endpointCoverageState returns (orphans, coveredSet, hasAnyEndpoint)
@@ -2040,8 +2068,19 @@ func renderActions(r Report) []string {
 		out = append(out, "break the import cycle (refactor a shared interface to a third package)")
 	}
 	if r.OrphanEndpoints.Score > 0 {
+		// Format orphans as "endpoint→source" pairs when sources are
+		// known, so the agent sees both the route and the file the
+		// test belongs alongside.
+		labels := make([]string, 0, len(r.OrphanEndpoints.Orphans))
+		for _, ep := range r.OrphanEndpoints.Orphans {
+			if src, ok := r.OrphanEndpoints.OrphanSources[ep]; ok && src != "" {
+				labels = append(labels, ep+" (in "+src+")")
+			} else {
+				labels = append(labels, ep)
+			}
+		}
 		out = append(out, "add a test alongside the source file containing the orphan endpoint(s): "+
-			joinShort(r.OrphanEndpoints.Orphans, 3))
+			joinShort(labels, 3))
 	}
 	if len(r.OrphanEndpoints.NewlyOrphanedEndpoints) > 0 {
 		out = append(out, "restore test coverage for endpoint(s) that lost their verifies link since baseline: "+
