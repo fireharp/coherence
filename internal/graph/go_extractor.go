@@ -248,6 +248,13 @@ func docText(g *ast.CommentGroup) string {
 // dash before the id, and matches any of US/ADR/IDR.
 var implementsRe = regexp.MustCompile(`(?i)\bimplements\b[\s:\-]*\b((?:US|ADR|IDR)-\d{3})\b`)
 
+// docBacktickSpanRe matches inline-code (`...`) spans inside doc
+// comments. The implements extractor strips these before scanning so
+// that documentation about the implements convention itself — e.g.,
+// "use the `// implements US-001` annotation" — doesn't get parsed as
+// a real claim against a non-existent story.
+var docBacktickSpanRe = regexp.MustCompile("(?s)`[^`]*`")
+
 // emitImplementsFromDoc scans a code symbol's doc comment for `implements
 // <typed-id>` annotations and emits one `implements` edge per match.
 // Target nodes are not pre-created; if the typed-id file isn't tracked,
@@ -256,9 +263,12 @@ func emitImplementsFromDoc(b *Builder, rel, pkg, name, doc string) {
 	if doc == "" {
 		return
 	}
+	// Strip inline-code spans so that doc text *describing* the
+	// `// implements US-001` convention doesn't fire as a real claim.
+	cleaned := docBacktickSpanRe.ReplaceAllString(doc, "")
 	from := CodeSymbolNodeID(pkg, name)
 	seen := map[string]bool{}
-	for _, m := range implementsRe.FindAllStringSubmatch(doc, -1) {
+	for _, m := range implementsRe.FindAllStringSubmatch(cleaned, -1) {
 		id := m[1]
 		if seen[id] {
 			continue

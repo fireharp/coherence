@@ -9,17 +9,17 @@ import (
 // emitImplementsFromDoc pass but operates on raw source text since
 // neither language is parsed with an AST in this MVP. The algorithm:
 //
-//   1. Walk the source line-by-line.
-//   2. On each line, scan for `implements <ID>` claims (anywhere on
-//      the line — covers `// implements US-001`, `# implements`,
-//      `/** @implements ADR-007 */`, `"""implements IDR-002"""`).
-//   3. If the same line also defines a top-level symbol, emit edges
-//      from that symbol to the captured ids and clear pending claims.
-//   4. If the line has only claims (and no symbol), accumulate them as
-//      pending and emit them against the NEXT line that defines a
-//      symbol. Blank/comment lines don't reset pending — so a JSDoc
-//      block with `@implements` on a continuation line still attaches
-//      to the export below it.
+//  1. Walk the source line-by-line.
+//  2. On each line, scan for `implements <ID>` claims (anywhere on
+//     the line — covers `// implements US-001`, `# implements`,
+//     `/** @implements ADR-007 */`, `"""implements IDR-002"""`).
+//  3. If the same line also defines a top-level symbol, emit edges
+//     from that symbol to the captured ids and clear pending claims.
+//  4. If the line has only claims (and no symbol), accumulate them as
+//     pending and emit them against the NEXT line that defines a
+//     symbol. Blank/comment lines don't reset pending — so a JSDoc
+//     block with `@implements` on a continuation line still attaches
+//     to the export below it.
 //
 // False-positive guardrail: the typed-id pattern `(?:US|ADR|IDR)-\d{3}`
 // rejects TypeScript's `class Foo implements IBar` since `IBar` is not
@@ -74,9 +74,14 @@ func emitImplementsFromLines(b *Builder, rel, pkg, src string, symbolFromLine fu
 	seen := map[string]bool{}
 
 	for _, line := range strings.Split(src, "\n") {
+		// Strip inline-code spans so that doc text describing the
+		// implements convention itself — e.g.,
+		// `// implements US-001` in a comment about the convention —
+		// doesn't get parsed as a real claim.
+		stripped := docBacktickSpanRe.ReplaceAllString(line, "")
 		// Collect claims on this line (may be zero or more).
 		var lineClaims []string
-		for _, m := range implementsClaimRe.FindAllStringSubmatch(line, -1) {
+		for _, m := range implementsClaimRe.FindAllStringSubmatch(stripped, -1) {
 			lineClaims = append(lineClaims, m[1])
 		}
 		// Detect a symbol definition on this line.
