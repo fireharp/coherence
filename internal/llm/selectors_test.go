@@ -103,3 +103,60 @@ func TestSelectCandidatesFromSnapshotDiffCapsAtBudget(t *testing.T) {
 		t.Errorf("budget exceeded: got %d > %d", len(got), maxCallsPerRun)
 	}
 }
+
+func TestTrimReturnsInputBelowLimit(t *testing.T) {
+	in := "short"
+	if got := trim(in, 100); got != in {
+		t.Errorf("trim should return input unchanged when below max, got %q", got)
+	}
+}
+
+func TestTrimSplitsHalvesAtLimit(t *testing.T) {
+	// 100 chars, limit 50 → first 25 + ellipsis + last 25.
+	in := ""
+	for i := 0; i < 100; i++ {
+		in += "x"
+	}
+	got := trim(in, 50)
+	if len(got) == len(in) {
+		t.Errorf("trim should shorten input above max; got len=%d", len(got))
+	}
+	if !contains(got, "[truncated]") {
+		t.Errorf("trim should mark cut with truncated marker, got %q", got)
+	}
+}
+
+func TestTrimEmptyInput(t *testing.T) {
+	if got := trim("", 100); got != "" {
+		t.Errorf("trim on empty should return empty, got %q", got)
+	}
+}
+
+func TestMaxReturnsLarger(t *testing.T) {
+	cases := []struct {
+		a, b, want int
+	}{
+		{1, 2, 2},
+		{5, 5, 5},
+		{-1, 0, 0},
+		{10, 3, 10},
+	}
+	for _, c := range cases {
+		if got := max(c.a, c.b); got != c.want {
+			t.Errorf("max(%d, %d) = %d, want %d", c.a, c.b, got, c.want)
+		}
+	}
+}
+
+func contains(s, sub string) bool {
+	return len(s) >= len(sub) && indexOf(s, sub) >= 0
+}
+
+func indexOf(s, sub string) int {
+	for i := 0; i+len(sub) <= len(s); i++ {
+		if s[i:i+len(sub)] == sub {
+			return i
+		}
+	}
+	return -1
+}
