@@ -1,10 +1,34 @@
 package ids
 
 import (
+	"os"
+	"os/exec"
+	"path/filepath"
 	"sort"
 	"strings"
 	"testing"
 )
+
+func buildFixture(t *testing.T, files map[string]string) string {
+	t.Helper()
+	dir := t.TempDir()
+	if err := exec.Command("git", "-C", dir, "init", "-q").Run(); err != nil {
+		t.Fatal(err)
+	}
+	for rel, body := range files {
+		abs := filepath.Join(dir, rel)
+		if err := os.MkdirAll(filepath.Dir(abs), 0o755); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(abs, []byte(body), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if err := exec.Command("git", "-C", dir, "add", "-A").Run(); err != nil {
+		t.Fatal(err)
+	}
+	return dir
+}
 
 func TestScanWarnsOnlyForMissing(t *testing.T) {
 	idx := &Index{
@@ -107,6 +131,49 @@ func TestSanitizeIDSearchTextLeavesBareReferences(t *testing.T) {
 	got := SanitizeIDSearchText(src)
 	if !strings.Contains(got, "US-999") {
 		t.Errorf("bare comment reference should survive sanitize, got %q", got)
+	}
+}
+
+func TestBuildIndexesUserStoryFromFilename(t *testing.T) {
+	dir := buildFixture(t, map[string]string{
+		"docs/user-stories/US-001.md": "# Story\n",
+	})
+	idx := Build(dir)
+	if !idx.has("US", "US-001") {
+		t.Errorf("expected US-001 to be indexed from filename, got %+v", idx)
+	}
+}
+
+func TestBuildIndexesADRFromFilenameAndFrontmatter(t *testing.T) {
+	dir := buildFixture(t, map[string]string{
+		"docs/decisions/ADR-007-oauth.md": "---\nid: ADR-007\n---\n# OAuth\n",
+		"docs/decisions/IDR-002-retry.md": "---\nid: IDR-002\n---\n# Retry\n",
+	})
+	idx := Build(dir)
+	if !idx.has("ADR", "ADR-007") {
+		t.Errorf("expected ADR-007 to be indexed")
+	}
+	if !idx.has("IDR", "IDR-002") {
+		t.Errorf("expected IDR-002 to be indexed")
+	}
+}
+
+func TestBuildIgnoresFilesOutsideKnownDirs(t *testing.T) {
+	dir := buildFixture(t, map[string]string{
+		"docs/random/US-999.md": "stray\n",
+		"src/main.go":           "package main\n",
+	})
+	idx := Build(dir)
+	if idx.has("US", "US-999") {
+		t.Errorf("US-999 in docs/random/ should NOT be indexed (Build only scans docs/user-stories + docs/decisions)")
+	}
+}
+
+func TestBuildEmptyRepoReturnsEmptyIndex(t *testing.T) {
+	dir := buildFixture(t, nil)
+	idx := Build(dir)
+	if len(idx.US) != 0 || len(idx.ADR) != 0 || len(idx.IDR) != 0 {
+		t.Errorf("empty repo should produce empty index, got US=%v ADR=%v IDR=%v", idx.US, idx.ADR, idx.IDR)
 	}
 }
 
