@@ -10,6 +10,7 @@ import (
 	"os"
 	"os/signal"
 	"path/filepath"
+	"runtime/debug"
 	"strings"
 	"syscall"
 	"time"
@@ -57,6 +58,7 @@ const usage = `coherence <subcommand> [flags]
   status [--json] [--ontology=path]       rewrite .coherence/STATUS.md (or emit JSON payload)
 
   templates [--json]                      list available init templates with kind + description
+  version [--json]                        print version (module path, build vcs revision/time)
 
 exit codes:
   0 — clean (no actionable findings)
@@ -737,6 +739,9 @@ func run() int {
 		}
 		return 0
 
+	case "version":
+		return runVersion(boolFlag(args, "json"))
+
 	case "bench":
 		return runBench(args, rootDir)
 
@@ -980,6 +985,47 @@ func short12(s string) string {
 		return s
 	}
 	return s[:12]
+}
+
+// runVersion prints build version info — module path, VCS revision,
+// VCS time — sourced from runtime/debug.BuildInfo. Falls back to a
+// "(no build info)" sentinel when invoked from a binary built without
+// VCS stamping (rare; mainly `go run` invocations).
+func runVersion(jsonOut bool) int {
+	type versionInfo struct {
+		Module   string `json:"module"`
+		Revision string `json:"revision,omitempty"`
+		Time     string `json:"time,omitempty"`
+		GoVer    string `json:"go,omitempty"`
+	}
+	info := versionInfo{Module: "coherence"}
+	if bi, ok := debug.ReadBuildInfo(); ok {
+		info.Module = bi.Main.Path
+		info.GoVer = bi.GoVersion
+		for _, s := range bi.Settings {
+			switch s.Key {
+			case "vcs.revision":
+				info.Revision = s.Value
+			case "vcs.time":
+				info.Time = s.Value
+			}
+		}
+	}
+	if jsonOut {
+		enc := json.NewEncoder(os.Stdout)
+		enc.SetIndent("", "  ")
+		if err := enc.Encode(info); err != nil {
+			fmt.Fprintln(os.Stderr, "coherence: fatal:", err)
+			return 2
+		}
+		return 0
+	}
+	if info.Revision == "" {
+		fmt.Printf("coherence (%s) — (no build info; built without VCS stamping)\n", info.Module)
+		return 0
+	}
+	fmt.Printf("coherence %s\n  revision: %s\n  built:    %s\n  go:       %s\n", info.Module, info.Revision, info.Time, info.GoVer)
+	return 0
 }
 
 func runBench(args parsedArgs, rootDir string) int {
