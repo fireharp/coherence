@@ -548,6 +548,9 @@ func run() int {
 		fmt.Print(usage)
 		return 0
 	}
+	if sub == "--version" || sub == "-v" {
+		return runVersion(boolFlag(args, "json"))
+	}
 
 	if os.Getenv("COHERENCE_OFF") == "1" {
 		fmt.Fprintln(os.Stderr, "coherence: COHERENCE_OFF=1 set; skipping coherence checks")
