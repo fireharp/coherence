@@ -10,21 +10,41 @@ Evaluates the project's `ontology.yml` rules against a list of changed
 file paths. Each rule encodes a "when X changes, Y must change too"
 invariant. When that pair isn't satisfied, the rule fires.
 
-## Rule shape
+## File shape
 
 ```yaml
-- id: pre-commit-hook-change-needs-doc
-  when:
-    - ".githooks/pre-commit"
-  expect_any:
-    - "README.md"
-    - "AGENTS.md"
-    - "docs/**/*.md"
-  severity: warn               # warn | error
-  message: "Pre-commit hook touched; document the change."
-  suggested_commands:
-    - "git diff --cached .githooks/pre-commit"
+version: 1
+
+# Optional: project-wide command suggestions surfaced to agents.
+# Map of category → list of shell commands. Used by reviewers to
+# suggest "run the test suite" / "rebuild" etc.
+commands:
+  test:
+    - go test ./...
+  build:
+    - go build ./cmd/coherence
+
+rules:
+  - id: pre-commit-hook-change-needs-doc
+    when:
+      - ".githooks/pre-commit"
+    expect_any:
+      - "README.md"
+      - "AGENTS.md"
+      - "docs/**/*.md"
+    severity: warn               # warn | error
+    message: "Pre-commit hook touched; document the change."
+    suggested_commands:
+      - "git diff --cached .githooks/pre-commit"
 ```
+
+The top-level fields:
+
+| Field | Purpose |
+|-------|---------|
+| `version` | Schema version. Currently always `1`. |
+| `commands` | Optional. Map of `test`/`build`/`lint`/etc. → list of shell snippets. Templates ship sensible defaults; reviewers surface these in suggested actions. |
+| `rules` | List of rule objects (see below). |
 
 | Field | Purpose |
 |-------|---------|
