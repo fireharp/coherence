@@ -7,14 +7,17 @@
 
 A typed-edge knowledge graph from the repository:
 
-- **17 node kinds**: `concept`, `claim`, `doc`, `file`, `directory`,
-  `code_symbol`, `endpoint`, `test`, `evidence`, `generated_artifact`,
-  `command`, `metric`, `user_story`, `adr`, `idr`, `rule`,
-  `database_field`.
-- **15 edge kinds**: `mentions`, `defines`, `implements`, `verifies`,
-  `supports`, `cites`, `references`, `depends_on`, `contains`,
-  `supersedes`, `generates`, `expects`, `requires`, `describes`,
-  `suggests`.
+- **17 node kinds**: `file`, `directory`, `doc`, `user_story`, `adr`,
+  `idr`, `rule`, `command`, `concept`, `claim`, `metric`, `test`,
+  `evidence`, `generated_artifact`, `code_symbol`, `endpoint`,
+  `data_model`.
+- **15 edge kinds**: `contains`, `mentions`, `defines`, `suggests`,
+  `describes`, `verifies`, `supports`, `generates`, `supersedes`,
+  `depends_on`, `implements`, `expects`, `contradicts`, `mirrors`,
+  `invalidates`.
+
+(Authoritative source: the `NodeKind` / `EdgeKind` constants block in
+[`internal/graph/graph.go`](../../internal/graph/graph.go).)
 
 Each extractor pass adds nodes + edges; the build is deterministic
 (same input → same graph) so diffs against a stored baseline are
