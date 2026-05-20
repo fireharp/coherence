@@ -221,6 +221,39 @@ func TestRunSkipsExistingSkillWithoutForce(t *testing.T) {
 	}
 }
 
+func TestHumanRendersResult(t *testing.T) {
+	r := Result{
+		Template: "go-cli",
+		Actions: []Action{
+			{Path: "/repo/ontology.yml", Status: "created"},
+			{Path: "/repo/.githooks/pre-commit", Status: "skipped", Detail: "exists"},
+		},
+		HintNext: []string{"coherence doctor", "coherence index"},
+	}
+	out := Human(r)
+	for _, want := range []string{
+		"coherence init: template=go-cli",
+		"created  /repo/ontology.yml",
+		"skipped  /repo/.githooks/pre-commit",
+		"(exists)",
+		"Next:",
+		"$ coherence doctor",
+		"$ coherence index",
+	} {
+		if !strings.Contains(out, want) {
+			t.Errorf("missing %q in human output:\n%s", want, out)
+		}
+	}
+}
+
+func TestHumanWithoutHintsDropsNextSection(t *testing.T) {
+	r := Result{Template: "generic"}
+	out := Human(r)
+	if strings.Contains(out, "Next:") {
+		t.Errorf("empty HintNext should not render Next: section, got %q", out)
+	}
+}
+
 func TestRunNoBaselineSkipsBuildBaselineAction(t *testing.T) {
 	// --no-baseline must omit the buildBaseline action from the
 	// result so CI/test flows that index explicitly later don't pay
