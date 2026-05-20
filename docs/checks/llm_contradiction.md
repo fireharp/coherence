@@ -34,14 +34,18 @@ trace to grep for. An LLM can do this comparison in one prompt.
 
 Source: [`internal/llm/llm.go`](../../internal/llm/llm.go).
 
-1. **Candidate selection** — two paths:
-   - `SelectCandidatesFromSnapshotDiff(base, current)` — picks
-     markdown files whose `semantic_hash` changed between baseline +
-     current snapshots. Used by `review` / `watch`.
-   - `SelectCandidatesFromStaged(staged)` — picks staged markdown
-     files matching `docs/(user-stories|specs)/.+\.md`. Used by
+1. **Candidate selection** — two separate selectors with different
+   filters:
+   - `SelectCandidatesFromSnapshotDiff(base, current)` — picks **any**
+     markdown file whose `semantic_hash` changed between baseline +
+     current snapshots (no path filter). Used by `review` / `watch`.
+   - `SelectCandidatesFromStaged(staged)` — picks staged files whose
+     path matches `^docs/(user-stories|specs)/.+\.md$` (the
+     `candidateRe` regex). Narrower scope so pre-commit isn't
+     paying LLM cost for arbitrary markdown edits. Used by
      `scan --staged`.
-   - Capped at `maxCallsPerRun = 3` to honor the per-run LLM budget.
+   - Both selectors cap at `maxCallsPerRun = 3` to honor the
+     per-run LLM budget.
 2. **Citation extraction** — for each candidate, parse the staged
    diff hunk for inline markdown links `[text](path)`. Resolve
    relative paths against the candidate's directory. Read up to 2
