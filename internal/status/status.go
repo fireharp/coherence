@@ -197,9 +197,13 @@ type snapshot struct {
 }
 
 var (
-	dateDirRe  = regexp.MustCompile(`^\d{4}-\d{2}-\d{2}$`)
-	verdictRe  = regexp.MustCompile(`(?im)^- \*\*Suite verdict:\*\*\s*` + "`?" + `([a-z]+)` + "`?")
-	tableRowRe = regexp.MustCompile(`(?m)^\|\s*[A-Za-z0-9]`)
+	dateDirRe = regexp.MustCompile(`^\d{4}-\d{2}-\d{2}$`)
+	verdictRe = regexp.MustCompile(`(?im)^- \*\*Suite verdict:\*\*\s*` + "`?" + `([a-z]+)` + "`?")
+	// tableRowRe matches a data row in the per-scenario Markdown
+	// table whose first cell is a typed-id like `CB-001` or
+	// `EXT-DOC-001`. Requires the prefix-digit pattern so the
+	// `| ID | Status | …` header row is not counted as a scenario.
+	tableRowRe = regexp.MustCompile(`(?m)^\|\s*[A-Z]+(?:-[A-Z]+)*-\d+\b`)
 )
 
 func listSnapshots(rootDir string) []snapshot {
