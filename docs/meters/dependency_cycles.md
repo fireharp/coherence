@@ -30,11 +30,17 @@ Source: [`internal/drift/drift.go#computeDependencyCycles`](../../internal/drift
   "dependency_cycles": {
     "score": 1,
     "cycles": [
-      ["dir:cmd/foo", "dir:internal/util", "dir:cmd/foo"]
+      ["dir:cmd/foo", "dir:internal/util"]
     ]
   }
 }
 ```
+
+Each cycle is listed once — the back-edge implicitly closes the loop
+from the last node to the first. So `["A", "B"]` means `A → B → A`.
+Cycles are canonicalized (rotated so the lexicographically-smallest
+node id is first) and deduped so the same cycle reached from different
+entry nodes only appears once.
 
 ## Signal interpretation
 
