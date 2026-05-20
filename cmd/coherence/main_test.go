@@ -5,6 +5,19 @@ import (
 	"testing"
 )
 
+func TestRunVersionExitsZero(t *testing.T) {
+	// Smoke test: both human and JSON modes must return exit 0 even
+	// when invoked outside a stamped build (the `(no build info)`
+	// fallback path). Catches a future refactor that accidentally
+	// errors out on missing VCS info.
+	if got := runVersion(false); got != 0 {
+		t.Errorf("runVersion(false) = %d, want 0", got)
+	}
+	if got := runVersion(true); got != 0 {
+		t.Errorf("runVersion(true) = %d, want 0", got)
+	}
+}
+
 func TestStrictPromotionMessageWithRegressions(t *testing.T) {
 	got := strictPromotionMessage(3, nil)
 	if !strings.Contains(got, "3 regression(s)") {
