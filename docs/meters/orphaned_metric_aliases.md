@@ -37,9 +37,9 @@ of scope.
 {
   "orphaned_metric_aliases": {
     "score": 2,
-    "aliases": [
-      {"file": "apps/frontend/src/dashboard.tsx", "alias": "success_rate"},
-      {"file": "apps/frontend/src/api.ts", "alias": "success_rate"}
+    "orphans": [
+      {"file": "apps/frontend/src/dashboard.tsx", "orphan_name": "success_rate"},
+      {"file": "apps/frontend/src/api.ts", "orphan_name": "success_rate"}
     ]
   }
 }
