@@ -223,11 +223,11 @@ scenario is a self-contained directory under
 
 `status:` distinguishes:
 
-- `deterministic` — runnable with the current rules/IDs engine. Today: 7
-  scenarios (CB-001/002/003/005/007/009/010) pass.
-- `skip` — deferred to later milestones (graph/Merkle/LLM layers). Today: 8
-  scenarios (CB-004/006/008/011..015) are shipped as stubs so the suite is
-  honest about scope. Each stub records the milestone that would enable it.
+- `deterministic` / `scored` — runnable with the current rules/IDs/graph/drift
+  engine. 20 scenarios (CB-001..005, CB-007..021) pass today.
+- `skip` — deferred to later milestones (typically LLM-only paths). 1 scenario
+  remains: CB-006 (LLM contradiction). Each skipped stub records the milestone
+  that would enable it.
 
 The shipped totals are: **21 scenarios, 20 pass, 0 fail, 1 skipped** —
 matching M1's "at least 8 internal scenarios exist" bar.
