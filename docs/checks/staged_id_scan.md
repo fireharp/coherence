@@ -67,15 +67,30 @@ runs, or the pair-matching mis-aligns.
 
 The check does NOT fire on:
 
-- Markdown files (skipped — docs often reference planned IDs).
-- Test files (`*_test.go`, `*.test.ts`, `__tests__/x.tsx`, etc.).
+- **Markdown files** — skipped at the caller in
+  `cmd/coherence/main.go:evaluate()`. Docs often reference
+  planned IDs.
+- **Test files** — also skipped at the caller via
+  `graph.IsTestFile`. Test fixtures frequently mention example IDs.
+- **IDs wrapped in backticks** — sanitization happens inside
+  `ids.Scan` via `SanitizeIDSearchText`. Catches inline-code in doc
+  comments, template literals, and raw-string fixtures.
+- **IDs inside `"..."` double-quote spans on the same line** — same
+  sanitizer pass. Catches string-literal sample data like
+  `"docs/.../US-007.md"`.
+
+The drift-meter version (`unknown_id_references`) adds two
+additional skips that the **staged scan does NOT apply**:
+
 - Files under `.agents/` (skill packs use example IDs).
-- Files under fixture-shaped dirs: `scenarios/`, `fixtures/`,
-  `testdata/`, `golden/`, `eval/`.
-- IDs wrapped in backticks (inline-code in doc comments / template
-  literals / raw strings).
-- IDs inside `"..."` double-quote spans on the same line (string
-  literal sample data like `"docs/.../US-007.md"`).
+- Files under fixture-shaped dirs (`scenarios/`, `fixtures/`,
+  `testdata/`, `golden/`, `eval/`).
+
+If you stage a typed-ID under one of those paths, the pre-commit
+scan will fire. The drift meter won't, on the same file. This is
+intentional: the drift meter scans the entire tree on each run, so
+it needs broader skip rules to avoid noise; the staged scan only
+sees a few files at a time and a fire is usually actionable.
 
 ## Example
 
