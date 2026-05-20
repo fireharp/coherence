@@ -1429,6 +1429,72 @@ func TestActiveMetersListsAllFiringMeters(t *testing.T) {
 	}
 }
 
+func TestHumanSummaryCleanReportIsOneLine(t *testing.T) {
+	r := Report{
+		Verdict:           VerdictClean,
+		NeighborhoodDrift: NeighborhoodDrift{BaseAvailable: true},
+	}
+	s := HumanSummary(r)
+	if !strings.HasPrefix(s, "coherence drift: verdict=clean") {
+		t.Errorf("clean header missing, got %q", s)
+	}
+	if n := strings.Count(s, "\n"); n != 1 {
+		t.Errorf("clean summary should be 1 line + newline, got %d newlines: %q", n, s)
+	}
+}
+
+func TestHumanSummaryWithActiveAndSilencedMeters(t *testing.T) {
+	r := Report{
+		Verdict:        VerdictTelemetry,
+		ActiveMeters:   []string{"neighborhood_drift", "stale_tests"},
+		SilencedMeters: []string{"path_loss"},
+	}
+	s := HumanSummary(r)
+	for _, want := range []string{"verdict=telemetry", "active: neighborhood_drift, stale_tests", "silenced: path_loss"} {
+		if !strings.Contains(s, want) {
+			t.Errorf("missing %q in summary: %q", want, s)
+		}
+	}
+}
+
+func TestHumanSummaryListsRegressionEntries(t *testing.T) {
+	r := Report{
+		Verdict:           VerdictTelemetry,
+		NeighborhoodDrift: NeighborhoodDrift{BaseAvailable: true},
+		ActiveMeters:      []string{"path_loss"},
+		Regressions: Regressions{
+			Count: 2,
+			Entries: []RegressionEntry{
+				{Kind: "newly_orphaned_concept", ID: "concept:auth", SuggestedAction: "add link"},
+				{Kind: "newly_orphaned_endpoint", ID: "endpoint:GET:/", SuggestedAction: "add test"},
+			},
+		},
+	}
+	s := HumanSummary(r)
+	if !strings.Contains(s, "regressions=2") {
+		t.Errorf("missing regression count in header: %q", s)
+	}
+	for _, want := range []string{"concept:auth", "endpoint:GET:/", "[newly_orphaned_concept]", "[newly_orphaned_endpoint]"} {
+		if !strings.Contains(s, want) {
+			t.Errorf("missing %q in regression list: %q", want, s)
+		}
+	}
+	if !strings.Contains(s, "next: review") {
+		t.Errorf("regression report should include a next-step hint: %q", s)
+	}
+}
+
+func TestHumanSummaryHintsIndexWhenBaselineMissing(t *testing.T) {
+	r := Report{
+		Verdict:           VerdictClean,
+		NeighborhoodDrift: NeighborhoodDrift{BaseAvailable: false},
+	}
+	s := HumanSummary(r)
+	if !strings.Contains(s, "next: coherence index") {
+		t.Errorf("missing index hint when baseline unavailable: %q", s)
+	}
+}
+
 func TestSilencedMetersListsConventionGatedSignals(t *testing.T) {
 	// Repo where path_loss + claim_support are at floor but neither
 	// convention is in use: both should appear in silenced_meters so
