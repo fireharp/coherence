@@ -589,17 +589,21 @@ read concept-level changes without re-parsing the prose.
 
 ### Semantic hash coverage
 
-| kind       | semantic hash                                                |
-| ---------- | ------------------------------------------------------------ |
-| `markdown` | frontmatter + headings + link targets + code-fence languages |
-| `yaml`     | placeholder (= content hash) — M2 follow-up                  |
-| `code`     | placeholder (= content hash) — M2 follow-up                  |
-| `other`    | placeholder (= content hash)                                 |
+| kind                                       | semantic hash                                                                  |
+| ------------------------------------------ | ------------------------------------------------------------------------------ |
+| `markdown`                                 | frontmatter + headings + link targets + code-fence languages                   |
+| `.go`                                      | AST via `go/parser` + canonical `go/format` (comments stripped)                |
+| `.ts/.tsx/.js/.jsx/.java/.kt/.rs/.sql`     | `//` + `/* */` stripped, whitespace collapsed, SHA-256                         |
+| `.py/.rb`                                  | `#` lines + triple-quoted docstrings stripped, whitespace collapsed, SHA-256   |
+| `yaml`                                     | placeholder (= content hash) — M2 follow-up                                    |
+| `other`                                    | placeholder (= content hash)                                                   |
 
-So a typo in Markdown prose leaves `semantic_hash` unchanged; renaming a
-heading, swapping a link target, changing a frontmatter value, or editing a
-code-fence language all change it. This is the foundation for the deferred
-CB-011 (semantic no-op) and CB-013 (stale generated artifact) scenarios.
+So a typo in Markdown prose leaves `semantic_hash` unchanged; a comment-only
+edit to a Go function (or a JSDoc-only edit to a `.ts` file) does the same.
+Renaming a heading, swapping a link target, changing function bodies, etc.
+all change it. This is what lets `stale_tests` ignore comment-only edits, and
+the foundation for the deferred CB-011 (semantic no-op) and CB-013 (stale
+generated artifact) scenarios.
 
 ## Watch
 
