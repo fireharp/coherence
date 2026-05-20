@@ -94,9 +94,10 @@ type Result struct {
 
 // Suite aggregates scenario results.
 type Suite struct {
-	Results []Result `json:"results"`
-	Pass    bool     `json:"pass"`
-	Counts  Counts   `json:"counts"`
+	Results []Result    `json:"results"`
+	Pass    bool        `json:"pass"`
+	Counts  Counts      `json:"counts"`
+	LLM     *LLMMetrics `json:"llm,omitempty"`
 }
 
 // Counts is the suite-wide tally.
@@ -105,6 +106,23 @@ type Counts struct {
 	Pass    int `json:"pass"`
 	Fail    int `json:"fail"`
 	Skipped int `json:"skipped"`
+}
+
+// LLMMetrics is the precision/recall/F1 roll-up across the LLM-mode
+// scenarios that actually executed. Each LLM scenario has an expected
+// fires set (possibly empty for negative cases); a finding rule that
+// appears in both expected and actual contributes one true positive,
+// in actual-only contributes one false positive, and in expected-only
+// contributes one false negative. Skipped scenarios are excluded — the
+// metrics only reflect runs the harness could observe.
+type LLMMetrics struct {
+	ScenariosRun   int     `json:"scenarios_run"`
+	TruePositives  int     `json:"true_positives"`
+	FalsePositives int     `json:"false_positives"`
+	FalseNegatives int     `json:"false_negatives"`
+	Precision      float64 `json:"precision"`
+	Recall         float64 `json:"recall"`
+	F1             float64 `json:"f1"`
 }
 
 // IDs returns the sorted catalog of scenario IDs shipped with the binary.
@@ -232,7 +250,49 @@ func RunAll() Suite {
 			suite.Pass = false
 		}
 	}
+	suite.LLM = aggregateLLMMetrics(suite.Results)
 	return suite
+}
+
+// aggregateLLMMetrics walks the LLM-mode results that actually ran
+// (not skipped, not errored) and computes precision/recall/F1 over
+// their expected vs actual rule sets. Returns nil when no LLM
+// scenario executed — keeps the field omitempty-friendly.
+func aggregateLLMMetrics(results []Result) *LLMMetrics {
+	m := &LLMMetrics{}
+	for _, r := range results {
+		if r.Scenario.Mode != ModeLLM || r.Skipped || r.Error != "" {
+			continue
+		}
+		m.ScenariosRun++
+		expected := stringSet(r.Scenario.Expected.LLMFires)
+		actual := stringSet(r.Actual)
+		for rule := range expected {
+			if actual[rule] {
+				m.TruePositives++
+			} else {
+				m.FalseNegatives++
+			}
+		}
+		for rule := range actual {
+			if !expected[rule] {
+				m.FalsePositives++
+			}
+		}
+	}
+	if m.ScenariosRun == 0 {
+		return nil
+	}
+	if m.TruePositives+m.FalsePositives > 0 {
+		m.Precision = float64(m.TruePositives) / float64(m.TruePositives+m.FalsePositives)
+	}
+	if m.TruePositives+m.FalseNegatives > 0 {
+		m.Recall = float64(m.TruePositives) / float64(m.TruePositives+m.FalseNegatives)
+	}
+	if m.Precision+m.Recall > 0 {
+		m.F1 = 2 * m.Precision * m.Recall / (m.Precision + m.Recall)
+	}
+	return m
 }
 
 func stringSet(s []string) map[string]bool {
@@ -268,6 +328,11 @@ func Human(s Suite) string {
 				fmt.Fprintf(&b, "       unexpected fires: %s\n", strings.Join(r.Extra, ", "))
 			}
 		}
+	}
+	if s.LLM != nil {
+		fmt.Fprintf(&b, "\nllm contradiction metrics (across %d scenario(s)): P=%.2f R=%.2f F1=%.2f  (TP=%d FP=%d FN=%d)\n",
+			s.LLM.ScenariosRun, s.LLM.Precision, s.LLM.Recall, s.LLM.F1,
+			s.LLM.TruePositives, s.LLM.FalsePositives, s.LLM.FalseNegatives)
 	}
 	verdict := "pass"
 	if !s.Pass {
