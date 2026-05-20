@@ -12,14 +12,17 @@ the typed-id itself doesn't reach any supporting evidence. The chain
 
 Source: [`internal/drift/drift.go#computeBrokenImplementsChains`](../../internal/drift/drift.go).
 
-1. Find every `implements` edge in the graph. These are emitted by
-   the Go AST extractor and the TS/Python implements extractor when a
-   doc comment / JSDoc / docstring says `implements US-001` style.
-2. For each `implements: code_symbol → typed-id`:
-   - Walk outgoing `supports` edges from the typed-id.
-   - If no `supports` edge exists → the chain is broken: the code
-     claims to implement something with no evidence backing it.
+1. Pre-compute the **`supported` set**: every node that's the target
+   of at least one `supports` edge (evidence packets create
+   `supports: evidence → typed-id`).
+2. Walk every `implements` edge (code_symbol → typed-id). If the
+   target is NOT in the `supported` set → broken chain. The code
+   claims to implement something with no evidence backing it.
 3. `score = broken_chain_count`.
+
+Implements edges are emitted by the Go AST extractor and the
+TS/Python implements extractor when a doc comment / JSDoc / docstring
+says `implements US-001` style.
 
 The meter does NOT fire when the typed-id ITSELF doesn't exist in
 the graph — that's [`unknown_id_references`](unknown_id_references.md)'s
