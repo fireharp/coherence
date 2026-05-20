@@ -34,7 +34,8 @@ Source: [`internal/drift/drift.go#computeBlastRadius`](../../internal/drift/drif
 {
   "blast_radius": {
     "score": 142,
-    "touched": 167,
+    "base_available": true,
+    "changed_node_count": 167,
     "impacted_neighbors": 142,
     "centrality_weight": 599
   }
