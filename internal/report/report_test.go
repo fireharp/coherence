@@ -105,6 +105,56 @@ func keys(m map[string]any) []string {
 	return out
 }
 
+func TestWriteAndLoadRoundtrip(t *testing.T) {
+	dir := t.TempDir()
+	want := Payload{
+		Subcommand:        "scan",
+		Files:             []string{"a.go", "b.go"},
+		Findings:          []Finding{{Rule: "r1", Severity: "warn", Message: "msg"}},
+		Flags:             map[string]any{"json": true},
+		SuggestedCommands: []string{"coherence index"},
+	}
+	if err := Write(dir, want); err != nil {
+		t.Fatalf("Write: %v", err)
+	}
+	if _, err := os.Stat(Path(dir)); err != nil {
+		t.Fatalf("Write did not create file: %v", err)
+	}
+	got := Load(dir)
+	if got == nil {
+		t.Fatal("Load returned nil after Write")
+	}
+	if got.Subcommand != want.Subcommand || len(got.Files) != 2 || got.Findings[0].Rule != "r1" {
+		t.Errorf("roundtrip mismatch: %+v", got)
+	}
+}
+
+func TestLoadAbsentFileReturnsNil(t *testing.T) {
+	dir := t.TempDir()
+	if got := Load(dir); got != nil {
+		t.Errorf("Load with no file should return nil, got %+v", got)
+	}
+}
+
+func TestWriteNormalizesNilFields(t *testing.T) {
+	// Empty slices/maps must round-trip as `[]` / `{}` (not `null`) so
+	// agents consuming the report don't need to handle both shapes.
+	dir := t.TempDir()
+	if err := Write(dir, Payload{Subcommand: "scan"}); err != nil {
+		t.Fatal(err)
+	}
+	body, err := os.ReadFile(Path(dir))
+	if err != nil {
+		t.Fatal(err)
+	}
+	js := string(body)
+	for _, want := range []string{`"files": []`, `"findings": []`, `"flags": {}`, `"suggested_commands": []`} {
+		if !strings.Contains(js, want) {
+			t.Errorf("expected %q in serialized payload, got:\n%s", want, js)
+		}
+	}
+}
+
 func TestFromResultNilModel(t *testing.T) {
 	r := llm.Result{Skipped: "off", Calls: 0, Model: ""}
 	out := FromResult(r)
