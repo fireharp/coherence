@@ -77,7 +77,8 @@ Use Go 1.22 or newer.
   All 9 GOAL.md M4 meters: `required_edge_breakage`, `trace_coverage`,
   `neighborhood_drift`, `semantic_movement`, `path_loss`, `blast_radius`,
   `staleness`, `claim_support`, `contradiction` (LLM-fed; disabled
-  otherwise), plus six extra graph-traversal and link-integrity meters:
+  otherwise), plus 10 extra graph-traversal and link-integrity meters
+  (19 total):
   `stale_decision_links` (supersedes + mentions),
   `broken_implements_chains` (implements + supports),
   `dependency_cycles` (DFS over depends_on; promotes to `warn` since
