@@ -3,10 +3,31 @@ package initcmd
 import (
 	"errors"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
 )
+
+// hooksPathGitInit creates a fresh git work-tree so configureHooksPath
+// has a `.git` directory to find. Returns the dir.
+func hooksPathGitInit(t *testing.T) string {
+	t.Helper()
+	dir := t.TempDir()
+	if err := exec.Command("git", "-C", dir, "init", "-q").Run(); err != nil {
+		t.Fatal(err)
+	}
+	return dir
+}
+
+func hooksPathReadValue(t *testing.T, dir string) string {
+	t.Helper()
+	out, err := exec.Command("git", "-C", dir, "config", "--default=", "core.hooksPath").Output()
+	if err != nil {
+		t.Fatalf("read core.hooksPath: %v", err)
+	}
+	return strings.TrimSpace(string(out))
+}
 
 func withoutSkillInstall() string {
 	return SkillInstallOff
@@ -197,6 +218,56 @@ func TestRunSkipsExistingSkillWithoutForce(t *testing.T) {
 	}
 	if !saw {
 		t.Fatalf("expected mixed update action for missing reference file, got %+v", res.Actions)
+	}
+}
+
+func TestConfigureHooksPathSkipsWhenNotAGitWorktree(t *testing.T) {
+	dir := t.TempDir() // no `git init`
+	got := configureHooksPath(dir)
+	if got.Status != "skipped" || !strings.Contains(got.Detail, "not a git work-tree") {
+		t.Errorf("expected skipped/not-a-git-work-tree, got %+v", got)
+	}
+}
+
+func TestConfigureHooksPathSetsWhenUnset(t *testing.T) {
+	dir := hooksPathGitInit(t)
+	got := configureHooksPath(dir)
+	if got.Status != "created" {
+		t.Errorf("expected created, got %+v", got)
+	}
+	if v := hooksPathReadValue(t, dir); v != ".githooks" {
+		t.Errorf("core.hooksPath = %q, want .githooks", v)
+	}
+}
+
+func TestConfigureHooksPathIdempotentWhenAlreadyGithooks(t *testing.T) {
+	dir := hooksPathGitInit(t)
+	if err := exec.Command("git", "-C", dir, "config", "core.hooksPath", ".githooks").Run(); err != nil {
+		t.Fatal(err)
+	}
+	got := configureHooksPath(dir)
+	if got.Status != "skipped" || !strings.Contains(got.Detail, "already = .githooks") {
+		t.Errorf("expected skipped/already, got %+v", got)
+	}
+}
+
+func TestConfigureHooksPathPreservesNonGithooksValue(t *testing.T) {
+	// Regression guard for iteration 132: when a project already uses
+	// husky/lefthook (or any other hooks dir), `coherence init` must NOT
+	// overwrite the existing `core.hooksPath` value.
+	dir := hooksPathGitInit(t)
+	if err := exec.Command("git", "-C", dir, "config", "core.hooksPath", ".husky").Run(); err != nil {
+		t.Fatal(err)
+	}
+	got := configureHooksPath(dir)
+	if got.Status != "skipped" {
+		t.Errorf("expected skipped to preserve husky setup, got status=%q", got.Status)
+	}
+	if !strings.Contains(got.Detail, ".husky") {
+		t.Errorf("detail should mention the preserved value, got %q", got.Detail)
+	}
+	if v := hooksPathReadValue(t, dir); v != ".husky" {
+		t.Errorf("core.hooksPath = %q, want preserved .husky", v)
 	}
 }
 
