@@ -151,3 +151,35 @@ func TestRunWarnsOnMissingGitignoreEntry(t *testing.T) {
 		t.Fatalf("expected gitignore warn, got %+v", rep.Checks)
 	}
 }
+
+func TestHumanRendersAllStatusMarkers(t *testing.T) {
+	r := Report{
+		OK: false,
+		Checks: []Check{
+			{ID: "ontology", Status: "ok", Message: "loaded 5 rule(s)"},
+			{ID: "hook", Status: "warn", Message: "missing", Detail: "no pre-commit", Fix: "run init"},
+			{ID: "state", Status: "fail", Message: "bad", Detail: "directory missing"},
+		},
+	}
+	out := Human(r)
+	for _, want := range []string{
+		"[ok] ontology: loaded 5 rule(s)",
+		"[WARN] hook: missing",
+		"detail: no pre-commit",
+		"fix:    run init",
+		"[FAIL] state: bad",
+		"doctor: blocking issues present.",
+	} {
+		if !strings.Contains(out, want) {
+			t.Errorf("missing %q in human output:\n%s", want, out)
+		}
+	}
+}
+
+func TestHumanReportsOKFooterWhenAllClean(t *testing.T) {
+	r := Report{OK: true, Checks: []Check{{ID: "x", Status: "ok", Message: "fine"}}}
+	out := Human(r)
+	if !strings.Contains(out, "doctor: no blocking issues.") {
+		t.Errorf("missing clean footer, got:\n%s", out)
+	}
+}
