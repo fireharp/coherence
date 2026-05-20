@@ -355,3 +355,60 @@ func TestWriteMarkdownProducesIndexFile(t *testing.T) {
 		}
 	}
 }
+
+func TestHumanRendersPassFailSkip(t *testing.T) {
+	suite := Suite{
+		Pass:   false,
+		Counts: Counts{Total: 3, Pass: 1, Fail: 1, Skipped: 1},
+		Results: []Result{
+			{Scenario: Scenario{ID: "CB-001", Name: "passes"}, Pass: true},
+			{Scenario: Scenario{ID: "CB-002", Name: "fails"}, Pass: false, Missing: []string{"r1"}, Extra: []string{"r2"}},
+			{Scenario: Scenario{ID: "CB-003", Name: "skipped"}, Skipped: true},
+		},
+	}
+	out := Human(suite)
+	for _, want := range []string{
+		"3 scenarios — pass=1 fail=1 skip=1",
+		"[pass] CB-001  passes",
+		"[FAIL] CB-002  fails",
+		"missing fires: r1",
+		"unexpected fires: r2",
+		"[skip] CB-003  skipped",
+		"suite verdict: fail",
+	} {
+		if !strings.Contains(out, want) {
+			t.Errorf("missing %q in human output:\n%s", want, out)
+		}
+	}
+}
+
+func TestHumanReportsErrorWhenSet(t *testing.T) {
+	suite := Suite{
+		Pass:   false,
+		Counts: Counts{Total: 1, Fail: 1},
+		Results: []Result{{
+			Scenario: Scenario{ID: "CB-X", Name: "broken"},
+			Pass:     false,
+			Error:    "syntax error in fixture",
+		}},
+	}
+	out := Human(suite)
+	if !strings.Contains(out, "error: syntax error in fixture") {
+		t.Errorf("error message missing, got:\n%s", out)
+	}
+}
+
+func TestHumanPassVerdictWhenAllOK(t *testing.T) {
+	suite := Suite{
+		Pass:   true,
+		Counts: Counts{Total: 2, Pass: 2},
+		Results: []Result{
+			{Scenario: Scenario{ID: "CB-1"}, Pass: true},
+			{Scenario: Scenario{ID: "CB-2"}, Pass: true},
+		},
+	}
+	out := Human(suite)
+	if !strings.Contains(out, "suite verdict: pass") {
+		t.Errorf("clean pass run should produce verdict=pass, got:\n%s", out)
+	}
+}
