@@ -5,6 +5,11 @@ diffed files against declarative rules in `ontology.yml`, scans non-Markdown
 additions for unknown `US-###`, `ADR-###`, and `IDR-###` references, and can
 optionally run a Groq semantic pass.
 
+> **Algorithm reference**: [`docs/`](docs/README.md) has a long-form
+> page for every drift meter and check, with the algorithm, JSON
+> output shape, signal interpretation, and a benchmark scenario
+> example. Start there if you want to understand a firing signal.
+
 ## Requirements
 
 - Go 1.22 or newer (to build)
