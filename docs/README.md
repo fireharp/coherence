@@ -79,17 +79,35 @@ These run outside `coherence drift` — they fire from `scan`, `check`,
 
 ## Verdict + outcome contract
 
-The drift report rolls every meter's score up into a single `verdict`:
+The drift report rolls every meter's score up into a single `verdict`,
+one of three values:
 
 - **`clean`** — no actionable signal.
-- **`telemetry`** — movement-only meters fired (neighborhood drift,
-  semantic movement, blast radius). Informational. Doesn't block commit.
-- **`warn`** — at least one real meter fired (ontology rule with
-  severity=warn, dependency cycles, dangling imports, broken_links, etc.).
-  Pre-commit returns exit 1.
-- **`telemetry_only_movement`** — telemetry verdict where only movement
-  meters are active and no diff-aware regression appeared. Set in the
-  `outcome` JSON for agent consumers.
+- **`telemetry`** — at least one "soft" meter fired: movement meters
+  (`neighborhood_drift`, `semantic_movement`, `blast_radius`),
+  diff-aware regressions, or signal-only meters (`broken_links`,
+  `unknown_id_references`, `stale_tests`, `orphan_endpoints`,
+  `orphaned_metric_aliases`, `stale_decision_links`,
+  `broken_implements_chains`, `unimplemented_stories`, `path_loss`,
+  `claim_support`, `contradiction`). Informational; doesn't block
+  commit by itself, but `coherence drift --strict` promotes
+  `telemetry` → exit 1.
+- **`warn`** — an ontology rule with `severity=warn` fired,
+  `dependency_cycles` is non-zero, or `dangling_imports` is non-zero.
+  These promote because they break the build or violate a declared
+  invariant. Pre-commit returns exit 1.
+
+The `outcome.json` (written by `scan` / `check` / `review`) adds four
+boolean fields on top of the verdict:
+
+- `safe_to_commit` — false when a `blocking_error` is present.
+- `review_recommended` — true when a `warn`-severity rule fired or
+  a diff-aware regression appeared.
+- `blocking_error` — true when an `error`-severity rule fired.
+- `telemetry_only_movement` — true when the verdict is `telemetry`
+  AND only movement meters are active AND no diff-aware regression
+  appeared. Lets agents distinguish "informational drift" from
+  "actionable telemetry" without re-reading the meter list.
 
 Convention gates (path_loss, claim_support, orphan_endpoints,
 unimplemented_stories) **silence** their meter from verdict promotion
