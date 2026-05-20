@@ -11,6 +11,7 @@ import (
 	"coherence/internal/graph"
 	"coherence/internal/ontology"
 	"coherence/internal/report"
+	"coherence/internal/rules"
 )
 
 func indexAndWrite(t *testing.T, dir string) {
@@ -190,6 +191,66 @@ func TestComputePayloadJSONShape(t *testing.T) {
 		if !contains(string(buf), want) {
 			t.Errorf("JSON missing key %s\n---\n%s", want, string(buf))
 		}
+	}
+}
+
+func TestFindingsTableEmptyReturnsPlaceholder(t *testing.T) {
+	got := findingsTable(nil)
+	if len(got) != 1 || got[0] != "_No findings._" {
+		t.Errorf("empty findings should return placeholder line, got %v", got)
+	}
+}
+
+func TestFindingsTableRendersRows(t *testing.T) {
+	got := findingsTable([]rules.Finding{
+		{Rule: "r1", Severity: "warn", TriggeredBy: []string{"a.go", "b.go"}},
+		{Rule: "r2", Severity: "error"},
+	})
+	if len(got) != 4 {
+		t.Fatalf("expected header(2) + 2 rows = 4 lines, got %d (%v)", len(got), got)
+	}
+	if !contains(got[0], "Severity") || !contains(got[0], "Rule") {
+		t.Errorf("first row should be header, got %q", got[0])
+	}
+	if !contains(got[2], "warn") || !contains(got[2], "r1") || !contains(got[2], "a.go") {
+		t.Errorf("warn row missing details: %q", got[2])
+	}
+	if !contains(got[3], "error") || !contains(got[3], "r2") || !contains(got[3], "—") {
+		t.Errorf("error row missing details or em-dash, got: %q", got[3])
+	}
+}
+
+func TestFindingsTableTruncatesTriggeredByAtThree(t *testing.T) {
+	got := findingsTable([]rules.Finding{
+		{Rule: "r", Severity: "warn", TriggeredBy: []string{"a", "b", "c", "d", "e"}},
+	})
+	// Row 2 (after header+sep) is the data row. It should mention a,b,c
+	// but NOT d or e.
+	row := got[2]
+	for _, w := range []string{"`a`", "`b`", "`c`"} {
+		if !contains(row, w) {
+			t.Errorf("expected %s in row, got %q", w, row)
+		}
+	}
+	for _, w := range []string{"`d`", "`e`"} {
+		if contains(row, w) {
+			t.Errorf("expected %s NOT in row (truncated at 3), got %q", w, row)
+		}
+	}
+}
+
+func TestBulletsJoinsWithBackticks(t *testing.T) {
+	got := bullets([]string{"alpha", "beta", "gamma"})
+	want := "`alpha`, `beta`, `gamma`"
+	if got != want {
+		t.Errorf("bullets = %q, want %q", got, want)
+	}
+}
+
+func TestBulletsEmpty(t *testing.T) {
+	got := bullets(nil)
+	if got != "" {
+		t.Errorf("empty input should return empty string, got %q", got)
 	}
 }
 
