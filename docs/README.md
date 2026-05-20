@@ -92,10 +92,19 @@ one of three values:
   `claim_support`, `contradiction`). Informational; doesn't block
   commit by itself, but `coherence drift --strict` promotes
   `telemetry` → exit 1.
-- **`warn`** — an ontology rule with `severity=warn` fired,
-  `dependency_cycles` is non-zero, or `dangling_imports` is non-zero.
-  These promote because they break the build or violate a declared
-  invariant. Pre-commit returns exit 1.
+- **`warn`** — promoted by any of these five conditions:
+  - An ontology rule fired (`required_edge_breakage.broken_count > 0`).
+    Severity `error` additionally flips `outcome.blocking_error=true`.
+  - At least one user story is uncovered
+    (`trace_coverage.uncovered_stories` non-empty).
+  - The LLM contradiction pass emitted a finding
+    (`contradiction.contradiction_count > 0`).
+  - A directory-level import cycle exists
+    (`dependency_cycles.score > 0`).
+  - An unresolved TS / Python relative import exists
+    (`dangling_imports.score > 0`).
+
+  Pre-commit returns exit 1 on `warn`.
 
 The `outcome.json` (written by `scan` / `check` / `review`) adds four
 boolean fields on top of the verdict:

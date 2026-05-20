@@ -53,12 +53,20 @@ When the repo has zero user-story nodes, the meter reports
 | Output | Meaning |
 |--------|---------|
 | `story_coverage = 1.0` | Every story is cited somewhere. |
-| `story_coverage < 1.0`, `newly_uncovered_stories` empty | Long-standing coverage gap. Telemetry only. |
-| `newly_uncovered_stories` non-empty | Regression: a story you used to cite is no longer referenced. Verdict-promoting. |
+| `story_coverage < 1.0` | Verdict → `warn`. Any uncovered story promotes verdict — see `computeVerdict` line 1748. Pre-commit returns exit 1. |
+| `newly_uncovered_stories` non-empty | Regression list. Surfaced in `regressions.entries[]` with a suggested action even when overall coverage is still high. |
 
-The fix for a newly-uncovered story: re-add the citation. Either the
-linking doc was renamed (and the link wasn't updated), or the file that
-mentioned the typed-id had the mention deleted.
+The fix for an uncovered story: cite it from any doc, or remove the
+story file if it's no longer needed. For a *newly*-uncovered story
+(was cited before, isn't now), either the linking doc was renamed
+(update the link) or the file that mentioned the typed-id had the
+mention deleted (restore the reference).
+
+Note: this is one of three drift meters that promotes verdict to `warn`
+(the others are `required_edge_breakage` with any broken rule, and the
+build-breakers `dependency_cycles` and `dangling_imports`). It's a hard
+gate by design: if you ship user stories, every one should have at
+least one citing doc.
 
 ## Example — CB-019
 
