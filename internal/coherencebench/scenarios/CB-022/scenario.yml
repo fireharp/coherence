@@ -1,11 +1,11 @@
-id: CB-006
-name: markdown claim contradicts cited markdown context
+id: CB-022
+name: consistent markdown change does not trigger contradiction
 description: |
-  LLM contradiction pass: the staged change to `docs/specs/auth.md`
-  flips the authentication mechanism from OAuth 2.0 to Basic Auth,
-  directly contradicting the cited `docs/decisions/ADR-007.md` which
-  mandates OAuth 2.0 and explicitly forbids Basic Auth. The deterministic
-  rule engine can't catch this — it requires the LLM contradiction pass.
+  Negative-case companion to CB-006. The staged change to
+  `docs/specs/auth.md` rewords the spec but stays semantically
+  aligned with `docs/decisions/ADR-007.md` (still mandates OAuth 2.0).
+  The LLM contradiction pass should NOT emit `llm-contradiction`. Used
+  to measure precision (no false positives) alongside CB-006's recall.
   Skipped at runtime when no GROQ_API_KEY is set.
 mode: llm
 base_files:
@@ -33,11 +33,10 @@ files:
   docs/specs/auth.md: |
     # Authentication Spec
 
-    The system now authenticates users using **Basic Auth** as the
-    primary mechanism. Per [ADR-007](../decisions/ADR-007.md), this
-    is the simplest approach and transmits credentials inline with
-    each request, which is fine for our use case.
+    The system uses **OAuth 2.0** for user authentication, following
+    the authorization code + PKCE flow as required by
+    [ADR-007](../decisions/ADR-007.md). All token exchanges happen
+    over TLS and the access token is rotated on every refresh.
 expected:
-  llm_fires:
-    - llm-contradiction
+  llm_fires: []
   blocking_error: false

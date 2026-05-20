@@ -15,18 +15,18 @@ func TestLoadUnknownScenarioErrors(t *testing.T) {
 	}
 }
 
-func TestLoadSkippedScenarioReturnsNilOntology(t *testing.T) {
-	// CB-006 is the LLM-only contradiction scenario, status: skip.
-	// Load should return the scenario but no ontology and no error.
+func TestLoadLLMScenarioReturnsNilOntology(t *testing.T) {
+	// CB-006 is an LLM-mode files scenario. Load should return the
+	// scenario but no ontology; the ontology is materialized at runtime.
 	sc, ont, err := Load("CB-006")
 	if err != nil {
 		t.Fatalf("Load(CB-006): %v", err)
 	}
-	if sc.Status != StatusSkip {
-		t.Errorf("expected status=skip, got %q", sc.Status)
+	if sc.Mode != ModeLLM {
+		t.Errorf("expected mode=llm, got %q", sc.Mode)
 	}
 	if ont != nil {
-		t.Errorf("skipped scenario should return nil ontology, got %+v", ont)
+		t.Errorf("LLM files scenario should return nil ontology, got %+v", ont)
 	}
 }
 
@@ -66,7 +66,7 @@ func TestIDsShipsAllExpectedScenarios(t *testing.T) {
 		"CB-006", "CB-007", "CB-008", "CB-009", "CB-010",
 		"CB-011", "CB-012", "CB-013", "CB-014", "CB-015",
 		"CB-016", "CB-017", "CB-018", "CB-019", "CB-020",
-		"CB-021",
+		"CB-021", "CB-022",
 	}
 	gotSet := map[string]bool{}
 	for _, n := range got {
@@ -90,26 +90,30 @@ func TestRunAllPassesDeterministicAndSkipsRest(t *testing.T) {
 		}
 		t.Fatal("suite did not pass")
 	}
-	if suite.Counts.Total != 21 {
-		t.Errorf("total = %d, want 21", suite.Counts.Total)
+	if suite.Counts.Total != 22 {
+		t.Errorf("total = %d, want 22", suite.Counts.Total)
 	}
 	if suite.Counts.Pass < 13 {
 		t.Errorf("expected >=13 deterministic passes, got %d", suite.Counts.Pass)
 	}
-	if suite.Counts.Skipped < 1 {
-		t.Errorf("expected >=1 skipped (LLM-only deferred), got %d", suite.Counts.Skipped)
-	}
+	// CB-006 + CB-022 are LLM-mode. They skip at runtime when
+	// GROQ_API_KEY is absent (CI-friendly default) and run for real
+	// when it's set. The suite-pass invariant holds either way.
 }
 
-func TestRunSkipScenarioReturnsSkippedResult(t *testing.T) {
-	// CB-006 is LLM-only and stays skipped until a real LLM harness is
-	// wired into bench; we use it as the canonical example here.
+func TestRunLLMScenarioRespectsAPIKeyPresence(t *testing.T) {
+	// CB-006 is LLM-mode. Without GROQ_API_KEY it must skip; with it,
+	// either pass (LLM caught the contradiction) or fail with a
+	// recorded LLM result — never erroring out at the runner level.
 	r := Run("CB-006")
-	if !r.Skipped {
-		t.Errorf("CB-006 should be skipped, got %+v", r)
+	if os.Getenv("GROQ_API_KEY") == "" {
+		if !r.Skipped || !r.Pass {
+			t.Errorf("CB-006 with no GROQ_API_KEY should skip-pass, got %+v", r)
+		}
+		return
 	}
-	if !r.Pass {
-		t.Errorf("skipped scenarios should report pass=true")
+	if r.Error != "" {
+		t.Errorf("CB-006 with GROQ_API_KEY should not error at runner level, got %q", r.Error)
 	}
 }
 

@@ -40,6 +40,13 @@ type Expected struct {
 	Fires         []string       `yaml:"fires" json:"fires"`
 	BlockingError bool           `yaml:"blocking_error" json:"blocking_error"`
 	Drift         *DriftExpected `yaml:"drift,omitempty" json:"drift,omitempty"`
+	// LLMFires lists rule names the LLM contradiction pass must emit
+	// against the materialized scenario. Setting this field puts the
+	// scenario in LLM mode; `Files`/`BaseFiles` must also be set so
+	// the runner has a real working tree to stage from. An empty list
+	// (`llm_fires: []`) is the negative case — assert the LLM does NOT
+	// produce any contradiction findings on this change.
+	LLMFires []string `yaml:"llm_fires,omitempty" json:"llm_fires,omitempty"`
 }
 
 // Scenario is the metadata side of a CB-### entry. When `Files` is
@@ -51,10 +58,15 @@ type Expected struct {
 // `neighborhood_drift`. Without `Files` it falls back to the path-list
 // `rules.Evaluate` mode used by the original CB-001..CB-010 scenarios.
 type Scenario struct {
-	ID           string            `yaml:"id" json:"id"`
-	Name         string            `yaml:"name" json:"name"`
-	Description  string            `yaml:"description" json:"description"`
-	Status       string            `yaml:"status" json:"status"`
+	ID          string `yaml:"id" json:"id"`
+	Name        string `yaml:"name" json:"name"`
+	Description string `yaml:"description" json:"description"`
+	Status      string `yaml:"status" json:"status"`
+	// Mode is an optional explicit dispatch hint. "" defers to the
+	// auto-rules (Files presence chooses files-mode). "llm" selects the
+	// LLM-contradiction runner — Files/BaseFiles must be set so the
+	// runner has a worktree to stage from.
+	Mode         string            `yaml:"mode,omitempty" json:"mode,omitempty"`
 	ChangedFiles []string          `yaml:"changed_files" json:"changed_files"`
 	Files        map[string]string `yaml:"files,omitempty" json:"files,omitempty"`
 	BaseFiles    map[string]string `yaml:"base_files,omitempty" json:"base_files,omitempty"`
@@ -64,6 +76,10 @@ type Scenario struct {
 	RemovedFiles []string `yaml:"removed_files,omitempty" json:"removed_files,omitempty"`
 	Expected     Expected `yaml:"expected" json:"expected"`
 }
+
+// ModeLLM is the explicit dispatch hint that selects the LLM
+// contradiction runner. Set via `mode: llm` on a Files-mode scenario.
+const ModeLLM = "llm"
 
 // Result is one scenario outcome.
 type Result struct {
@@ -151,6 +167,9 @@ func Run(id string) Result {
 	}
 	if sc.Status == StatusSkip {
 		return Result{Scenario: sc, Skipped: true, Pass: true}
+	}
+	if sc.Mode == ModeLLM {
+		return runLLMScenario(sc)
 	}
 	if len(sc.Files) > 0 {
 		return runFilesScenario(sc)
