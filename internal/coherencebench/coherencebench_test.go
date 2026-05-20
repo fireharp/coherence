@@ -8,6 +8,57 @@ import (
 	"time"
 )
 
+func TestLoadUnknownScenarioErrors(t *testing.T) {
+	_, _, err := Load("CB-999")
+	if err == nil {
+		t.Error("Load on unknown id should return error")
+	}
+}
+
+func TestLoadSkippedScenarioReturnsNilOntology(t *testing.T) {
+	// CB-006 is the LLM-only contradiction scenario, status: skip.
+	// Load should return the scenario but no ontology and no error.
+	sc, ont, err := Load("CB-006")
+	if err != nil {
+		t.Fatalf("Load(CB-006): %v", err)
+	}
+	if sc.Status != StatusSkip {
+		t.Errorf("expected status=skip, got %q", sc.Status)
+	}
+	if ont != nil {
+		t.Errorf("skipped scenario should return nil ontology, got %+v", ont)
+	}
+}
+
+func TestLoadFilesModeReturnsNilOntology(t *testing.T) {
+	// CB-021 uses files-mode (inline materialized repo). Ontology should
+	// be nil — the embedded files include their own ontology.yml.
+	sc, ont, err := Load("CB-021")
+	if err != nil {
+		t.Fatalf("Load(CB-021): %v", err)
+	}
+	if len(sc.Files) == 0 {
+		t.Error("CB-021 should be files-mode with non-empty Files map")
+	}
+	if ont != nil {
+		t.Error("files-mode scenario should return nil ontology")
+	}
+}
+
+func TestLoadScoredScenarioReturnsOntology(t *testing.T) {
+	// CB-001 is deterministic path-list mode — has a sibling ontology.yml.
+	_, ont, err := Load("CB-001")
+	if err != nil {
+		t.Fatalf("Load(CB-001): %v", err)
+	}
+	if ont == nil {
+		t.Error("path-list scenario should return ontology, got nil")
+	}
+	if len(ont.Rules) == 0 {
+		t.Error("ontology should have at least one rule")
+	}
+}
+
 func TestIDsShipsAllExpectedScenarios(t *testing.T) {
 	got := IDs()
 	want := []string{
