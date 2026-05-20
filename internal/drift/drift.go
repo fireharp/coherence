@@ -99,9 +99,10 @@ type StaleTest struct {
 }
 
 // StaleTests is the 17th drift meter. It walks `verifies` edges and
-// compares base+current snapshot content_hashes for the test-source
-// pair. When the source content changed but the test didn't, the test
-// is flagged as potentially stale.
+// compares base+current snapshot semantic_hashes for the test-source
+// pair (SemanticHash strips comments + canonicalizes whitespace per
+// language). When the source's semantics changed but the test's
+// didn't, the test is flagged as potentially stale.
 type StaleTests struct {
 	Score int         `json:"score"`
 	Stale []StaleTest `json:"stale"`
