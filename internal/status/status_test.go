@@ -193,6 +193,71 @@ func TestComputePayloadJSONShape(t *testing.T) {
 	}
 }
 
+func TestListSnapshotsEmptyWhenNoRunsDir(t *testing.T) {
+	dir := t.TempDir()
+	if got := listSnapshots(dir); got != nil {
+		t.Errorf("no runs/ dir should return nil, got %+v", got)
+	}
+}
+
+func TestListSnapshotsParsesDateDirs(t *testing.T) {
+	dir := t.TempDir()
+	runDir := filepath.Join(dir, ".coherence", "runs", "2026-05-19")
+	if err := os.MkdirAll(runDir, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	body := "# Scenario suite run\n\n" +
+		"- **Suite verdict:** `pass`\n\n" +
+		"| ID | Status |\n" +
+		"|----|--------|\n" +
+		"| CB-001 | pass |\n" +
+		"| CB-002 | pass |\n"
+	if err := os.WriteFile(filepath.Join(runDir, "index.md"), []byte(body), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	snaps := listSnapshots(dir)
+	if len(snaps) != 1 {
+		t.Fatalf("expected 1 snapshot, got %d (%+v)", len(snaps), snaps)
+	}
+	if snaps[0].Date != "2026-05-19" || snaps[0].Verdict != "pass" || snaps[0].ScenarioCount != 2 {
+		t.Errorf("snapshot = %+v, want {Date:2026-05-19 Verdict:pass ScenarioCount:2}", snaps[0])
+	}
+}
+
+func TestListSnapshotsSortsNewestFirst(t *testing.T) {
+	dir := t.TempDir()
+	for _, d := range []string{"2026-04-01", "2026-05-19", "2026-05-01"} {
+		runDir := filepath.Join(dir, ".coherence", "runs", d)
+		if err := os.MkdirAll(runDir, 0o755); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(filepath.Join(runDir, "index.md"), []byte("- **Suite verdict:** `pass`\n"), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	snaps := listSnapshots(dir)
+	if len(snaps) != 3 || snaps[0].Date != "2026-05-19" || snaps[2].Date != "2026-04-01" {
+		t.Errorf("snapshots not sorted newest-first: %+v", snaps)
+	}
+}
+
+func TestListSnapshotsSkipsNonDateDirs(t *testing.T) {
+	dir := t.TempDir()
+	for _, name := range []string{"latest", "scratch", "2026-05-19"} {
+		runDir := filepath.Join(dir, ".coherence", "runs", name)
+		if err := os.MkdirAll(runDir, 0o755); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(filepath.Join(runDir, "index.md"), []byte("- **Suite verdict:** `pass`\n"), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	snaps := listSnapshots(dir)
+	if len(snaps) != 1 || snaps[0].Date != "2026-05-19" {
+		t.Errorf("non-date dirs should be skipped, got %+v", snaps)
+	}
+}
+
 func contains(s, sub string) bool {
 	return len(s) >= len(sub) && indexOf(s, sub) >= 0
 }
