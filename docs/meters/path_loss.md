@@ -24,11 +24,14 @@ silenced from verdict promotion (still reported as informational).
 Source: [`internal/drift/drift.go#computePathLoss`](../../internal/drift/drift.go).
 
 1. Collect all `concept` nodes.
-2. For each concept, run a typed-edge BFS. Allowed traversal edges:
-   `mentions`, `defines`, `implements`, `verifies`, `supports`,
-   `cites`, `references`.
+2. For each concept, run an **undirected** BFS over a fixed edge set:
+   `describes`, `mentions`, `defines`, `implements`, `supports`,
+   `verifies`, `depends_on`, `generates`, `expects`. Defined in
+   `supportPathEdgeKinds` at
+   [`internal/drift/drift.go`](../../internal/drift/drift.go).
 3. A concept "reaches an artifact" if BFS hits any node of kind `test`,
-   `evidence`, `endpoint`, or `generated_artifact`.
+   `evidence`, `endpoint`, or `generated_artifact`
+   (`supportPathArtifactKinds`).
 4. `score = orphan_concepts / total_concepts`.
 5. Convention check: if ZERO concepts ever reach an artifact (i.e. the
    repo doesn't even have evidence/endpoint nodes), `convention=false`,

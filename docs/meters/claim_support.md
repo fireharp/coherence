@@ -23,8 +23,11 @@ Source: [`internal/drift/drift.go#computeClaimSupport`](../../internal/drift/dri
    [`internal/graph/extractors.go`](../../internal/graph/extractors.go).
    Each bullet matching `^\s*-\s+(must|should|shall|...)` becomes a
    `claim:<hash>` node with a `defines` edge from its source doc.
-2. For each claim node, run typed-edge BFS (same edge set as
-   `path_loss`).
+2. For each claim node, run an **undirected** BFS over the same edge
+   set as `path_loss`: `describes`, `mentions`, `defines`,
+   `implements`, `supports`, `verifies`, `depends_on`, `generates`,
+   `expects` (shared `supportPathEdgeKinds` constant in
+   [`internal/drift/drift.go`](../../internal/drift/drift.go)).
 3. A claim "reaches an artifact" if BFS hits a node of kind `test`,
    `evidence`, `endpoint`, or `generated_artifact`.
 4. `score = unsupported_claims / total_claims`.
