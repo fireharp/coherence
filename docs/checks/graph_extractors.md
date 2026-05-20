@@ -56,9 +56,13 @@ The build IS sensitive to:
 - File content (obviously).
 - Filenames + paths.
 - Frontmatter order is normalized.
-- Comments in `.go` files are **NOT** part of the AST output for the
-  Pass-9 extractor (it uses `parser.ParseFile` with comments dropped),
-  except where the implements extractor explicitly scans them.
+- Comments in `.go` files ARE part of the AST for Pass-8 (the Go
+  extractor uses `parser.ParseComments` so it can pick up
+  `// implements US-001` doc-comment annotations).
+- The snapshot's `SemanticHash` for Go files uses a separate parse in
+  `internal/snapshot/go_semantic.go` that explicitly nils
+  `file.Comments` before re-formatting — so comment-only edits
+  flip `ContentHash` but not `SemanticHash`.
 
 The build is NOT sensitive to:
 
