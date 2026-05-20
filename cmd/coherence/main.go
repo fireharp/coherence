@@ -1024,10 +1024,10 @@ func runVersion(jsonOut bool) int {
 		return 0
 	}
 	if info.Revision == "" {
-		fmt.Printf("coherence (%s) — (no build info; built without VCS stamping)\n", info.Module)
+		fmt.Println("coherence — (no build info; built without VCS stamping)")
 		return 0
 	}
-	fmt.Printf("coherence %s\n  revision: %s\n  built:    %s\n  go:       %s\n", info.Module, info.Revision, info.Time, info.GoVer)
+	fmt.Printf("coherence\n  module:   %s\n  revision: %s\n  built:    %s\n  go:       %s\n", info.Module, info.Revision, info.Time, info.GoVer)
 	return 0
 }
 
