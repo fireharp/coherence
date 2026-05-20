@@ -27,25 +27,27 @@ meaningful.
 
 Source: [`internal/graph/extractors.go`](../../internal/graph/extractors.go)
 and per-language extractor files in [`internal/graph/`](../../internal/graph).
+Pass numbers below match the `// Pass N:` comments in the
+`Build()` function.
 
 | # | Pass | What it adds |
 |---|------|--------------|
-| 1 | **Markdown structure** | `doc` node per `.md` file; `concept` node per H2/H3 heading; `contains` edges from doc to concept. |
-| 2 | **Markdown inline links** | `mentions` edges from `doc` to any other tracked node referenced via `[text](path)`. |
-| 3 | **Frontmatter typed-IDs** | `user_story` / `adr` / `idr` nodes from YAML frontmatter `id:` fields. `supersedes` edges from `supersedes: ADR-XXX`. |
-| 4 | **Markdown claim bullets** | `claim` nodes from bullets matching `^\s*-\s+(must\|should\|shall\|requires\|ensures\|guarantees\|cannot\|will)`. `defines` edge from doc to claim. |
-| 5 | **YAML extraction** | Metrics under `metrics: …`; database field defs; configured commands. |
-| 6 | **Makefile / shell commands** | `command` nodes from `Makefile` targets and `package.json` scripts. |
-| 7 | **Evidence packets** | `evidence` node per `docs/evidence/<id>/` dir. `supports` edge to the matching typed-id. |
-| 8 | **Test / source pairing** | `test` nodes per test-file pattern + `verifies` edges to inferred source file (see [`SuggestTestFilePath`](../../internal/graph/extractors.go)). |
-| 9 | **Go AST extraction** | `code_symbol` nodes for top-level exported funcs/types/consts; `depends_on` edges from per-module imports; `endpoint` nodes from `http.HandleFunc` + chi-style + stdlib registrations; `implements` edges from `// implements US-001` doc comments. |
-| 10 | **TS extraction** | Same shape: `code_symbol` for top-level exports; `endpoint` for Express/Fastify routes; `implements` from JSDoc. |
-| 11 | **Python extraction** | Top-level def/class/UPPER_CONST → `code_symbol`; relative imports → `depends_on`; `implements` from `# implements US-001` comments and docstrings. |
-| 12 | **SQL-ish schema** | `database_field` nodes from `CREATE TABLE` / `ALTER TABLE` declarations. |
-| 13 | **Generated artifact pairing** | When a doc references a "generates: <path>" annotation, link generator → generated. |
-| 14 | **Code-level typed-id mentions** | For each non-Markdown tracked file, regex-match `US-###`/`ADR-###`/`IDR-###` (after sanitization), emit `mentions` edges. Used by `path_loss` BFS. |
-| 15 | **Implements (TS/Python)** | Top-level symbol pairing for JSDoc / docstring `implements`. |
-| 16 | **File references** | When a tracked file path appears as a literal string in code or markdown, emit a `references` edge. |
+| 1 | **File + directory** | `file` / `directory` nodes for every tracked path. `contains` edges from each dir to its children (recursive). |
+| 2 | **Markdown structure + frontmatter** | `doc` nodes per `.md` file; `concept` nodes per H2/H3 heading (with `contains` from doc to concept); `claim` nodes from bullets starting with claim-verbs (must/should/shall/requires/ensures/guarantees/cannot/will); `user_story` / `adr` / `idr` nodes from YAML frontmatter `id:`; `supersedes` edges from `supersedes: ADR-XXX`; `mentions` edges from inline `[text](path)` links. |
+| 3 | **Ontology rules + commands** | `rule` nodes per `ontology.yml` entry. `command` nodes from each rule's `suggested_commands`. |
+| 4 | **Metric files** | `metric` nodes from `metrics:` blocks in YAML/JSON config files. |
+| 5 | **Test files** | `test` nodes per test-file pattern (`*_test.go`, `*.test.ts`, `__tests__/`, `test_*.py`, etc.). `verifies` edges inferred via [`sourceFileForTest`](../../internal/graph/extractors.go). |
+| 6 | **Evidence packets** | `evidence` node per `docs/evidence/<bucket>/` dir. `supports` edge when the bucket name matches a typed-id (`US-###` / `ADR-###` / `IDR-###`). |
+| 7 | **Generated artifacts** | `generated_artifact` nodes from ontology rules' `expect_any` paths so the graph can reason about generator→generated relationships. |
+| 8 | **Go AST extraction** | `code_symbol` nodes for top-level exported funcs/types/consts; `depends_on` edges from in-module imports; `endpoint` nodes from `http.HandleFunc` + chi-style + stdlib registrations; `implements` edges from `// implements US-001` doc comments. |
+| 9 | **Schema files** | `data_model` nodes from SQL `CREATE TABLE`, protobuf `message`, and GraphQL `type` declarations. |
+| 10 | **Makefile commands** | `command` nodes from `Makefile` / `*.mk` target declarations. |
+| 11 | **TypeScript extraction** | `code_symbol` for top-level exports; `depends_on` from relative imports (with ESM `.js`→`.ts` swap); `endpoint` nodes for Express/Fastify/Hono routes; `implements` from JSDoc / inline-comment annotations. |
+| 12 | **Python extraction** | Top-level `def`/`class`/`UPPER_CONST` → `code_symbol`; explicit-relative imports → `depends_on`; `implements` from `# implements US-001` comments + docstrings. |
+| 13 | **Shell script commands** | `command` nodes from `.sh` / `.bash` / `.zsh` files (and shebang-detected scripts). |
+| 14 | **Code-level typed-id mentions** | Non-Markdown tracked file scan. After [`ids.SanitizeIDSearchText`](../../internal/ids/ids.go) strips backtick/quote spans, regex-match `\b(US\|ADR\|IDR)-\d{3}\b` and emit `mentions` edges from file → typed-id. Used by `path_loss` BFS. |
+| 15 | **Code-level metric mentions** | Same shape as Pass 14 but for metric names. Pass 4 emits the metric nodes; this pass wires mentions edges from any code file that names them. Used by `orphaned_metric_aliases`. |
+| 16 | **File references** | When a tracked file path appears as a quoted string literal in code, emit a reference edge (used by drift's blast radius + neighborhood analysis). |
 
 ## Determinism
 
