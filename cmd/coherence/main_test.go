@@ -5,6 +5,38 @@ import (
 	"testing"
 )
 
+func TestResolveOntologyPathDefault(t *testing.T) {
+	args := parsedArgs{flags: map[string]any{}}
+	got := resolveOntologyPath("/repo", args)
+	if got != "/repo/ontology.yml" {
+		t.Errorf("default = %q, want /repo/ontology.yml", got)
+	}
+}
+
+func TestResolveOntologyPathAbsolute(t *testing.T) {
+	args := parsedArgs{flags: map[string]any{"ontology": "/etc/coherence/ontology.yml"}}
+	got := resolveOntologyPath("/repo", args)
+	if got != "/etc/coherence/ontology.yml" {
+		t.Errorf("absolute override = %q, want untouched", got)
+	}
+}
+
+func TestResolveOntologyPathRelative(t *testing.T) {
+	args := parsedArgs{flags: map[string]any{"ontology": "configs/coherence.yml"}}
+	got := resolveOntologyPath("/repo", args)
+	if got != "/repo/configs/coherence.yml" {
+		t.Errorf("relative override = %q, want /repo/configs/coherence.yml", got)
+	}
+}
+
+func TestResolveOntologyPathEmptyStringFallsBack(t *testing.T) {
+	args := parsedArgs{flags: map[string]any{"ontology": ""}}
+	got := resolveOntologyPath("/repo", args)
+	if got != "/repo/ontology.yml" {
+		t.Errorf("empty override should fall back to default, got %q", got)
+	}
+}
+
 func TestRunVersionExitsZero(t *testing.T) {
 	// Smoke test: both human and JSON modes must return exit 0 even
 	// when invoked outside a stamped build (the `(no build info)`
