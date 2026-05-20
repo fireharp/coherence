@@ -1429,6 +1429,46 @@ func TestActiveMetersListsAllFiringMeters(t *testing.T) {
 	}
 }
 
+func TestSilencedMetersListsConventionGatedSignals(t *testing.T) {
+	// Repo where path_loss + claim_support are at floor but neither
+	// convention is in use: both should appear in silenced_meters so
+	// agents can see why the verdict stays clean.
+	r := Report{
+		PathLoss:     PathLoss{TotalConcepts: 12, Score: 1.0, Convention: false},
+		ClaimSupport: ClaimSupport{TotalClaims: 4, Score: 1.0, Convention: false},
+		OrphanEndpoints: OrphanEndpoints{
+			Score:      1,
+			Convention: false,
+			Orphans:    []string{"endpoint:GET:/"},
+		},
+	}
+	got := silencedMeters(r)
+	want := map[string]bool{"path_loss": true, "claim_support": true, "orphan_endpoints": true}
+	if len(got) != len(want) {
+		t.Errorf("expected %d silenced meters, got %d (%v)", len(want), len(got), got)
+	}
+	for _, m := range got {
+		if !want[m] {
+			t.Errorf("unexpected silenced meter %q", m)
+		}
+	}
+}
+
+func TestSilencedMetersIgnoresMetersWithConventionTrue(t *testing.T) {
+	// When the convention IS in use, the meter is NOT silenced —
+	// it's active and should drive verdict promotion via the normal
+	// path. silencedMeters should return empty.
+	r := Report{
+		PathLoss:        PathLoss{TotalConcepts: 12, Score: 1.0, Convention: true},
+		ClaimSupport:    ClaimSupport{TotalClaims: 4, Score: 1.0, Convention: true},
+		OrphanEndpoints: OrphanEndpoints{Score: 1, Convention: true},
+	}
+	got := silencedMeters(r)
+	if len(got) != 0 {
+		t.Errorf("convention=true meters should not appear in silenced list, got %v", got)
+	}
+}
+
 func TestActiveMetersEmptyOnCleanReport(t *testing.T) {
 	got := activeMeters(Report{})
 	if len(got) != 0 {
