@@ -1,5 +1,10 @@
 # Repository Guidelines
 
+> **Algorithm reference**: see [`docs/`](docs/README.md) for a long-form
+> page on every drift meter and check, including JSON output shape,
+> verdict-promotion conditions, and a benchmark scenario example. Agents
+> interpreting a firing signal should start there.
+
 ## Project Structure & Module Organization
 
 This is a Go CLI. `cmd/coherence/main.go` owns argument parsing, repo-root
