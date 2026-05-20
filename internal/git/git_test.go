@@ -142,6 +142,75 @@ func TestLsFilesScopedToPathArgs(t *testing.T) {
 	}
 }
 
+func TestRootReturnsRepoTopLevel(t *testing.T) {
+	dir := gitInitAndCommit(t, map[string]string{"a.txt": "alpha\n"})
+	// Chdir into the repo so Root() can resolve via cwd.
+	oldWd, _ := os.Getwd()
+	defer os.Chdir(oldWd)
+	if err := os.Chdir(dir); err != nil {
+		t.Fatal(err)
+	}
+	got, err := Root()
+	if err != nil {
+		t.Fatalf("Root() error: %v", err)
+	}
+	// macOS resolves /var → /private/var symlinks; use filepath.EvalSymlinks
+	// to compare canonical paths.
+	wantResolved, _ := filepath.EvalSymlinks(dir)
+	gotResolved, _ := filepath.EvalSymlinks(got)
+	if gotResolved != wantResolved {
+		t.Errorf("Root() = %q (resolved %q), want %q (resolved %q)", got, gotResolved, dir, wantResolved)
+	}
+}
+
+func TestRootErrorsOutsideRepo(t *testing.T) {
+	oldWd, _ := os.Getwd()
+	defer os.Chdir(oldWd)
+	if err := os.Chdir(t.TempDir()); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := Root(); err == nil {
+		t.Error("Root() outside repo should return error")
+	}
+}
+
+func TestDiffNameOnlyListsChangedFiles(t *testing.T) {
+	dir := gitInitAndCommit(t, map[string]string{"a.txt": "v1\n", "b.txt": "v1\n"})
+	// Modify a, commit so HEAD~1..HEAD diff has one file.
+	if err := os.WriteFile(filepath.Join(dir, "a.txt"), []byte("v2\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := exec.Command("git", "-C", dir, "add", "-A").Run(); err != nil {
+		t.Fatal(err)
+	}
+	if err := exec.Command("git", "-C", dir, "-c", "commit.gpgsign=false",
+		"-c", "user.email=t@t", "-c", "user.name=t",
+		"commit", "-qm", "update a").Run(); err != nil {
+		t.Fatal(err)
+	}
+	got := DiffNameOnly("HEAD~1..HEAD", dir)
+	if len(got) != 1 || got[0] != "a.txt" {
+		t.Errorf("DiffNameOnly(HEAD~1..HEAD) = %v, want [a.txt]", got)
+	}
+}
+
+func TestStagedHunkProducesUnifiedDiff(t *testing.T) {
+	dir := gitInitAndCommit(t, map[string]string{"a.txt": "v1\n"})
+	if err := os.WriteFile(filepath.Join(dir, "a.txt"), []byte("v1\nadded\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := exec.Command("git", "-C", dir, "add", "a.txt").Run(); err != nil {
+		t.Fatal(err)
+	}
+	got := StagedHunk("a.txt", dir)
+	if !strings.Contains(got, "+added") {
+		t.Errorf("StagedHunk should contain +added, got %q", got)
+	}
+	if !strings.Contains(got, "@@") {
+		t.Errorf("StagedHunk should contain unified diff header @@, got %q", got)
+	}
+}
+
 func TestStagedAddedContentReturnsPlusLinesOnly(t *testing.T) {
 	dir := gitInitAndCommit(t, map[string]string{"a.txt": "line1\nline2\n"})
 	// Modify and stage.
