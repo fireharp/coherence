@@ -13,13 +13,18 @@ guidance.
 
 Source: [`internal/drift/drift.go#computeStaleDecisionLinks`](../../internal/drift/drift.go).
 
-1. Find every `supersedes` edge in the graph (created when an ADR/IDR
-   has `supersedes: ADR-XXX` in its frontmatter). The *new* one
-   supersedes the *old* one.
-2. Find every `mentions` edge pointing at the **superseded** node.
-3. For each such mention, check whether the citing doc also mentions
-   the **successor** (via any other `mentions` edge). If not → stale
-   citation.
+1. Index `defines` edges from doc nodes → typed-id nodes (so we know
+   which doc *defines* each `us:` / `adr:` / `idr:` id).
+2. Index `mentions` edges target → list of citing doc nodes.
+3. For every `supersedes` edge (new id supersedes old id):
+   - Find the doc(s) that define the old id.
+   - Find the doc(s) that define the new id.
+   - For each doc citing the old-id-doc, check whether it ALSO cites
+     any new-id-doc. If not → stale citation.
+
+A "supersedes" edge comes from frontmatter: ADR-019 with
+`supersedes: ADR-007` in its YAML frontmatter emits a
+`supersedes: adr:ADR-019 → adr:ADR-007` edge (new supersedes old).
 
 ## Output shape
 
@@ -28,7 +33,11 @@ Source: [`internal/drift/drift.go#computeStaleDecisionLinks`](../../internal/dri
   "stale_decision_links": {
     "score": 1,
     "stale_links": [
-      {"source": "docs/specs/auth.md", "cited": "adr:ADR-007", "successor": "adr:ADR-019"}
+      {
+        "citing_doc": "doc:docs/specs/auth.md",
+        "superseded_id": "adr:ADR-007",
+        "superseder_id": "adr:ADR-019"
+      }
     ]
   }
 }
