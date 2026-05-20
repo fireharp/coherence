@@ -63,7 +63,8 @@ Use Go 1.22 or newer.
   `depends_on` edges. The Markdown
   semantic hash ignores prose typos but flips
   on heading/link/frontmatter/code-fence-language edits. Foundation for
-  drift scoring and the deferred CB-008/011/013/014/015 scenarios.
+  drift scoring; those scenarios (CB-008, CB-011..015) now ship as
+  scored — only CB-006 (LLM contradiction) remains deferred.
 - `./bin/coherence diff [--base=path] [--json]` compares the current
   worktree against a baseline snapshot AND the current graph against
   `.coherence/graph.json`. Per-file `change_type` distinguishes `added` /
