@@ -70,8 +70,12 @@ The `Evaluate(ont, changedFiles)` function:
      suggested_commands.
 2. Return `[]Finding`.
 
-Globs use **doublestar** syntax (`**`) via
-[`internal/glob`](../../internal/glob).
+Globs use a custom regex-based matcher in
+[`internal/glob`](../../internal/glob). Syntax supports `**` (any
+depth, including zero), `*` (any chars except `/`), and `?` (one char
+except `/`). It's compatible with the most common doublestar patterns
+but isn't the `doublestar` library — see `internal/glob/glob.go` for
+the exact translation rules.
 
 ## Where it runs
 
