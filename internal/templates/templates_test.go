@@ -183,3 +183,46 @@ func TestDetectNxIsMonorepo(t *testing.T) {
 		t.Errorf("nx.json should detect monorepo, got %q", got)
 	}
 }
+
+func TestCountExtCountsMatchingFiles(t *testing.T) {
+	dir := detectFixture(t, map[string]string{
+		"a.go":         "",
+		"b.go":         "",
+		"c.go":         "",
+		"d.txt":        "",
+		"main.py":      "",
+		"sub/inner.go": "", // not counted — countExt is non-recursive
+	}, nil)
+	if got := countExt(dir, ".go"); got != 3 {
+		t.Errorf("countExt(.go) = %d, want 3 (a/b/c.go; sub/inner.go is in a subdir)", got)
+	}
+	if got := countExt(dir, ".py"); got != 1 {
+		t.Errorf("countExt(.py) = %d, want 1", got)
+	}
+	if got := countExt(dir, ".rs"); got != 0 {
+		t.Errorf("countExt(.rs) on absent ext = %d, want 0", got)
+	}
+}
+
+func TestCountExtMissingDir(t *testing.T) {
+	got := countExt("/no/such/path", ".go")
+	if got != 0 {
+		t.Errorf("missing dir should return 0, got %d", got)
+	}
+}
+
+func TestScenariosForReturnsEvalBytes(t *testing.T) {
+	body, err := ScenariosFor("go-cli")
+	if err != nil {
+		t.Fatalf("ScenariosFor(go-cli) failed: %v", err)
+	}
+	if len(body) == 0 {
+		t.Error("eval fixture body is empty")
+	}
+}
+
+func TestScenariosForUnknownTemplate(t *testing.T) {
+	if _, err := ScenariosFor("does-not-exist"); err == nil {
+		t.Error("expected error for unknown template, got nil")
+	}
+}
