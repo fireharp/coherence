@@ -685,11 +685,12 @@ func run() int {
 		return runWatchLoop(args, rootDir, ontPath)
 
 	case "init":
-		// Auto-detect template when the user didn't specify one.
+		// Auto-detect template when the user didn't specify one — or
+		// when they explicitly passed --template=auto.
 		defaultTpl := templates.Detect(rootDir)
 		userTpl := stringFlag(args, "template", "")
 		chosen := userTpl
-		if chosen == "" {
+		if chosen == "" || chosen == "auto" {
 			chosen = defaultTpl
 			if !boolFlag(args, "json") && defaultTpl != templates.Default {
 				fmt.Fprintf(os.Stderr, "coherence: auto-detected template %q (use --template=NAME to override)\n", defaultTpl)
