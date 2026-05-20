@@ -46,10 +46,15 @@ When no baseline graph is on disk, the meter reports
 
 ## Signal interpretation
 
+The verdict-promotion threshold is `telemetryFloor = 2.0`, defined in
+[`internal/drift/drift.go`](../../internal/drift/drift.go). Above
+that, verdict → `telemetry`.
+
 | Output | Meaning |
 |--------|---------|
 | `score = 0` | No graph movement. (Usually means the snapshot was just rebuilt.) |
-| `score < ~50` | Small change. Single feature, a few file edits. |
+| `score < 2.0` | Below floor. No verdict promotion. |
+| `score 2.0–~50` | Small change. Verdict → `telemetry`. |
 | `score 50–200` | Moderate change. A spec rewrite or moderate refactor. |
 | `score > 200` | Large change. Either a real big diff, or a stale baseline (hint emitted: "`coherence index` will refresh"). |
 

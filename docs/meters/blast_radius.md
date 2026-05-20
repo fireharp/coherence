@@ -43,10 +43,15 @@ Source: [`internal/drift/drift.go#computeBlastRadius`](../../internal/drift/drif
 
 ## Signal interpretation
 
+The verdict-promotion threshold is `blastRadiusFloor = 10`, defined in
+[`internal/drift/drift.go`](../../internal/drift/drift.go). Above that,
+verdict → `telemetry`.
+
 | Output | Meaning |
 |--------|---------|
 | `score = 0` | No graph touch. (Often: only `.coherence/` or untracked changes.) |
-| `score < ~50` | Local change, low impact. |
+| `score < 10` | Below floor. No verdict promotion. |
+| `score 10–~50` | Local change, low impact. Verdict → `telemetry`. |
 | `score 50–200` | Moderate review surface — couple of feature areas touched. |
 | `score > 200` | Broad change. Worth splitting into smaller commits if possible. |
 

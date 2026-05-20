@@ -45,10 +45,12 @@ Source: [`internal/drift/staleness.go`](../../internal/drift/staleness.go).
 | Output | Meaning |
 |--------|---------|
 | `score = 0` | Everything recent. |
-| `score < 0.1` | Small staleness tail. Healthy. |
-| `score > 0.3` | A meaningful chunk of the repo hasn't been touched. Could be reference docs (fine) or abandoned material (review). |
+| `score < 0.25` | Below the `stalenessFloor` constant. Telemetry only — doesn't promote verdict. |
+| `score ≥ 0.25` | Verdict → `telemetry`. A meaningful chunk of the repo hasn't been touched — review the `oldest_stale_files` list to decide whether to refresh, archive, or delete. |
 
-The `oldest_stale_files` list is sorted oldest-first so an agent can
+The `stalenessFloor` constant lives in
+[`internal/drift/staleness.go`](../../internal/drift/staleness.go). The
+`oldest_stale_files` list is sorted oldest-first so an agent can
 glance at the top 3–5 to spot the longest-untouched material.
 
 ## Example
