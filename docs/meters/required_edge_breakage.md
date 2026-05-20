@@ -48,11 +48,15 @@ Each rule has:
 
 ## Signal interpretation
 
-| Output | Meaning |
-|--------|---------|
-| `score: 0` | All rules satisfied. |
-| `score > 0`, severity=`warn` | Verdict → `warn`. Pre-commit returns exit 1. |
-| `score > 0`, severity=`error` | Verdict → `warn` + `blocking_error=true`. Pre-commit hard-fails. |
+The drift verdict and the outcome `blocking_error` flag live on
+**different** layers — both can fire from the same broken rule, but
+they're computed independently.
+
+| Layer | Field | Triggered by |
+|-------|-------|--------------|
+| Drift verdict | `verdict: warn` | Any `RequiredEdgeBreakage.BrokenCount > 0`, regardless of the rule's severity (see `computeVerdict` line 1745). |
+| Outcome | `blocking_error: true` | A rule with `severity: error` fired in `scan` / `check` / `review`. Set in `internal/outcome/outcome.go` from the rules engine's findings, not from the drift meter. |
+| Pre-commit exit code | `1` | The drift verdict is `warn` OR an error-severity finding fired. |
 
 The fix: update the matching `expect_any` path alongside your `when`
 path. E.g., if you touched `apps/backend/src/server.ts`, also touch
