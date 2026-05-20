@@ -45,6 +45,32 @@ func TestIsTestFileTSDotTestDotSpec(t *testing.T) {
 	}
 }
 
+func TestSuggestTestFilePathPerLanguage(t *testing.T) {
+	cases := map[string]string{
+		"cmd/server.go":  "cmd/server_test.go",
+		"src/auth.ts":    "src/auth.test.ts",
+		"src/Button.tsx": "src/Button.test.tsx",
+		"src/util.js":    "src/util.test.js",
+		"src/App.jsx":    "src/App.test.jsx",
+		"src/loader.mts": "src/loader.test.mts",
+		"src/loader.cts": "src/loader.test.cts",
+		"app/auth.py":    "app/test_auth.py",
+	}
+	for src, want := range cases {
+		if got := SuggestTestFilePath(src); got != want {
+			t.Errorf("SuggestTestFilePath(%q) = %q, want %q", src, got, want)
+		}
+	}
+}
+
+func TestSuggestTestFilePathUnknownExtReturnsEmpty(t *testing.T) {
+	for _, src := range []string{"src/lib.rs", "main.kt", "Build.gradle", "Makefile"} {
+		if got := SuggestTestFilePath(src); got != "" {
+			t.Errorf("SuggestTestFilePath(%q) = %q, want empty (no clean reverse-map)", src, got)
+		}
+	}
+}
+
 func TestIsTestFileDirectoryFallbacks(t *testing.T) {
 	// Regression guard for iteration 89: the TS switch case once
 	// returned false before the directory fallback ran, so a file
