@@ -54,10 +54,15 @@ The meter:
 
 ## Signal interpretation
 
+The verdict-promotion threshold is `semanticMovementFloor = 0.05`,
+defined in [`internal/drift/drift.go`](../../internal/drift/drift.go).
+Above that, verdict → `telemetry`.
+
 | Output | Meaning |
 |--------|---------|
 | `score = 0`, all noop | Prose edits only. Re-running graph analysis is unnecessary. |
-| `score > 0` | A heading, link, frontmatter, or code-fence in some doc changed. The graph may need refresh. |
+| `score 0 – 0.05` | Below floor. No verdict promotion. |
+| `score ≥ 0.05` | Verdict → `telemetry`. A heading, link, frontmatter, or code-fence in some doc changed. The graph may need refresh. |
 | `markdown_noop_changes > 0` together with score>0 | Mix — review the `changed_docs` list. |
 
 ## Example — CB-011
