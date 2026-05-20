@@ -91,6 +91,23 @@ func TestDanglingImportsExtensionFallbackResolves(t *testing.T) {
 	}
 }
 
+func TestDanglingImportsESMSuffixSwap(t *testing.T) {
+	// Node ESM TypeScript convention: source imports `./foo.js` and the
+	// runtime resolves it to `./foo.ts` on disk. The resolver must do
+	// the same swap so a perfectly valid ESM-TS project doesn't trip
+	// dangling_imports. Regression guard for iteration 96.
+	dir := danglingGitInit(t, map[string]string{
+		"src/a.ts":             `import { x } from "./b.js"; export const y = x`,
+		"src/b.ts":             `export const x = 1`,
+		"src/c.ts":             `import { Comp } from "./components/d.jsx"; export const App = Comp`,
+		"src/components/d.tsx": `export const Comp = 1`,
+	})
+	r := computeDanglingImports(dir)
+	if r.Score != 0 {
+		t.Errorf("ESM .js→.ts (and .jsx→.tsx) suffix swap should resolve: %+v", r.Imports)
+	}
+}
+
 func TestDanglingImportsDirIndexResolves(t *testing.T) {
 	dir := danglingGitInit(t, map[string]string{
 		"src/a.ts":             `import { core } from "./feature"; export const x = core`,
