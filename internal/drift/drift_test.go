@@ -1,6 +1,7 @@
 package drift
 
 import (
+	"os"
 	"strings"
 	"testing"
 
@@ -1426,6 +1427,32 @@ func TestActiveMetersListsAllFiringMeters(t *testing.T) {
 		if !gotSet[w] {
 			t.Errorf("expected %s in active_meters, got %v", w, got)
 		}
+	}
+}
+
+func TestPathForReturnsCanonicalLocation(t *testing.T) {
+	got := PathFor("/repo")
+	want := "/repo/.coherence/drift.json"
+	if got != want {
+		t.Errorf("PathFor = %q, want %q", got, want)
+	}
+}
+
+func TestWriteCreatesDriftJSON(t *testing.T) {
+	dir := t.TempDir()
+	r := Report{Verdict: VerdictClean, GeneratedAt: "2026-05-19T00:00:00Z"}
+	if err := Write(dir, r); err != nil {
+		t.Fatalf("Write: %v", err)
+	}
+	body, err := os.ReadFile(PathFor(dir))
+	if err != nil {
+		t.Fatalf("read: %v", err)
+	}
+	if !strings.Contains(string(body), `"verdict": "clean"`) {
+		t.Errorf("expected verdict in serialized JSON, got: %s", body)
+	}
+	if !strings.Contains(string(body), `"generated_at": "2026-05-19T00:00:00Z"`) {
+		t.Errorf("expected generated_at, got: %s", body)
 	}
 }
 
