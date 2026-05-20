@@ -660,7 +660,7 @@ today (all 9 GOAL.md M4 meters plus 10 extras):
 | `dependency_cycles`       | DFS over `depends_on` (dir-level)    | count of import cycles (warn-level — cycles break the build)    |
 | `orphan_endpoints`        | `defines` (reverse) + `verifies` (base + current) | count of HTTP endpoints whose source file has no test; reports `newly_orphaned_endpoints` and `newly_covered_endpoints` when a base graph is on disk; `convention=false` (no verifies edge anywhere) skips score-based verdict promotion so kickoff projects without tests yet don't look like 100% orphan regressions |
 | `unimplemented_stories`   | user_story nodes + `implements`      | stories with no incoming implements claim (gated on convention) |
-| `broken_links`            | markdown re-scan of tracked .md      | inline links pointing to paths not in the tracked set           |
+| `broken_links`            | markdown re-scan of tracked .md      | inline links to targets missing from the filesystem (untracked-but-on-disk targets like `.gitignore`d LOCAL.md are intentionally allowed) |
 | `unknown_id_references`   | typed-id regex over non-Markdown production code | code mentions of US/ADR/IDR ids not defined in the graph; test files (`*_test.go`, `*.test.ts`, etc.), `.agents/`, and fixture-shaped dirs (`scenarios/`, `fixtures/`, `testdata/`, `golden/`, `eval/`) are excluded |
 | `stale_tests`             | `verifies` + base/current snapshot   | tests unchanged while their `verifies`-linked source changed    |
 | `orphaned_metric_aliases` | base+current metric diff + frontend scan | frontend string refs to metric names removed/renamed in current |
