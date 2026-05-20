@@ -221,6 +221,55 @@ func TestRunSkipsExistingSkillWithoutForce(t *testing.T) {
 	}
 }
 
+func TestRunNoBaselineSkipsBuildBaselineAction(t *testing.T) {
+	// --no-baseline must omit the buildBaseline action from the
+	// result so CI/test flows that index explicitly later don't pay
+	// the cost twice. Verify by absence of the action and by no
+	// .coherence/snapshot.json being written.
+	dir := t.TempDir()
+	res, err := Run(dir, Options{
+		Template:     "generic",
+		SkillInstall: SkillInstallOff,
+		NoBaseline:   true,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, a := range res.Actions {
+		if strings.HasSuffix(a.Path, ".coherence/snapshot.json") || strings.HasSuffix(a.Path, ".coherence/graph.json") {
+			t.Errorf("expected no baseline action when NoBaseline=true, got %+v", a)
+		}
+	}
+	if _, err := os.Stat(filepath.Join(dir, ".coherence", "snapshot.json")); !os.IsNotExist(err) {
+		t.Errorf("snapshot.json should not exist with NoBaseline=true: %v", err)
+	}
+}
+
+func TestRunNoHooksConfigSkipsHooksAction(t *testing.T) {
+	// --no-hooks-config must omit the `git config core.hooksPath`
+	// action. Verify by absence — users running husky/lefthook on
+	// projects that don't yet have core.hooksPath set must be able
+	// to opt out cleanly.
+	dir := hooksPathGitInit(t)
+	res, err := Run(dir, Options{
+		Template:      "generic",
+		SkillInstall:  SkillInstallOff,
+		NoBaseline:    true,
+		NoHooksConfig: true,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, a := range res.Actions {
+		if strings.Contains(a.Path, "core.hooksPath") {
+			t.Errorf("expected no hooksPath action when NoHooksConfig=true, got %+v", a)
+		}
+	}
+	if v := hooksPathReadValue(t, dir); v != "" {
+		t.Errorf("core.hooksPath should remain unset with NoHooksConfig=true, got %q", v)
+	}
+}
+
 func TestConfigureHooksPathSkipsWhenNotAGitWorktree(t *testing.T) {
 	dir := t.TempDir() // no `git init`
 	got := configureHooksPath(dir)
