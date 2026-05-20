@@ -142,6 +142,65 @@ func TestLsFilesScopedToPathArgs(t *testing.T) {
 	}
 }
 
+func TestStagedAddedContentReturnsPlusLinesOnly(t *testing.T) {
+	dir := gitInitAndCommit(t, map[string]string{"a.txt": "line1\nline2\n"})
+	// Modify and stage.
+	if err := os.WriteFile(filepath.Join(dir, "a.txt"), []byte("line1\nline2\nnew line\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := exec.Command("git", "-C", dir, "add", "a.txt").Run(); err != nil {
+		t.Fatal(err)
+	}
+	got := StagedAddedContent("a.txt", dir)
+	if !strings.Contains(got, "new line") {
+		t.Errorf("expected added content to contain 'new line', got %q", got)
+	}
+	// Must not include the `+++ b/a.txt` header line.
+	if strings.Contains(got, "b/a.txt") {
+		t.Errorf("StagedAddedContent should drop the +++ header, got %q", got)
+	}
+}
+
+func TestStagedNameOnlyInScopedToPath(t *testing.T) {
+	dir := gitInitAndCommit(t, map[string]string{
+		"docs/spec.md": "spec\n",
+		"src/main.go":  "package main\n",
+	})
+	// Modify both, stage both.
+	if err := os.WriteFile(filepath.Join(dir, "docs/spec.md"), []byte("spec v2\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(dir, "src/main.go"), []byte("package main\nfunc F(){}\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := exec.Command("git", "-C", dir, "add", "-A").Run(); err != nil {
+		t.Fatal(err)
+	}
+	got := StagedNameOnlyIn(dir, "docs")
+	if len(got) != 1 || got[0] != "docs/spec.md" {
+		t.Errorf("StagedNameOnlyIn(docs) = %v, want [docs/spec.md]", got)
+	}
+}
+
+func TestLastCommitTimeReturnsCommitTimestamp(t *testing.T) {
+	dir := gitInitAndCommit(t, map[string]string{"a.txt": "alpha\n"})
+	ts, ok := LastCommitTime(dir, "a.txt")
+	if !ok {
+		t.Fatal("LastCommitTime returned ok=false for committed file")
+	}
+	if ts.IsZero() {
+		t.Errorf("LastCommitTime returned zero time")
+	}
+}
+
+func TestLastCommitTimeFalseForUntrackedPath(t *testing.T) {
+	dir := gitInitAndCommit(t, map[string]string{"a.txt": "alpha\n"})
+	_, ok := LastCommitTime(dir, "never-tracked.txt")
+	if ok {
+		t.Error("LastCommitTime should return ok=false for path with no commits")
+	}
+}
+
 func TestWorktreeChangedFilesUnionsTrackedAndUntracked(t *testing.T) {
 	dir := gitInitAndCommit(t, map[string]string{"a.txt": "alpha\n"})
 	// Modify tracked + create untracked.
