@@ -133,3 +133,30 @@ func TestParseRealOntology(t *testing.T) {
 		t.Fatal("expected rules")
 	}
 }
+
+func TestParseEmptyInputErrors(t *testing.T) {
+	_, err := Parse(nil, "empty.yml")
+	if err == nil {
+		t.Error("Parse on empty input should error")
+	}
+}
+
+func TestParseAllWhitespaceErrors(t *testing.T) {
+	_, err := Parse([]byte("   \n\t\r\n   "), "ws.yml")
+	if err == nil {
+		t.Error("Parse on all-whitespace input should error (matches buildIdIndex shape)")
+	}
+}
+
+func TestParseRulesWithVersionButNoRulesNotError(t *testing.T) {
+	// A YAML file that sets `version: 1` but ships no rules is valid —
+	// caller's hook may add rules at runtime. Only fully-empty inputs
+	// should error.
+	ont, err := Parse([]byte("version: 1\n"), "version-only.yml")
+	if err != nil {
+		t.Fatalf("Parse(version-only) = %v, want nil", err)
+	}
+	if ont.Version != 1 {
+		t.Errorf("Version = %d, want 1", ont.Version)
+	}
+}
