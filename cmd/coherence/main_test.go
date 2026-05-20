@@ -5,6 +5,42 @@ import (
 	"testing"
 )
 
+func TestSeverityRankMapping(t *testing.T) {
+	cases := map[string]int{
+		"":      0,
+		"info":  0,
+		"warn":  1,
+		"error": 2,
+	}
+	for input, want := range cases {
+		if got := severityRank(input); got != want {
+			t.Errorf("severityRank(%q) = %d, want %d", input, got, want)
+		}
+	}
+}
+
+func TestMergeUniquePreservesFirstOrder(t *testing.T) {
+	got := mergeUnique([]string{"a", "b", "c"}, []string{"b", "d", "a"})
+	want := []string{"a", "b", "c", "d"}
+	if len(got) != len(want) {
+		t.Fatalf("mergeUnique = %v, want %v", got, want)
+	}
+	for i := range want {
+		if got[i] != want[i] {
+			t.Errorf("mergeUnique[%d] = %q, want %q", i, got[i], want[i])
+		}
+	}
+}
+
+func TestMergeUniqueEmptyInputs(t *testing.T) {
+	if got := mergeUnique(nil, nil); len(got) != 0 {
+		t.Errorf("mergeUnique(nil, nil) = %v, want empty", got)
+	}
+	if got := mergeUnique([]string{"a"}, nil); len(got) != 1 || got[0] != "a" {
+		t.Errorf("mergeUnique([a], nil) = %v, want [a]", got)
+	}
+}
+
 func TestResolveOntologyPathDefault(t *testing.T) {
 	args := parsedArgs{flags: map[string]any{}}
 	got := resolveOntologyPath("/repo", args)
