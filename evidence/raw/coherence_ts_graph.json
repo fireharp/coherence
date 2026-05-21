@@ -1,0 +1,2112 @@
+{
+  "generated_at": "2026-05-21T12:38:47Z",
+  "nodes": [
+    {
+      "id": "code_symbol:src/app.AppOptions",
+      "kind": "code_symbol",
+      "label": "src/app.AppOptions",
+      "path": "src/app.ts",
+      "meta": {
+        "module": "src/app",
+        "ts_kind": "interface"
+      }
+    },
+    {
+      "id": "code_symbol:src/app.createApp",
+      "kind": "code_symbol",
+      "label": "src/app.createApp",
+      "path": "src/app.ts",
+      "meta": {
+        "module": "src/app",
+        "ts_kind": "function"
+      }
+    },
+    {
+      "id": "code_symbol:src/events.DurableEventBus",
+      "kind": "code_symbol",
+      "label": "src/events.DurableEventBus",
+      "path": "src/events.ts",
+      "meta": {
+        "module": "src/events",
+        "ts_kind": "class"
+      }
+    },
+    {
+      "id": "code_symbol:src/events.EventBus",
+      "kind": "code_symbol",
+      "label": "src/events.EventBus",
+      "path": "src/events.ts",
+      "meta": {
+        "module": "src/events",
+        "ts_kind": "interface"
+      }
+    },
+    {
+      "id": "code_symbol:src/events.EventHub",
+      "kind": "code_symbol",
+      "label": "src/events.EventHub",
+      "path": "src/events.ts",
+      "meta": {
+        "module": "src/events",
+        "ts_kind": "class"
+      }
+    },
+    {
+      "id": "code_symbol:src/events.MemoryEventBus",
+      "kind": "code_symbol",
+      "label": "src/events.MemoryEventBus",
+      "path": "src/events.ts",
+      "meta": {
+        "module": "src/events",
+        "ts_kind": "class"
+      }
+    },
+    {
+      "id": "code_symbol:src/events.encodeFrame",
+      "kind": "code_symbol",
+      "label": "src/events.encodeFrame",
+      "path": "src/events.ts",
+      "meta": {
+        "module": "src/events",
+        "ts_kind": "function"
+      }
+    },
+    {
+      "id": "code_symbol:src/events.normalizeEvent",
+      "kind": "code_symbol",
+      "label": "src/events.normalizeEvent",
+      "path": "src/events.ts",
+      "meta": {
+        "module": "src/events",
+        "ts_kind": "function"
+      }
+    },
+    {
+      "id": "code_symbol:src/store.D1Store",
+      "kind": "code_symbol",
+      "label": "src/store.D1Store",
+      "path": "src/store.ts",
+      "meta": {
+        "module": "src/store",
+        "ts_kind": "class"
+      }
+    },
+    {
+      "id": "code_symbol:src/store.MemoryStore",
+      "kind": "code_symbol",
+      "label": "src/store.MemoryStore",
+      "path": "src/store.ts",
+      "meta": {
+        "module": "src/store",
+        "ts_kind": "class"
+      }
+    },
+    {
+      "id": "code_symbol:src/store.Store",
+      "kind": "code_symbol",
+      "label": "src/store.Store",
+      "path": "src/store.ts",
+      "meta": {
+        "module": "src/store",
+        "ts_kind": "interface"
+      }
+    },
+    {
+      "id": "code_symbol:src/store.storeFromEnv",
+      "kind": "code_symbol",
+      "label": "src/store.storeFromEnv",
+      "path": "src/store.ts",
+      "meta": {
+        "module": "src/store",
+        "ts_kind": "function"
+      }
+    },
+    {
+      "id": "code_symbol:src/types.AgentEvent",
+      "kind": "code_symbol",
+      "label": "src/types.AgentEvent",
+      "path": "src/types.ts",
+      "meta": {
+        "module": "src/types",
+        "ts_kind": "interface"
+      }
+    },
+    {
+      "id": "code_symbol:src/types.AgentProvider",
+      "kind": "code_symbol",
+      "label": "src/types.AgentProvider",
+      "path": "src/types.ts",
+      "meta": {
+        "module": "src/types",
+        "ts_kind": "type"
+      }
+    },
+    {
+      "id": "code_symbol:src/types.AgentRun",
+      "kind": "code_symbol",
+      "label": "src/types.AgentRun",
+      "path": "src/types.ts",
+      "meta": {
+        "module": "src/types",
+        "ts_kind": "interface"
+      }
+    },
+    {
+      "id": "code_symbol:src/types.AgentRunStatus",
+      "kind": "code_symbol",
+      "label": "src/types.AgentRunStatus",
+      "path": "src/types.ts",
+      "meta": {
+        "module": "src/types",
+        "ts_kind": "type"
+      }
+    },
+    {
+      "id": "code_symbol:src/types.Asset",
+      "kind": "code_symbol",
+      "label": "src/types.Asset",
+      "path": "src/types.ts",
+      "meta": {
+        "module": "src/types",
+        "ts_kind": "interface"
+      }
+    },
+    {
+      "id": "code_symbol:src/types.AuthContext",
+      "kind": "code_symbol",
+      "label": "src/types.AuthContext",
+      "path": "src/types.ts",
+      "meta": {
+        "module": "src/types",
+        "ts_kind": "interface"
+      }
+    },
+    {
+      "id": "code_symbol:src/types.Block",
+      "kind": "code_symbol",
+      "label": "src/types.Block",
+      "path": "src/types.ts",
+      "meta": {
+        "module": "src/types",
+        "ts_kind": "interface"
+      }
+    },
+    {
+      "id": "code_symbol:src/types.BlockKind",
+      "kind": "code_symbol",
+      "label": "src/types.BlockKind",
+      "path": "src/types.ts",
+      "meta": {
+        "module": "src/types",
+        "ts_kind": "type"
+      }
+    },
+    {
+      "id": "code_symbol:src/types.Callback",
+      "kind": "code_symbol",
+      "label": "src/types.Callback",
+      "path": "src/types.ts",
+      "meta": {
+        "module": "src/types",
+        "ts_kind": "interface"
+      }
+    },
+    {
+      "id": "code_symbol:src/types.Canvas",
+      "kind": "code_symbol",
+      "label": "src/types.Canvas",
+      "path": "src/types.ts",
+      "meta": {
+        "module": "src/types",
+        "ts_kind": "interface"
+      }
+    },
+    {
+      "id": "code_symbol:src/types.CanvasBundle",
+      "kind": "code_symbol",
+      "label": "src/types.CanvasBundle",
+      "path": "src/types.ts",
+      "meta": {
+        "module": "src/types",
+        "ts_kind": "interface"
+      }
+    },
+    {
+      "id": "code_symbol:src/types.CanvasBundleAsset",
+      "kind": "code_symbol",
+      "label": "src/types.CanvasBundleAsset",
+      "path": "src/types.ts",
+      "meta": {
+        "module": "src/types",
+        "ts_kind": "interface"
+      }
+    },
+    {
+      "id": "code_symbol:src/types.CanvasEdit",
+      "kind": "code_symbol",
+      "label": "src/types.CanvasEdit",
+      "path": "src/types.ts",
+      "meta": {
+        "module": "src/types",
+        "ts_kind": "interface"
+      }
+    },
+    {
+      "id": "code_symbol:src/types.CanvasImportRequest",
+      "kind": "code_symbol",
+      "label": "src/types.CanvasImportRequest",
+      "path": "src/types.ts",
+      "meta": {
+        "module": "src/types",
+        "ts_kind": "interface"
+      }
+    },
+    {
+      "id": "code_symbol:src/types.CanvasImportResult",
+      "kind": "code_symbol",
+      "label": "src/types.CanvasImportResult",
+      "path": "src/types.ts",
+      "meta": {
+        "module": "src/types",
+        "ts_kind": "interface"
+      }
+    },
+    {
+      "id": "code_symbol:src/types.CanvasLogEvent",
+      "kind": "code_symbol",
+      "label": "src/types.CanvasLogEvent",
+      "path": "src/types.ts",
+      "meta": {
+        "module": "src/types",
+        "ts_kind": "interface"
+      }
+    },
+    {
+      "id": "code_symbol:src/types.CanvasLogEventType",
+      "kind": "code_symbol",
+      "label": "src/types.CanvasLogEventType",
+      "path": "src/types.ts",
+      "meta": {
+        "module": "src/types",
+        "ts_kind": "type"
+      }
+    },
+    {
+      "id": "code_symbol:src/types.CanvasMode",
+      "kind": "code_symbol",
+      "label": "src/types.CanvasMode",
+      "path": "src/types.ts",
+      "meta": {
+        "module": "src/types",
+        "ts_kind": "type"
+      }
+    },
+    {
+      "id": "code_symbol:src/types.CanvasRestoreResponse",
+      "kind": "code_symbol",
+      "label": "src/types.CanvasRestoreResponse",
+      "path": "src/types.ts",
+      "meta": {
+        "module": "src/types",
+        "ts_kind": "interface"
+      }
+    },
+    {
+      "id": "code_symbol:src/types.CanvasSnapshot",
+      "kind": "code_symbol",
+      "label": "src/types.CanvasSnapshot",
+      "path": "src/types.ts",
+      "meta": {
+        "module": "src/types",
+        "ts_kind": "interface"
+      }
+    },
+    {
+      "id": "code_symbol:src/types.CanvasStatus",
+      "kind": "code_symbol",
+      "label": "src/types.CanvasStatus",
+      "path": "src/types.ts",
+      "meta": {
+        "module": "src/types",
+        "ts_kind": "type"
+      }
+    },
+    {
+      "id": "code_symbol:src/types.ChartPoint",
+      "kind": "code_symbol",
+      "label": "src/types.ChartPoint",
+      "path": "src/types.ts",
+      "meta": {
+        "module": "src/types",
+        "ts_kind": "interface"
+      }
+    },
+    {
+      "id": "code_symbol:src/types.ChartSeries",
+      "kind": "code_symbol",
+      "label": "src/types.ChartSeries",
+      "path": "src/types.ts",
+      "meta": {
+        "module": "src/types",
+        "ts_kind": "interface"
+      }
+    },
+    {
+      "id": "code_symbol:src/types.ChartSpec",
+      "kind": "code_symbol",
+      "label": "src/types.ChartSpec",
+      "path": "src/types.ts",
+      "meta": {
+        "module": "src/types",
+        "ts_kind": "interface"
+      }
+    },
+    {
+      "id": "code_symbol:src/types.ChecklistItem",
+      "kind": "code_symbol",
+      "label": "src/types.ChecklistItem",
+      "path": "src/types.ts",
+      "meta": {
+        "module": "src/types",
+        "ts_kind": "interface"
+      }
+    },
+    {
+      "id": "code_symbol:src/types.CreateCanvasSnapshotRequest",
+      "kind": "code_symbol",
+      "label": "src/types.CreateCanvasSnapshotRequest",
+      "path": "src/types.ts",
+      "meta": {
+        "module": "src/types",
+        "ts_kind": "interface"
+      }
+    },
+    {
+      "id": "code_symbol:src/types.DeliveryReceipt",
+      "kind": "code_symbol",
+      "label": "src/types.DeliveryReceipt",
+      "path": "src/types.ts",
+      "meta": {
+        "module": "src/types",
+        "ts_kind": "interface"
+      }
+    },
+    {
+      "id": "code_symbol:src/types.DeliveryStatus",
+      "kind": "code_symbol",
+      "label": "src/types.DeliveryStatus",
+      "path": "src/types.ts",
+      "meta": {
+        "module": "src/types",
+        "ts_kind": "type"
+      }
+    },
+    {
+      "id": "code_symbol:src/types.Feedback",
+      "kind": "code_symbol",
+      "label": "src/types.Feedback",
+      "path": "src/types.ts",
+      "meta": {
+        "module": "src/types",
+        "ts_kind": "interface"
+      }
+    },
+    {
+      "id": "code_symbol:src/types.FeedbackAnchor",
+      "kind": "code_symbol",
+      "label": "src/types.FeedbackAnchor",
+      "path": "src/types.ts",
+      "meta": {
+        "module": "src/types",
+        "ts_kind": "interface"
+      }
+    },
+    {
+      "id": "code_symbol:src/types.FeedbackDecision",
+      "kind": "code_symbol",
+      "label": "src/types.FeedbackDecision",
+      "path": "src/types.ts",
+      "meta": {
+        "module": "src/types",
+        "ts_kind": "type"
+      }
+    },
+    {
+      "id": "code_symbol:src/types.FeedbackDelivery",
+      "kind": "code_symbol",
+      "label": "src/types.FeedbackDelivery",
+      "path": "src/types.ts",
+      "meta": {
+        "module": "src/types",
+        "ts_kind": "interface"
+      }
+    },
+    {
+      "id": "code_symbol:src/types.FeedbackTarget",
+      "kind": "code_symbol",
+      "label": "src/types.FeedbackTarget",
+      "path": "src/types.ts",
+      "meta": {
+        "module": "src/types",
+        "ts_kind": "interface"
+      }
+    },
+    {
+      "id": "code_symbol:src/types.FormField",
+      "kind": "code_symbol",
+      "label": "src/types.FormField",
+      "path": "src/types.ts",
+      "meta": {
+        "module": "src/types",
+        "ts_kind": "interface"
+      }
+    },
+    {
+      "id": "code_symbol:src/types.FormSchema",
+      "kind": "code_symbol",
+      "label": "src/types.FormSchema",
+      "path": "src/types.ts",
+      "meta": {
+        "module": "src/types",
+        "ts_kind": "interface"
+      }
+    },
+    {
+      "id": "code_symbol:src/types.HubEnv",
+      "kind": "code_symbol",
+      "label": "src/types.HubEnv",
+      "path": "src/types.ts",
+      "meta": {
+        "module": "src/types",
+        "ts_kind": "interface"
+      }
+    },
+    {
+      "id": "code_symbol:src/types.HubEvent",
+      "kind": "code_symbol",
+      "label": "src/types.HubEvent",
+      "path": "src/types.ts",
+      "meta": {
+        "module": "src/types",
+        "ts_kind": "interface"
+      }
+    },
+    {
+      "id": "code_symbol:src/types.ObserverDecision",
+      "kind": "code_symbol",
+      "label": "src/types.ObserverDecision",
+      "path": "src/types.ts",
+      "meta": {
+        "module": "src/types",
+        "ts_kind": "interface"
+      }
+    },
+    {
+      "id": "code_symbol:src/types.ObserverDryRunAction",
+      "kind": "code_symbol",
+      "label": "src/types.ObserverDryRunAction",
+      "path": "src/types.ts",
+      "meta": {
+        "module": "src/types",
+        "ts_kind": "interface"
+      }
+    },
+    {
+      "id": "code_symbol:src/types.ObserverIssue",
+      "kind": "code_symbol",
+      "label": "src/types.ObserverIssue",
+      "path": "src/types.ts",
+      "meta": {
+        "module": "src/types",
+        "ts_kind": "interface"
+      }
+    },
+    {
+      "id": "code_symbol:src/types.OrderableItem",
+      "kind": "code_symbol",
+      "label": "src/types.OrderableItem",
+      "path": "src/types.ts",
+      "meta": {
+        "module": "src/types",
+        "ts_kind": "interface"
+      }
+    },
+    {
+      "id": "code_symbol:src/types.Priority",
+      "kind": "code_symbol",
+      "label": "src/types.Priority",
+      "path": "src/types.ts",
+      "meta": {
+        "module": "src/types",
+        "ts_kind": "type"
+      }
+    },
+    {
+      "id": "code_symbol:src/types.RuleClause",
+      "kind": "code_symbol",
+      "label": "src/types.RuleClause",
+      "path": "src/types.ts",
+      "meta": {
+        "module": "src/types",
+        "ts_kind": "interface"
+      }
+    },
+    {
+      "id": "code_symbol:src/types.RuleSchema",
+      "kind": "code_symbol",
+      "label": "src/types.RuleSchema",
+      "path": "src/types.ts",
+      "meta": {
+        "module": "src/types",
+        "ts_kind": "interface"
+      }
+    },
+    {
+      "id": "code_symbol:src/types.RuleSchemaField",
+      "kind": "code_symbol",
+      "label": "src/types.RuleSchemaField",
+      "path": "src/types.ts",
+      "meta": {
+        "module": "src/types",
+        "ts_kind": "interface"
+      }
+    },
+    {
+      "id": "code_symbol:src/types.SplitSlice",
+      "kind": "code_symbol",
+      "label": "src/types.SplitSlice",
+      "path": "src/types.ts",
+      "meta": {
+        "module": "src/types",
+        "ts_kind": "interface"
+      }
+    },
+    {
+      "id": "code_symbol:src/types.ViewerLink",
+      "kind": "code_symbol",
+      "label": "src/types.ViewerLink",
+      "path": "src/types.ts",
+      "meta": {
+        "module": "src/types",
+        "ts_kind": "interface"
+      }
+    },
+    {
+      "id": "code_symbol:src/types.ViewerLinkCheck",
+      "kind": "code_symbol",
+      "label": "src/types.ViewerLinkCheck",
+      "path": "src/types.ts",
+      "meta": {
+        "module": "src/types",
+        "ts_kind": "interface"
+      }
+    },
+    {
+      "id": "code_symbol:src/types.ViewerLinkCreateResponse",
+      "kind": "code_symbol",
+      "label": "src/types.ViewerLinkCreateResponse",
+      "path": "src/types.ts",
+      "meta": {
+        "module": "src/types",
+        "ts_kind": "interface"
+      }
+    },
+    {
+      "id": "code_symbol:src/types.ViewerLinkExchangeResponse",
+      "kind": "code_symbol",
+      "label": "src/types.ViewerLinkExchangeResponse",
+      "path": "src/types.ts",
+      "meta": {
+        "module": "src/types",
+        "ts_kind": "interface"
+      }
+    },
+    {
+      "id": "code_symbol:src/types.ViewerLinkPreflightResponse",
+      "kind": "code_symbol",
+      "label": "src/types.ViewerLinkPreflightResponse",
+      "path": "src/types.ts",
+      "meta": {
+        "module": "src/types",
+        "ts_kind": "interface"
+      }
+    },
+    {
+      "id": "code_symbol:src/types.ViewerLinkRequest",
+      "kind": "code_symbol",
+      "label": "src/types.ViewerLinkRequest",
+      "path": "src/types.ts",
+      "meta": {
+        "module": "src/types",
+        "ts_kind": "interface"
+      }
+    },
+    {
+      "id": "code_symbol:src/types.ViewerSession",
+      "kind": "code_symbol",
+      "label": "src/types.ViewerSession",
+      "path": "src/types.ts",
+      "meta": {
+        "module": "src/types",
+        "ts_kind": "interface"
+      }
+    },
+    {
+      "id": "code_symbol:src/types.WebhookCallback",
+      "kind": "code_symbol",
+      "label": "src/types.WebhookCallback",
+      "path": "src/types.ts",
+      "meta": {
+        "module": "src/types",
+        "ts_kind": "interface"
+      }
+    },
+    {
+      "id": "code_symbol:src/utils.AppError",
+      "kind": "code_symbol",
+      "label": "src/utils.AppError",
+      "path": "src/utils.ts",
+      "meta": {
+        "module": "src/utils",
+        "ts_kind": "class"
+      }
+    },
+    {
+      "id": "code_symbol:src/utils.addSeconds",
+      "kind": "code_symbol",
+      "label": "src/utils.addSeconds",
+      "path": "src/utils.ts",
+      "meta": {
+        "module": "src/utils",
+        "ts_kind": "function"
+      }
+    },
+    {
+      "id": "code_symbol:src/utils.badRequest",
+      "kind": "code_symbol",
+      "label": "src/utils.badRequest",
+      "path": "src/utils.ts",
+      "meta": {
+        "module": "src/utils",
+        "ts_kind": "function"
+      }
+    },
+    {
+      "id": "code_symbol:src/utils.base64Decode",
+      "kind": "code_symbol",
+      "label": "src/utils.base64Decode",
+      "path": "src/utils.ts",
+      "meta": {
+        "module": "src/utils",
+        "ts_kind": "function"
+      }
+    },
+    {
+      "id": "code_symbol:src/utils.base64Encode",
+      "kind": "code_symbol",
+      "label": "src/utils.base64Encode",
+      "path": "src/utils.ts",
+      "meta": {
+        "module": "src/utils",
+        "ts_kind": "function"
+      }
+    },
+    {
+      "id": "code_symbol:src/utils.conflict",
+      "kind": "code_symbol",
+      "label": "src/utils.conflict",
+      "path": "src/utils.ts",
+      "meta": {
+        "module": "src/utils",
+        "ts_kind": "function"
+      }
+    },
+    {
+      "id": "code_symbol:src/utils.errorResponse",
+      "kind": "code_symbol",
+      "label": "src/utils.errorResponse",
+      "path": "src/utils.ts",
+      "meta": {
+        "module": "src/utils",
+        "ts_kind": "function"
+      }
+    },
+    {
+      "id": "code_symbol:src/utils.firstNonEmpty",
+      "kind": "code_symbol",
+      "label": "src/utils.firstNonEmpty",
+      "path": "src/utils.ts",
+      "meta": {
+        "module": "src/utils",
+        "ts_kind": "function"
+      }
+    },
+    {
+      "id": "code_symbol:src/utils.forbidden",
+      "kind": "code_symbol",
+      "label": "src/utils.forbidden",
+      "path": "src/utils.ts",
+      "meta": {
+        "module": "src/utils",
+        "ts_kind": "function"
+      }
+    },
+    {
+      "id": "code_symbol:src/utils.hmacSHA256Hex",
+      "kind": "code_symbol",
+      "label": "src/utils.hmacSHA256Hex",
+      "path": "src/utils.ts",
+      "meta": {
+        "module": "src/utils",
+        "ts_kind": "function"
+      }
+    },
+    {
+      "id": "code_symbol:src/utils.jsonResponse",
+      "kind": "code_symbol",
+      "label": "src/utils.jsonResponse",
+      "path": "src/utils.ts",
+      "meta": {
+        "module": "src/utils",
+        "ts_kind": "function"
+      }
+    },
+    {
+      "id": "code_symbol:src/utils.newID",
+      "kind": "code_symbol",
+      "label": "src/utils.newID",
+      "path": "src/utils.ts",
+      "meta": {
+        "module": "src/utils",
+        "ts_kind": "function"
+      }
+    },
+    {
+      "id": "code_symbol:src/utils.notFound",
+      "kind": "code_symbol",
+      "label": "src/utils.notFound",
+      "path": "src/utils.ts",
+      "meta": {
+        "module": "src/utils",
+        "ts_kind": "function"
+      }
+    },
+    {
+      "id": "code_symbol:src/utils.nowISO",
+      "kind": "code_symbol",
+      "label": "src/utils.nowISO",
+      "path": "src/utils.ts",
+      "meta": {
+        "module": "src/utils",
+        "ts_kind": "function"
+      }
+    },
+    {
+      "id": "code_symbol:src/utils.parseBool",
+      "kind": "code_symbol",
+      "label": "src/utils.parseBool",
+      "path": "src/utils.ts",
+      "meta": {
+        "module": "src/utils",
+        "ts_kind": "function"
+      }
+    },
+    {
+      "id": "code_symbol:src/utils.parseJSONDate",
+      "kind": "code_symbol",
+      "label": "src/utils.parseJSONDate",
+      "path": "src/utils.ts",
+      "meta": {
+        "module": "src/utils",
+        "ts_kind": "function"
+      }
+    },
+    {
+      "id": "code_symbol:src/utils.scoped",
+      "kind": "code_symbol",
+      "label": "src/utils.scoped",
+      "path": "src/utils.ts",
+      "meta": {
+        "module": "src/utils",
+        "ts_kind": "function"
+      }
+    },
+    {
+      "id": "code_symbol:src/utils.sha256Hex",
+      "kind": "code_symbol",
+      "label": "src/utils.sha256Hex",
+      "path": "src/utils.ts",
+      "meta": {
+        "module": "src/utils",
+        "ts_kind": "function"
+      }
+    },
+    {
+      "id": "code_symbol:src/utils.stampWorkspace",
+      "kind": "code_symbol",
+      "label": "src/utils.stampWorkspace",
+      "path": "src/utils.ts",
+      "meta": {
+        "module": "src/utils",
+        "ts_kind": "function"
+      }
+    },
+    {
+      "id": "code_symbol:src/utils.stripUndefined",
+      "kind": "code_symbol",
+      "label": "src/utils.stripUndefined",
+      "path": "src/utils.ts",
+      "meta": {
+        "module": "src/utils",
+        "ts_kind": "function"
+      }
+    },
+    {
+      "id": "code_symbol:src/utils.validateID",
+      "kind": "code_symbol",
+      "label": "src/utils.validateID",
+      "path": "src/utils.ts",
+      "meta": {
+        "module": "src/utils",
+        "ts_kind": "function"
+      }
+    },
+    {
+      "id": "code_symbol:src/utils.workspaceVisible",
+      "kind": "code_symbol",
+      "label": "src/utils.workspaceVisible",
+      "path": "src/utils.ts",
+      "meta": {
+        "module": "src/utils",
+        "ts_kind": "function"
+      }
+    },
+    {
+      "id": "code_symbol:src/validation.CANVAS_BUNDLE_SCHEMA_VERSION",
+      "kind": "code_symbol",
+      "label": "src/validation.CANVAS_BUNDLE_SCHEMA_VERSION",
+      "path": "src/validation.ts",
+      "meta": {
+        "module": "src/validation",
+        "ts_kind": "const"
+      }
+    },
+    {
+      "id": "code_symbol:src/validation.SNAPSHOT_DYNAMIC_COMPLETE",
+      "kind": "code_symbol",
+      "label": "src/validation.SNAPSHOT_DYNAMIC_COMPLETE",
+      "path": "src/validation.ts",
+      "meta": {
+        "module": "src/validation",
+        "ts_kind": "const"
+      }
+    },
+    {
+      "id": "code_symbol:src/validation.SNAPSHOT_MANUAL",
+      "kind": "code_symbol",
+      "label": "src/validation.SNAPSHOT_MANUAL",
+      "path": "src/validation.ts",
+      "meta": {
+        "module": "src/validation",
+        "ts_kind": "const"
+      }
+    },
+    {
+      "id": "code_symbol:src/validation.SNAPSHOT_PRE_IMPORT",
+      "kind": "code_symbol",
+      "label": "src/validation.SNAPSHOT_PRE_IMPORT",
+      "path": "src/validation.ts",
+      "meta": {
+        "module": "src/validation",
+        "ts_kind": "const"
+      }
+    },
+    {
+      "id": "code_symbol:src/validation.SNAPSHOT_PRE_RESTORE",
+      "kind": "code_symbol",
+      "label": "src/validation.SNAPSHOT_PRE_RESTORE",
+      "path": "src/validation.ts",
+      "meta": {
+        "module": "src/validation",
+        "ts_kind": "const"
+      }
+    },
+    {
+      "id": "code_symbol:src/validation.SNAPSHOT_STATIC_OVERWRITE",
+      "kind": "code_symbol",
+      "label": "src/validation.SNAPSHOT_STATIC_OVERWRITE",
+      "path": "src/validation.ts",
+      "meta": {
+        "module": "src/validation",
+        "ts_kind": "const"
+      }
+    },
+    {
+      "id": "code_symbol:src/validation.canvasReferencesAsset",
+      "kind": "code_symbol",
+      "label": "src/validation.canvasReferencesAsset",
+      "path": "src/validation.ts",
+      "meta": {
+        "module": "src/validation",
+        "ts_kind": "function"
+      }
+    },
+    {
+      "id": "code_symbol:src/validation.newCanvasSnapshot",
+      "kind": "code_symbol",
+      "label": "src/validation.newCanvasSnapshot",
+      "path": "src/validation.ts",
+      "meta": {
+        "module": "src/validation",
+        "ts_kind": "function"
+      }
+    },
+    {
+      "id": "code_symbol:src/validation.normalizeAgentEvent",
+      "kind": "code_symbol",
+      "label": "src/validation.normalizeAgentEvent",
+      "path": "src/validation.ts",
+      "meta": {
+        "module": "src/validation",
+        "ts_kind": "function"
+      }
+    },
+    {
+      "id": "code_symbol:src/validation.normalizeAgentRun",
+      "kind": "code_symbol",
+      "label": "src/validation.normalizeAgentRun",
+      "path": "src/validation.ts",
+      "meta": {
+        "module": "src/validation",
+        "ts_kind": "function"
+      }
+    },
+    {
+      "id": "code_symbol:src/validation.normalizeBlock",
+      "kind": "code_symbol",
+      "label": "src/validation.normalizeBlock",
+      "path": "src/validation.ts",
+      "meta": {
+        "module": "src/validation",
+        "ts_kind": "function"
+      }
+    },
+    {
+      "id": "code_symbol:src/validation.normalizeCanvas",
+      "kind": "code_symbol",
+      "label": "src/validation.normalizeCanvas",
+      "path": "src/validation.ts",
+      "meta": {
+        "module": "src/validation",
+        "ts_kind": "function"
+      }
+    },
+    {
+      "id": "code_symbol:src/validation.normalizeCanvasEdit",
+      "kind": "code_symbol",
+      "label": "src/validation.normalizeCanvasEdit",
+      "path": "src/validation.ts",
+      "meta": {
+        "module": "src/validation",
+        "ts_kind": "function"
+      }
+    },
+    {
+      "id": "code_symbol:src/validation.normalizeCanvasLogEvent",
+      "kind": "code_symbol",
+      "label": "src/validation.normalizeCanvasLogEvent",
+      "path": "src/validation.ts",
+      "meta": {
+        "module": "src/validation",
+        "ts_kind": "function"
+      }
+    },
+    {
+      "id": "code_symbol:src/validation.normalizeFeedback",
+      "kind": "code_symbol",
+      "label": "src/validation.normalizeFeedback",
+      "path": "src/validation.ts",
+      "meta": {
+        "module": "src/validation",
+        "ts_kind": "function"
+      }
+    },
+    {
+      "id": "code_symbol:src/validation.normalizeFeedbackDelivery",
+      "kind": "code_symbol",
+      "label": "src/validation.normalizeFeedbackDelivery",
+      "path": "src/validation.ts",
+      "meta": {
+        "module": "src/validation",
+        "ts_kind": "function"
+      }
+    },
+    {
+      "id": "code_symbol:src/validation.normalizeFeedbackTarget",
+      "kind": "code_symbol",
+      "label": "src/validation.normalizeFeedbackTarget",
+      "path": "src/validation.ts",
+      "meta": {
+        "module": "src/validation",
+        "ts_kind": "function"
+      }
+    },
+    {
+      "id": "code_symbol:src/validation.normalizeSnapshot",
+      "kind": "code_symbol",
+      "label": "src/validation.normalizeSnapshot",
+      "path": "src/validation.ts",
+      "meta": {
+        "module": "src/validation",
+        "ts_kind": "function"
+      }
+    },
+    {
+      "id": "code_symbol:src/validation.normalizeViewerLinkRequest",
+      "kind": "code_symbol",
+      "label": "src/validation.normalizeViewerLinkRequest",
+      "path": "src/validation.ts",
+      "meta": {
+        "module": "src/validation",
+        "ts_kind": "function"
+      }
+    },
+    {
+      "id": "code_symbol:src/validation.opRequiresBlockKind",
+      "kind": "code_symbol",
+      "label": "src/validation.opRequiresBlockKind",
+      "path": "src/validation.ts",
+      "meta": {
+        "module": "src/validation",
+        "ts_kind": "function"
+      }
+    },
+    {
+      "id": "code_symbol:src/validation.projectCanvasLogEvent",
+      "kind": "code_symbol",
+      "label": "src/validation.projectCanvasLogEvent",
+      "path": "src/validation.ts",
+      "meta": {
+        "module": "src/validation",
+        "ts_kind": "function"
+      }
+    },
+    {
+      "id": "code_symbol:src/validation.sanitizeCanvasForViewer",
+      "kind": "code_symbol",
+      "label": "src/validation.sanitizeCanvasForViewer",
+      "path": "src/validation.ts",
+      "meta": {
+        "module": "src/validation",
+        "ts_kind": "function"
+      }
+    },
+    {
+      "id": "code_symbol:src/validation.validAgentProvider",
+      "kind": "code_symbol",
+      "label": "src/validation.validAgentProvider",
+      "path": "src/validation.ts",
+      "meta": {
+        "module": "src/validation",
+        "ts_kind": "function"
+      }
+    },
+    {
+      "id": "code_symbol:src/validation.validBlockKind",
+      "kind": "code_symbol",
+      "label": "src/validation.validBlockKind",
+      "path": "src/validation.ts",
+      "meta": {
+        "module": "src/validation",
+        "ts_kind": "function"
+      }
+    },
+    {
+      "id": "command:bash .githooks/pre-commit",
+      "kind": "command",
+      "label": "bash .githooks/pre-commit"
+    },
+    {
+      "id": "command:echo \"no build configured — set commands.build in ontology.yml\"",
+      "kind": "command",
+      "label": "echo \"no build configured — set commands.build in ontology.yml\""
+    },
+    {
+      "id": "command:echo \"no test runner configured — set commands.test in ontology.yml\"",
+      "kind": "command",
+      "label": "echo \"no test runner configured — set commands.test in ontology.yml\""
+    },
+    {
+      "id": "command:git diff README.md",
+      "kind": "command",
+      "label": "git diff README.md"
+    },
+    {
+      "id": "command:git diff docs/",
+      "kind": "command",
+      "label": "git diff docs/"
+    },
+    {
+      "id": "dir:.",
+      "kind": "directory",
+      "label": "."
+    },
+    {
+      "id": "dir:src",
+      "kind": "directory",
+      "label": "src",
+      "path": "src"
+    },
+    {
+      "id": "file:src/app.test.ts",
+      "kind": "file",
+      "label": "app.test.ts",
+      "path": "src/app.test.ts"
+    },
+    {
+      "id": "file:src/app.ts",
+      "kind": "file",
+      "label": "app.ts",
+      "path": "src/app.ts"
+    },
+    {
+      "id": "file:src/events.ts",
+      "kind": "file",
+      "label": "events.ts",
+      "path": "src/events.ts"
+    },
+    {
+      "id": "file:src/index.ts",
+      "kind": "file",
+      "label": "index.ts",
+      "path": "src/index.ts"
+    },
+    {
+      "id": "file:src/store.ts",
+      "kind": "file",
+      "label": "store.ts",
+      "path": "src/store.ts"
+    },
+    {
+      "id": "file:src/types.ts",
+      "kind": "file",
+      "label": "types.ts",
+      "path": "src/types.ts"
+    },
+    {
+      "id": "file:src/utils.ts",
+      "kind": "file",
+      "label": "utils.ts",
+      "path": "src/utils.ts"
+    },
+    {
+      "id": "file:src/validation.ts",
+      "kind": "file",
+      "label": "validation.ts",
+      "path": "src/validation.ts"
+    },
+    {
+      "id": "rule:pre-commit-hook-change-needs-doc",
+      "kind": "rule",
+      "label": "pre-commit-hook-change-needs-doc",
+      "path": "ontology.yml",
+      "meta": {
+        "message": "Pre-commit hook changed; note the change in README/AGENTS or docs.",
+        "severity": "warn"
+      }
+    },
+    {
+      "id": "rule:readme-needs-touch-on-major-change",
+      "kind": "rule",
+      "label": "readme-needs-touch-on-major-change",
+      "path": "ontology.yml",
+      "meta": {
+        "message": "Source changed; refresh README, docs, or CHANGELOG so adopters see the diff.",
+        "severity": "warn"
+      }
+    },
+    {
+      "id": "test:src/app.test.ts",
+      "kind": "test",
+      "label": "app.test.ts",
+      "path": "src/app.test.ts"
+    }
+  ],
+  "edges": [
+    {
+      "from": "dir:.",
+      "to": "dir:src",
+      "kind": "contains"
+    },
+    {
+      "from": "dir:src",
+      "to": "file:src/app.test.ts",
+      "kind": "contains"
+    },
+    {
+      "from": "dir:src",
+      "to": "file:src/app.ts",
+      "kind": "contains"
+    },
+    {
+      "from": "dir:src",
+      "to": "file:src/events.ts",
+      "kind": "contains"
+    },
+    {
+      "from": "dir:src",
+      "to": "file:src/index.ts",
+      "kind": "contains"
+    },
+    {
+      "from": "dir:src",
+      "to": "file:src/store.ts",
+      "kind": "contains"
+    },
+    {
+      "from": "dir:src",
+      "to": "file:src/types.ts",
+      "kind": "contains"
+    },
+    {
+      "from": "dir:src",
+      "to": "file:src/utils.ts",
+      "kind": "contains"
+    },
+    {
+      "from": "dir:src",
+      "to": "file:src/validation.ts",
+      "kind": "contains"
+    },
+    {
+      "from": "file:src/app.ts",
+      "to": "code_symbol:src/app.AppOptions",
+      "kind": "defines",
+      "provenance": "src/app.ts (ts interface)"
+    },
+    {
+      "from": "file:src/app.ts",
+      "to": "code_symbol:src/app.createApp",
+      "kind": "defines",
+      "provenance": "src/app.ts (ts function)"
+    },
+    {
+      "from": "file:src/events.ts",
+      "to": "code_symbol:src/events.DurableEventBus",
+      "kind": "defines",
+      "provenance": "src/events.ts (ts class)"
+    },
+    {
+      "from": "file:src/events.ts",
+      "to": "code_symbol:src/events.EventBus",
+      "kind": "defines",
+      "provenance": "src/events.ts (ts interface)"
+    },
+    {
+      "from": "file:src/events.ts",
+      "to": "code_symbol:src/events.EventHub",
+      "kind": "defines",
+      "provenance": "src/events.ts (ts class)"
+    },
+    {
+      "from": "file:src/events.ts",
+      "to": "code_symbol:src/events.MemoryEventBus",
+      "kind": "defines",
+      "provenance": "src/events.ts (ts class)"
+    },
+    {
+      "from": "file:src/events.ts",
+      "to": "code_symbol:src/events.encodeFrame",
+      "kind": "defines",
+      "provenance": "src/events.ts (ts function)"
+    },
+    {
+      "from": "file:src/events.ts",
+      "to": "code_symbol:src/events.normalizeEvent",
+      "kind": "defines",
+      "provenance": "src/events.ts (ts function)"
+    },
+    {
+      "from": "file:src/store.ts",
+      "to": "code_symbol:src/store.D1Store",
+      "kind": "defines",
+      "provenance": "src/store.ts (ts class)"
+    },
+    {
+      "from": "file:src/store.ts",
+      "to": "code_symbol:src/store.MemoryStore",
+      "kind": "defines",
+      "provenance": "src/store.ts (ts class)"
+    },
+    {
+      "from": "file:src/store.ts",
+      "to": "code_symbol:src/store.Store",
+      "kind": "defines",
+      "provenance": "src/store.ts (ts interface)"
+    },
+    {
+      "from": "file:src/store.ts",
+      "to": "code_symbol:src/store.storeFromEnv",
+      "kind": "defines",
+      "provenance": "src/store.ts (ts function)"
+    },
+    {
+      "from": "file:src/types.ts",
+      "to": "code_symbol:src/types.AgentEvent",
+      "kind": "defines",
+      "provenance": "src/types.ts (ts interface)"
+    },
+    {
+      "from": "file:src/types.ts",
+      "to": "code_symbol:src/types.AgentProvider",
+      "kind": "defines",
+      "provenance": "src/types.ts (ts type)"
+    },
+    {
+      "from": "file:src/types.ts",
+      "to": "code_symbol:src/types.AgentRun",
+      "kind": "defines",
+      "provenance": "src/types.ts (ts interface)"
+    },
+    {
+      "from": "file:src/types.ts",
+      "to": "code_symbol:src/types.AgentRunStatus",
+      "kind": "defines",
+      "provenance": "src/types.ts (ts type)"
+    },
+    {
+      "from": "file:src/types.ts",
+      "to": "code_symbol:src/types.Asset",
+      "kind": "defines",
+      "provenance": "src/types.ts (ts interface)"
+    },
+    {
+      "from": "file:src/types.ts",
+      "to": "code_symbol:src/types.AuthContext",
+      "kind": "defines",
+      "provenance": "src/types.ts (ts interface)"
+    },
+    {
+      "from": "file:src/types.ts",
+      "to": "code_symbol:src/types.Block",
+      "kind": "defines",
+      "provenance": "src/types.ts (ts interface)"
+    },
+    {
+      "from": "file:src/types.ts",
+      "to": "code_symbol:src/types.BlockKind",
+      "kind": "defines",
+      "provenance": "src/types.ts (ts type)"
+    },
+    {
+      "from": "file:src/types.ts",
+      "to": "code_symbol:src/types.Callback",
+      "kind": "defines",
+      "provenance": "src/types.ts (ts interface)"
+    },
+    {
+      "from": "file:src/types.ts",
+      "to": "code_symbol:src/types.Canvas",
+      "kind": "defines",
+      "provenance": "src/types.ts (ts interface)"
+    },
+    {
+      "from": "file:src/types.ts",
+      "to": "code_symbol:src/types.CanvasBundle",
+      "kind": "defines",
+      "provenance": "src/types.ts (ts interface)"
+    },
+    {
+      "from": "file:src/types.ts",
+      "to": "code_symbol:src/types.CanvasBundleAsset",
+      "kind": "defines",
+      "provenance": "src/types.ts (ts interface)"
+    },
+    {
+      "from": "file:src/types.ts",
+      "to": "code_symbol:src/types.CanvasEdit",
+      "kind": "defines",
+      "provenance": "src/types.ts (ts interface)"
+    },
+    {
+      "from": "file:src/types.ts",
+      "to": "code_symbol:src/types.CanvasImportRequest",
+      "kind": "defines",
+      "provenance": "src/types.ts (ts interface)"
+    },
+    {
+      "from": "file:src/types.ts",
+      "to": "code_symbol:src/types.CanvasImportResult",
+      "kind": "defines",
+      "provenance": "src/types.ts (ts interface)"
+    },
+    {
+      "from": "file:src/types.ts",
+      "to": "code_symbol:src/types.CanvasLogEvent",
+      "kind": "defines",
+      "provenance": "src/types.ts (ts interface)"
+    },
+    {
+      "from": "file:src/types.ts",
+      "to": "code_symbol:src/types.CanvasLogEventType",
+      "kind": "defines",
+      "provenance": "src/types.ts (ts type)"
+    },
+    {
+      "from": "file:src/types.ts",
+      "to": "code_symbol:src/types.CanvasMode",
+      "kind": "defines",
+      "provenance": "src/types.ts (ts type)"
+    },
+    {
+      "from": "file:src/types.ts",
+      "to": "code_symbol:src/types.CanvasRestoreResponse",
+      "kind": "defines",
+      "provenance": "src/types.ts (ts interface)"
+    },
+    {
+      "from": "file:src/types.ts",
+      "to": "code_symbol:src/types.CanvasSnapshot",
+      "kind": "defines",
+      "provenance": "src/types.ts (ts interface)"
+    },
+    {
+      "from": "file:src/types.ts",
+      "to": "code_symbol:src/types.CanvasStatus",
+      "kind": "defines",
+      "provenance": "src/types.ts (ts type)"
+    },
+    {
+      "from": "file:src/types.ts",
+      "to": "code_symbol:src/types.ChartPoint",
+      "kind": "defines",
+      "provenance": "src/types.ts (ts interface)"
+    },
+    {
+      "from": "file:src/types.ts",
+      "to": "code_symbol:src/types.ChartSeries",
+      "kind": "defines",
+      "provenance": "src/types.ts (ts interface)"
+    },
+    {
+      "from": "file:src/types.ts",
+      "to": "code_symbol:src/types.ChartSpec",
+      "kind": "defines",
+      "provenance": "src/types.ts (ts interface)"
+    },
+    {
+      "from": "file:src/types.ts",
+      "to": "code_symbol:src/types.ChecklistItem",
+      "kind": "defines",
+      "provenance": "src/types.ts (ts interface)"
+    },
+    {
+      "from": "file:src/types.ts",
+      "to": "code_symbol:src/types.CreateCanvasSnapshotRequest",
+      "kind": "defines",
+      "provenance": "src/types.ts (ts interface)"
+    },
+    {
+      "from": "file:src/types.ts",
+      "to": "code_symbol:src/types.DeliveryReceipt",
+      "kind": "defines",
+      "provenance": "src/types.ts (ts interface)"
+    },
+    {
+      "from": "file:src/types.ts",
+      "to": "code_symbol:src/types.DeliveryStatus",
+      "kind": "defines",
+      "provenance": "src/types.ts (ts type)"
+    },
+    {
+      "from": "file:src/types.ts",
+      "to": "code_symbol:src/types.Feedback",
+      "kind": "defines",
+      "provenance": "src/types.ts (ts interface)"
+    },
+    {
+      "from": "file:src/types.ts",
+      "to": "code_symbol:src/types.FeedbackAnchor",
+      "kind": "defines",
+      "provenance": "src/types.ts (ts interface)"
+    },
+    {
+      "from": "file:src/types.ts",
+      "to": "code_symbol:src/types.FeedbackDecision",
+      "kind": "defines",
+      "provenance": "src/types.ts (ts type)"
+    },
+    {
+      "from": "file:src/types.ts",
+      "to": "code_symbol:src/types.FeedbackDelivery",
+      "kind": "defines",
+      "provenance": "src/types.ts (ts interface)"
+    },
+    {
+      "from": "file:src/types.ts",
+      "to": "code_symbol:src/types.FeedbackTarget",
+      "kind": "defines",
+      "provenance": "src/types.ts (ts interface)"
+    },
+    {
+      "from": "file:src/types.ts",
+      "to": "code_symbol:src/types.FormField",
+      "kind": "defines",
+      "provenance": "src/types.ts (ts interface)"
+    },
+    {
+      "from": "file:src/types.ts",
+      "to": "code_symbol:src/types.FormSchema",
+      "kind": "defines",
+      "provenance": "src/types.ts (ts interface)"
+    },
+    {
+      "from": "file:src/types.ts",
+      "to": "code_symbol:src/types.HubEnv",
+      "kind": "defines",
+      "provenance": "src/types.ts (ts interface)"
+    },
+    {
+      "from": "file:src/types.ts",
+      "to": "code_symbol:src/types.HubEvent",
+      "kind": "defines",
+      "provenance": "src/types.ts (ts interface)"
+    },
+    {
+      "from": "file:src/types.ts",
+      "to": "code_symbol:src/types.ObserverDecision",
+      "kind": "defines",
+      "provenance": "src/types.ts (ts interface)"
+    },
+    {
+      "from": "file:src/types.ts",
+      "to": "code_symbol:src/types.ObserverDryRunAction",
+      "kind": "defines",
+      "provenance": "src/types.ts (ts interface)"
+    },
+    {
+      "from": "file:src/types.ts",
+      "to": "code_symbol:src/types.ObserverIssue",
+      "kind": "defines",
+      "provenance": "src/types.ts (ts interface)"
+    },
+    {
+      "from": "file:src/types.ts",
+      "to": "code_symbol:src/types.OrderableItem",
+      "kind": "defines",
+      "provenance": "src/types.ts (ts interface)"
+    },
+    {
+      "from": "file:src/types.ts",
+      "to": "code_symbol:src/types.Priority",
+      "kind": "defines",
+      "provenance": "src/types.ts (ts type)"
+    },
+    {
+      "from": "file:src/types.ts",
+      "to": "code_symbol:src/types.RuleClause",
+      "kind": "defines",
+      "provenance": "src/types.ts (ts interface)"
+    },
+    {
+      "from": "file:src/types.ts",
+      "to": "code_symbol:src/types.RuleSchema",
+      "kind": "defines",
+      "provenance": "src/types.ts (ts interface)"
+    },
+    {
+      "from": "file:src/types.ts",
+      "to": "code_symbol:src/types.RuleSchemaField",
+      "kind": "defines",
+      "provenance": "src/types.ts (ts interface)"
+    },
+    {
+      "from": "file:src/types.ts",
+      "to": "code_symbol:src/types.SplitSlice",
+      "kind": "defines",
+      "provenance": "src/types.ts (ts interface)"
+    },
+    {
+      "from": "file:src/types.ts",
+      "to": "code_symbol:src/types.ViewerLink",
+      "kind": "defines",
+      "provenance": "src/types.ts (ts interface)"
+    },
+    {
+      "from": "file:src/types.ts",
+      "to": "code_symbol:src/types.ViewerLinkCheck",
+      "kind": "defines",
+      "provenance": "src/types.ts (ts interface)"
+    },
+    {
+      "from": "file:src/types.ts",
+      "to": "code_symbol:src/types.ViewerLinkCreateResponse",
+      "kind": "defines",
+      "provenance": "src/types.ts (ts interface)"
+    },
+    {
+      "from": "file:src/types.ts",
+      "to": "code_symbol:src/types.ViewerLinkExchangeResponse",
+      "kind": "defines",
+      "provenance": "src/types.ts (ts interface)"
+    },
+    {
+      "from": "file:src/types.ts",
+      "to": "code_symbol:src/types.ViewerLinkPreflightResponse",
+      "kind": "defines",
+      "provenance": "src/types.ts (ts interface)"
+    },
+    {
+      "from": "file:src/types.ts",
+      "to": "code_symbol:src/types.ViewerLinkRequest",
+      "kind": "defines",
+      "provenance": "src/types.ts (ts interface)"
+    },
+    {
+      "from": "file:src/types.ts",
+      "to": "code_symbol:src/types.ViewerSession",
+      "kind": "defines",
+      "provenance": "src/types.ts (ts interface)"
+    },
+    {
+      "from": "file:src/types.ts",
+      "to": "code_symbol:src/types.WebhookCallback",
+      "kind": "defines",
+      "provenance": "src/types.ts (ts interface)"
+    },
+    {
+      "from": "file:src/utils.ts",
+      "to": "code_symbol:src/utils.AppError",
+      "kind": "defines",
+      "provenance": "src/utils.ts (ts class)"
+    },
+    {
+      "from": "file:src/utils.ts",
+      "to": "code_symbol:src/utils.addSeconds",
+      "kind": "defines",
+      "provenance": "src/utils.ts (ts function)"
+    },
+    {
+      "from": "file:src/utils.ts",
+      "to": "code_symbol:src/utils.badRequest",
+      "kind": "defines",
+      "provenance": "src/utils.ts (ts function)"
+    },
+    {
+      "from": "file:src/utils.ts",
+      "to": "code_symbol:src/utils.base64Decode",
+      "kind": "defines",
+      "provenance": "src/utils.ts (ts function)"
+    },
+    {
+      "from": "file:src/utils.ts",
+      "to": "code_symbol:src/utils.base64Encode",
+      "kind": "defines",
+      "provenance": "src/utils.ts (ts function)"
+    },
+    {
+      "from": "file:src/utils.ts",
+      "to": "code_symbol:src/utils.conflict",
+      "kind": "defines",
+      "provenance": "src/utils.ts (ts function)"
+    },
+    {
+      "from": "file:src/utils.ts",
+      "to": "code_symbol:src/utils.errorResponse",
+      "kind": "defines",
+      "provenance": "src/utils.ts (ts function)"
+    },
+    {
+      "from": "file:src/utils.ts",
+      "to": "code_symbol:src/utils.firstNonEmpty",
+      "kind": "defines",
+      "provenance": "src/utils.ts (ts function)"
+    },
+    {
+      "from": "file:src/utils.ts",
+      "to": "code_symbol:src/utils.forbidden",
+      "kind": "defines",
+      "provenance": "src/utils.ts (ts function)"
+    },
+    {
+      "from": "file:src/utils.ts",
+      "to": "code_symbol:src/utils.hmacSHA256Hex",
+      "kind": "defines",
+      "provenance": "src/utils.ts (ts function)"
+    },
+    {
+      "from": "file:src/utils.ts",
+      "to": "code_symbol:src/utils.jsonResponse",
+      "kind": "defines",
+      "provenance": "src/utils.ts (ts function)"
+    },
+    {
+      "from": "file:src/utils.ts",
+      "to": "code_symbol:src/utils.newID",
+      "kind": "defines",
+      "provenance": "src/utils.ts (ts function)"
+    },
+    {
+      "from": "file:src/utils.ts",
+      "to": "code_symbol:src/utils.notFound",
+      "kind": "defines",
+      "provenance": "src/utils.ts (ts function)"
+    },
+    {
+      "from": "file:src/utils.ts",
+      "to": "code_symbol:src/utils.nowISO",
+      "kind": "defines",
+      "provenance": "src/utils.ts (ts function)"
+    },
+    {
+      "from": "file:src/utils.ts",
+      "to": "code_symbol:src/utils.parseBool",
+      "kind": "defines",
+      "provenance": "src/utils.ts (ts function)"
+    },
+    {
+      "from": "file:src/utils.ts",
+      "to": "code_symbol:src/utils.parseJSONDate",
+      "kind": "defines",
+      "provenance": "src/utils.ts (ts function)"
+    },
+    {
+      "from": "file:src/utils.ts",
+      "to": "code_symbol:src/utils.scoped",
+      "kind": "defines",
+      "provenance": "src/utils.ts (ts function)"
+    },
+    {
+      "from": "file:src/utils.ts",
+      "to": "code_symbol:src/utils.sha256Hex",
+      "kind": "defines",
+      "provenance": "src/utils.ts (ts function)"
+    },
+    {
+      "from": "file:src/utils.ts",
+      "to": "code_symbol:src/utils.stampWorkspace",
+      "kind": "defines",
+      "provenance": "src/utils.ts (ts function)"
+    },
+    {
+      "from": "file:src/utils.ts",
+      "to": "code_symbol:src/utils.stripUndefined",
+      "kind": "defines",
+      "provenance": "src/utils.ts (ts function)"
+    },
+    {
+      "from": "file:src/utils.ts",
+      "to": "code_symbol:src/utils.validateID",
+      "kind": "defines",
+      "provenance": "src/utils.ts (ts function)"
+    },
+    {
+      "from": "file:src/utils.ts",
+      "to": "code_symbol:src/utils.workspaceVisible",
+      "kind": "defines",
+      "provenance": "src/utils.ts (ts function)"
+    },
+    {
+      "from": "file:src/validation.ts",
+      "to": "code_symbol:src/validation.CANVAS_BUNDLE_SCHEMA_VERSION",
+      "kind": "defines",
+      "provenance": "src/validation.ts (ts const)"
+    },
+    {
+      "from": "file:src/validation.ts",
+      "to": "code_symbol:src/validation.SNAPSHOT_DYNAMIC_COMPLETE",
+      "kind": "defines",
+      "provenance": "src/validation.ts (ts const)"
+    },
+    {
+      "from": "file:src/validation.ts",
+      "to": "code_symbol:src/validation.SNAPSHOT_MANUAL",
+      "kind": "defines",
+      "provenance": "src/validation.ts (ts const)"
+    },
+    {
+      "from": "file:src/validation.ts",
+      "to": "code_symbol:src/validation.SNAPSHOT_PRE_IMPORT",
+      "kind": "defines",
+      "provenance": "src/validation.ts (ts const)"
+    },
+    {
+      "from": "file:src/validation.ts",
+      "to": "code_symbol:src/validation.SNAPSHOT_PRE_RESTORE",
+      "kind": "defines",
+      "provenance": "src/validation.ts (ts const)"
+    },
+    {
+      "from": "file:src/validation.ts",
+      "to": "code_symbol:src/validation.SNAPSHOT_STATIC_OVERWRITE",
+      "kind": "defines",
+      "provenance": "src/validation.ts (ts const)"
+    },
+    {
+      "from": "file:src/validation.ts",
+      "to": "code_symbol:src/validation.canvasReferencesAsset",
+      "kind": "defines",
+      "provenance": "src/validation.ts (ts function)"
+    },
+    {
+      "from": "file:src/validation.ts",
+      "to": "code_symbol:src/validation.newCanvasSnapshot",
+      "kind": "defines",
+      "provenance": "src/validation.ts (ts function)"
+    },
+    {
+      "from": "file:src/validation.ts",
+      "to": "code_symbol:src/validation.normalizeAgentEvent",
+      "kind": "defines",
+      "provenance": "src/validation.ts (ts function)"
+    },
+    {
+      "from": "file:src/validation.ts",
+      "to": "code_symbol:src/validation.normalizeAgentRun",
+      "kind": "defines",
+      "provenance": "src/validation.ts (ts function)"
+    },
+    {
+      "from": "file:src/validation.ts",
+      "to": "code_symbol:src/validation.normalizeBlock",
+      "kind": "defines",
+      "provenance": "src/validation.ts (ts function)"
+    },
+    {
+      "from": "file:src/validation.ts",
+      "to": "code_symbol:src/validation.normalizeCanvas",
+      "kind": "defines",
+      "provenance": "src/validation.ts (ts function)"
+    },
+    {
+      "from": "file:src/validation.ts",
+      "to": "code_symbol:src/validation.normalizeCanvasEdit",
+      "kind": "defines",
+      "provenance": "src/validation.ts (ts function)"
+    },
+    {
+      "from": "file:src/validation.ts",
+      "to": "code_symbol:src/validation.normalizeCanvasLogEvent",
+      "kind": "defines",
+      "provenance": "src/validation.ts (ts function)"
+    },
+    {
+      "from": "file:src/validation.ts",
+      "to": "code_symbol:src/validation.normalizeFeedback",
+      "kind": "defines",
+      "provenance": "src/validation.ts (ts function)"
+    },
+    {
+      "from": "file:src/validation.ts",
+      "to": "code_symbol:src/validation.normalizeFeedbackDelivery",
+      "kind": "defines",
+      "provenance": "src/validation.ts (ts function)"
+    },
+    {
+      "from": "file:src/validation.ts",
+      "to": "code_symbol:src/validation.normalizeFeedbackTarget",
+      "kind": "defines",
+      "provenance": "src/validation.ts (ts function)"
+    },
+    {
+      "from": "file:src/validation.ts",
+      "to": "code_symbol:src/validation.normalizeSnapshot",
+      "kind": "defines",
+      "provenance": "src/validation.ts (ts function)"
+    },
+    {
+      "from": "file:src/validation.ts",
+      "to": "code_symbol:src/validation.normalizeViewerLinkRequest",
+      "kind": "defines",
+      "provenance": "src/validation.ts (ts function)"
+    },
+    {
+      "from": "file:src/validation.ts",
+      "to": "code_symbol:src/validation.opRequiresBlockKind",
+      "kind": "defines",
+      "provenance": "src/validation.ts (ts function)"
+    },
+    {
+      "from": "file:src/validation.ts",
+      "to": "code_symbol:src/validation.projectCanvasLogEvent",
+      "kind": "defines",
+      "provenance": "src/validation.ts (ts function)"
+    },
+    {
+      "from": "file:src/validation.ts",
+      "to": "code_symbol:src/validation.sanitizeCanvasForViewer",
+      "kind": "defines",
+      "provenance": "src/validation.ts (ts function)"
+    },
+    {
+      "from": "file:src/validation.ts",
+      "to": "code_symbol:src/validation.validAgentProvider",
+      "kind": "defines",
+      "provenance": "src/validation.ts (ts function)"
+    },
+    {
+      "from": "file:src/validation.ts",
+      "to": "code_symbol:src/validation.validBlockKind",
+      "kind": "defines",
+      "provenance": "src/validation.ts (ts function)"
+    },
+    {
+      "from": "file:src/app.ts",
+      "to": "file:src/events.ts",
+      "kind": "depends_on",
+      "provenance": "src/app.ts (ts import src/events.ts)"
+    },
+    {
+      "from": "file:src/app.ts",
+      "to": "file:src/store.ts",
+      "kind": "depends_on",
+      "provenance": "src/app.ts (ts import src/store.ts)"
+    },
+    {
+      "from": "file:src/events.ts",
+      "to": "file:src/store.ts",
+      "kind": "depends_on",
+      "provenance": "src/events.ts (ts import src/store.ts)"
+    },
+    {
+      "from": "file:src/events.ts",
+      "to": "file:src/types.ts",
+      "kind": "depends_on",
+      "provenance": "src/events.ts (ts import src/types.ts)"
+    },
+    {
+      "from": "file:src/events.ts",
+      "to": "file:src/utils.ts",
+      "kind": "depends_on",
+      "provenance": "src/events.ts (ts import src/utils.ts)"
+    },
+    {
+      "from": "file:src/events.ts",
+      "to": "file:src/validation.ts",
+      "kind": "depends_on",
+      "provenance": "src/events.ts (ts import src/validation.ts)"
+    },
+    {
+      "from": "file:src/index.ts",
+      "to": "file:src/app.ts",
+      "kind": "depends_on",
+      "provenance": "src/index.ts (ts import src/app.ts)"
+    },
+    {
+      "from": "file:src/index.ts",
+      "to": "file:src/events.ts",
+      "kind": "depends_on",
+      "provenance": "src/index.ts (ts import src/events.ts)"
+    },
+    {
+      "from": "file:src/index.ts",
+      "to": "file:src/types.ts",
+      "kind": "depends_on",
+      "provenance": "src/index.ts (ts import src/types.ts)"
+    },
+    {
+      "from": "file:src/store.ts",
+      "to": "file:src/utils.ts",
+      "kind": "depends_on",
+      "provenance": "src/store.ts (ts import src/utils.ts)"
+    },
+    {
+      "from": "file:src/validation.ts",
+      "to": "file:src/utils.ts",
+      "kind": "depends_on",
+      "provenance": "src/validation.ts (ts import src/utils.ts)"
+    },
+    {
+      "from": "rule:readme-needs-touch-on-major-change",
+      "to": "file:src/app.test.ts",
+      "kind": "expects",
+      "provenance": "ontology.yml (readme-needs-touch-on-major-change.when)"
+    },
+    {
+      "from": "rule:readme-needs-touch-on-major-change",
+      "to": "file:src/app.ts",
+      "kind": "expects",
+      "provenance": "ontology.yml (readme-needs-touch-on-major-change.when)"
+    },
+    {
+      "from": "rule:readme-needs-touch-on-major-change",
+      "to": "file:src/events.ts",
+      "kind": "expects",
+      "provenance": "ontology.yml (readme-needs-touch-on-major-change.when)"
+    },
+    {
+      "from": "rule:readme-needs-touch-on-major-change",
+      "to": "file:src/index.ts",
+      "kind": "expects",
+      "provenance": "ontology.yml (readme-needs-touch-on-major-change.when)"
+    },
+    {
+      "from": "rule:readme-needs-touch-on-major-change",
+      "to": "file:src/store.ts",
+      "kind": "expects",
+      "provenance": "ontology.yml (readme-needs-touch-on-major-change.when)"
+    },
+    {
+      "from": "rule:readme-needs-touch-on-major-change",
+      "to": "file:src/types.ts",
+      "kind": "expects",
+      "provenance": "ontology.yml (readme-needs-touch-on-major-change.when)"
+    },
+    {
+      "from": "rule:readme-needs-touch-on-major-change",
+      "to": "file:src/utils.ts",
+      "kind": "expects",
+      "provenance": "ontology.yml (readme-needs-touch-on-major-change.when)"
+    },
+    {
+      "from": "rule:readme-needs-touch-on-major-change",
+      "to": "file:src/validation.ts",
+      "kind": "expects",
+      "provenance": "ontology.yml (readme-needs-touch-on-major-change.when)"
+    },
+    {
+      "from": "rule:pre-commit-hook-change-needs-doc",
+      "to": "command:bash .githooks/pre-commit",
+      "kind": "suggests",
+      "provenance": "ontology.yml (suggested_commands)"
+    },
+    {
+      "from": "rule:readme-needs-touch-on-major-change",
+      "to": "command:git diff README.md",
+      "kind": "suggests",
+      "provenance": "ontology.yml (suggested_commands)"
+    },
+    {
+      "from": "rule:readme-needs-touch-on-major-change",
+      "to": "command:git diff docs/",
+      "kind": "suggests",
+      "provenance": "ontology.yml (suggested_commands)"
+    },
+    {
+      "from": "test:src/app.test.ts",
+      "to": "file:src/app.ts",
+      "kind": "verifies",
+      "provenance": "src/app.test.ts (test → source pair)"
+    }
+  ],
+  "counts": {
+    "nodes_by_kind": {
+      "code_symbol": 112,
+      "command": 5,
+      "directory": 2,
+      "file": 8,
+      "rule": 2,
+      "test": 1
+    },
+    "edges_by_kind": {
+      "contains": 9,
+      "defines": 112,
+      "depends_on": 11,
+      "expects": 8,
+      "suggests": 3,
+      "verifies": 1
+    },
+    "total_nodes": 130,
+    "total_edges": 144
+  }
+}
