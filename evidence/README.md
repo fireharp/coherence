@@ -8,7 +8,11 @@ Generated 2026-05-21 by the ralph-loop research task that started with:
 
 ## Files
 
-- **`REPORT.md`** — the summary. Capability matrix, benchmark numbers, recommendation. Read this first.
+- **`REPORT.md`** — iteration-1 summary. Capability matrix, benchmark numbers, recommendation. Read this first.
+- **`ITERATION-2.md`** — iteration-2 addendum: working POC reader, synthetic corpus with ground truth, precision/recall on synthetic vs real code, revised recommendation.
+- **`poc/cgpoc.go`** — standalone Go reader for codegraph's SQLite DB. Emits a `dead_code` meter in coherence-shaped JSON.
+- **`poc/dead_code_*.json`** — POC outputs on the four corpora.
+- **`synthetic/`** — annotated Go corpus with `// GT: live` / `// GT: dead-code` markers for precision/recall measurement.
 - **`raw/`** — captured graph outputs from both engines on three corpora:
   - `coherence_self_graph.json` — coherence on its own repo (183 files, 774 nodes, 1,093 edges)
   - `coherence_copycat_graph.json` — coherence on /Users/fireharp/Prog/Stuff/copycat (Python, 596/658)
