@@ -6,7 +6,12 @@ One page. Four iterations of evidence boil down to one question:
 
 ## Answer
 
-**Conditional yes** — adopt as an **opt-in side-car**, ship one meter first (`callsite_blast_radius`), gate everything else on per-language real-code precision. Do **not** take a hard Node/SQLite dependency. Do **not** replace coherence's existing graph layer; codegraph models a different concept (code symbols, no docs/ADRs/claims/metrics/rules).
+**Conditional yes for non-Go languages; no for Go.** Iteration 6 (see `ITERATION-6.md`) demonstrated that a 230-line stdlib-only Go AST extractor produces strictly better Go call edges than codegraph (100% precision on every probe vs codegraph's contaminated `Build`/`Compute`/`Run` collisions), in 40% of the indexing time, with zero new dependencies. So the language-dispatched recommendation is:
+
+- **Go:** ship the native `go/ast` extractor (`evidence/poc/go_ast_extractor.go`) as a first-party coherence feature. No codegraph dependency on the Go side.
+- **Python / TypeScript / Rust / Java / C# / Ruby / Swift / Kotlin / Dart / Scala / Vue / Svelte / Liquid / Pascal:** adopt codegraph as an **opt-in side-car**, gated by per-language real-code precision (see ITERATION-3).
+- Ship `callsite_blast_radius` first either way; use the Go native extractor when the changed symbols are in Go, the codegraph side-car when they're in another language.
+- Do **not** take a hard Node/SQLite dependency for the Go path. Do **not** replace coherence's existing graph layer; codegraph models a different concept (code symbols, no docs/ADRs/claims/metrics/rules).
 
 The detailed reasoning lives in `REPORT.md` (iteration 1), `ITERATION-2.md`, `ITERATION-3.md`, and `blast_radius_head_to_head/COMPARISON.md`. This page is the executive condensation.
 
