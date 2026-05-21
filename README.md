@@ -1,29 +1,69 @@
-# coherence
+# Coherence
 
-Repository-coherence CLI for Git projects, written in Go. It checks staged or
-diffed files against declarative rules in `ontology.yml`, scans non-Markdown
-additions for unknown `US-###`, `ADR-###`, and `IDR-###` references, and can
-optionally run a Groq semantic pass.
+Git-native drift detector for agent-assisted repositories.
+
+Coherence catches when code, docs, ADRs, tests, metrics, generated files,
+endpoints, and evidence stop agreeing - especially after AI-agent edits.
+
+Tests can pass while the repository becomes less coherent. Coherence looks for
+broken edges between docs, decisions, stories, tests, metrics, generated
+artifacts, endpoints, and evidence.
 
 > **Algorithm reference**: [`docs/`](docs/README.md) has a long-form
 > page for every drift meter and check, with the algorithm, JSON
 > output shape, signal interpretation, and a benchmark scenario
 > example. Start there if you want to understand a firing signal.
 
+## 30-second demo
+
+```bash
+# install from a clone
+go install ./cmd/coherence
+
+# add repo rules, a pre-commit hook, a drift baseline, and the Codex skill
+coherence init --template=agent-repo
+
+# review local worktree drift before handing off or committing
+coherence review --base=HEAD --worktree --json
+```
+
+One concrete regression looks like this:
+
+```json
+{
+  "safe_to_commit": true,
+  "review_recommended": true,
+  "drift_verdict": "telemetry",
+  "drift_regression_count": 1,
+  "drift_regressions": [
+    {
+      "kind": "newly_orphaned_endpoint",
+      "id": "endpoint:GET:/api/orders",
+      "suggested_action": "add or restore a test that verifies the source file defining endpoint:GET:/api/orders"
+    }
+  ],
+  "recommended_next_command": "coherence drift --json"
+}
+```
+
+That is the gap Coherence is built for: the commit can be technically safe,
+but it still removed a traceable support path that an agent or reviewer should
+look at.
+
 ## Requirements
 
-- Go 1.22 or newer (to build)
+- Go 1.26.3 or newer (to build)
 - Git
 - Optional: `GROQ_API_KEY` for the LLM pass
 
-## Build
+## Install
 
 ```bash
 go build -o bin/coherence ./cmd/coherence   # local build into ./bin
 go install ./cmd/coherence                  # install to $GOBIN / $GOPATH/bin
 ```
 
-## Commands
+## Command reference
 
 ```bash
 coherence init --template=go-cli                     # scaffold ontology + hook
@@ -84,7 +124,9 @@ Notable behaviors:
 
 ## Pre-commit hook
 
-`.githooks/pre-commit` runs `coherence scan --staged`. To use it:
+`.githooks/pre-commit` runs `coherence scan --staged`. `coherence init`
+sets `git config core.hooksPath .githooks` automatically when the repo has no
+conflicting hook path. If init reports that hook config was skipped, run:
 
 ```bash
 git config core.hooksPath .githooks
@@ -136,8 +178,9 @@ to load a non-default ontology.
 
 ## Init and templates
 
-`coherence init [--template=<name>] [--force] [--skill-install=auto|native|off] [--json]`
-scaffolds a fresh repository. When `--template` is omitted, the command
+`coherence init [--template=<name>] [--force] [--skill-install=auto|native|off]
+[--no-baseline] [--no-hooks-config] [--json]` scaffolds a fresh repository.
+When `--template` is omitted, the command
 auto-detects from layout tells (`pnpm-workspace.yaml`, `go.mod`,
 `pyproject.toml`, `apps/`+`packages/`, etc.) and falls back to
 `generic` if nothing strong matches. The detected template name prints
@@ -157,7 +200,7 @@ shape was inferred.
 - installs the Codex project skill at `.agents/skills/coherence/SKILL.md`.
 
 It is idempotent: existing files are skipped without `--force`. After init,
-run `git config core.hooksPath .githooks` and `coherence doctor` to verify.
+run `coherence doctor` to verify.
 Skill installation defaults to `auto`, which tries
 `npx --yes skills add ... --agent codex --copy -y` and falls back to native
 file writes. Use `--skill-install=native` to skip `npx`, or

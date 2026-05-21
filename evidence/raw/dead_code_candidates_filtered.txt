@@ -1,0 +1,13 @@
+Compute|internal/drift/drift.go|453
+Human|internal/exteval/exteval.go|258
+DiffNameOnlyBase|internal/git/git.go|123
+FilesMatching|internal/glob/glob.go|85
+HumanDelta|internal/graph/diff.go|135
+IsTestFile|internal/graph/extractors.go|505
+tsExtractSymbolName|internal/graph/implements_extractor.go|57
+pyExtractSymbolName|internal/graph/implements_extractor.go|65
+runSkillsInstallerCommand|internal/initcmd/initcmd.go|330
+Run|internal/llm/llm.go|268
+Now|internal/report/report.go|60
+HumanDiff|internal/snapshot/diff.go|162
+Catalogue|internal/templates/templates.go|51
