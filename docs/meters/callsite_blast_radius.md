@@ -66,6 +66,9 @@ returns a stable shape with `enabled: false` and zero values throughout
 
 ## Output shape
 
+A real captured run of `coherence drift --json` against this repo with
+a stale baseline (so 207 Go symbols read as "changed"):
+
 ```json
 {
   "callsite_blast_radius": {
@@ -74,7 +77,13 @@ returns a stable shape with `enabled: false` and zero values throughout
     "base_available": true,
     "depth": 2,
     "score": 31,
-    "changed_symbols": ["main.boolFlag", "main.stringFlag", "..."],
+    "changed_symbols": [
+      "main.boolFlag",
+      "main.stringFlag",
+      "coherencebench.stringSet",
+      "main.runEvaluation",
+      "..."
+    ],
     "per_symbol": [
       {
         "symbol": "main.boolFlag",
@@ -82,25 +91,42 @@ returns a stable shape with `enabled: false` and zero values throughout
         "direct_callers": 31,
         "direct_callers_production_only": 31,
         "transitive_callers": 8,
-        "transitive_caller_files": 4,
+        "transitive_caller_files": 1,
         "top_direct_callers": [
-          {"caller": "main.run", "file": "cmd/coherence/main.go", "line": 530},
-          ...
+          {"caller": "main.collectScanFiles", "file": "cmd/coherence/main.go", "line": 220},
+          {"caller": "main.collectCheckFiles", "file": "cmd/coherence/main.go", "line": 235},
+          {"caller": "main.collectReviewFiles", "file": "cmd/coherence/main.go", "line": 260}
         ]
       },
-      ...
+      {
+        "symbol": "main.stringFlag",
+        "file_path": "cmd/coherence/main.go",
+        "direct_callers": 7,
+        "direct_callers_production_only": 7,
+        "transitive_callers": 6,
+        "transitive_caller_files": 1,
+        "top_direct_callers": [...]
+      }
     ],
     "top_blast_symbols": [
       "main.boolFlag",
       "main.stringFlag",
+      "coherencebench.stringSet",
       "main.runEvaluation",
-      "main.strictPromotionMessage",
-      "main.collectReviewFiles"
+      "main.strictPromotionMessage"
     ],
-    "warnings": []
+    "warnings": [
+      "207 changed symbols exceeds max_symbols=50; truncating"
+    ]
   }
 }
 ```
+
+Reading this: 207 production Go functions had their semantic hash flip
+since the baseline. The meter capped at 50 (`max_symbols` default),
+warning that the truncation happened. Of those 50, `main.boolFlag` is
+the highest fan-in (31 direct production callers, all in `cmd/coherence/main.go`).
+A change to `boolFlag` would touch 31 call sites — worth a focused review.
 
 When the meter is disabled (default):
 

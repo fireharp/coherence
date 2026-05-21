@@ -17,6 +17,10 @@ internally.
 
 ## Fields
 
+A real `coherence scan --staged --json` run against this repo with
+nothing staged but the worktree dirty (typical pre-commit-after-edit
+state):
+
 ```json
 {
   "safe_to_commit": true,
@@ -26,8 +30,26 @@ internally.
   "staged": "clean",
   "worktree": "dirty",
   "untracked_files_excluded": true,
-  "untracked_file_count": 17,
-  "recommended_next_command": "coherence review --base=HEAD --worktree --json",
+  "untracked_file_count": 1,
+  "recommended_next_command": "coherence review --base=HEAD --worktree --json"
+}
+```
+
+A more elaborate example showing how drift output threads into the
+outcome (synthetic — what you'd see if a commit removed a tested
+endpoint):
+
+```json
+{
+  "safe_to_commit": true,
+  "review_recommended": true,
+  "blocking_error": false,
+  "telemetry_only_movement": false,
+  "staged": "dirty",
+  "worktree": "dirty",
+  "untracked_files_excluded": false,
+  "untracked_file_count": 0,
+  "recommended_next_command": "coherence drift --json",
   "drift_verdict": "telemetry",
   "drift_regression_count": 1,
   "drift_regressions": [

@@ -57,27 +57,61 @@ The dispatch lives in `snapshot.Compute()` in `internal/snapshot/snapshot.go`.
 
 ## Output shape
 
-`.coherence/snapshot.json`:
+`.coherence/snapshot.json` — three real entries from this repo's own
+snapshot illustrating the three dispatch strategies:
 
 ```json
 {
-  "generated_at": "2026-05-21T15:40:00Z",
-  "files": [
-    {
-      "path": "internal/drift/drift.go",
-      "size": 89312,
-      "kind": "code",
-      "content_hash": "9b1a…",
-      "semantic_hash": "9b1a…"
-    },
-    ...
-  ],
-  "directories": [
-    {"path": "internal/drift", "hash": "…", "children": ["…", "…"]},
-    ...
-  ],
-  "root_hash": "ab12…",
-  "file_count": 183
+  "path": "internal/drift/broken_links.go",
+  "size": 2641,
+  "kind": "code",
+  "content_hash": "58e292a35dd703151e91999b86198fe4149e6240fb56b9b928695518debf2de7",
+  "semantic_hash": "b11bc1808704eaf4d037e691a4b925b543ac5e57c74021ff727c0b8c6d48e2dc"
+}
+```
+
+A `.go` file — the hashes *differ* because `goSemantic` parses + re-formats
+the bytes, so the semantic hash is computed off canonical formatting rather
+than the raw bytes. Comment / whitespace changes leave the semantic hash
+stable while the content hash drifts.
+
+```json
+{
+  "path": ".agents/skills/coherence/SKILL.md",
+  "size": 426,
+  "kind": "markdown",
+  "content_hash": "04d52f8ad3c5211ccf0141a396348a5fc387227dfdf5e5bed100c68e5e091b58",
+  "semantic_hash": "7041fa7d1bae726c46c6cf5bdd6f8fe4fec73630ab64f09f231fe75fad9e58fe"
+}
+```
+
+A markdown file — hashes differ because `markdownSemantic` strips
+frontmatter and reduces the body to a heading/bullet skeleton. Re-wording
+a paragraph leaves the semantic hash stable.
+
+```json
+{
+  "path": "go.mod",
+  "size": 73,
+  "kind": "other",
+  "content_hash": "458a0cceee5ac0e18f0b327ea8dc644384f3267c42b92f84d7c4abac4afd6879",
+  "semantic_hash": "458a0cceee5ac0e18f0b327ea8dc644384f3267c42b92f84d7c4abac4afd6879"
+}
+```
+
+A `go.mod` — `kind: "other"` (no language-aware strategy), so semantic
+hash falls back to the content hash. Any byte change flips both. Safe
+default; just lossier signal.
+
+Wrapping the file list, the top-level snapshot shape:
+
+```json
+{
+  "generated_at": "2026-05-21T13:58:49Z",
+  "files":       [ ... 183 entries on this repo ... ],
+  "directories": [ ... 84 Merkle roll-ups, one per directory ... ],
+  "root_hash":   "06e58b5b1929b18675af...",
+  "file_count":  183
 }
 ```
 

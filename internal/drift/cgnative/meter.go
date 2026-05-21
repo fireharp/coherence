@@ -3,8 +3,10 @@ package cgnative
 import (
 	"fmt"
 	"go/ast"
+	"go/build"
 	"go/parser"
 	"go/token"
+	"path/filepath"
 	"sort"
 	"strings"
 
@@ -91,10 +93,18 @@ func Compute(rootDir string, cfg Config, baseSnap, currentSnap *snapshot.Snapsho
 	}
 
 	// For each changed Go file, extract its top-level function names.
+	// Honor `//go:build` constraints so files excluded from the default
+	// Go build (e.g. `//go:build poc` POC files, `//go:build linux` on
+	// other platforms) don't pollute the meter output. Matches the
+	// extractor's behavior in extractor.go.
 	symbols := []symbolRef{}
 	fset := token.NewFileSet()
+	ctx := build.Default
 	for _, rel := range changedGoFiles {
-		full := rootDir + "/" + rel
+		full := filepath.Join(rootDir, rel)
+		if match, err := ctx.MatchFile(filepath.Dir(full), filepath.Base(full)); err == nil && !match {
+			continue
+		}
 		f, err := parser.ParseFile(fset, full, nil, 0)
 		if err != nil {
 			continue

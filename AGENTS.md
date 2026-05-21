@@ -109,6 +109,16 @@ Use Go 1.22 or newer.
   drift report inline under the `drift` key and surfaces
   `drift_verdict` + `telemetry_only_movement` at the top of the outcome
   contract. `scan` and `check` skip drift to keep pre-commit fast.
+  Plus two **optional engines** in `internal/drift/cgnative/`
+  (off by default; enable via `optional_engines:` in `ontology.yml`):
+  `callsite_blast_radius` (for each changed Go top-level function,
+  count direct + transitive callers via native `go/ast`) and
+  `dead_code` (unexported Go top-level functions with zero inbound
+  resolved calls). Both share one parse pass; no external deps;
+  telemetry-only (don't promote the verdict). See
+  `docs/meters/{callsite_blast_radius,dead_code}.md` for the full
+  contracts and `evidence/DECISION.md` for the reasoning behind a
+  native extractor rather than a codegraph dependency.
 - `./bin/coherence bench [--suite=templates|coherencebench|external|all]
   [--template=<name>] [--json] [--write-report]` runs the shipped scenario
   / evaluation suites. Templates is the v0.3 onboarding suite (38 scenarios

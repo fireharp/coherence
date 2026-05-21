@@ -15,44 +15,50 @@ Source: [`internal/doctor/doctor.go`](../../internal/doctor/doctor.go).
 2. **`hook`** — `.githooks/pre-commit` exists, is executable, and
    references the `coherence scan --staged` invocation. Catches the
    common "I ran `coherence init` and then `chmod -x` somehow" case.
-3. **`hooks_path`** — `git config core.hooksPath` is set to `.githooks`
+3. **`hooks-path`** — `git config core.hooksPath` is set to `.githooks`
    so the pre-commit hook actually fires. `coherence init` sets this
    when the repo has no conflicting hook path; this check catches drift
    when the user removes the config or `git config --unset`s it.
 4. **`gitignore`** — `.gitignore` excludes `.coherence/`. The local
    snapshot/graph/drift files shouldn't be committed, and this is the
    guard against accidentally checking them in.
-5. **`coherence_state`** — `.coherence/snapshot.json` and
-   `.coherence/graph.json` either both exist or both don't (running
-   one without the other means diff-aware meters silently degrade).
-6. **`agent_skill`** — if `.codex/skills/coherence/` or
-   `.claude/skills/coherence/` exists, validate it isn't stale relative
-   to the shipped skill version. Skips silently when neither is
-   present.
-7. **`legacy_skill`** — heuristic check for the older skill layout
-   (`.codex/skills/coherence-skill/`) that some users have from before
-   the rename. Emits a warn if found, with a fix hint.
+5. **`state`** — `.coherence/` directory exists and is populated. If
+   missing, the recommended first command is `coherence index`.
+6. **`agent-skill`** — if `.agents/skills/coherence/`,
+   `.codex/skills/coherence/`, or `.claude/skills/coherence/` exists,
+   validate it isn't stale relative to the shipped skill version.
+   Skips silently when none of them are present.
+7. **`legacy-skill`** *(optional)* — heuristic check for the older skill
+   layout (`.codex/skills/coherence-skill/`) that some users have from
+   before the rename. Emits a warn if found, with a fix hint.
 
 ## Output shape
 
+A real run of `coherence doctor --json` against this repo:
+
 ```json
 {
-  "ok": false,
+  "ok": true,
   "checks": [
-    {
-      "id": "ontology",
-      "status": "ok",
-      "message": "ontology.yml parses (3 rules, 2 commands)"
-    },
-    {
-      "id": "hook",
-      "status": "fail",
-      "message": ".githooks/pre-commit is not executable",
-      "detail": "mode=0644, expected at least 0755",
-      "fix": "chmod +x .githooks/pre-commit"
-    },
-    ...
+    {"id": "ontology",    "status": "ok", "message": "ontology loaded (7 rule(s))"},
+    {"id": "hook",        "status": "ok", "message": ".githooks/pre-commit present and executable"},
+    {"id": "hooks-path",  "status": "ok", "message": "git config core.hooksPath = .githooks"},
+    {"id": "gitignore",   "status": "ok", "message": ".coherence/ is gitignored"},
+    {"id": "state",       "status": "ok", "message": ".coherence/ directory present"},
+    {"id": "agent-skill", "status": "ok", "message": ".agents/skills/coherence/SKILL.md present"}
   ]
+}
+```
+
+A failure example (synthetic, what you'd see after `chmod -x .githooks/pre-commit`):
+
+```json
+{
+  "id": "hook",
+  "status": "fail",
+  "message": ".githooks/pre-commit is not executable",
+  "detail": "mode=0644, expected at least 0755",
+  "fix": "chmod +x .githooks/pre-commit"
 }
 ```
 

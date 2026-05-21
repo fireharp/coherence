@@ -56,6 +56,8 @@ signal contributed.
 
 ## Output shape
 
+A real captured run of `coherence drift --json` against this repo:
+
 ```json
 {
   "dead_code": {
@@ -83,6 +85,27 @@ signal contributed.
   }
 }
 ```
+
+What you're seeing: three functions that the call-graph extractor
+cannot connect to any caller because each one is referenced as a
+function *value*, not via a direct `pkg.Func()` call:
+
+```go
+// internal/graph/implements_extractor.go:47
+emitImplementsFromLines(b, rel, pkg, src, tsExtractSymbolName)
+
+// internal/initcmd/initcmd.go:59
+var runSkillsInstaller = runSkillsInstallerCommand
+```
+
+These are documented function-value false positives — see "Honest
+limitations" below. They're useful as a **stability anchor**: when
+this meter starts reporting candidates beyond these three, you know
+something new has appeared that's worth investigating.
+
+For a comparison, `tinkershop` (one of coherence's dogfood targets,
+29 .go files) reports `score: 0` — a clean codebase with no
+unreferenced unexported functions.
 
 When the meter is disabled (default):
 
