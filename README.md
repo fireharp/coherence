@@ -2,6 +2,8 @@
 
 Git-native drift detector for agent-assisted repositories.
 
+Docs site: https://fireharp.github.io/coherence/
+
 Coherence catches when code, docs, ADRs, tests, metrics, generated files,
 endpoints, and evidence stop agreeing - especially after AI-agent edits.
 

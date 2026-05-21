@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Coherence - Drift detection for agent-assisted repos</title>
+    <meta name="description" content="Coherence catches drift between code, docs, ADRs, tests, metrics, generated artifacts, endpoints, and evidence before agents commit it.">
+    <link rel="stylesheet" href="assets/site.css">
+  </head>
+  <body>
+    <header class="site-header">
+      <nav class="nav" aria-label="Primary">
+        <a class="brand" href="./" aria-label="Coherence home">
+          <span class="brand-mark">C</span>
+          <span>Coherence</span>
+        </a>
+        <div class="nav-links">
+          <a href="#quickstart">Quickstart</a>
+          <a href="#scenarios">Scenarios</a>
+          <a href="#agents">Agent workflows</a>
+          <a href="README.md">Reference</a>
+          <a href="https://github.com/fireharp/coherence">GitHub</a>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div>
+          <p class="eyebrow"><span class="dot"></span> Git-native drift detector</p>
+          <h1>Keep agent edits attached to the repo truth.</h1>
+          <p class="lead">Coherence checks when code, docs, ADRs, tests, metrics, generated files, endpoints, and evidence stop agreeing. It gives coding agents JSON they can act on.</p>
+          <div class="hero-actions">
+            <a class="button primary" href="#quickstart">Start in 30 seconds</a>
+            <a class="button" href="README.md">Read algorithm reference</a>
+          </div>
+        </div>
+        <div class="diagram" aria-label="Repository signal map">
+          <img src="assets/coherence-map.svg" alt="Code, docs, tests, and evidence connected through a Coherence drift graph.">
+        </div>
+      </section>
+
+      <section class="section" id="quickstart">
+        <div class="section-head">
+          <h2>Quickstart</h2>
+          <p>Install the release binary, initialize rules for an agent repo, then run the worktree review before handoff or commit.</p>
+        </div>
+        <div class="grid three">
+          <article class="card">
+            <p class="step">Step 1</p>
+            <h3>Install</h3>
+            <pre class="code"><code>curl -fsSL https://github.com/fireharp/coherence/releases/latest/download/install.sh | sh</code></pre>
+          </article>
+          <article class="card">
+            <p class="step">Step 2</p>
+            <h3>Initialize</h3>
+            <pre class="code"><code>coherence init --template=agent-repo</code></pre>
+          </article>
+          <article class="card">
+            <p class="step">Step 3</p>
+            <h3>Review</h3>
+            <pre class="code"><code>coherence review --base=HEAD --worktree --json</code></pre>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="example">
+        <div class="section-head">
+          <h2>What a useful failure looks like</h2>
+          <p>Tests can pass while the repository gets less coherent. Coherence reports that as a typed regression with a concrete next action.</p>
+        </div>
+        <div class="json-example">
+          <pre class="code tight"><code>{
+  "safe_to_commit": true,
+  "review_recommended": true,
+  "drift_verdict": "telemetry",
+  "drift_regression_count": 1,
+  "drift_regressions": [
+    {
+      "kind": "newly_orphaned_endpoint",
+      "id": "endpoint:GET:/api/orders",
+      "suggested_action": "add or restore a test that verifies the source file defining endpoint:GET:/api/orders"
+    }
+  ],
+  "recommended_next_command": "coherence drift --json"
+}</code></pre>
+          <aside class="card callout">
+            <h3>The commit is not blocked, but the agent has work.</h3>
+            <p>The endpoint lost its verification path. A coding agent can inspect `drift_regressions`, restore a test or evidence link, then rerun `coherence review`.</p>
+          </aside>
+        </div>
+      </section>
+
+      <section class="section" id="scenarios">
+        <div class="section-head">
+          <h2>Use cases</h2>
+          <p>Use Coherence where normal tests do not explain whether the repository still tells one story.</p>
+        </div>
+        <table class="scenario-table">
+          <thead>
+            <tr>
+              <th>Scenario</th>
+              <th>Command</th>
+              <th>What you get</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="pill">Coding agents</span></td>
+              <td><code>coherence review --base=HEAD --worktree --json</code></td>
+              <td>Worktree drift, typed regressions, suggested commands, and a machine-readable commit verdict.</td>
+            </tr>
+            <tr>
+              <td><span class="pill">Pre-commit</span></td>
+              <td><code>coherence scan --staged</code></td>
+              <td>Fast staged-file checks against ontology rules before drift reaches history.</td>
+            </tr>
+            <tr>
+              <td><span class="pill">PR review</span></td>
+              <td><code>coherence review --base=origin/main --staged --json</code></td>
+              <td>PR-shaped signal across the branch diff plus staged local changes.</td>
+            </tr>
+            <tr>
+              <td><span class="pill">Zero-drift CI</span></td>
+              <td><code>coherence review --base=origin/main --worktree --json --strict</code></td>
+              <td>Telemetry promoted to exit 1 when CI needs every drift signal handled.</td>
+            </tr>
+            <tr>
+              <td><span class="pill">Debugging</span></td>
+              <td><code>coherence drift --json</code></td>
+              <td>Full meter output for broken links, orphan endpoints, stale tests, trace coverage, and optional Go callsite meters.</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="section" id="agents">
+        <div class="section-head">
+          <h2>Agent workflow</h2>
+          <p>Agents should consume the JSON contract, not parse human prose.</p>
+        </div>
+        <div class="workflow">
+          <article class="card">
+            <p class="step">1</p>
+            <h3>Review</h3>
+            <pre class="code"><code>coherence review --base=HEAD --worktree --json</code></pre>
+          </article>
+          <article class="card">
+            <p class="step">2</p>
+            <h3>Inspect</h3>
+            <pre class="code"><code>drift_regressions[]
+suggested_commands[]</code></pre>
+          </article>
+          <article class="card">
+            <p class="step">3</p>
+            <h3>Repair</h3>
+            <p>Restore the missing test, evidence, generated artifact, link, or ontology-paired file.</p>
+          </article>
+          <article class="card">
+            <p class="step">4</p>
+            <h3>Rerun</h3>
+            <pre class="code"><code>coherence review --base=HEAD --worktree --json</code></pre>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="reference">
+        <div class="section-head">
+          <h2>Reference</h2>
+          <p>Keep the homepage small. Use the existing Markdown reference for deep algorithm details.</p>
+        </div>
+        <div class="link-grid">
+          <a class="card" href="README.md"><strong>Algorithm reference</strong><br>Every meter and check.</a>
+          <a class="card" href="checks/outcome_contract.md"><strong>JSON contract</strong><br>Fields agents should read first.</a>
+          <a class="card" href="meters/trace_coverage.md"><strong>Trace coverage</strong><br>User-story coverage signal.</a>
+          <a class="card" href="https://github.com/fireharp/coherence/releases"><strong>Releases</strong><br>Install assets and changelog.</a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>Coherence is a Go CLI for Git repositories. Source and issues live at <a href="https://github.com/fireharp/coherence">github.com/fireharp/coherence</a>.</p>
+    </footer>
+  </body>
+</html>

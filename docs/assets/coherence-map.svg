@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 520" role="img" aria-labelledby="title desc">
+  <title id="title">Coherence repository signal map</title>
+  <desc id="desc">A schematic showing code, docs, ADRs, tests, metrics, generated artifacts, endpoints, and evidence connected through Coherence checks.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#4b5563"/>
+    </marker>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#111827" flood-opacity=".12"/>
+    </filter>
+  </defs>
+  <rect width="920" height="520" rx="24" fill="#f7faf9"/>
+  <rect x="55" y="52" width="810" height="416" rx="18" fill="#ffffff" filter="url(#shadow)"/>
+  <g stroke="#4b5563" stroke-width="2.2" fill="none" marker-end="url(#arrow)" opacity=".84">
+    <path d="M233 153 C335 105 448 109 575 153"/>
+    <path d="M651 193 C722 243 724 316 655 365"/>
+    <path d="M575 407 C447 457 336 456 230 405"/>
+    <path d="M158 365 C91 315 91 244 159 193"/>
+    <path d="M264 200 L398 250"/>
+    <path d="M522 250 L656 200"/>
+    <path d="M522 310 L656 360"/>
+    <path d="M264 360 L398 310"/>
+  </g>
+  <g font-family="Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="18" font-weight="700">
+    <g>
+      <rect x="128" y="122" width="154" height="72" rx="10" fill="#e7f0ff" stroke="#8ab4f8"/>
+      <text x="205" y="164" text-anchor="middle" fill="#1f3b73">Code</text>
+    </g>
+    <g>
+      <rect x="638" y="122" width="154" height="72" rx="10" fill="#e9f8ef" stroke="#80c995"/>
+      <text x="715" y="164" text-anchor="middle" fill="#1f5f3d">Tests</text>
+    </g>
+    <g>
+      <rect x="638" y="327" width="154" height="72" rx="10" fill="#fff1df" stroke="#f0b35c"/>
+      <text x="715" y="370" text-anchor="middle" fill="#804b11">Evidence</text>
+    </g>
+    <g>
+      <rect x="128" y="327" width="154" height="72" rx="10" fill="#f1eafe" stroke="#b69cf2"/>
+      <text x="205" y="370" text-anchor="middle" fill="#53368c">Docs / ADRs</text>
+    </g>
+    <g>
+      <rect x="382" y="229" width="156" height="102" rx="14" fill="#0f172a"/>
+      <text x="460" y="270" text-anchor="middle" fill="#ffffff" font-size="20">Coherence</text>
+      <text x="460" y="299" text-anchor="middle" fill="#b7c4d5" font-size="14" font-weight="500">drift graph</text>
+    </g>
+  </g>
+  <g font-family="Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="14" fill="#4b5563">
+    <text x="82" y="86">Checks broken edges before agents commit drift.</text>
+    <text x="565" y="448">JSON verdicts give agents the next command.</text>
+  </g>
+</svg>
