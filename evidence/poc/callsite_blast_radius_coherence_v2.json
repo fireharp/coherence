@@ -1,7 +1,7 @@
 {
   "meter": "callsite_blast_radius",
   "version": "v1",
-  "db_path": "/tmp/cg_bench_coherence/.codegraph/codegraph.db",
+  "db_path": "/Users/fireharp/Prog/Harness/coherence/evidence/poc/../raw/codegraph_coherence_self.db",
   "depth": 2,
   "changed_symbols": [
     "graph.Build",

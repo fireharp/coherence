@@ -1,3 +1,5 @@
+//go:build poc
+
 // cgpoc_blast — runnable POC of the proposed `callsite_blast_radius` drift
 // meter.
 //

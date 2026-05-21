@@ -1,5 +1,10 @@
+//go:build poc
+
 // Standalone POC reader for codegraph SQLite output.
 // Emits a dead_code meter in the same shape as coherence's drift JSON.
+//
+// Excluded from the main coherence module via the `poc` build tag.
+// Build via the Makefile in this directory.
 package main
 
 import (

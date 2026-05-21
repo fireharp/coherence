@@ -10,6 +10,7 @@ Generated 2026-05-21 by the ralph-loop research task that started with:
 
 - **`FINDINGS.md`** — 2-minute executive briefing. **Start here.**
 - **`DECISION.md`** — single-page synthesis of the recommendation.
+- **`INTEGRATION-PLAN.md`** — file-by-file PR plan for shipping the Go-side native extractor as a coherence first-party meter. Ready to execute.
 - **`REPORT.md`** — iteration-1 summary. Capability matrix, benchmark numbers, recommendation.
 - **`ITERATION-2.md`** — iteration-2 addendum: working POC reader, synthetic corpus with ground truth, precision/recall on synthetic vs real code, revised recommendation.
 - **`ITERATION-3.md`** — iteration-3 addendum: v2 language-aware reader, synthetic-TS corpus, Django + Fastify route-detection reality check.
@@ -19,6 +20,8 @@ Generated 2026-05-21 by the ralph-loop research task that started with:
 - **`poc/cgpoc_blast.go`** — runnable POC of the recommended first meter (with collision gate).
 - **`poc/go_ast_extractor.go`** — stdlib-only Go AST extractor (230 lines). The recommended source for Go call edges (no codegraph dependency).
 - **`upstream-issues/`** — 5 fileable issue drafts for codegraph upstream covering the bugs found.
+- **`poc/Makefile`** — `make build` / `make test` / `make test-smoke` / `make run-all` to reproduce every POC + every JSON output.
+- **`poc/go_ast_extractor_test.go`** — 7 unit tests + 1 real-corpus smoke test covering the native extractor. All pass.
 - **`poc/cgpoc.go`** — v1 standalone Go reader (basic filters only).
 - **`poc/cgpoc_v2.go`** — v2 language-aware reader (class-instantiates join, Python dunder + TS spec/test filters, respects `is_exported` where populated).
 - **`poc/dead_code_*.json`** — POC outputs across all corpora (v1 + v2).

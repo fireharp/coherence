@@ -1,11 +1,16 @@
 {
   "root": "/Users/fireharp/Prog/Harness/coherence",
   "files_parsed": 53,
-  "functions_indexed": 347,
-  "call_edges_resolved": 687,
+  "functions_indexed": 348,
+  "call_edges_resolved": 688,
   "call_edges_skipped_method_calls": 401,
   "callers_by_target": {
     "bench.Human": [
+      {
+        "caller": "bench.HumanOne",
+        "file": "/Users/fireharp/Prog/Harness/coherence/internal/bench/bench.go",
+        "line": 207
+      },
       {
         "caller": "main.runBench",
         "file": "/Users/fireharp/Prog/Harness/coherence/cmd/coherence/main.go",
@@ -15,11 +20,6 @@
         "caller": "main.runBench",
         "file": "/Users/fireharp/Prog/Harness/coherence/cmd/coherence/main.go",
         "line": 1174
-      },
-      {
-        "caller": "bench.HumanOne",
-        "file": "/Users/fireharp/Prog/Harness/coherence/internal/bench/bench.go",
-        "line": 207
       }
     ],
     "bench.HumanOne": [
@@ -43,14 +43,14 @@
     ],
     "bench.RunTemplate": [
       {
-        "caller": "main.runBench",
-        "file": "/Users/fireharp/Prog/Harness/coherence/cmd/coherence/main.go",
-        "line": 1052
-      },
-      {
         "caller": "bench.RunAll",
         "file": "/Users/fireharp/Prog/Harness/coherence/internal/bench/bench.go",
         "line": 99
+      },
+      {
+        "caller": "main.runBench",
+        "file": "/Users/fireharp/Prog/Harness/coherence/cmd/coherence/main.go",
+        "line": 1052
       }
     ],
     "bench.runOne": [
@@ -150,14 +150,14 @@
     ],
     "coherencebench.materializeScenario": [
       {
-        "caller": "coherencebench.runFilesScenario",
-        "file": "/Users/fireharp/Prog/Harness/coherence/internal/coherencebench/files_runner.go",
-        "line": 21
-      },
-      {
         "caller": "coherencebench.runLLMScenario",
         "file": "/Users/fireharp/Prog/Harness/coherence/internal/coherencebench/llm_runner.go",
         "line": 24
+      },
+      {
+        "caller": "coherencebench.runFilesScenario",
+        "file": "/Users/fireharp/Prog/Harness/coherence/internal/coherencebench/files_runner.go",
+        "line": 21
       }
     ],
     "coherencebench.renderMarkdown": [
@@ -204,16 +204,6 @@
     ],
     "coherencebench.stringSet": [
       {
-        "caller": "coherencebench.runLLMScenario",
-        "file": "/Users/fireharp/Prog/Harness/coherence/internal/coherencebench/llm_runner.go",
-        "line": 52
-      },
-      {
-        "caller": "coherencebench.runLLMScenario",
-        "file": "/Users/fireharp/Prog/Harness/coherence/internal/coherencebench/llm_runner.go",
-        "line": 53
-      },
-      {
         "caller": "coherencebench.runRulesScenario",
         "file": "/Users/fireharp/Prog/Harness/coherence/internal/coherencebench/coherencebench.go",
         "line": 212
@@ -232,6 +222,16 @@
         "caller": "coherencebench.aggregateLLMMetrics",
         "file": "/Users/fireharp/Prog/Harness/coherence/internal/coherencebench/coherencebench.go",
         "line": 269
+      },
+      {
+        "caller": "coherencebench.runLLMScenario",
+        "file": "/Users/fireharp/Prog/Harness/coherence/internal/coherencebench/llm_runner.go",
+        "line": 52
+      },
+      {
+        "caller": "coherencebench.runLLMScenario",
+        "file": "/Users/fireharp/Prog/Harness/coherence/internal/coherencebench/llm_runner.go",
+        "line": 53
       }
     ],
     "coherencebench.writeFiles": [
@@ -318,14 +318,14 @@
     ],
     "drift.Compute": [
       {
-        "caller": "coherencebench.runFilesScenario",
-        "file": "/Users/fireharp/Prog/Harness/coherence/internal/coherencebench/files_runner.go",
-        "line": 27
-      },
-      {
         "caller": "main.run",
         "file": "/Users/fireharp/Prog/Harness/coherence/cmd/coherence/main.go",
         "line": 886
+      },
+      {
+        "caller": "coherencebench.runFilesScenario",
+        "file": "/Users/fireharp/Prog/Harness/coherence/internal/coherencebench/files_runner.go",
+        "line": 27
       }
     ],
     "drift.ComputeWith": [
@@ -968,11 +968,6 @@
     ],
     "git.LsFiles": [
       {
-        "caller": "drift.computeBrokenLinks",
-        "file": "/Users/fireharp/Prog/Harness/coherence/internal/drift/broken_links.go",
-        "line": 29
-      },
-      {
         "caller": "snapshot.Compute",
         "file": "/Users/fireharp/Prog/Harness/coherence/internal/snapshot/snapshot.go",
         "line": 63
@@ -981,16 +976,6 @@
         "caller": "drift.computeOrphanedMetricAliases",
         "file": "/Users/fireharp/Prog/Harness/coherence/internal/drift/orphaned_metrics.go",
         "line": 43
-      },
-      {
-        "caller": "drift.computeUnknownIDReferences",
-        "file": "/Users/fireharp/Prog/Harness/coherence/internal/drift/unknown_ids.go",
-        "line": 62
-      },
-      {
-        "caller": "graph.Build",
-        "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/extractors.go",
-        "line": 17
       },
       {
         "caller": "drift.defaultStalenessClock",
@@ -1003,14 +988,29 @@
         "line": 54
       },
       {
-        "caller": "ids.Build",
-        "file": "/Users/fireharp/Prog/Harness/coherence/internal/ids/ids.go",
-        "line": 140
+        "caller": "drift.computeUnknownIDReferences",
+        "file": "/Users/fireharp/Prog/Harness/coherence/internal/drift/unknown_ids.go",
+        "line": 62
+      },
+      {
+        "caller": "drift.computeBrokenLinks",
+        "file": "/Users/fireharp/Prog/Harness/coherence/internal/drift/broken_links.go",
+        "line": 29
       },
       {
         "caller": "drift.computeDanglingImports",
         "file": "/Users/fireharp/Prog/Harness/coherence/internal/drift/dangling_imports.go",
         "line": 28
+      },
+      {
+        "caller": "graph.Build",
+        "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/extractors.go",
+        "line": 17
+      },
+      {
+        "caller": "ids.Build",
+        "file": "/Users/fireharp/Prog/Harness/coherence/internal/ids/ids.go",
+        "line": 140
       }
     ],
     "git.Root": [
@@ -1270,14 +1270,9 @@
     ],
     "graph.Build": [
       {
-        "caller": "exteval.runOne",
-        "file": "/Users/fireharp/Prog/Harness/coherence/internal/exteval/exteval.go",
-        "line": 113
-      },
-      {
-        "caller": "coherencebench.materializeScenario",
-        "file": "/Users/fireharp/Prog/Harness/coherence/internal/coherencebench/files_runner.go",
-        "line": 122
+        "caller": "initcmd.buildBaseline",
+        "file": "/Users/fireharp/Prog/Harness/coherence/internal/initcmd/initcmd.go",
+        "line": 194
       },
       {
         "caller": "drift.ComputeWith",
@@ -1300,9 +1295,14 @@
         "line": 808
       },
       {
-        "caller": "initcmd.buildBaseline",
-        "file": "/Users/fireharp/Prog/Harness/coherence/internal/initcmd/initcmd.go",
-        "line": 194
+        "caller": "exteval.runOne",
+        "file": "/Users/fireharp/Prog/Harness/coherence/internal/exteval/exteval.go",
+        "line": 113
+      },
+      {
+        "caller": "coherencebench.materializeScenario",
+        "file": "/Users/fireharp/Prog/Harness/coherence/internal/coherencebench/files_runner.go",
+        "line": 122
       }
     ],
     "graph.ClaimNodeID": [
@@ -1319,21 +1319,6 @@
     ],
     "graph.CodeSymbolNodeID": [
       {
-        "caller": "graph.emitPythonSymbols",
-        "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/python_extractor.go",
-        "line": 168
-      },
-      {
-        "caller": "graph.emitPythonSymbols",
-        "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/python_extractor.go",
-        "line": 176
-      },
-      {
-        "caller": "graph.emitImplementsFromLines",
-        "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/implements_extractor.go",
-        "line": 97
-      },
-      {
         "caller": "graph.emitImplementsFromDoc",
         "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/go_extractor.go",
         "line": 269
@@ -1347,6 +1332,21 @@
         "caller": "graph.emitSymbol",
         "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/go_extractor.go",
         "line": 297
+      },
+      {
+        "caller": "graph.emitImplementsFromLines",
+        "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/implements_extractor.go",
+        "line": 97
+      },
+      {
+        "caller": "graph.emitPythonSymbols",
+        "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/python_extractor.go",
+        "line": 168
+      },
+      {
+        "caller": "graph.emitPythonSymbols",
+        "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/python_extractor.go",
+        "line": 176
       },
       {
         "caller": "graph.emitTSExports",
@@ -1407,6 +1407,11 @@
     ],
     "graph.DirNodeID": [
       {
+        "caller": "graph.extractGoSymbols",
+        "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/go_extractor.go",
+        "line": 84
+      },
+      {
         "caller": "graph.emitFileAndAncestors",
         "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/extractors.go",
         "line": 169
@@ -1425,19 +1430,9 @@
         "caller": "graph.emitDocNode",
         "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/extractors.go",
         "line": 218
-      },
-      {
-        "caller": "graph.extractGoSymbols",
-        "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/go_extractor.go",
-        "line": 84
       }
     ],
     "graph.DocNodeID": [
-      {
-        "caller": "exteval.PredictImpact",
-        "file": "/Users/fireharp/Prog/Harness/coherence/internal/exteval/exteval.go",
-        "line": 162
-      },
       {
         "caller": "graph.emitDocNode",
         "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/extractors.go",
@@ -1477,6 +1472,11 @@
         "caller": "graph.emitMentionsEdges",
         "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/extractors.go",
         "line": 492
+      },
+      {
+        "caller": "exteval.PredictImpact",
+        "file": "/Users/fireharp/Prog/Harness/coherence/internal/exteval/exteval.go",
+        "line": 162
       }
     ],
     "graph.EndpointNodeID": [
@@ -1500,29 +1500,59 @@
     ],
     "graph.FileNodeID": [
       {
+        "caller": "graph.extractMetricMentions",
+        "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/metric_mentions_extractor.go",
+        "line": 69
+      },
+      {
+        "caller": "graph.emitSchemaModels",
+        "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/schema_extractor.go",
+        "line": 65
+      },
+      {
+        "caller": "graph.extractCodeMentions",
+        "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/code_mentions_extractor.go",
+        "line": 62
+      },
+      {
+        "caller": "graph.extractFileReferences",
+        "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/file_references_extractor.go",
+        "line": 60
+      },
+      {
+        "caller": "graph.extractFileReferences",
+        "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/file_references_extractor.go",
+        "line": 61
+      },
+      {
+        "caller": "graph.extractGoSymbols",
+        "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/go_extractor.go",
+        "line": 83
+      },
+      {
+        "caller": "graph.emitEndpoint",
+        "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/go_extractor.go",
+        "line": 173
+      },
+      {
+        "caller": "graph.emitSymbol",
+        "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/go_extractor.go",
+        "line": 296
+      },
+      {
         "caller": "graph.extractGeneratedArtifacts",
         "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/ontology_extractor.go",
         "line": 96
       },
       {
-        "caller": "graph.emitPythonSymbols",
-        "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/python_extractor.go",
-        "line": 175
+        "caller": "graph.extractShellCommands",
+        "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/shell_extractor.go",
+        "line": 47
       },
       {
-        "caller": "graph.emitPythonImports",
-        "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/python_extractor.go",
-        "line": 200
-      },
-      {
-        "caller": "graph.emitPythonImports",
-        "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/python_extractor.go",
-        "line": 201
-      },
-      {
-        "caller": "exteval.PredictImpact",
-        "file": "/Users/fireharp/Prog/Harness/coherence/internal/exteval/exteval.go",
-        "line": 161
+        "caller": "graph.emitMakefileTargets",
+        "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/makefile_extractor.go",
+        "line": 113
       },
       {
         "caller": "graph.emitMetricNode",
@@ -1550,39 +1580,19 @@
         "line": 695
       },
       {
-        "caller": "graph.extractMetricMentions",
-        "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/metric_mentions_extractor.go",
-        "line": 69
+        "caller": "graph.emitPythonSymbols",
+        "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/python_extractor.go",
+        "line": 175
       },
       {
-        "caller": "graph.extractCodeMentions",
-        "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/code_mentions_extractor.go",
-        "line": 62
+        "caller": "graph.emitPythonImports",
+        "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/python_extractor.go",
+        "line": 200
       },
       {
-        "caller": "graph.extractGoSymbols",
-        "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/go_extractor.go",
-        "line": 83
-      },
-      {
-        "caller": "graph.emitEndpoint",
-        "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/go_extractor.go",
-        "line": 173
-      },
-      {
-        "caller": "graph.emitSymbol",
-        "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/go_extractor.go",
-        "line": 296
-      },
-      {
-        "caller": "graph.extractFileReferences",
-        "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/file_references_extractor.go",
-        "line": 60
-      },
-      {
-        "caller": "graph.extractFileReferences",
-        "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/file_references_extractor.go",
-        "line": 61
+        "caller": "graph.emitPythonImports",
+        "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/python_extractor.go",
+        "line": 201
       },
       {
         "caller": "graph.emitTSExports",
@@ -1600,19 +1610,9 @@
         "line": 215
       },
       {
-        "caller": "graph.emitMakefileTargets",
-        "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/makefile_extractor.go",
-        "line": 113
-      },
-      {
-        "caller": "graph.extractShellCommands",
-        "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/shell_extractor.go",
-        "line": 47
-      },
-      {
-        "caller": "graph.emitSchemaModels",
-        "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/schema_extractor.go",
-        "line": 65
+        "caller": "exteval.PredictImpact",
+        "file": "/Users/fireharp/Prog/Harness/coherence/internal/exteval/exteval.go",
+        "line": 161
       }
     ],
     "graph.GeneratedArtifactNodeID": [
@@ -1635,6 +1635,16 @@
       }
     ],
     "graph.IDNodeID": [
+      {
+        "caller": "graph.extractCodeMentions",
+        "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/code_mentions_extractor.go",
+        "line": 53
+      },
+      {
+        "caller": "graph.emitImplementsFromDoc",
+        "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/go_extractor.go",
+        "line": 280
+      },
       {
         "caller": "graph.emitImplementsFromLines",
         "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/implements_extractor.go",
@@ -1674,28 +1684,18 @@
         "caller": "graph.extractEvidence",
         "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/extractors.go",
         "line": 677
-      },
-      {
-        "caller": "graph.extractCodeMentions",
-        "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/code_mentions_extractor.go",
-        "line": 53
-      },
-      {
-        "caller": "graph.emitImplementsFromDoc",
-        "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/go_extractor.go",
-        "line": 280
       }
     ],
     "graph.IsPythonSourceFile": [
       {
-        "caller": "graph.extractPythonSymbols",
-        "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/python_extractor.go",
-        "line": 60
-      },
-      {
         "caller": "drift.computeDanglingImports",
         "file": "/Users/fireharp/Prog/Harness/coherence/internal/drift/dangling_imports.go",
         "line": 38
+      },
+      {
+        "caller": "graph.extractPythonSymbols",
+        "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/python_extractor.go",
+        "line": 60
       }
     ],
     "graph.IsShellScript": [
@@ -1707,14 +1707,14 @@
     ],
     "graph.IsTSSourceFile": [
       {
-        "caller": "graph.extractTSSymbols",
-        "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/ts_extractor.go",
-        "line": 69
-      },
-      {
         "caller": "drift.computeDanglingImports",
         "file": "/Users/fireharp/Prog/Harness/coherence/internal/drift/dangling_imports.go",
         "line": 36
+      },
+      {
+        "caller": "graph.extractTSSymbols",
+        "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/ts_extractor.go",
+        "line": 69
       }
     ],
     "graph.IsTestFile": [
@@ -1801,26 +1801,26 @@
     ],
     "graph.ResolvePyImport": [
       {
-        "caller": "graph.emitPythonImports",
-        "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/python_extractor.go",
-        "line": 207
-      },
-      {
         "caller": "drift.appendPyDangling",
         "file": "/Users/fireharp/Prog/Harness/coherence/internal/drift/dangling_imports.go",
         "line": 86
+      },
+      {
+        "caller": "graph.emitPythonImports",
+        "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/python_extractor.go",
+        "line": 207
       }
     ],
     "graph.ResolveTSImport": [
       {
-        "caller": "graph.emitTSImports",
-        "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/ts_extractor.go",
-        "line": 221
-      },
-      {
         "caller": "drift.appendTSDangling",
         "file": "/Users/fireharp/Prog/Harness/coherence/internal/drift/dangling_imports.go",
         "line": 62
+      },
+      {
+        "caller": "graph.emitTSImports",
+        "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/ts_extractor.go",
+        "line": 221
       }
     ],
     "graph.RuleNodeCommandID": [
@@ -1840,16 +1840,6 @@
         "line": 52
       },
       {
-        "caller": "graph.emitMakefileTargets",
-        "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/makefile_extractor.go",
-        "line": 108
-      },
-      {
-        "caller": "graph.emitMakefileTargets",
-        "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/makefile_extractor.go",
-        "line": 114
-      },
-      {
         "caller": "graph.extractShellCommands",
         "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/shell_extractor.go",
         "line": 41
@@ -1858,6 +1848,16 @@
         "caller": "graph.extractShellCommands",
         "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/shell_extractor.go",
         "line": 48
+      },
+      {
+        "caller": "graph.emitMakefileTargets",
+        "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/makefile_extractor.go",
+        "line": 108
+      },
+      {
+        "caller": "graph.emitMakefileTargets",
+        "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/makefile_extractor.go",
+        "line": 114
       }
     ],
     "graph.RuleNodeID": [
@@ -1884,50 +1884,50 @@
     ],
     "graph.ScanPyFromImports": [
       {
-        "caller": "graph.emitPythonImports",
-        "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/python_extractor.go",
-        "line": 206
-      },
-      {
         "caller": "drift.appendPyDangling",
         "file": "/Users/fireharp/Prog/Harness/coherence/internal/drift/dangling_imports.go",
         "line": 82
+      },
+      {
+        "caller": "graph.emitPythonImports",
+        "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/python_extractor.go",
+        "line": 206
       }
     ],
     "graph.ScanTSImports": [
       {
-        "caller": "graph.emitTSImports",
-        "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/ts_extractor.go",
-        "line": 220
-      },
-      {
         "caller": "drift.appendTSDangling",
         "file": "/Users/fireharp/Prog/Harness/coherence/internal/drift/dangling_imports.go",
         "line": 58
+      },
+      {
+        "caller": "graph.emitTSImports",
+        "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/ts_extractor.go",
+        "line": 220
       }
     ],
     "graph.StripPythonComments": [
       {
-        "caller": "graph.extractPythonSymbols",
-        "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/python_extractor.go",
-        "line": 69
-      },
-      {
         "caller": "drift.appendPyDangling",
         "file": "/Users/fireharp/Prog/Harness/coherence/internal/drift/dangling_imports.go",
         "line": 80
+      },
+      {
+        "caller": "graph.extractPythonSymbols",
+        "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/python_extractor.go",
+        "line": 69
       }
     ],
     "graph.StripTSComments": [
       {
-        "caller": "graph.extractTSSymbols",
-        "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/ts_extractor.go",
-        "line": 83
-      },
-      {
         "caller": "drift.appendTSDangling",
         "file": "/Users/fireharp/Prog/Harness/coherence/internal/drift/dangling_imports.go",
         "line": 56
+      },
+      {
+        "caller": "graph.extractTSSymbols",
+        "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/ts_extractor.go",
+        "line": 83
       }
     ],
     "graph.SuggestTestFilePath": [
@@ -1946,11 +1946,6 @@
     ],
     "graph.TestNodeID": [
       {
-        "caller": "exteval.PredictImpact",
-        "file": "/Users/fireharp/Prog/Harness/coherence/internal/exteval/exteval.go",
-        "line": 163
-      },
-      {
         "caller": "graph.emitTestNode",
         "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/extractors.go",
         "line": 687
@@ -1959,13 +1954,18 @@
         "caller": "graph.emitTestNode",
         "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/extractors.go",
         "line": 694
+      },
+      {
+        "caller": "exteval.PredictImpact",
+        "file": "/Users/fireharp/Prog/Harness/coherence/internal/exteval/exteval.go",
+        "line": 163
       }
     ],
     "graph.Write": [
       {
-        "caller": "coherencebench.materializeScenario",
-        "file": "/Users/fireharp/Prog/Harness/coherence/internal/coherencebench/files_runner.go",
-        "line": 127
+        "caller": "initcmd.buildBaseline",
+        "file": "/Users/fireharp/Prog/Harness/coherence/internal/initcmd/initcmd.go",
+        "line": 198
       },
       {
         "caller": "main.run",
@@ -1978,9 +1978,9 @@
         "line": 823
       },
       {
-        "caller": "initcmd.buildBaseline",
-        "file": "/Users/fireharp/Prog/Harness/coherence/internal/initcmd/initcmd.go",
-        "line": 198
+        "caller": "coherencebench.materializeScenario",
+        "file": "/Users/fireharp/Prog/Harness/coherence/internal/coherencebench/files_runner.go",
+        "line": 127
       }
     ],
     "graph.displayDir": [
@@ -2061,6 +2061,11 @@
     ],
     "graph.emitEndpoint": [
       {
+        "caller": "graph.extractGoSymbols",
+        "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/go_extractor.go",
+        "line": 60
+      },
+      {
         "caller": "graph.emitPythonEndpoints",
         "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/python_extractor.go",
         "line": 116
@@ -2074,11 +2079,6 @@
         "caller": "graph.emitPythonEndpoints",
         "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/python_extractor.go",
         "line": 130
-      },
-      {
-        "caller": "graph.extractGoSymbols",
-        "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/go_extractor.go",
-        "line": 60
       },
       {
         "caller": "graph.emitTSEndpoints",
@@ -2411,11 +2411,6 @@
     ],
     "graph.isTestFile": [
       {
-        "caller": "graph.IsPythonSourceFile",
-        "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/python_extractor.go",
-        "line": 141
-      },
-      {
         "caller": "graph.Build",
         "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/extractors.go",
         "line": 58
@@ -2424,6 +2419,11 @@
         "caller": "graph.IsTestFile",
         "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/extractors.go",
         "line": 505
+      },
+      {
+        "caller": "graph.IsPythonSourceFile",
+        "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/python_extractor.go",
+        "line": 141
       },
       {
         "caller": "graph.IsTSSourceFile",
@@ -2500,6 +2500,11 @@
     ],
     "graph.slugify": [
       {
+        "caller": "graph.emitSchemaModels",
+        "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/schema_extractor.go",
+        "line": 50
+      },
+      {
         "caller": "graph.emitMetricNode",
         "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/extractors.go",
         "line": 125
@@ -2513,11 +2518,6 @@
         "caller": "graph.extractEvidence",
         "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/extractors.go",
         "line": 663
-      },
-      {
-        "caller": "graph.emitSchemaModels",
-        "file": "/Users/fireharp/Prog/Harness/coherence/internal/graph/schema_extractor.go",
-        "line": 50
       }
     ],
     "graph.sortEdges": [
@@ -2863,6 +2863,13 @@
         "line": 303
       }
     ],
+    "main.Extract": [
+      {
+        "caller": "main.main",
+        "file": "/Users/fireharp/Prog/Harness/coherence/evidence/poc/go_ast_extractor.go",
+        "line": 292
+      }
+    ],
     "main.RegisterExportedAPI": [
       {
         "caller": "main.registerExportedAPI",
@@ -3201,14 +3208,14 @@
     ],
     "main.receiverName": [
       {
-        "caller": "main.main",
+        "caller": "main.Extract",
         "file": "/Users/fireharp/Prog/Harness/coherence/evidence/poc/go_ast_extractor.go",
-        "line": 164
+        "line": 166
       },
       {
-        "caller": "main.main",
+        "caller": "main.Extract",
         "file": "/Users/fireharp/Prog/Harness/coherence/evidence/poc/go_ast_extractor.go",
-        "line": 194
+        "line": 196
       }
     ],
     "main.registerExportedAPI": [
@@ -3394,9 +3401,9 @@
     ],
     "ontology.Parse": [
       {
-        "caller": "ontology.Load",
-        "file": "/Users/fireharp/Prog/Harness/coherence/internal/ontology/ontology.go",
-        "line": 33
+        "caller": "coherencebench.Load",
+        "file": "/Users/fireharp/Prog/Harness/coherence/internal/coherencebench/coherencebench.go",
+        "line": 173
       },
       {
         "caller": "bench.RunTemplate",
@@ -3404,9 +3411,9 @@
         "line": 70
       },
       {
-        "caller": "coherencebench.Load",
-        "file": "/Users/fireharp/Prog/Harness/coherence/internal/coherencebench/coherencebench.go",
-        "line": 173
+        "caller": "ontology.Load",
+        "file": "/Users/fireharp/Prog/Harness/coherence/internal/ontology/ontology.go",
+        "line": 33
       }
     ],
     "ontology.allWhitespace": [
@@ -3494,6 +3501,16 @@
     ],
     "rules.Evaluate": [
       {
+        "caller": "coherencebench.runRulesScenario",
+        "file": "/Users/fireharp/Prog/Harness/coherence/internal/coherencebench/coherencebench.go",
+        "line": 199
+      },
+      {
+        "caller": "bench.runOne",
+        "file": "/Users/fireharp/Prog/Harness/coherence/internal/bench/bench.go",
+        "line": 118
+      },
+      {
         "caller": "status.computeLive",
         "file": "/Users/fireharp/Prog/Harness/coherence/internal/status/status.go",
         "line": 252
@@ -3512,28 +3529,28 @@
         "caller": "main.evaluate",
         "file": "/Users/fireharp/Prog/Harness/coherence/cmd/coherence/main.go",
         "line": 280
-      },
-      {
-        "caller": "bench.runOne",
-        "file": "/Users/fireharp/Prog/Harness/coherence/internal/bench/bench.go",
-        "line": 118
-      },
-      {
-        "caller": "coherencebench.runRulesScenario",
-        "file": "/Users/fireharp/Prog/Harness/coherence/internal/coherencebench/coherencebench.go",
-        "line": 199
       }
     ],
     "snapshot.Compute": [
       {
-        "caller": "coherencebench.materializeScenario",
-        "file": "/Users/fireharp/Prog/Harness/coherence/internal/coherencebench/files_runner.go",
-        "line": 113
+        "caller": "initcmd.buildBaseline",
+        "file": "/Users/fireharp/Prog/Harness/coherence/internal/initcmd/initcmd.go",
+        "line": 187
       },
       {
         "caller": "drift.ComputeWith",
         "file": "/Users/fireharp/Prog/Harness/coherence/internal/drift/drift.go",
         "line": 468
+      },
+      {
+        "caller": "watch.NewPoller",
+        "file": "/Users/fireharp/Prog/Harness/coherence/internal/watch/watch.go",
+        "line": 34
+      },
+      {
+        "caller": "watch.Poller::Tick",
+        "file": "/Users/fireharp/Prog/Harness/coherence/internal/watch/watch.go",
+        "line": 52
       },
       {
         "caller": "main.runEvaluation",
@@ -3551,19 +3568,9 @@
         "line": 803
       },
       {
-        "caller": "initcmd.buildBaseline",
-        "file": "/Users/fireharp/Prog/Harness/coherence/internal/initcmd/initcmd.go",
-        "line": 187
-      },
-      {
-        "caller": "watch.NewPoller",
-        "file": "/Users/fireharp/Prog/Harness/coherence/internal/watch/watch.go",
-        "line": 34
-      },
-      {
-        "caller": "watch.Poller::Tick",
-        "file": "/Users/fireharp/Prog/Harness/coherence/internal/watch/watch.go",
-        "line": 52
+        "caller": "coherencebench.materializeScenario",
+        "file": "/Users/fireharp/Prog/Harness/coherence/internal/coherencebench/files_runner.go",
+        "line": 113
       }
     ],
     "snapshot.Diff": [
@@ -3606,6 +3613,11 @@
     ],
     "snapshot.PathFor": [
       {
+        "caller": "initcmd.buildBaseline",
+        "file": "/Users/fireharp/Prog/Harness/coherence/internal/initcmd/initcmd.go",
+        "line": 175
+      },
+      {
         "caller": "snapshot.Write",
         "file": "/Users/fireharp/Prog/Harness/coherence/internal/snapshot/snapshot.go",
         "line": 235
@@ -3629,18 +3641,13 @@
         "caller": "main.run",
         "file": "/Users/fireharp/Prog/Harness/coherence/cmd/coherence/main.go",
         "line": 818
-      },
-      {
-        "caller": "initcmd.buildBaseline",
-        "file": "/Users/fireharp/Prog/Harness/coherence/internal/initcmd/initcmd.go",
-        "line": 175
       }
     ],
     "snapshot.Write": [
       {
-        "caller": "coherencebench.materializeScenario",
-        "file": "/Users/fireharp/Prog/Harness/coherence/internal/coherencebench/files_runner.go",
-        "line": 118
+        "caller": "initcmd.buildBaseline",
+        "file": "/Users/fireharp/Prog/Harness/coherence/internal/initcmd/initcmd.go",
+        "line": 191
       },
       {
         "caller": "main.run",
@@ -3653,9 +3660,9 @@
         "line": 819
       },
       {
-        "caller": "initcmd.buildBaseline",
-        "file": "/Users/fireharp/Prog/Harness/coherence/internal/initcmd/initcmd.go",
-        "line": 191
+        "caller": "coherencebench.materializeScenario",
+        "file": "/Users/fireharp/Prog/Harness/coherence/internal/coherencebench/files_runner.go",
+        "line": 118
       }
     ],
     "snapshot.WriteDiff": [
@@ -3936,26 +3943,26 @@
     ],
     "templates.Names": [
       {
-        "caller": "templates.Resolve",
-        "file": "/Users/fireharp/Prog/Harness/coherence/internal/templates/templates.go",
-        "line": 186
-      },
-      {
         "caller": "bench.RunAll",
         "file": "/Users/fireharp/Prog/Harness/coherence/internal/bench/bench.go",
         "line": 96
+      },
+      {
+        "caller": "templates.Resolve",
+        "file": "/Users/fireharp/Prog/Harness/coherence/internal/templates/templates.go",
+        "line": 186
       }
     ],
     "templates.Resolve": [
       {
-        "caller": "bench.RunTemplate",
-        "file": "/Users/fireharp/Prog/Harness/coherence/internal/bench/bench.go",
-        "line": 66
-      },
-      {
         "caller": "initcmd.Run",
         "file": "/Users/fireharp/Prog/Harness/coherence/internal/initcmd/initcmd.go",
         "line": 63
+      },
+      {
+        "caller": "bench.RunTemplate",
+        "file": "/Users/fireharp/Prog/Harness/coherence/internal/bench/bench.go",
+        "line": 66
       }
     ],
     "templates.ScenariosFor": [

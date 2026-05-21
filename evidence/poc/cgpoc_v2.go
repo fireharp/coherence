@@ -1,3 +1,5 @@
+//go:build poc
+
 // cgpoc_v2 — language-aware dead_code meter from codegraph SQLite.
 //
 // Improvements over cgpoc.go:

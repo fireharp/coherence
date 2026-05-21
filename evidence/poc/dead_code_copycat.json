@@ -1,6 +1,6 @@
 {
   "meter": "dead_code",
-  "db_path": "/tmp/cg_bench_copycat/.codegraph/codegraph.db",
+  "db_path": "/Users/fireharp/Prog/Harness/coherence/evidence/poc/../raw/codegraph_copycat.db",
   "total_function_method": 909,
   "no_caller_raw": 726,
   "after_filters": 726,
