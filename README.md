@@ -76,13 +76,15 @@ coherence review --base=HEAD --worktree --json      # combined local/agent revie
 coherence review --base=origin/main --staged --json # PR-shaped review
 coherence watch --once --json                        # one-shot local worktree signal
 coherence doctor                                     # validate ontology + hook + state
-coherence index                                      # write .coherence/snapshot.json (Merkle + hashes)
+coherence index                                      # write .coherence/snapshot.json + graph.json
 coherence diff                                       # compare current snapshot vs baseline
 coherence drift                                      # compute drift meters → .coherence/drift.json
+coherence drift --summary                            # print a 1-line drift summary
 coherence drift --strict                             # same, but exit 1 on telemetry too (zero-drift CI gate)
 coherence status                                     # rewrite .coherence/STATUS.md
 coherence status --json                              # same data as STATUS.md but structured for agents
 coherence report                                     # print the last stored report
+coherence version                                    # print build/module version
 coherence help                                       # usage
 ```
 

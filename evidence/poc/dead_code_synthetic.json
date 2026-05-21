@@ -1,0 +1,35 @@
+{
+  "meter": "dead_code",
+  "db_path": "/tmp/cg_synth/.codegraph/codegraph.db",
+  "total_function_method": 12,
+  "no_caller_raw": 5,
+  "after_filters": 3,
+  "candidates": [
+    {
+      "qualified_name": "orphanedInternal",
+      "file_path": "src/main.go",
+      "start_line": 32,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "anotherOrphan",
+      "file_path": "src/main.go",
+      "start_line": 37,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "unusedUtil",
+      "file_path": "src/utility.go",
+      "start_line": 9,
+      "kind": "function"
+    }
+  ],
+  "filters_applied": [
+    "kind in (function,method)",
+    "in-degree(calls)==0",
+    "name not in {main, init}",
+    "name does not start with Test/Benchmark",
+    "file_path does not end with _test.go",
+    "capital-leading name treated as exported (library API): excluded as candidate"
+  ]
+}

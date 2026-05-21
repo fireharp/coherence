@@ -1,0 +1,35 @@
+{
+  "meter": "dead_code",
+  "db_path": "/tmp/cg_bench_coherence/.codegraph/codegraph.db",
+  "total_function_method": 949,
+  "no_caller_raw": 606,
+  "after_filters": 3,
+  "candidates": [
+    {
+      "qualified_name": "tsExtractSymbolName",
+      "file_path": "internal/graph/implements_extractor.go",
+      "start_line": 57,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "pyExtractSymbolName",
+      "file_path": "internal/graph/implements_extractor.go",
+      "start_line": 65,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "runSkillsInstallerCommand",
+      "file_path": "internal/initcmd/initcmd.go",
+      "start_line": 330,
+      "kind": "function"
+    }
+  ],
+  "filters_applied": [
+    "kind in (function,method)",
+    "in-degree(calls)==0",
+    "name not in {main, init}",
+    "name does not start with Test/Benchmark",
+    "file_path does not end with _test.go",
+    "capital-leading name treated as exported (library API): excluded as candidate"
+  ]
+}

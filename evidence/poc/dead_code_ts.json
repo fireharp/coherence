@@ -1,0 +1,191 @@
+{
+  "meter": "dead_code",
+  "db_path": "/tmp/cg_bench_ts/.codegraph/codegraph.db",
+  "total_function_method": 199,
+  "no_caller_raw": 29,
+  "after_filters": 29,
+  "candidates": [
+    {
+      "qualified_name": "testCanvas",
+      "file_path": "src/app.test.ts",
+      "start_line": 10,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "makeHarness",
+      "file_path": "src/app.test.ts",
+      "start_line": 26,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "readJSON",
+      "file_path": "src/app.test.ts",
+      "start_line": 54,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "HubApp::token",
+      "file_path": "src/app.ts",
+      "start_line": 112,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "HubApp::constructor",
+      "file_path": "src/app.ts",
+      "start_line": 115,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "HubApp::apiKeyVerifier",
+      "file_path": "src/app.ts",
+      "start_line": 129,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "readJSON",
+      "file_path": "src/app.ts",
+      "start_line": 1022,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "readOptionalJSON",
+      "file_path": "src/app.ts",
+      "start_line": 1033,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "MemoryEventBus::subscribers",
+      "file_path": "src/events.ts",
+      "start_line": 13,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "MemoryEventBus::constructor",
+      "file_path": "src/events.ts",
+      "start_line": 15,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "MemoryEventBus::publish",
+      "file_path": "src/events.ts",
+      "start_line": 17,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "DurableEventBus::constructor",
+      "file_path": "src/events.ts",
+      "start_line": 53,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "DurableEventBus::publish",
+      "file_path": "src/events.ts",
+      "start_line": 55,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "DurableEventBus::stream",
+      "file_path": "src/events.ts",
+      "start_line": 64,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "EventHub::subscribers",
+      "file_path": "src/events.ts",
+      "start_line": 78,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "EventHub::constructor",
+      "file_path": "src/events.ts",
+      "start_line": 80,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "EventHub::fetch",
+      "file_path": "src/events.ts",
+      "start_line": 85,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "BaseStore::getEdit",
+      "file_path": "src/store.ts",
+      "start_line": 333,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "BaseStore::listAgentEvents",
+      "file_path": "src/store.ts",
+      "start_line": 387,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "MemoryStore::records",
+      "file_path": "src/store.ts",
+      "start_line": 507,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "MemoryStore::assets",
+      "file_path": "src/store.ts",
+      "start_line": 508,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "MemoryStore::list",
+      "file_path": "src/store.ts",
+      "start_line": 520,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "D1Store::ensured",
+      "file_path": "src/store.ts",
+      "start_line": 537,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "D1Store::constructor",
+      "file_path": "src/store.ts",
+      "start_line": 539,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "D1Store::list",
+      "file_path": "src/store.ts",
+      "start_line": 607,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "D1Store::putAssetBody",
+      "file_path": "src/store.ts",
+      "start_line": 613,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "D1Store::getAssetBody",
+      "file_path": "src/store.ts",
+      "start_line": 617,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "AppError::constructor",
+      "file_path": "src/utils.ts",
+      "start_line": 2,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "scoped",
+      "file_path": "src/utils.ts",
+      "start_line": 55,
+      "kind": "function"
+    }
+  ],
+  "filters_applied": [
+    "kind in (function,method)",
+    "in-degree(calls)==0",
+    "name not in {main, init}",
+    "name does not start with Test/Benchmark",
+    "file_path does not end with _test.go",
+    "capital-leading name treated as exported (library API): excluded as candidate"
+  ]
+}
