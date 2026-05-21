@@ -22,9 +22,6 @@ or `--llm` is set.
 
 ## How is this different?
 
-The space is getting crowded. Coherence is deliberately narrower than a
-general AI reviewer and broader than a single docs-or-architecture drift check.
-
 | Tool/category | Positioning | Coherence differentiation |
 | --- | --- | --- |
 | [Fiberplane Drift](https://fiberplane.com/blog/drift-documentation-linter/) | Binds Markdown specs to code anchors and flags docs as stale when bound code changes. | Broader repo-graph drift across ADRs, tests, metrics, generated artifacts, endpoints, and evidence. |

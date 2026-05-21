@@ -273,6 +273,15 @@ h3 {
   border-bottom: 0;
 }
 
+.table-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.comparison-table {
+  min-width: 760px;
+}
+
 .pill {
   display: inline-flex;
   border-radius: 999px;
