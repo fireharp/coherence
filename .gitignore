@@ -4,3 +4,4 @@ bin/
 repomix*.*
 .env
 LOCAL.md
+.claude/*.local.md
