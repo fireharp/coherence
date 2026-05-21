@@ -1,3 +1,8 @@
+//go:build synthcorpus
+
+// This file is part of the synthetic Go corpus used to ground-truth the
+// codegraph benchmark in evidence/. It is excluded from the main coherence
+// module via the `synthcorpus` build tag so `go build ./...` doesn't see it.
 package main
 
 import "fmt"

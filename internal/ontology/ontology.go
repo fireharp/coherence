@@ -18,9 +18,29 @@ type Rule struct {
 }
 
 type Ontology struct {
-	Version  int                 `yaml:"version"`
-	Rules    []Rule              `yaml:"rules"`
-	Commands map[string][]string `yaml:"commands"`
+	Version         int                 `yaml:"version"`
+	Rules           []Rule              `yaml:"rules"`
+	Commands        map[string][]string `yaml:"commands"`
+	OptionalEngines OptionalEngines     `yaml:"optional_engines,omitempty"`
+}
+
+// OptionalEngines toggles experimental/extra drift meters that are off by
+// default. Configured under `optional_engines:` in ontology.yml.
+type OptionalEngines struct {
+	// CallsiteBlastRadius enables the native-Go call-graph meter that
+	// reports caller blast for each Go symbol whose semantic hash
+	// changed between the baseline snapshot and the current worktree.
+	// Implementation in internal/drift/cgnative.
+	CallsiteBlastRadius CallsiteBlastRadiusConfig `yaml:"callsite_blast_radius"`
+}
+
+// CallsiteBlastRadiusConfig mirrors cgnative.Config but is declared here so
+// the YAML schema lives next to the rest of the ontology types. Keep the
+// fields in sync with cgnative.Config.
+type CallsiteBlastRadiusConfig struct {
+	Enabled    bool `yaml:"enabled"`
+	Depth      int  `yaml:"depth"`       // default 2 when unset
+	MaxSymbols int  `yaml:"max_symbols"` // default 50 when unset
 }
 
 // Load reads, parses, and validates an ontology YAML file. Mirrors the checks

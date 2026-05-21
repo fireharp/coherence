@@ -19,6 +19,7 @@ import (
 	"coherence/internal/coherencebench"
 	"coherence/internal/doctor"
 	"coherence/internal/drift"
+	"coherence/internal/drift/cgnative"
 	"coherence/internal/exteval"
 	"coherence/internal/git"
 	"coherence/internal/graph"
@@ -147,6 +148,23 @@ func nonMovementMeters(active []string) []string {
 		}
 	}
 	return out
+}
+
+// loadCallsiteBlastConfig reads ontology.yml and returns the callsite blast
+// radius meter config. Missing ontology or missing optional_engines block
+// → zero value (disabled). Translates from the ontology YAML schema to
+// cgnative.Config.
+func loadCallsiteBlastConfig(ontPath string) cgnative.Config {
+	ont, err := ontology.Load(ontPath)
+	if err != nil || ont == nil {
+		return cgnative.Config{}
+	}
+	c := ont.OptionalEngines.CallsiteBlastRadius
+	return cgnative.Config{
+		Enabled:    c.Enabled,
+		Depth:      c.Depth,
+		MaxSymbols: c.MaxSymbols,
+	}
 }
 
 func resolveOntologyPath(rootDir string, args parsedArgs) string {
@@ -436,6 +454,7 @@ func runEvaluation(sub string, fs fileSet, args parsedArgs, rootDir, ontPath str
 		if llmRes.Skipped == "" {
 			opts.LLMFindings = llmRes.Findings
 		}
+		opts.CallsiteBlastRadius = loadCallsiteBlastConfig(ontPath)
 		if rep, err := drift.ComputeWith(rootDir, ontPath, opts); err == nil {
 			driftReport = &rep
 			driftVerdict = rep.Verdict
@@ -883,7 +902,10 @@ func run() int {
 		return 0
 
 	case "drift":
-		rep, err := drift.Compute(rootDir, ontPath)
+		opts := drift.ComputeOptions{
+			CallsiteBlastRadius: loadCallsiteBlastConfig(ontPath),
+		}
+		rep, err := drift.ComputeWith(rootDir, ontPath, opts)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, "coherence: fatal:", err)
 			return 2

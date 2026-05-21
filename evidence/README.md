@@ -17,6 +17,7 @@ Generated 2026-05-21 by the ralph-loop research task that started with:
 - **`blast_radius_head_to_head/`** — iteration-4 direct comparison: coherence's `blast_radius` vs codegraph's transitive caller closure on `graph.Build`.
 - **`ITERATION-5.md`** — runnable `callsite_blast_radius` binary, plus a correction to iteration 4: codegraph's Go call resolver collapses name-collided symbols across packages.
 - **`ITERATION-6.md`** — uniqueness gate hardening + a native stdlib-only Go AST extractor that outperforms codegraph for Go specifically.
+- **`ITERATION-10.md`** — meter wired into the drift pipeline. The recommendation is now shipped code under `internal/drift/cgnative/`. Off by default.
 - **`poc/cgpoc_blast.go`** — runnable POC of the recommended first meter (with collision gate).
 - **`poc/go_ast_extractor.go`** — stdlib-only Go AST extractor (230 lines). The recommended source for Go call edges (no codegraph dependency).
 - **`upstream-issues/`** — 5 fileable issue drafts for codegraph upstream covering the bugs found.

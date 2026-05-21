@@ -19,6 +19,7 @@ import (
 	"strings"
 	"time"
 
+	"coherence/internal/drift/cgnative"
 	"coherence/internal/git"
 	"coherence/internal/graph"
 	"coherence/internal/llm"
@@ -415,7 +416,13 @@ type Report struct {
 	StaleTests             StaleTests             `json:"stale_tests"`
 	OrphanedMetricAliases  OrphanedMetricAliases  `json:"orphaned_metric_aliases"`
 	DanglingImports        DanglingImports        `json:"dangling_imports"`
-	Regressions            Regressions            `json:"regressions"`
+	// CallsiteBlastRadius is the optional native-Go call-graph meter
+	// (see internal/drift/cgnative). Disabled by default; enable via
+	// `optional_engines.callsite_blast_radius.enabled: true` in
+	// ontology.yml. When disabled, the field is present with
+	// `enabled: false` and zero values throughout.
+	CallsiteBlastRadius cgnative.Result `json:"callsite_blast_radius"`
+	Regressions         Regressions     `json:"regressions"`
 	// ActiveMeters is the canonical list of meter names that
 	// contributed signal to the verdict — exactly the meters whose
 	// individual gates fired. Lets agents triage at a glance without
@@ -446,6 +453,9 @@ type ComputeOptions struct {
 	// `llm-contradiction` findings within. nil means "LLM not run, leave
 	// the meter disabled".
 	LLMFindings []llm.Finding
+	// CallsiteBlastRadius configures the optional native-Go call-graph
+	// meter (see internal/drift/cgnative). Zero value = disabled.
+	CallsiteBlastRadius cgnative.Config
 }
 
 // Compute is the convenience wrapper for the common case: run every
@@ -538,6 +548,13 @@ func ComputeWith(rootDir, ontologyPath string, opts ComputeOptions) (Report, err
 
 	// Meter 19: dangling TypeScript imports (relative target not in tracked set).
 	report.DanglingImports = computeDanglingImports(rootDir)
+
+	// Optional meter: callsite_blast_radius (native Go call-graph meter,
+	// off by default). See internal/drift/cgnative. Silent unless
+	// `optional_engines.callsite_blast_radius.enabled: true` is set in
+	// ontology.yml. Even when disabled, the field is populated with
+	// `enabled: false` so the JSON shape is stable.
+	report.CallsiteBlastRadius = cgnative.Compute(rootDir, opts.CallsiteBlastRadius, baseSnap, &currentSnap)
 
 	report.Regressions = aggregateRegressions(report)
 	report.ActiveMeters = activeMeters(report)
