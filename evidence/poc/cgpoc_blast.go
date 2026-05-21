@@ -215,49 +215,22 @@ func computeOne(db *sql.DB, symbol string, depth, topN int, includeTests bool) P
 		return ps
 	}
 
-	// Name-collision gate (ITERATION-5 §3): codegraph's Go call resolver
-	// does not qualify symbols by package, so when multiple nodes share a
-	// name the caller edges silently collapse onto an arbitrary one. The
-	// signal is contaminated; the right move is to skip and warn rather
-	// than emit a misleading number. Override with a package hint by
-	// passing `pkg.Name` instead of bare `Name`.
-	if len(matches) > 1 && hint == "" {
+	// Name-collision gate (ITERATION-5 §3, tightened in ITERATION-6):
+	// codegraph's Go call resolver does not qualify symbols by package,
+	// so when multiple nodes share a name the caller edges silently
+	// collapse onto an arbitrary one. The signal is contaminated even
+	// if the user passes a package hint, because the EDGES themselves
+	// have already been mis-attributed at index time. The only safe
+	// option is to require the name to be globally unique in the index.
+	if len(matches) > 1 {
 		ps.Resolved = false
 		ps.CollisionCount = len(matches)
 		ps.SkipReason = "name_collision_in_codegraph_index"
 		return ps
 	}
-	// Symbol-resolution preference (most specific first), only used when a
-	// package hint was supplied:
-	//   1. file_path basename equals "<hint>.go" / "<hint>.py" / "<hint>.ts" — the
-	//      conventional "package's main file" pick.
-	//   2. file_path contains "/<hint>/" — anywhere in that package.
-	//   3. Fall back to the first match.
-	pick := matches[0]
-	if hint != "" {
-		chosen := false
-		for _, m := range matches {
-			fp := m[1]
-			base := fp
-			if i := strings.LastIndex(fp, "/"); i >= 0 {
-				base = fp[i+1:]
-			}
-			if base == hint+".go" || base == hint+".py" || base == hint+".ts" {
-				pick = m
-				chosen = true
-				break
-			}
-		}
-		if !chosen {
-			for _, m := range matches {
-				if strings.Contains(m[1], "/"+hint+"/") {
-					pick = m
-					break
-				}
-			}
-		}
-	}
-	targetID, filePath = pick[0], pick[1]
+	_ = hint // hint is currently advisory only; with len(matches)==1 it's redundant
+	// Single match guaranteed by the collision gate above.
+	targetID, filePath = matches[0][0], matches[0][1]
 	ps.Resolved = true
 	ps.FilePath = filePath
 

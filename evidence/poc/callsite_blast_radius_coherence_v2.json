@@ -1,0 +1,136 @@
+{
+  "meter": "callsite_blast_radius",
+  "version": "v1",
+  "db_path": "/tmp/cg_bench_coherence/.codegraph/codegraph.db",
+  "depth": 2,
+  "changed_symbols": [
+    "graph.Build",
+    "drift.ComputeWith",
+    "drift.computeContradiction",
+    "graph.slugify",
+    "Build",
+    "Compute",
+    "Run"
+  ],
+  "per_symbol": [
+    {
+      "symbol": "graph.Build",
+      "resolved": false,
+      "skip_reason": "name_collision_in_codegraph_index",
+      "collision_count": 3,
+      "direct_callers": 0,
+      "direct_callers_production_only": 0,
+      "transitive_callers": 0,
+      "transitive_caller_files": 0,
+      "top_direct_callers": []
+    },
+    {
+      "symbol": "drift.ComputeWith",
+      "file_path": "internal/drift/drift.go",
+      "resolved": true,
+      "direct_callers": 1,
+      "direct_callers_production_only": 1,
+      "transitive_callers": 1,
+      "transitive_caller_files": 1,
+      "top_direct_callers": [
+        {
+          "qualified_name": "Compute",
+          "file_path": "internal/drift/drift.go",
+          "is_test": false
+        }
+      ]
+    },
+    {
+      "symbol": "drift.computeContradiction",
+      "file_path": "internal/drift/drift.go",
+      "resolved": true,
+      "direct_callers": 1,
+      "direct_callers_production_only": 1,
+      "transitive_callers": 2,
+      "transitive_caller_files": 1,
+      "top_direct_callers": [
+        {
+          "qualified_name": "ComputeWith",
+          "file_path": "internal/drift/drift.go",
+          "is_test": false
+        }
+      ]
+    },
+    {
+      "symbol": "graph.slugify",
+      "file_path": "internal/graph/extractors.go",
+      "resolved": true,
+      "direct_callers": 4,
+      "direct_callers_production_only": 4,
+      "transitive_callers": 6,
+      "transitive_caller_files": 2,
+      "top_direct_callers": [
+        {
+          "qualified_name": "emitConceptNode",
+          "file_path": "internal/graph/extractors.go",
+          "is_test": false
+        },
+        {
+          "qualified_name": "emitMetricNode",
+          "file_path": "internal/graph/extractors.go",
+          "is_test": false
+        },
+        {
+          "qualified_name": "extractEvidence",
+          "file_path": "internal/graph/extractors.go",
+          "is_test": false
+        },
+        {
+          "qualified_name": "emitSchemaModels",
+          "file_path": "internal/graph/schema_extractor.go",
+          "is_test": false
+        }
+      ]
+    },
+    {
+      "symbol": "Build",
+      "resolved": false,
+      "skip_reason": "name_collision_in_codegraph_index",
+      "collision_count": 3,
+      "direct_callers": 0,
+      "direct_callers_production_only": 0,
+      "transitive_callers": 0,
+      "transitive_caller_files": 0,
+      "top_direct_callers": []
+    },
+    {
+      "symbol": "Compute",
+      "resolved": false,
+      "skip_reason": "name_collision_in_codegraph_index",
+      "collision_count": 4,
+      "direct_callers": 0,
+      "direct_callers_production_only": 0,
+      "transitive_callers": 0,
+      "transitive_caller_files": 0,
+      "top_direct_callers": []
+    },
+    {
+      "symbol": "Run",
+      "resolved": false,
+      "skip_reason": "name_collision_in_codegraph_index",
+      "collision_count": 5,
+      "direct_callers": 0,
+      "direct_callers_production_only": 0,
+      "transitive_callers": 0,
+      "transitive_caller_files": 0,
+      "top_direct_callers": []
+    }
+  ],
+  "score": 4,
+  "top_blast_symbols": [
+    "graph.slugify",
+    "drift.ComputeWith",
+    "drift.computeContradiction"
+  ],
+  "warnings": [
+    "symbol \"graph.Build\" skipped: 3 collisions in codegraph index (pass pkg.Name to disambiguate)",
+    "symbol \"Build\" skipped: 3 collisions in codegraph index (pass pkg.Name to disambiguate)",
+    "symbol \"Compute\" skipped: 4 collisions in codegraph index (pass pkg.Name to disambiguate)",
+    "symbol \"Run\" skipped: 5 collisions in codegraph index (pass pkg.Name to disambiguate)"
+  ]
+}
