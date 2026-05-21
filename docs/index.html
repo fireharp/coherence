@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Coherence - Drift detection for agent-assisted repos</title>
-    <meta name="description" content="Coherence catches drift between code, docs, ADRs, tests, metrics, generated artifacts, endpoints, and evidence before agents commit it.">
+    <meta name="description" content="Tests pass. The repo still drifts. Coherence catches broken links between code, docs, ADRs, tests, metrics, generated files, endpoints, and evidence.">
     <link rel="stylesheet" href="assets/site.css">
   </head>
   <body>
@@ -16,6 +16,7 @@
         </a>
         <div class="nav-links">
           <a href="#quickstart">Quickstart</a>
+          <a href="#github-actions">CI</a>
           <a href="#scenarios">Scenarios</a>
           <a href="#agents">Agent workflows</a>
           <a href="README.md">Reference</a>
@@ -29,7 +30,7 @@
         <div>
           <p class="eyebrow"><span class="dot"></span> Git-native drift detector</p>
           <h1>Keep agent edits attached to the repo truth.</h1>
-          <p class="lead">Coherence checks when code, docs, ADRs, tests, metrics, generated files, endpoints, and evidence stop agreeing. It gives coding agents JSON they can act on.</p>
+          <p class="lead"><strong>Coherence is not an AI reviewer. It is a repo consistency harness for AI-edited codebases.</strong> Tests pass. The repo still drifts. Coherence catches the broken links between code, docs, ADRs, tests, metrics, generated files, endpoints, and evidence - especially after AI-agent edits.</p>
           <div class="hero-actions">
             <a class="button primary" href="#quickstart">Start in 30 seconds</a>
             <a class="button" href="README.md">Read algorithm reference</a>
@@ -40,10 +41,51 @@
         </div>
       </section>
 
+      <section class="section" id="different">
+        <div class="section-head">
+          <h2>How is this different?</h2>
+          <p>Coherence is deliberately narrower than a general AI reviewer and broader than a single docs-or-architecture drift check.</p>
+        </div>
+        <div class="table-scroll">
+          <table class="scenario-table comparison-table">
+            <thead>
+              <tr>
+                <th>Tool/category</th>
+                <th>Positioning</th>
+                <th>Coherence differentiation</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><a href="https://fiberplane.com/blog/drift-documentation-linter/">Fiberplane Drift</a></td>
+                <td>Binds Markdown specs to code anchors and flags docs as stale when bound code changes.</td>
+                <td>Broader repo-graph drift across ADRs, tests, metrics, generated artifacts, endpoints, and evidence.</td>
+              </tr>
+              <tr>
+                <td><a href="https://pypi.org/project/drift-analyzer/"><code>drift-analyzer</code></a></td>
+                <td>Detects deterministic architectural erosion and structural drift in AI-accelerated codebases.</td>
+                <td>Adds traceability and semantic repo consistency, not only structural analysis.</td>
+              </tr>
+              <tr>
+                <td><a href="https://github.com/agent-sh/agentsys">AgentSys <code>/drift-detect</code></a></td>
+                <td>Compares documented plans and project docs with actual implementation using deterministic collectors plus one LLM analysis call.</td>
+                <td>Deterministic CLI/JSON-first checks with an optional LLM pass.</td>
+              </tr>
+              <tr>
+                <td><a href="https://www.agentlint.app/">AgentLint</a></td>
+                <td>Audits the agent harness: <code>AGENTS.md</code>, <code>CLAUDE.md</code>, CI, hooks, and related rule surfaces.</td>
+                <td>Checks whether changed repo artifacts still support each other.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
       <section class="section" id="quickstart">
         <div class="section-head">
           <h2>Quickstart</h2>
           <p>Install the release binary, initialize rules for an agent repo, then run the worktree review before handoff or commit.</p>
+          <p>Coherence runs locally. Deterministic checks do not send code anywhere. The optional LLM pass is disabled by default and only runs when <code>COHERENCE_LLM=1</code> or <code>--llm</code> is set.</p>
         </div>
         <div class="grid three">
           <article class="card">
@@ -61,6 +103,37 @@
             <h3>Review</h3>
             <pre class="code"><code>coherence review --base=HEAD --worktree --json</code></pre>
           </article>
+        </div>
+      </section>
+
+      <section class="section" id="github-actions">
+        <div class="section-head">
+          <h2>GitHub Actions</h2>
+          <p>Run Coherence on pull requests with strict drift gating.</p>
+        </div>
+        <div class="json-example">
+          <pre class="code tight"><code>name: coherence
+
+on:
+  pull_request:
+
+jobs:
+  coherence:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Coherence
+        run: curl -fsSL https://github.com/fireharp/coherence/releases/latest/download/install.sh | sh
+
+      - name: Review repo drift
+        run: ~/.local/bin/coherence review --base=origin/main --worktree --json --strict</code></pre>
+          <aside class="card callout">
+            <h3>Copy-paste CI</h3>
+            <p><code>--strict</code> promotes telemetry to exit 1, so every drift signal must be handled before merge.</p>
+          </aside>
         </div>
       </section>
 

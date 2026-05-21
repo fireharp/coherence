@@ -4,17 +4,33 @@ Git-native drift detector for agent-assisted repositories.
 
 Docs site: https://fireharp.github.io/coherence/
 
-Coherence catches when code, docs, ADRs, tests, metrics, generated files,
-endpoints, and evidence stop agreeing - especially after AI-agent edits.
+**Coherence is not an AI reviewer. It is a repo consistency harness for
+AI-edited codebases.**
 
-Tests can pass while the repository becomes less coherent. Coherence looks for
-broken edges between docs, decisions, stories, tests, metrics, generated
-artifacts, endpoints, and evidence.
+Tests pass. The repo still drifts. Coherence catches the broken links between
+code, docs, ADRs, tests, metrics, generated files, endpoints, and evidence -
+especially after AI-agent edits.
+
+Coherence runs locally. Deterministic checks do not send code anywhere. The
+optional LLM pass is disabled by default and only runs when `COHERENCE_LLM=1`
+or `--llm` is set.
 
 > **Algorithm reference**: [`docs/`](docs/README.md) has a long-form
 > page for every drift meter and check, with the algorithm, JSON
 > output shape, signal interpretation, and a benchmark scenario
 > example. Start there if you want to understand a firing signal.
+
+## How is this different?
+
+The space is getting crowded. Coherence is deliberately narrower than a
+general AI reviewer and broader than a single docs-or-architecture drift check.
+
+| Tool/category | Positioning | Coherence differentiation |
+| --- | --- | --- |
+| [Fiberplane Drift](https://fiberplane.com/blog/drift-documentation-linter/) | Binds Markdown specs to code anchors and flags docs as stale when bound code changes. | Broader repo-graph drift across ADRs, tests, metrics, generated artifacts, endpoints, and evidence. |
+| [`drift-analyzer`](https://pypi.org/project/drift-analyzer/) | Detects deterministic architectural erosion and structural drift in AI-accelerated codebases. | Adds traceability and semantic repo consistency, not only structural analysis. |
+| [AgentSys `/drift-detect`](https://github.com/agent-sh/agentsys) | Compares documented plans and project docs with actual implementation using deterministic collectors plus one LLM analysis call. | Deterministic CLI/JSON-first checks with an optional LLM pass. |
+| [AgentLint](https://www.agentlint.app/) | Audits the agent harness: `AGENTS.md`, `CLAUDE.md`, CI, hooks, and related rule surfaces. | Checks whether changed repo artifacts still support each other. |
 
 ## 30-second demo
 
@@ -69,6 +85,31 @@ go install github.com/fireharp/coherence/cmd/coherence@latest
 
 # local development build from a clone
 go build -o bin/coherence ./cmd/coherence
+```
+
+## GitHub Actions
+
+Run Coherence in PR CI with strict drift gating:
+
+```yaml
+name: coherence
+
+on:
+  pull_request:
+
+jobs:
+  coherence:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Coherence
+        run: curl -fsSL https://github.com/fireharp/coherence/releases/latest/download/install.sh | sh
+
+      - name: Review repo drift
+        run: ~/.local/bin/coherence review --base=origin/main --worktree --json --strict
 ```
 
 ## Command reference
