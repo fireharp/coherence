@@ -1,0 +1,572 @@
+{
+  "meter": "dead_code",
+  "version": "v2",
+  "db_path": "/tmp/cg_bench_copycat/.codegraph/codegraph.db",
+  "total_function_method": 909,
+  "no_caller_raw": 726,
+  "after_filters": 69,
+  "candidates": [
+    {
+      "qualified_name": "generate",
+      "file_path": "src/copycat/ask.py",
+      "start_line": 158,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "save",
+      "file_path": "src/copycat/ask.py",
+      "start_line": 423,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "load_asks",
+      "file_path": "src/copycat/ask.py",
+      "start_line": 525,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "check_answer",
+      "file_path": "src/copycat/ask.py",
+      "start_line": 598,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "cells_from_lists",
+      "file_path": "src/copycat/bench.py",
+      "start_line": 130,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "compose_run",
+      "file_path": "src/copycat/bench.py",
+      "start_line": 169,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "run",
+      "file_path": "src/copycat/bench.py",
+      "start_line": 418,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "cell_summary",
+      "file_path": "src/copycat/bench.py",
+      "start_line": 798,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "_non_negative_int",
+      "file_path": "src/copycat/cli.py",
+      "start_line": 108,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "_positive_int",
+      "file_path": "src/copycat/cli.py",
+      "start_line": 124,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "_threshold_float",
+      "file_path": "src/copycat/cli.py",
+      "start_line": 141,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "_cmd_verify",
+      "file_path": "src/copycat/cli.py",
+      "start_line": 223,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "_cmd_scope",
+      "file_path": "src/copycat/cli.py",
+      "start_line": 244,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "_cmd_init",
+      "file_path": "src/copycat/cli.py",
+      "start_line": 257,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "_cmd_rewrite",
+      "file_path": "src/copycat/cli.py",
+      "start_line": 274,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "_cmd_bench",
+      "file_path": "src/copycat/cli.py",
+      "start_line": 466,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "_cmd_probe",
+      "file_path": "src/copycat/cli.py",
+      "start_line": 668,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "_cmd_highlight",
+      "file_path": "src/copycat/cli.py",
+      "start_line": 734,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "_cmd_fix",
+      "file_path": "src/copycat/cli.py",
+      "start_line": 850,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "_cmd_report",
+      "file_path": "src/copycat/cli.py",
+      "start_line": 1022,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "_cmd_bench_compose",
+      "file_path": "src/copycat/cli.py",
+      "start_line": 1155,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "_cmd_profile_show",
+      "file_path": "src/copycat/cli.py",
+      "start_line": 1302,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "_cmd_compose_from_notes",
+      "file_path": "src/copycat/cli.py",
+      "start_line": 1403,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "_cmd_ask_human",
+      "file_path": "src/copycat/cli.py",
+      "start_line": 1639,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "_cmd_apply_human",
+      "file_path": "src/copycat/cli.py",
+      "start_line": 1746,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "_cmd_compose",
+      "file_path": "src/copycat/cli.py",
+      "start_line": 1935,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "_cmd_template_extract",
+      "file_path": "src/copycat/cli.py",
+      "start_line": 2065,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "_cmd_status",
+      "file_path": "src/copycat/cli.py",
+      "start_line": 2131,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "compose",
+      "file_path": "src/copycat/compose.py",
+      "start_line": 113,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "write_draft",
+      "file_path": "src/copycat/compose.py",
+      "start_line": 179,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "check_adherence",
+      "file_path": "src/copycat/compose.py",
+      "start_line": 251,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "check_notes_reuse",
+      "file_path": "src/copycat/compose.py",
+      "start_line": 326,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "check_facts_reuse",
+      "file_path": "src/copycat/compose.py",
+      "start_line": 353,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "append_human_ask_sample",
+      "file_path": "src/copycat/corpus.py",
+      "start_line": 119,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "load_human_ask",
+      "file_path": "src/copycat/corpus.py",
+      "start_line": 178,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "make_injector",
+      "file_path": "src/copycat/corpus.py",
+      "start_line": 401,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "run",
+      "file_path": "src/copycat/fix.py",
+      "start_line": 162,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "run",
+      "file_path": "src/copycat/highlight.py",
+      "start_line": 68,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "run",
+      "file_path": "src/copycat/probe.py",
+      "start_line": 67,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "fit",
+      "file_path": "src/copycat/profile.py",
+      "start_line": 210,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "to_dict",
+      "file_path": "src/copycat/profile.py",
+      "start_line": 254,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "_read_markdown",
+      "file_path": "src/copycat/readers.py",
+      "start_line": 69,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "_read_html",
+      "file_path": "src/copycat/readers.py",
+      "start_line": 75,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "_read_pdf",
+      "file_path": "src/copycat/readers.py",
+      "start_line": 89,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "_read_txt",
+      "file_path": "src/copycat/readers.py",
+      "start_line": 107,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "read",
+      "file_path": "src/copycat/readers.py",
+      "start_line": 121,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "_parse_verify",
+      "file_path": "src/copycat/report.py",
+      "start_line": 46,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "_parse_probe",
+      "file_path": "src/copycat/report.py",
+      "start_line": 57,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "_parse_highlight",
+      "file_path": "src/copycat/report.py",
+      "start_line": 74,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "_parse_rewrite",
+      "file_path": "src/copycat/report.py",
+      "start_line": 88,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "_parse_fix",
+      "file_path": "src/copycat/report.py",
+      "start_line": 104,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "_parse_bench",
+      "file_path": "src/copycat/report.py",
+      "start_line": 119,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "known_kinds",
+      "file_path": "src/copycat/report.py",
+      "start_line": 160,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "load_events",
+      "file_path": "src/copycat/report.py",
+      "start_line": 178,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "timeline_for",
+      "file_path": "src/copycat/report.py",
+      "start_line": 223,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "recent",
+      "file_path": "src/copycat/report.py",
+      "start_line": 230,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "cell_ranking",
+      "file_path": "src/copycat/report.py",
+      "start_line": 236,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "family_ranking",
+      "file_path": "src/copycat/report.py",
+      "start_line": 271,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "Rewriter::propose",
+      "file_path": "src/copycat/rewrite.py",
+      "start_line": 100,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "loop_rewrite",
+      "file_path": "src/copycat/rewrite.py",
+      "start_line": 756,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "rewrite_sentences",
+      "file_path": "src/copycat/rewrite.py",
+      "start_line": 985,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "make_groq_rewriter",
+      "file_path": "src/copycat/rewrite.py",
+      "start_line": 1061,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "make_agent_rewriter",
+      "file_path": "src/copycat/rewrite.py",
+      "start_line": 1073,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "find_targets",
+      "file_path": "src/copycat/sentence.py",
+      "start_line": 47,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "top_by_ai_prob",
+      "file_path": "src/copycat/sentence.py",
+      "start_line": 95,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "stitch",
+      "file_path": "src/copycat/sentence.py",
+      "start_line": 113,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "collect",
+      "file_path": "src/copycat/status.py",
+      "start_line": 167,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "run",
+      "file_path": "src/copycat/verify.py",
+      "start_line": 138,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "write",
+      "file_path": "src/copycat/writeback.py",
+      "start_line": 52,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    }
+  ],
+  "filters_applied": [
+    "kind ∈ {function, method}",
+    "in-degree(calls) = 0",
+    "name ∉ {main, init, __init__, __enter__, __exit__, __call__, __repr__, __str__, __hash__, __eq__, constructor}",
+    "name does not start with Test/Benchmark/test_/it_",
+    "file_path does not look like a test file",
+    "is_exported = 1 → treated as library API and skipped",
+    "go: leading capital → treated as exported (workaround for broken is_exported)",
+    "method whose parent class has inbound instantiates OR any called method → skipped"
+  ]
+}

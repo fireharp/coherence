@@ -10,9 +10,12 @@ Generated 2026-05-21 by the ralph-loop research task that started with:
 
 - **`REPORT.md`** — iteration-1 summary. Capability matrix, benchmark numbers, recommendation. Read this first.
 - **`ITERATION-2.md`** — iteration-2 addendum: working POC reader, synthetic corpus with ground truth, precision/recall on synthetic vs real code, revised recommendation.
-- **`poc/cgpoc.go`** — standalone Go reader for codegraph's SQLite DB. Emits a `dead_code` meter in coherence-shaped JSON.
-- **`poc/dead_code_*.json`** — POC outputs on the four corpora.
-- **`synthetic/`** — annotated Go corpus with `// GT: live` / `// GT: dead-code` markers for precision/recall measurement.
+- **`ITERATION-3.md`** — iteration-3 addendum: v2 language-aware reader, synthetic-TS corpus, Django + Fastify route-detection reality check.
+- **`poc/cgpoc.go`** — v1 standalone Go reader (basic filters only).
+- **`poc/cgpoc_v2.go`** — v2 language-aware reader (class-instantiates join, Python dunder + TS spec/test filters, respects `is_exported` where populated).
+- **`poc/dead_code_*.json`** — POC outputs across all corpora (v1 + v2).
+- **`synthetic/`** — annotated Go corpus (12 funcs, 3 known-dead).
+- **`synthetic_ts/`** — annotated TS corpus (10 funcs/methods/classes, 4 known-dead).
 - **`raw/`** — captured graph outputs from both engines on three corpora:
   - `coherence_self_graph.json` — coherence on its own repo (183 files, 774 nodes, 1,093 edges)
   - `coherence_copycat_graph.json` — coherence on /Users/fireharp/Prog/Stuff/copycat (Python, 596/658)

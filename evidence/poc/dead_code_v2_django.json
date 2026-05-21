@@ -1,0 +1,4468 @@
+{
+  "meter": "dead_code",
+  "version": "v2",
+  "db_path": "/tmp/cg_bench_django/.codegraph/codegraph.db",
+  "total_function_method": 4023,
+  "no_caller_raw": 2999,
+  "after_filters": 556,
+  "candidates": [
+    {
+      "qualified_name": "WorkflowAdminForm::clean_execution_order",
+      "file_path": "awe/admin.py",
+      "start_line": 419,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "WorkflowAdminForm::clean_edges",
+      "file_path": "awe/admin.py",
+      "start_line": 450,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "WorkflowRunInline::has_add_permission",
+      "file_path": "awe/admin.py",
+      "start_line": 510,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "WorkflowRunInline::has_change_permission",
+      "file_path": "awe/admin.py",
+      "start_line": 514,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "WorkflowExecutionEventInline::has_add_permission",
+      "file_path": "awe/admin.py",
+      "start_line": 677,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "WorkflowExecutionEventInline::details_display",
+      "file_path": "awe/admin.py",
+      "start_line": 682,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "ContextInline::has_add_permission",
+      "file_path": "awe/admin.py",
+      "start_line": 701,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "ContextInline::data_preview",
+      "file_path": "awe/admin.py",
+      "start_line": 706,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "MCPToolInline::has_add_permission",
+      "file_path": "awe/admin.py",
+      "start_line": 1279,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "AgentMCPToolForm::clean_config_override",
+      "file_path": "awe/admin.py",
+      "start_line": 1513,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "WorkflowTaskInline::has_add_permission",
+      "file_path": "awe/admin.py",
+      "start_line": 1676,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "EvaluationResultInline::has_add_permission",
+      "file_path": "awe/admin.py",
+      "start_line": 3021,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "EvaluationResultInline::has_change_permission",
+      "file_path": "awe/admin.py",
+      "start_line": 3025,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "PromptTestSuiteAdmin::overall_pass_rate_display",
+      "file_path": "awe/admin.py",
+      "start_line": 3629,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "PromptTestSuiteAdmin::avg_score_display",
+      "file_path": "awe/admin.py",
+      "start_line": 3638,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "PromptTestSuiteAdmin::score_std_dev_display",
+      "file_path": "awe/admin.py",
+      "start_line": 3647,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "PromptTestSuiteAdmin::route_consistency_display",
+      "file_path": "awe/admin.py",
+      "start_line": 3656,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "PromptTestSuiteAdmin::configuration_pretty",
+      "file_path": "awe/admin.py",
+      "start_line": 3671,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "PromptTestSuiteAdmin::has_add_permission",
+      "file_path": "awe/admin.py",
+      "start_line": 3677,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "PromptTestSuiteAdmin::has_change_permission",
+      "file_path": "awe/admin.py",
+      "start_line": 3681,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "PromptTestSuiteAdmin::has_delete_permission",
+      "file_path": "awe/admin.py",
+      "start_line": 3685,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestSuiteFilter::lookups",
+      "file_path": "awe/admin.py",
+      "start_line": 3696,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestSuiteFilter::queryset",
+      "file_path": "awe/admin.py",
+      "start_line": 3709,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "PromptEvaluationResultAdmin::overall_score_display",
+      "file_path": "awe/admin.py",
+      "start_line": 3858,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "PromptEvaluationResultAdmin::pass_rate_display",
+      "file_path": "awe/admin.py",
+      "start_line": 3865,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "PromptEvaluationResultAdmin::total_cost_display",
+      "file_path": "awe/admin.py",
+      "start_line": 3871,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "PromptEvaluationResultAdmin::failed_routes_display",
+      "file_path": "awe/admin.py",
+      "start_line": 3880,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "PromptEvaluationResultAdmin::errors_summary_display",
+      "file_path": "awe/admin.py",
+      "start_line": 3889,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "PromptEvaluationResultAdmin::has_add_permission",
+      "file_path": "awe/admin.py",
+      "start_line": 3920,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "PromptEvaluationResultAdmin::has_change_permission",
+      "file_path": "awe/admin.py",
+      "start_line": 3924,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "PromptEvaluationResultAdmin::has_delete_permission",
+      "file_path": "awe/admin.py",
+      "start_line": 3928,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "PromptEvaluationResultAdmin::save_model",
+      "file_path": "awe/admin.py",
+      "start_line": 3932,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "PromptEvaluationResultAdmin::get_readonly_fields",
+      "file_path": "awe/admin.py",
+      "start_line": 3937,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "PromptEvaluationResultAdmin::media",
+      "file_path": "awe/admin.py",
+      "start_line": 3943,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "AweConfig::ready",
+      "file_path": "awe/apps.py",
+      "start_line": 13,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "store_original_state",
+      "file_path": "awe/audit_signals.py",
+      "start_line": 18,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "create_audit_log_on_save",
+      "file_path": "awe/audit_signals.py",
+      "start_line": 30,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "create_audit_log_on_delete",
+      "file_path": "awe/audit_signals.py",
+      "start_line": 84,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "log_soft_delete",
+      "file_path": "awe/audit_signals.py",
+      "start_line": 111,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "log_restore",
+      "file_path": "awe/audit_signals.py",
+      "start_line": 131,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "log_rollback",
+      "file_path": "awe/audit_signals.py",
+      "start_line": 150,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "LogoutView::post",
+      "file_path": "awe/auth_views.py",
+      "start_line": 65,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "prepare_agent_prompt",
+      "file_path": "awe/context_instructions.py",
+      "start_line": 103,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "get_role_based_template",
+      "file_path": "awe/context_instructions.py",
+      "start_line": 158,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "validate_context_references",
+      "file_path": "awe/context_instructions.py",
+      "start_line": 193,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "extract_enhanced_trajectory_from_workflow_run",
+      "file_path": "awe/evaluation/enhanced_trajectory.py",
+      "start_line": 332,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "analyze_multi_agent_execution",
+      "file_path": "awe/evaluation/multi_agent_analysis.py",
+      "start_line": 397,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "JudgeCriteria::validate_custom_weights",
+      "file_path": "awe/evaluation/scenario_formats.py",
+      "start_line": 100,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "load_scenarios_from_directory",
+      "file_path": "awe/evaluation/scenario_loader.py",
+      "start_line": 224,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "extract_trajectory_from_workflow_run",
+      "file_path": "awe/evaluation/trajectory.py",
+      "start_line": 266,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "compare_trajectories",
+      "file_path": "awe/evaluation/trajectory_comparison.py",
+      "start_line": 411,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "setup_litellm_file_logging",
+      "file_path": "awe/logging_utils/litellm_logging.py",
+      "start_line": 10,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "clear_litellm_logs",
+      "file_path": "awe/logging_utils/litellm_logging.py",
+      "start_line": 97,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "initialize_with_service_account",
+      "file_path": "awe/logging_utils/vertex_ai_auth.py",
+      "start_line": 200,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "initialize_with_adc",
+      "file_path": "awe/logging_utils/vertex_ai_auth.py",
+      "start_line": 209,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "Command::add_arguments",
+      "file_path": "awe/management/commands/check_workflow_permissions.py",
+      "start_line": 23,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "Command::handle",
+      "file_path": "awe/management/commands/check_workflow_permissions.py",
+      "start_line": 31,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "Command::add_arguments",
+      "file_path": "awe/management/commands/create_tokens.py",
+      "start_line": 13,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "Command::handle",
+      "file_path": "awe/management/commands/create_tokens.py",
+      "start_line": 25,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "Command::add_arguments",
+      "file_path": "awe/management/commands/dspy_coordinator_sandbox.py",
+      "start_line": 417,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "Command::handle",
+      "file_path": "awe/management/commands/dspy_coordinator_sandbox.py",
+      "start_line": 423,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "Command::add_arguments",
+      "file_path": "awe/management/commands/grant_workflow_permissions.py",
+      "start_line": 24,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "Command::handle",
+      "file_path": "awe/management/commands/grant_workflow_permissions.py",
+      "start_line": 36,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "Command::handle",
+      "file_path": "awe/management/commands/wait_for_db.py",
+      "start_line": 11,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "VersionedSoftDeleteManager::create_with_version",
+      "file_path": "awe/managers.py",
+      "start_line": 181,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "VersionedSoftDeleteManager::update_with_version",
+      "file_path": "awe/managers.py",
+      "start_line": 194,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "VersionedSoftDeleteManager::soft_delete",
+      "file_path": "awe/managers.py",
+      "start_line": 239,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TokenAuthMiddlewareStack",
+      "file_path": "awe/middleware/websocket_auth.py",
+      "start_line": 122,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "fix_duplicate_temporal_workflow_ids",
+      "file_path": "awe/migrations/0006_fix_duplicate_temporal_workflow_ids.py",
+      "start_line": 7,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "reverse_fix_duplicate_temporal_workflow_ids",
+      "file_path": "awe/migrations/0006_fix_duplicate_temporal_workflow_ids.py",
+      "start_line": 49,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "populate_session_ids",
+      "file_path": "awe/migrations/0009_add_session_id_to_workflow_execution_event.py",
+      "start_line": 5,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "reverse_populate_session_ids",
+      "file_path": "awe/migrations/0009_add_session_id_to_workflow_execution_event.py",
+      "start_line": 13,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "populate_conversations",
+      "file_path": "awe/migrations/0019_populate_conversations.py",
+      "start_line": 6,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "reverse_populate_conversations",
+      "file_path": "awe/migrations/0019_populate_conversations.py",
+      "start_line": 64,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "drop_tables",
+      "file_path": "awe/migrations/0026_simplify_agent_models.py",
+      "start_line": 8,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "create_indexes",
+      "file_path": "awe/migrations/0026_simplify_agent_models.py",
+      "start_line": 20,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "migrate_agent_data",
+      "file_path": "awe/migrations/0037_migrate_agent_data.py",
+      "start_line": 10,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "reverse_migration",
+      "file_path": "awe/migrations/0037_migrate_agent_data.py",
+      "start_line": 30,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "set_template_icons_and_colors",
+      "file_path": "awe/migrations/0047_set_template_icons_colors.py",
+      "start_line": 8,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "reverse_template_icons_and_colors",
+      "file_path": "awe/migrations/0047_set_template_icons_colors.py",
+      "start_line": 39,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "create_default_agent_types",
+      "file_path": "awe/migrations/0050_create_default_agent_types.py",
+      "start_line": 8,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "reverse_default_agent_types",
+      "file_path": "awe/migrations/0050_create_default_agent_types.py",
+      "start_line": 54,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "add_evaluator_agent_type",
+      "file_path": "awe/migrations/0055_add_evaluator_agent_type.py",
+      "start_line": 6,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "remove_evaluator_agent_type",
+      "file_path": "awe/migrations/0055_add_evaluator_agent_type.py",
+      "start_line": 15,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "AgentCompletion::prompt_tokens",
+      "file_path": "awe/models.py",
+      "start_line": 1586,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "AgentCompletion::completion_tokens",
+      "file_path": "awe/models.py",
+      "start_line": 1594,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "AgentCompletion::total_tokens",
+      "file_path": "awe/models.py",
+      "start_line": 1602,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "AgentCompletion::response_content",
+      "file_path": "awe/models.py",
+      "start_line": 1610,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "AgentCompletion::response_tool_calls",
+      "file_path": "awe/models.py",
+      "start_line": 1620,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "publish_workflow_event_dual",
+      "file_path": "awe/notifications.py",
+      "start_line": 98,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "MCPServerSerializer::get_tool_count",
+      "file_path": "awe/serializers_mcp/mcp_serializers.py",
+      "start_line": 106,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "MCPServerSerializer::validate_name",
+      "file_path": "awe/serializers_mcp/mcp_serializers.py",
+      "start_line": 110,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "MCPServerSerializer::validate_args",
+      "file_path": "awe/serializers_mcp/mcp_serializers.py",
+      "start_line": 122,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "MCPServerSerializer::validate_env",
+      "file_path": "awe/serializers_mcp/mcp_serializers.py",
+      "start_line": 134,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "MCPServerSerializer::validate_timeout",
+      "file_path": "awe/serializers_mcp/mcp_serializers.py",
+      "start_line": 148,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "MCPServerSerializer::validate",
+      "file_path": "awe/serializers_mcp/mcp_serializers.py",
+      "start_line": 157,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "WorkflowTaskListSerializer::get_completed_count",
+      "file_path": "awe/serializers_new.py",
+      "start_line": 66,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "AgentMessageSerializer::get_completion_request_id",
+      "file_path": "awe/serializers_new.py",
+      "start_line": 288,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "notify_workflow_message",
+      "file_path": "awe/signals.py",
+      "start_line": 28,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "notify_workflow_task",
+      "file_path": "awe/signals.py",
+      "start_line": 55,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "notify_agent_completion",
+      "file_path": "awe/signals.py",
+      "start_line": 98,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "create_auth_token",
+      "file_path": "awe/signals.py",
+      "start_line": 118,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "create_user_profile",
+      "file_path": "awe/signals.py",
+      "start_line": 132,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "save_agent_history",
+      "file_path": "awe/signals.py",
+      "start_line": 147,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "save_user_profile",
+      "file_path": "awe/signals.py",
+      "start_line": 168,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "update_workflow_execution_status",
+      "file_path": "awe/temporal/activities/activities.py",
+      "start_line": 97,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "process_event_part",
+      "file_path": "awe/temporal/activities/activities.py",
+      "start_line": 255,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "_update_workflow_execution_status",
+      "file_path": "awe/temporal/activities/activities.py",
+      "start_line": 311,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "execute_single_agent",
+      "file_path": "awe/temporal/activities/activities.py",
+      "start_line": 340,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "send_assistant_notification",
+      "file_path": "awe/temporal/activities/activities.py",
+      "start_line": 478,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "send_tool_results",
+      "file_path": "awe/temporal/activities/activities.py",
+      "start_line": 529,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "get_workflow_run_activity",
+      "file_path": "awe/temporal/activities/activities.py",
+      "start_line": 576,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "adapt_prompt_step",
+      "file_path": "awe/temporal/activities/adaptive_prompt.py",
+      "start_line": 21,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "execute_adaptive_prompt",
+      "file_path": "awe/temporal/activities/adaptive_prompt.py",
+      "start_line": 115,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "save_adaptive_prompt_results",
+      "file_path": "awe/temporal/activities/adaptive_prompt.py",
+      "start_line": 213,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "load_agent_configuration",
+      "file_path": "awe/temporal/activities/agent_processing.py",
+      "start_line": 21,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "get_llm_completion",
+      "file_path": "awe/temporal/activities/agent_processing.py",
+      "start_line": 58,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "execute_tool",
+      "file_path": "awe/temporal/activities/agent_processing.py",
+      "start_line": 118,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "save_agent_processing_results",
+      "file_path": "awe/temporal/activities/agent_processing.py",
+      "start_line": 455,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "get_response_streaming",
+      "file_path": "awe/temporal/activities/assistant.py",
+      "start_line": 215,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "get_workflow_by_id",
+      "file_path": "awe/temporal/activities/assistant.py",
+      "start_line": 386,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "edit_workflow_activity",
+      "file_path": "awe/temporal/activities/assistant.py",
+      "start_line": 469,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "create_agent_activity",
+      "file_path": "awe/temporal/activities/assistant.py",
+      "start_line": 525,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "get_available_models_activity",
+      "file_path": "awe/temporal/activities/assistant.py",
+      "start_line": 613,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "edit_agent_activity",
+      "file_path": "awe/temporal/activities/assistant.py",
+      "start_line": 626,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "delete_agent_activity",
+      "file_path": "awe/temporal/activities/assistant.py",
+      "start_line": 699,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "send_tool_results",
+      "file_path": "awe/temporal/activities/assistant.py",
+      "start_line": 732,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "evaluate_scenario_with_enhanced_tracking",
+      "file_path": "awe/temporal/activities/enhanced_evaluation.py",
+      "start_line": 20,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "create_task_list_activity",
+      "file_path": "awe/temporal/activities/task_activities.py",
+      "start_line": 13,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "add_task_activity",
+      "file_path": "awe/temporal/activities/task_activities.py",
+      "start_line": 63,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "complete_task_activity",
+      "file_path": "awe/temporal/activities/task_activities.py",
+      "start_line": 136,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "list_tasks_activity",
+      "file_path": "awe/temporal/activities/task_activities.py",
+      "start_line": 235,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "save_workflow_message_activity",
+      "file_path": "awe/temporal/activities/task_activities.py",
+      "start_line": 311,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "get_task_activity",
+      "file_path": "awe/temporal/activities/task_activities.py",
+      "start_line": 373,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "update_workflow_run_status_activity",
+      "file_path": "awe/temporal/activities/task_activities.py",
+      "start_line": 448,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "save_artifact_activity",
+      "file_path": "awe/temporal/activities/task_activities.py",
+      "start_line": 505,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "tavily_activity",
+      "file_path": "awe/temporal/activities/tavily_activities.py",
+      "start_line": 94,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "get_sync_client",
+      "file_path": "awe/temporal/activities/tavily_activities.py",
+      "start_line": 135,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "tavily_search_activity",
+      "file_path": "awe/temporal/activities/tavily_activities.py",
+      "start_line": 144,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "tavily_qna_search_activity",
+      "file_path": "awe/temporal/activities/tavily_activities.py",
+      "start_line": 210,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "tavily_extract_activity",
+      "file_path": "awe/temporal/activities/tavily_activities.py",
+      "start_line": 259,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "tavily_map_activity",
+      "file_path": "awe/temporal/activities/tavily_activities.py",
+      "start_line": 309,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "tavily_crawl_activity",
+      "file_path": "awe/temporal/activities/tavily_activities.py",
+      "start_line": 318,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "read_context_activity",
+      "file_path": "awe/temporal/context_activities.py",
+      "start_line": 24,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "write_context_activity",
+      "file_path": "awe/temporal/context_activities.py",
+      "start_line": 57,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "read_full_context_activity",
+      "file_path": "awe/temporal/context_activities.py",
+      "start_line": 96,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "update_context_batch_activity",
+      "file_path": "awe/temporal/context_activities.py",
+      "start_line": 126,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "AdaptiveRouter::run",
+      "file_path": "awe/temporal/workflows/adaptive_router.py",
+      "start_line": 136,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "AdaptiveRouter::generic_handler",
+      "file_path": "awe/temporal/workflows/adaptive_router.py",
+      "start_line": 194,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "get_coordinator_test_input",
+      "file_path": "awe/temporal/workflows/test_adaptive_router_v5.py",
+      "start_line": 16,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "get_task_initializer_test_input",
+      "file_path": "awe/temporal/workflows/test_adaptive_router_v5.py",
+      "start_line": 50,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "get_researcher_test_input",
+      "file_path": "awe/temporal/workflows/test_adaptive_router_v5.py",
+      "start_line": 74,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "get_custom_routing_test",
+      "file_path": "awe/temporal/workflows/test_adaptive_router_v5.py",
+      "start_line": 98,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "get_loop_test",
+      "file_path": "awe/temporal/workflows/test_adaptive_router_v5.py",
+      "start_line": 211,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "other_test_user",
+      "file_path": "awe/tests/conftest.py",
+      "start_line": 23,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "authenticated_client",
+      "file_path": "awe/tests/conftest.py",
+      "start_line": 29,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "api_client",
+      "file_path": "awe/tests/conftest.py",
+      "start_line": 36,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "workflow_builder",
+      "file_path": "awe/tests/conftest.py",
+      "start_line": 46,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "agent_builder",
+      "file_path": "awe/tests/conftest.py",
+      "start_line": 56,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "message_factory",
+      "file_path": "awe/tests/conftest.py",
+      "start_line": 66,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "artifact_factory",
+      "file_path": "awe/tests/conftest.py",
+      "start_line": 74,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "workflow_event_factory",
+      "file_path": "awe/tests/conftest.py",
+      "start_line": 82,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "custom_django_db_setup",
+      "file_path": "awe/tests/conftest.py",
+      "start_line": 90,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestComparisonEngine::engine",
+      "file_path": "awe/tests/evaluation/test_comparisons.py",
+      "start_line": 17,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestEvaluationIntegration::setUp",
+      "file_path": "awe/tests/evaluation/test_integration.py",
+      "start_line": 28,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestScenarioLoader::sample_yaml_data",
+      "file_path": "awe/tests/evaluation/test_scenario_loader.py",
+      "start_line": 25,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestScenarioLoader::sample_json_data",
+      "file_path": "awe/tests/evaluation/test_scenario_loader.py",
+      "start_line": 50,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "sample_scenario_config",
+      "file_path": "awe/tests/evaluation/test_scenario_v2_executor.py",
+      "start_line": 24,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestEvaluationToolIntegration::mock_workflow",
+      "file_path": "awe/tests/evaluation/test_workflow_integration.py",
+      "start_line": 24,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestEvaluationToolIntegration::integration",
+      "file_path": "awe/tests/evaluation/test_workflow_integration.py",
+      "start_line": 31,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestEvaluationResultExtractor::mock_workflow_run",
+      "file_path": "awe/tests/evaluation/test_workflow_integration.py",
+      "start_line": 162,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestPerformanceMetricsCollector::mock_workflow_run_with_completions",
+      "file_path": "awe/tests/evaluation/test_workflow_integration.py",
+      "start_line": 284,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "WebSocketTestHelper::send_and_receive",
+      "file_path": "awe/tests/fixtures/helpers.py",
+      "start_line": 177,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "WebSocketTestHelper::wait_for_message",
+      "file_path": "awe/tests/fixtures/helpers.py",
+      "start_line": 184,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "WebSocketTestHelper::assert_no_messages",
+      "file_path": "awe/tests/fixtures/helpers.py",
+      "start_line": 201,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "mock_temporal_client",
+      "file_path": "awe/tests/fixtures/mocks.py",
+      "start_line": 310,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "mock_litellm",
+      "file_path": "awe/tests/fixtures/mocks.py",
+      "start_line": 316,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "mock_redis",
+      "file_path": "awe/tests/fixtures/mocks.py",
+      "start_line": 325,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "activity_env",
+      "file_path": "awe/tests/fixtures/mocks.py",
+      "start_line": 331,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "workflow_env",
+      "file_path": "awe/tests/fixtures/mocks.py",
+      "start_line": 337,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "mock_channel_layer",
+      "file_path": "awe/tests/fixtures/mocks.py",
+      "start_line": 364,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "mock_activity_context",
+      "file_path": "awe/tests/fixtures/mocks.py",
+      "start_line": 370,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "mock_vertexai",
+      "file_path": "awe/tests/fixtures/mocks.py",
+      "start_line": 376,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "mock_google_auth",
+      "file_path": "awe/tests/fixtures/mocks.py",
+      "start_line": 385,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "mock_websocket_scope",
+      "file_path": "awe/tests/fixtures/mocks.py",
+      "start_line": 408,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "agent_template",
+      "file_path": "awe/tests/fixtures/models.py",
+      "start_line": 31,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "agent_type",
+      "file_path": "awe/tests/fixtures/models.py",
+      "start_line": 52,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "group_node",
+      "file_path": "awe/tests/fixtures/models.py",
+      "start_line": 97,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "workflow_run",
+      "file_path": "awe/tests/fixtures/models.py",
+      "start_line": 110,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "context",
+      "file_path": "awe/tests/fixtures/models.py",
+      "start_line": 123,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "conversation",
+      "file_path": "awe/tests/fixtures/models.py",
+      "start_line": 136,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "artifact",
+      "file_path": "awe/tests/fixtures/models.py",
+      "start_line": 149,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "workflow_message",
+      "file_path": "awe/tests/fixtures/models.py",
+      "start_line": 166,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "workflow_execution_event",
+      "file_path": "awe/tests/fixtures/models.py",
+      "start_line": 183,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "user_profile",
+      "file_path": "awe/tests/fixtures/models.py",
+      "start_line": 197,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "session_record",
+      "file_path": "awe/tests/fixtures/models.py",
+      "start_line": 212,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "agent_history",
+      "file_path": "awe/tests/fixtures/models.py",
+      "start_line": 230,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "workflow_task_list",
+      "file_path": "awe/tests/fixtures/models.py",
+      "start_line": 247,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "workflow_task",
+      "file_path": "awe/tests/fixtures/models.py",
+      "start_line": 261,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "agent_completion",
+      "file_path": "awe/tests/fixtures/models.py",
+      "start_line": 279,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "agent_message",
+      "file_path": "awe/tests/fixtures/models.py",
+      "start_line": 301,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "audit_log",
+      "file_path": "awe/tests/fixtures/models.py",
+      "start_line": 318,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestFrameworkIntegration::harness",
+      "file_path": "awe/tests/prompts/test_framework_integration.py",
+      "start_line": 23,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestFrameworkIntegration::builder",
+      "file_path": "awe/tests/prompts/test_framework_integration.py",
+      "start_line": 29,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "create_agent_with_type",
+      "file_path": "awe/tests/prompts/test_helpers.py",
+      "start_line": 6,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "create_workflow_with_type",
+      "file_path": "awe/tests/prompts/test_helpers.py",
+      "start_line": 22,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestEvaluateAgainstCriteria::mock_scenario",
+      "file_path": "awe/tests/temporal/activities/test_evaluation_execution.py",
+      "start_line": 20,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestExecuteEvaluationScenario::mock_scenario",
+      "file_path": "awe/tests/temporal/activities/test_evaluation_execution.py",
+      "start_line": 204,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestExecuteEvaluationScenario::mock_workflow_run",
+      "file_path": "awe/tests/temporal/activities/test_evaluation_execution.py",
+      "start_line": 234,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestEvaluationWorkflowIntegration::evaluation_workflow",
+      "file_path": "awe/tests/temporal/workflows/test_evaluation_workflow_integration.py",
+      "start_line": 21,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestEvaluationWorkflowIntegration::evaluation_input",
+      "file_path": "awe/tests/temporal/workflows/test_evaluation_workflow_integration.py",
+      "start_line": 26,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "sample_user",
+      "file_path": "awe/tests/test_admin.py",
+      "start_line": 13,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestAgentAccessControl::users",
+      "file_path": "awe/tests/test_agent_access_control.py",
+      "start_line": 23,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestAgentAccessControl::shared_group",
+      "file_path": "awe/tests/test_agent_access_control.py",
+      "start_line": 33,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestAgentAccessControl::workflows",
+      "file_path": "awe/tests/test_agent_access_control.py",
+      "start_line": 38,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestAgentAccessControl::agents",
+      "file_path": "awe/tests/test_agent_access_control.py",
+      "start_line": 67,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestAgentAccessControl::api_client",
+      "file_path": "awe/tests/test_agent_access_control.py",
+      "start_line": 80,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestAgentTemplateModel::user",
+      "file_path": "awe/tests/test_agent_template_models.py",
+      "start_line": 15,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestAgentTemplateModel::template",
+      "file_path": "awe/tests/test_agent_template_models.py",
+      "start_line": 20,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestAgentTemplateSerializer::user",
+      "file_path": "awe/tests/test_agent_template_serializers.py",
+      "start_line": 18,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestAgentTemplateSerializer::template_data",
+      "file_path": "awe/tests/test_agent_template_serializers.py",
+      "start_line": 23,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestCreateAgentFromTemplateSerializer::user",
+      "file_path": "awe/tests/test_agent_template_serializers.py",
+      "start_line": 107,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestAgentTemplateViewSet::api_client",
+      "file_path": "awe/tests/test_agent_template_views.py",
+      "start_line": 16,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestAgentTemplateViewSet::user",
+      "file_path": "awe/tests/test_agent_template_views.py",
+      "start_line": 21,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestAgentTemplateViewSet::authenticated_client",
+      "file_path": "awe/tests/test_agent_template_views.py",
+      "start_line": 26,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestAgentTemplateViewSet::template",
+      "file_path": "awe/tests/test_agent_template_views.py",
+      "start_line": 32,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestAgentRestrictedToolRegistry::setup_method",
+      "file_path": "awe/tests/test_agent_tool_restrictions.py",
+      "start_line": 72,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestBuildAgentToolRegistry::setup_method",
+      "file_path": "awe/tests/test_agent_tool_restrictions.py",
+      "start_line": 130,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestAgentToolsAdmin::setup_method",
+      "file_path": "awe/tests/test_agent_tools_admin.py",
+      "start_line": 18,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestProcessIncomingMessage::mock_agent_state",
+      "file_path": "awe/tests/test_agent_workflow_messaging.py",
+      "start_line": 20,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestHandleResponseToolCalls::mock_agent_state",
+      "file_path": "awe/tests/test_agent_workflow_messaging.py",
+      "start_line": 224,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestSendMessageToAgentHandler::mock_workflow",
+      "file_path": "awe/tests/test_agent_workflow_messaging.py",
+      "start_line": 375,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestAgentMessageRouting::mock_workflow_v2",
+      "file_path": "awe/tests/test_agent_workflow_messaging.py",
+      "start_line": 658,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestAgentWorkflowRelationship::user",
+      "file_path": "awe/tests/test_agent_workflow_relationship.py",
+      "start_line": 16,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestAgentWorkflowRelationship::workflow",
+      "file_path": "awe/tests/test_agent_workflow_relationship.py",
+      "start_line": 21,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestAgentWorkflowRelationship::authenticated_client",
+      "file_path": "awe/tests/test_agent_workflow_relationship.py",
+      "start_line": 30,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestWorkflowAPI::setup_method",
+      "file_path": "awe/tests/test_api_endpoints.py",
+      "start_line": 16,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestAgentAPI::setup_method",
+      "file_path": "awe/tests/test_api_endpoints.py",
+      "start_line": 85,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestSessionAPI::setup_method",
+      "file_path": "awe/tests/test_api_endpoints.py",
+      "start_line": 112,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestConversationAPI::setup_method",
+      "file_path": "awe/tests/test_api_endpoints.py",
+      "start_line": 133,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestArtifactAccessControl::users",
+      "file_path": "awe/tests/test_artifact_access_control.py",
+      "start_line": 23,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestArtifactAccessControl::shared_group",
+      "file_path": "awe/tests/test_artifact_access_control.py",
+      "start_line": 33,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestArtifactAccessControl::workflows",
+      "file_path": "awe/tests/test_artifact_access_control.py",
+      "start_line": 38,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestArtifactAccessControl::workflow_runs",
+      "file_path": "awe/tests/test_artifact_access_control.py",
+      "start_line": 67,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestArtifactAccessControl::artifacts",
+      "file_path": "awe/tests/test_artifact_access_control.py",
+      "start_line": 80,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestArtifactAccessControl::api_client",
+      "file_path": "awe/tests/test_artifact_access_control.py",
+      "start_line": 95,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "admin_site",
+      "file_path": "awe/tests/test_artifact_admin_preview.py",
+      "start_line": 17,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "request_factory",
+      "file_path": "awe/tests/test_artifact_admin_preview.py",
+      "start_line": 23,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "admin_user",
+      "file_path": "awe/tests/test_artifact_admin_preview.py",
+      "start_line": 29,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "workflow_run",
+      "file_path": "awe/tests/test_artifact_admin_preview.py",
+      "start_line": 35,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestAuthentication::setup_method",
+      "file_path": "awe/tests/test_auth.py",
+      "start_line": 15,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestAvailableToolsGrouped::setUp",
+      "file_path": "awe/tests/test_available_tools_grouped.py",
+      "start_line": 16,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestAvailableToolsGrouped::tearDown",
+      "file_path": "awe/tests/test_available_tools_grouped.py",
+      "start_line": 130,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestBuiltinSaveArtifactMarkdown::setUp",
+      "file_path": "awe/tests/test_builtin_save_artifact_markdown.py",
+      "start_line": 16,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestBuiltinSaveArtifactPlain::setUp",
+      "file_path": "awe/tests/test_builtin_save_artifact_plain.py",
+      "start_line": 16,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestContextAccessControl::users",
+      "file_path": "awe/tests/test_context_access_control.py",
+      "start_line": 23,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestContextAccessControl::shared_group",
+      "file_path": "awe/tests/test_context_access_control.py",
+      "start_line": 33,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestContextAccessControl::workflows",
+      "file_path": "awe/tests/test_context_access_control.py",
+      "start_line": 38,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestContextAccessControl::workflow_runs",
+      "file_path": "awe/tests/test_context_access_control.py",
+      "start_line": 67,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestContextAccessControl::contexts",
+      "file_path": "awe/tests/test_context_access_control.py",
+      "start_line": 80,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestContextAccessControl::api_client",
+      "file_path": "awe/tests/test_context_access_control.py",
+      "start_line": 96,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "api_client",
+      "file_path": "awe/tests/test_context_views.py",
+      "start_line": 12,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "user",
+      "file_path": "awe/tests/test_context_views.py",
+      "start_line": 18,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "authenticated_client",
+      "file_path": "awe/tests/test_context_views.py",
+      "start_line": 24,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "workflow",
+      "file_path": "awe/tests/test_context_views.py",
+      "start_line": 31,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "workflow_run",
+      "file_path": "awe/tests/test_context_views.py",
+      "start_line": 37,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "context",
+      "file_path": "awe/tests/test_context_views.py",
+      "start_line": 45,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "user",
+      "file_path": "awe/tests/test_conversation_model.py",
+      "start_line": 11,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "agent",
+      "file_path": "awe/tests/test_conversation_model.py",
+      "start_line": 16,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "workflow",
+      "file_path": "awe/tests/test_conversation_model.py",
+      "start_line": 24,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "setup_vertex_ai",
+      "file_path": "awe/tests/test_dspy_advanced.py",
+      "start_line": 23,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "configure_dspy",
+      "file_path": "awe/tests/test_dspy_advanced.py",
+      "start_line": 39,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "setup_vertex_ai",
+      "file_path": "awe/tests/test_dspy_integration.py",
+      "start_line": 21,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "lm",
+      "file_path": "awe/tests/test_dspy_integration.py",
+      "start_line": 27,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "configure_dspy",
+      "file_path": "awe/tests/test_dspy_integration.py",
+      "start_line": 37,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestEmojiSuggestionView::api_client",
+      "file_path": "awe/tests/test_emoji_suggestion.py",
+      "start_line": 17,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestExportWorkflowCompletions::setUp",
+      "file_path": "awe/tests/test_export_workflow_completions.py",
+      "start_line": 19,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestExportWorkflowMessages::setUp",
+      "file_path": "awe/tests/test_export_workflow_messages.py",
+      "start_line": 17,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "user",
+      "file_path": "awe/tests/test_get_artifact_simple.py",
+      "start_line": 13,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "workflow",
+      "file_path": "awe/tests/test_get_artifact_simple.py",
+      "start_line": 18,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "workflow_run",
+      "file_path": "awe/tests/test_get_artifact_simple.py",
+      "start_line": 24,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "api_client",
+      "file_path": "awe/tests/test_group_nodes.py",
+      "start_line": 29,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "workflow",
+      "file_path": "awe/tests/test_group_nodes.py",
+      "start_line": 37,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "group_node",
+      "file_path": "awe/tests/test_group_nodes.py",
+      "start_line": 43,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "nested_group",
+      "file_path": "awe/tests/test_group_nodes.py",
+      "start_line": 56,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "agent",
+      "file_path": "awe/tests/test_group_nodes.py",
+      "start_line": 70,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestGroupNodeAccessControl::users",
+      "file_path": "awe/tests/test_groupnode_access_control.py",
+      "start_line": 23,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestGroupNodeAccessControl::shared_group",
+      "file_path": "awe/tests/test_groupnode_access_control.py",
+      "start_line": 33,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestGroupNodeAccessControl::workflows",
+      "file_path": "awe/tests/test_groupnode_access_control.py",
+      "start_line": 38,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestGroupNodeAccessControl::group_nodes",
+      "file_path": "awe/tests/test_groupnode_access_control.py",
+      "start_line": 67,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestGroupNodeAccessControl::api_client",
+      "file_path": "awe/tests/test_groupnode_access_control.py",
+      "start_line": 82,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "NotificationSerializerTests::setUp",
+      "file_path": "awe/tests/test_notification_serializers.py",
+      "start_line": 25,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "NotificationViewSetTests::setUp",
+      "file_path": "awe/tests/test_notification_viewsets.py",
+      "start_line": 30,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestConsumerLogging::test_websocket_consumer_logging_with_correlation_id::TestConsumer::connect",
+      "file_path": "awe/tests/test_structured_logging.py",
+      "start_line": 509,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestConsumerLogging::test_websocket_consumer_logging_with_correlation_id::TestConsumer::disconnect",
+      "file_path": "awe/tests/test_structured_logging.py",
+      "start_line": 540,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestVertexAIInitialization::setUp",
+      "file_path": "awe/tests/test_vertex_ai_init.py",
+      "start_line": 20,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestVertexAIInitialization::tearDown",
+      "file_path": "awe/tests/test_vertex_ai_init.py",
+      "start_line": 27,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "api_client",
+      "file_path": "awe/tests/test_views.py",
+      "start_line": 12,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "create_agent",
+      "file_path": "awe/tests/test_views.py",
+      "start_line": 35,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "api_client",
+      "file_path": "awe/tests/test_viewsets.py",
+      "start_line": 11,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "user",
+      "file_path": "awe/tests/test_viewsets.py",
+      "start_line": 16,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "authenticated_client",
+      "file_path": "awe/tests/test_viewsets.py",
+      "start_line": 21,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "workflow",
+      "file_path": "awe/tests/test_viewsets.py",
+      "start_line": 27,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "agent",
+      "file_path": "awe/tests/test_viewsets.py",
+      "start_line": 36,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "workflow_execution_status",
+      "file_path": "awe/tests/test_viewsets.py",
+      "start_line": 47,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "session_record",
+      "file_path": "awe/tests/test_viewsets.py",
+      "start_line": 59,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "api_client",
+      "file_path": "awe/tests/test_wine_research_templates.py",
+      "start_line": 16,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "admin_user",
+      "file_path": "awe/tests/test_wine_research_templates.py",
+      "start_line": 22,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "wine_templates",
+      "file_path": "awe/tests/test_wine_research_templates.py",
+      "start_line": 41,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestWorkflowAccessControl::owner",
+      "file_path": "awe/tests/test_workflow_access_control.py",
+      "start_line": 26,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestWorkflowAccessControl::shared_user",
+      "file_path": "awe/tests/test_workflow_access_control.py",
+      "start_line": 31,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestWorkflowAccessControl::other_user",
+      "file_path": "awe/tests/test_workflow_access_control.py",
+      "start_line": 36,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestWorkflowAccessControl::superuser",
+      "file_path": "awe/tests/test_workflow_access_control.py",
+      "start_line": 41,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestWorkflowAccessControl::shared_group",
+      "file_path": "awe/tests/test_workflow_access_control.py",
+      "start_line": 51,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestWorkflowAccessControl::workflow",
+      "file_path": "awe/tests/test_workflow_access_control.py",
+      "start_line": 56,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestWorkflowAPIAccess::api_client",
+      "file_path": "awe/tests/test_workflow_access_control.py",
+      "start_line": 328,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestWorkflowAPIAccess::users",
+      "file_path": "awe/tests/test_workflow_access_control.py",
+      "start_line": 333,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestWorkflowAPIAccess::workflow",
+      "file_path": "awe/tests/test_workflow_access_control.py",
+      "start_line": 342,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "mock_workflow",
+      "file_path": "awe/tests/test_workflow_completion_detection.py",
+      "start_line": 19,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "mock_agent_state",
+      "file_path": "awe/tests/test_workflow_completion_detection.py",
+      "start_line": 37,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestCheckWorkflowStatusHandler::handler",
+      "file_path": "awe/tests/test_workflow_completion_detection.py",
+      "start_line": 150,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestAgentWorkflowShouldExit::workflow",
+      "file_path": "awe/tests/test_workflow_completion_detection.py",
+      "start_line": 305,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestWorkflowCompletionSignal::workflow",
+      "file_path": "awe/tests/test_workflow_completion_detection.py",
+      "start_line": 391,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestWorkflowRun::workflow",
+      "file_path": "awe/tests/test_workflow_run.py",
+      "start_line": 15,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "user",
+      "file_path": "awe/tests/test_workflow_serializer.py",
+      "start_line": 12,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "api_client",
+      "file_path": "awe/tests/test_workflow_serializer.py",
+      "start_line": 18,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "authenticated_client",
+      "file_path": "awe/tests/test_workflow_serializer.py",
+      "start_line": 24,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "sample_user",
+      "file_path": "awe/tests/test_workflow_serializer.py",
+      "start_line": 31,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "mock_create_task_list_activity",
+      "file_path": "awe/tests/test_workflow_status_integration.py",
+      "start_line": 22,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "mock_list_tasks_activity",
+      "file_path": "awe/tests/test_workflow_status_integration.py",
+      "start_line": 28,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "mock_save_workflow_message_activity",
+      "file_path": "awe/tests/test_workflow_status_integration.py",
+      "start_line": 43,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "mock_read_full_context_activity",
+      "file_path": "awe/tests/test_workflow_status_integration.py",
+      "start_line": 49,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "mock_update_workflow_run_status_activity",
+      "file_path": "awe/tests/test_workflow_status_integration.py",
+      "start_line": 55,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "mock_get_agent_description_activity",
+      "file_path": "awe/tests/test_workflow_status_integration.py",
+      "start_line": 73,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "mock_write_context_activity",
+      "file_path": "awe/tests/test_workflow_status_integration.py",
+      "start_line": 121,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "mock_execute_single_agent",
+      "file_path": "awe/tests/test_workflow_status_integration.py",
+      "start_line": 127,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "mock_load_workflow_structure",
+      "file_path": "awe/tests/test_workflow_status_integration.py",
+      "start_line": 170,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "api_client",
+      "file_path": "awe/tests/test_workflow_views.py",
+      "start_line": 11,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "user",
+      "file_path": "awe/tests/test_workflow_views.py",
+      "start_line": 17,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "authenticated_client",
+      "file_path": "awe/tests/test_workflow_views.py",
+      "start_line": 23,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "get_agent_instructions_text",
+      "file_path": "awe/tests/utils.py",
+      "start_line": 76,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "get_agent_description_text",
+      "file_path": "awe/tests/utils.py",
+      "start_line": 89,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestWorkflowEventBus::event_bus",
+      "file_path": "awe/tests/workflows_isolated/agent_workflow/test_workflow_event_bus.py",
+      "start_line": 90,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestWorkflowEventBusIntegration::event_bus",
+      "file_path": "awe/tests/workflows_isolated/agent_workflow/test_workflow_event_bus_integration.py",
+      "start_line": 21,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestWorkflowEventBusIntegration::mock_workflow",
+      "file_path": "awe/tests/workflows_isolated/agent_workflow/test_workflow_event_bus_integration.py",
+      "start_line": 26,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestAssistantWorkflow::workflow",
+      "file_path": "awe/tests/workflows_isolated/assistant/test_assistant_workflow.py",
+      "start_line": 14,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestAssistantWorkflow::mock_env_vars",
+      "file_path": "awe/tests/workflows_isolated/assistant/test_assistant_workflow.py",
+      "start_line": 22,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestGetWorkflowHandler::handler",
+      "file_path": "awe/tests/workflows_isolated/assistant/test_tool_handlers.py",
+      "start_line": 20,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestGetAvailableModelsHandler::handler",
+      "file_path": "awe/tests/workflows_isolated/assistant/test_tool_handlers.py",
+      "start_line": 128,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestCreateAgentHandler::handler",
+      "file_path": "awe/tests/workflows_isolated/assistant/test_tool_handlers.py",
+      "start_line": 176,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestCreateAgentHandler::valid_args",
+      "file_path": "awe/tests/workflows_isolated/assistant/test_tool_handlers.py",
+      "start_line": 184,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestEditAgentHandler::handler",
+      "file_path": "awe/tests/workflows_isolated/assistant/test_tool_handlers.py",
+      "start_line": 251,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestEditAgentHandler::valid_args",
+      "file_path": "awe/tests/workflows_isolated/assistant/test_tool_handlers.py",
+      "start_line": 259,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestDeleteAgentHandler::handler",
+      "file_path": "awe/tests/workflows_isolated/assistant/test_tool_handlers.py",
+      "start_line": 322,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestToolHandlerIntegration::mock_workflow",
+      "file_path": "awe/tests/workflows_isolated/assistant/test_tool_handlers.py",
+      "start_line": 415,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "mock_workflow_info",
+      "file_path": "awe/tests/workflows_isolated/conftest.py",
+      "start_line": 16,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "mock_workflow_logger",
+      "file_path": "awe/tests/workflows_isolated/conftest.py",
+      "start_line": 27,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "mock_workflow_context",
+      "file_path": "awe/tests/workflows_isolated/conftest.py",
+      "start_line": 38,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "workflow_environment",
+      "file_path": "awe/tests/workflows_isolated/conftest.py",
+      "start_line": 55,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "mock_execute_activity",
+      "file_path": "awe/tests/workflows_isolated/conftest.py",
+      "start_line": 62,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "mock_vertexai_config",
+      "file_path": "awe/tests/workflows_isolated/conftest.py",
+      "start_line": 108,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "mock_google_credentials",
+      "file_path": "awe/tests/workflows_isolated/conftest.py",
+      "start_line": 127,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "sample_messages",
+      "file_path": "awe/tests/workflows_isolated/conftest.py",
+      "start_line": 141,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "sample_tool_calls",
+      "file_path": "awe/tests/workflows_isolated/conftest.py",
+      "start_line": 151,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "sample_streaming_output",
+      "file_path": "awe/tests/workflows_isolated/conftest.py",
+      "start_line": 174,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "mock_message_queue",
+      "file_path": "awe/tests/workflows_isolated/conftest.py",
+      "start_line": 190,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "mock_websocket_send",
+      "file_path": "awe/tests/workflows_isolated/conftest.py",
+      "start_line": 197,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "mock_tool_registry",
+      "file_path": "awe/tests/workflows_isolated/conftest.py",
+      "start_line": 214,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "create_test_message",
+      "file_path": "awe/tests/workflows_isolated/conftest.py",
+      "start_line": 223,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "create_test_tool_call",
+      "file_path": "awe/tests/workflows_isolated/conftest.py",
+      "start_line": 228,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "create_test_workflow_request",
+      "file_path": "awe/tests/workflows_isolated/conftest.py",
+      "start_line": 240,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestConfigurationService::mock_agent_model",
+      "file_path": "awe/tests/workflows_isolated/shared/services/test_config.py",
+      "start_line": 16,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestConfigurationService::vertex_ai_credentials",
+      "file_path": "awe/tests/workflows_isolated/shared/services/test_config.py",
+      "start_line": 30,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestEventPublishingService::mock_workflow_info",
+      "file_path": "awe/tests/workflows_isolated/shared/services/test_events.py",
+      "start_line": 16,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestEventPublishingService::mock_workflow_logger",
+      "file_path": "awe/tests/workflows_isolated/shared/services/test_events.py",
+      "start_line": 24,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestEventPublishingService::mock_execute_activity",
+      "file_path": "awe/tests/workflows_isolated/shared/services/test_events.py",
+      "start_line": 32,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestMessageService::sample_tool_calls",
+      "file_path": "awe/tests/workflows_isolated/shared/services/test_messages.py",
+      "start_line": 16,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestWorkflowBase::workflow_base",
+      "file_path": "awe/tests/workflows_isolated/shared/test_base.py",
+      "start_line": 22,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestWorkflowBase::mock_env_vars",
+      "file_path": "awe/tests/workflows_isolated/shared/test_base.py",
+      "start_line": 27,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestGetToolsForWorkflow::test_get_tools_for_workflow_with_tools::Tool1Handler::name",
+      "file_path": "awe/tests/workflows_isolated/shared/tools/test_common.py",
+      "start_line": 260,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestGetToolsForWorkflow::test_get_tools_for_workflow_with_tools::Tool2Handler::name",
+      "file_path": "awe/tests/workflows_isolated/shared/tools/test_common.py",
+      "start_line": 265,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestGetToolsForWorkflow::test_get_tools_for_workflow_with_conditional_tools::RegularTool::name",
+      "file_path": "awe/tests/workflows_isolated/shared/tools/test_common.py",
+      "start_line": 286,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestIntegration::test_full_tool_execution_flow::TestTool::name",
+      "file_path": "awe/tests/workflows_isolated/shared/tools/test_common.py",
+      "start_line": 329,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestIntegration::test_full_tool_execution_flow::TestTool::description",
+      "file_path": "awe/tests/workflows_isolated/shared/tools/test_common.py",
+      "start_line": 333,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestIntegration::test_full_tool_execution_flow::TestTool::parameters",
+      "file_path": "awe/tests/workflows_isolated/shared/tools/test_common.py",
+      "start_line": 337,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestIntegration::test_full_tool_execution_flow::TestTool::required_fields",
+      "file_path": "awe/tests/workflows_isolated/shared/tools/test_common.py",
+      "start_line": 345,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestIntegration::test_full_tool_execution_flow::TestTool::handle",
+      "file_path": "awe/tests/workflows_isolated/shared/tools/test_common.py",
+      "start_line": 348,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestJinaSearchHandler::mock_workflow",
+      "file_path": "awe/tests/workflows_isolated/shared/tools/test_jina_handlers.py",
+      "start_line": 18,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestJinaSearchHandler::handler",
+      "file_path": "awe/tests/workflows_isolated/shared/tools/test_jina_handlers.py",
+      "start_line": 23,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestJinaExtractHandler::mock_workflow",
+      "file_path": "awe/tests/workflows_isolated/shared/tools/test_jina_handlers.py",
+      "start_line": 207,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestJinaExtractHandler::handler",
+      "file_path": "awe/tests/workflows_isolated/shared/tools/test_jina_handlers.py",
+      "start_line": 212,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestJinaToolIntegration::mock_workflow",
+      "file_path": "awe/tests/workflows_isolated/shared/tools/test_jina_integration.py",
+      "start_line": 18,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "AnotherMockToolHandler::name",
+      "file_path": "awe/tests/workflows_isolated/shared/tools/test_registry.py",
+      "start_line": 44,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "AnotherMockToolHandler::description",
+      "file_path": "awe/tests/workflows_isolated/shared/tools/test_registry.py",
+      "start_line": 48,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "AnotherMockToolHandler::parameters",
+      "file_path": "awe/tests/workflows_isolated/shared/tools/test_registry.py",
+      "start_line": 52,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "AnotherMockToolHandler::handle",
+      "file_path": "awe/tests/workflows_isolated/shared/tools/test_registry.py",
+      "start_line": 55,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestTavilySearchHandler::mock_workflow",
+      "file_path": "awe/tests/workflows_isolated/shared/tools/test_tavily_handlers.py",
+      "start_line": 21,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestTavilySearchHandler::handler",
+      "file_path": "awe/tests/workflows_isolated/shared/tools/test_tavily_handlers.py",
+      "start_line": 26,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestTavilyQnaSearchHandler::mock_workflow",
+      "file_path": "awe/tests/workflows_isolated/shared/tools/test_tavily_handlers.py",
+      "start_line": 126,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestTavilyQnaSearchHandler::handler",
+      "file_path": "awe/tests/workflows_isolated/shared/tools/test_tavily_handlers.py",
+      "start_line": 131,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestTavilyExtractHandler::mock_workflow",
+      "file_path": "awe/tests/workflows_isolated/shared/tools/test_tavily_handlers.py",
+      "start_line": 179,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestTavilyExtractHandler::handler",
+      "file_path": "awe/tests/workflows_isolated/shared/tools/test_tavily_handlers.py",
+      "start_line": 184,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestTavilyMapHandler::mock_workflow",
+      "file_path": "awe/tests/workflows_isolated/shared/tools/test_tavily_handlers.py",
+      "start_line": 274,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestTavilyMapHandler::handler",
+      "file_path": "awe/tests/workflows_isolated/shared/tools/test_tavily_handlers.py",
+      "start_line": 279,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestTavilyCrawlHandler::mock_workflow",
+      "file_path": "awe/tests/workflows_isolated/shared/tools/test_tavily_handlers.py",
+      "start_line": 332,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestTavilyCrawlHandler::handler",
+      "file_path": "awe/tests/workflows_isolated/shared/tools/test_tavily_handlers.py",
+      "start_line": 337,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestLLMActivityExecutor::sample_config",
+      "file_path": "awe/tests/workflows_isolated/shared/utils/test_activities.py",
+      "start_line": 200,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestLLMActivityExecutor::sample_messages",
+      "file_path": "awe/tests/workflows_isolated/shared/utils/test_activities.py",
+      "start_line": 209,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestLLMActivityExecutor::sample_tools",
+      "file_path": "awe/tests/workflows_isolated/shared/utils/test_activities.py",
+      "start_line": 219,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestResponseHandler::sample_response",
+      "file_path": "awe/tests/workflows_isolated/shared/utils/test_responses.py",
+      "start_line": 20,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestResponseHandler::sample_streaming_output",
+      "file_path": "awe/tests/workflows_isolated/shared/utils/test_responses.py",
+      "start_line": 51,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "tool_decorator",
+      "file_path": "awe/tools/base.py",
+      "start_line": 94,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "get_default_registry",
+      "file_path": "awe/tools/base.py",
+      "start_line": 153,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "fetch_url",
+      "file_path": "awe/tools/builtin.py",
+      "start_line": 11,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "parse_json",
+      "file_path": "awe/tools/builtin.py",
+      "start_line": 19,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "save_to_context",
+      "file_path": "awe/tools/builtin.py",
+      "start_line": 26,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "get_from_context",
+      "file_path": "awe/tools/builtin.py",
+      "start_line": 32,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "register_builtin_tools",
+      "file_path": "awe/tools/builtin.py",
+      "start_line": 158,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "write_to_context",
+      "file_path": "awe/tools/context_tools.py",
+      "start_line": 20,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "read_from_context",
+      "file_path": "awe/tools/context_tools.py",
+      "start_line": 67,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "read_full_context",
+      "file_path": "awe/tools/context_tools.py",
+      "start_line": 100,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "update_context_batch",
+      "file_path": "awe/tools/context_tools.py",
+      "start_line": 129,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "HealthCheckView::get",
+      "file_path": "awe/views.py",
+      "start_line": 33,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "EmojiSuggestionView::post",
+      "file_path": "awe/views.py",
+      "start_line": 54,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "WorkflowRunSerializer::get_progress_percentage",
+      "file_path": "awe/workflow_serializers.py",
+      "start_line": 429,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "ConversationSerializer::get_latest_session",
+      "file_path": "awe/workflow_serializers.py",
+      "start_line": 520,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "ConversationSerializer::get_total_sessions",
+      "file_path": "awe/workflow_serializers.py",
+      "start_line": 532,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "ConversationDetailSerializer::get_all_messages",
+      "file_path": "awe/workflow_serializers.py",
+      "start_line": 548,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "ArtifactSerializer::get_file_size_display",
+      "file_path": "awe/workflow_serializers.py",
+      "start_line": 585,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "ArtifactSerializer::get_download_url",
+      "file_path": "awe/workflow_serializers.py",
+      "start_line": 594,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "AgentViewSet::get_queryset",
+      "file_path": "awe/workflow_views.py",
+      "start_line": 759,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "AgentViewSet::test",
+      "file_path": "awe/workflow_views.py",
+      "start_line": 773,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "AgentViewSet::available_models",
+      "file_path": "awe/workflow_views.py",
+      "start_line": 805,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "AgentViewSet::_test_agent",
+      "file_path": "awe/workflow_views.py",
+      "start_line": 809,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "SessionViewSet::list",
+      "file_path": "awe/workflow_views.py",
+      "start_line": 1051,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "SessionViewSet::retrieve",
+      "file_path": "awe/workflow_views.py",
+      "start_line": 1072,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "SessionViewSet::continue_session",
+      "file_path": "awe/workflow_views.py",
+      "start_line": 1082,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "SessionViewSet::end_session",
+      "file_path": "awe/workflow_views.py",
+      "start_line": 1098,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "UserProfileViewSet::get_queryset",
+      "file_path": "awe/workflow_views.py",
+      "start_line": 1115,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "UserProfileViewSet::perform_create",
+      "file_path": "awe/workflow_views.py",
+      "start_line": 1123,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "WorkflowRunViewSet::get_queryset",
+      "file_path": "awe/workflow_views.py",
+      "start_line": 1135,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "WorkflowRunViewSet::active",
+      "file_path": "awe/workflow_views.py",
+      "start_line": 1162,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "WorkflowRunViewSet::events",
+      "file_path": "awe/workflow_views.py",
+      "start_line": 1169,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "SessionRecordViewSet::get_queryset",
+      "file_path": "awe/workflow_views.py",
+      "start_line": 1224,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "SessionRecordViewSet::active",
+      "file_path": "awe/workflow_views.py",
+      "start_line": 1245,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "SessionRecordViewSet::end",
+      "file_path": "awe/workflow_views.py",
+      "start_line": 1252,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "MCPServerViewSet::get_queryset",
+      "file_path": "awe/workflow_views.py",
+      "start_line": 1777,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "MCPToolViewSet::get_queryset",
+      "file_path": "awe/workflow_views.py",
+      "start_line": 1823,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "AgentMCPToolViewSet::get_queryset",
+      "file_path": "awe/workflow_views.py",
+      "start_line": 1852,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "AgentMCPToolViewSet::by_agent",
+      "file_path": "awe/workflow_views.py",
+      "start_line": 1879,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TemporalViewSet::messages",
+      "file_path": "awe/workflow_views.py",
+      "start_line": 1916,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TemporalViewSet::tasklist",
+      "file_path": "awe/workflow_views.py",
+      "start_line": 1966,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TemporalViewSet::_get_temporal_messages",
+      "file_path": "awe/workflow_views.py",
+      "start_line": 2019,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TemporalViewSet::_get_temporal_tasklist",
+      "file_path": "awe/workflow_views.py",
+      "start_line": 2089,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "AgentTemplateViewSet::perform_create",
+      "file_path": "awe/workflow_views.py",
+      "start_line": 2382,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "AgentTemplateViewSet::create_agent",
+      "file_path": "awe/workflow_views.py",
+      "start_line": 2398,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "AddTaskHandler::name",
+      "file_path": "awe/workflows_isolated/agent_workflow/task_list.py",
+      "start_line": 100,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "AddTaskHandler::description",
+      "file_path": "awe/workflows_isolated/agent_workflow/task_list.py",
+      "start_line": 105,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "AddTaskHandler::parameters",
+      "file_path": "awe/workflows_isolated/agent_workflow/task_list.py",
+      "start_line": 110,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "AddTaskHandler::activity_name",
+      "file_path": "awe/workflows_isolated/agent_workflow/task_list.py",
+      "start_line": 188,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "AddTaskHandler::prepare_activity_args",
+      "file_path": "awe/workflows_isolated/agent_workflow/task_list.py",
+      "start_line": 192,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "AddTaskHandler::process_activity_result",
+      "file_path": "awe/workflows_isolated/agent_workflow/task_list.py",
+      "start_line": 208,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "ListTasksHandler::name",
+      "file_path": "awe/workflows_isolated/agent_workflow/task_list.py",
+      "start_line": 293,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "ListTasksHandler::description",
+      "file_path": "awe/workflows_isolated/agent_workflow/task_list.py",
+      "start_line": 298,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "ListTasksHandler::parameters",
+      "file_path": "awe/workflows_isolated/agent_workflow/task_list.py",
+      "start_line": 303,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "ListTasksHandler::activity_name",
+      "file_path": "awe/workflows_isolated/agent_workflow/task_list.py",
+      "start_line": 322,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "ListTasksHandler::prepare_activity_args",
+      "file_path": "awe/workflows_isolated/agent_workflow/task_list.py",
+      "start_line": 326,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "ListTasksHandler::process_activity_result",
+      "file_path": "awe/workflows_isolated/agent_workflow/task_list.py",
+      "start_line": 341,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "GetTaskHandler::name",
+      "file_path": "awe/workflows_isolated/agent_workflow/task_list.py",
+      "start_line": 390,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "GetTaskHandler::description",
+      "file_path": "awe/workflows_isolated/agent_workflow/task_list.py",
+      "start_line": 395,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "GetTaskHandler::parameters",
+      "file_path": "awe/workflows_isolated/agent_workflow/task_list.py",
+      "start_line": 400,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "GetTaskHandler::activity_name",
+      "file_path": "awe/workflows_isolated/agent_workflow/task_list.py",
+      "start_line": 411,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "GetTaskHandler::prepare_activity_args",
+      "file_path": "awe/workflows_isolated/agent_workflow/task_list.py",
+      "start_line": 415,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "GetTaskHandler::process_activity_result",
+      "file_path": "awe/workflows_isolated/agent_workflow/task_list.py",
+      "start_line": 430,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "CreateTaskListHandler::name",
+      "file_path": "awe/workflows_isolated/agent_workflow/task_list.py",
+      "start_line": 450,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "CreateTaskListHandler::description",
+      "file_path": "awe/workflows_isolated/agent_workflow/task_list.py",
+      "start_line": 455,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "CreateTaskListHandler::parameters",
+      "file_path": "awe/workflows_isolated/agent_workflow/task_list.py",
+      "start_line": 463,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "CreateTaskListHandler::activity_name",
+      "file_path": "awe/workflows_isolated/agent_workflow/task_list.py",
+      "start_line": 472,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "CreateTaskListHandler::prepare_activity_args",
+      "file_path": "awe/workflows_isolated/agent_workflow/task_list.py",
+      "start_line": 476,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "CreateTaskListHandler::process_activity_result",
+      "file_path": "awe/workflows_isolated/agent_workflow/task_list.py",
+      "start_line": 500,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestAgentMessageProcessorIntegration::mock_workflow",
+      "file_path": "awe/workflows_isolated/agent_workflow/test_agent_message_processor_integration.py",
+      "start_line": 22,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestAgentMessageProcessorIntegration::mock_router",
+      "file_path": "awe/workflows_isolated/agent_workflow/test_agent_message_processor_integration.py",
+      "start_line": 29,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestAgentMessageProcessorIntegration::processor",
+      "file_path": "awe/workflows_isolated/agent_workflow/test_agent_message_processor_integration.py",
+      "start_line": 36,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestAgentMessageProcessorIntegration::mock_agent",
+      "file_path": "awe/workflows_isolated/agent_workflow/test_agent_message_processor_integration.py",
+      "start_line": 44,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestRoutingHandler::mock_router",
+      "file_path": "awe/workflows_isolated/agent_workflow/test_message_handlers.py",
+      "start_line": 224,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestChainBuilder::mock_router",
+      "file_path": "awe/workflows_isolated/agent_workflow/test_message_handlers.py",
+      "start_line": 271,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestMessageRouter::mock_workflow",
+      "file_path": "awe/workflows_isolated/agent_workflow/test_message_router.py",
+      "start_line": 20,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestMessageRouter::router",
+      "file_path": "awe/workflows_isolated/agent_workflow/test_message_router.py",
+      "start_line": 28,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestWorkflowOrchestrator::mock_workflow",
+      "file_path": "awe/workflows_isolated/agent_workflow/test_workflow_orchestrator.py",
+      "start_line": 21,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "TestWorkflowOrchestrator::orchestrator",
+      "file_path": "awe/workflows_isolated/agent_workflow/test_workflow_orchestrator.py",
+      "start_line": 37,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "execute_llm_call",
+      "file_path": "awe/workflows_isolated/agent_workflow_async/activities/llm_activities.py",
+      "start_line": 21,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "estimate_token_count",
+      "file_path": "awe/workflows_isolated/agent_workflow_async/activities/llm_activities.py",
+      "start_line": 163,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "send_message_to_agent_activity",
+      "file_path": "awe/workflows_isolated/agent_workflow_async/activities/message_activities.py",
+      "start_line": 17,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "delegate_task_activity",
+      "file_path": "awe/workflows_isolated/agent_workflow_async/activities/message_activities.py",
+      "start_line": 80,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "calculate_activity",
+      "file_path": "awe/workflows_isolated/agent_workflow_async/activities/misc_tool_activities.py",
+      "start_line": 12,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "get_weather_activity",
+      "file_path": "awe/workflows_isolated/agent_workflow_async/activities/misc_tool_activities.py",
+      "start_line": 45,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "search_web_activity",
+      "file_path": "awe/workflows_isolated/agent_workflow_async/activities/misc_tool_activities.py",
+      "start_line": 70,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "send_email_activity",
+      "file_path": "awe/workflows_isolated/agent_workflow_async/activities/misc_tool_activities.py",
+      "start_line": 103,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "read_file_activity",
+      "file_path": "awe/workflows_isolated/agent_workflow_async/activities/misc_tool_activities.py",
+      "start_line": 137,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "create_task_list_activity",
+      "file_path": "awe/workflows_isolated/agent_workflow_async/activities/task_activities.py",
+      "start_line": 17,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "create_workflow_run_activity",
+      "file_path": "awe/workflows_isolated/agent_workflow_async/activities/task_activities.py",
+      "start_line": 28,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "add_task_activity",
+      "file_path": "awe/workflows_isolated/agent_workflow_async/activities/task_activities.py",
+      "start_line": 102,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "list_tasks_activity",
+      "file_path": "awe/workflows_isolated/agent_workflow_async/activities/task_activities.py",
+      "start_line": 128,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "complete_task_activity",
+      "file_path": "awe/workflows_isolated/agent_workflow_async/activities/task_activities.py",
+      "start_line": 138,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "update_task_status_activity",
+      "file_path": "awe/workflows_isolated/agent_workflow_async/activities/task_activities.py",
+      "start_line": 149,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "tavily_search_activity",
+      "file_path": "awe/workflows_isolated/agent_workflow_async/activities/tavily_activities.py",
+      "start_line": 22,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "tavily_qna_search_activity",
+      "file_path": "awe/workflows_isolated/agent_workflow_async/activities/tavily_activities.py",
+      "start_line": 70,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "tavily_extract_activity",
+      "file_path": "awe/workflows_isolated/agent_workflow_async/activities/tavily_activities.py",
+      "start_line": 109,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "tavily_crawl_activity",
+      "file_path": "awe/workflows_isolated/agent_workflow_async/activities/tavily_activities.py",
+      "start_line": 145,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "tavily_map_activity",
+      "file_path": "awe/workflows_isolated/agent_workflow_async/activities/tavily_activities.py",
+      "start_line": 201,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "get_pending_agent_messages",
+      "file_path": "awe/workflows_isolated/agent_workflow_async/activities/tool_activities.py",
+      "start_line": 39,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "execute_tool",
+      "file_path": "awe/workflows_isolated/agent_workflow_async/activities/tool_activities.py",
+      "start_line": 52,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "validate_tool_arguments",
+      "file_path": "awe/workflows_isolated/agent_workflow_async/activities/tool_activities.py",
+      "start_line": 162,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "get_agent_temporal_client",
+      "file_path": "awe/workflows_isolated/agent_workflow_async/client.py",
+      "start_line": 11,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "get_available_tools",
+      "file_path": "awe/workflows_isolated/agent_workflow_async/tool_activity_registry.py",
+      "start_line": 87,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "track_message_sent",
+      "file_path": "awe/workflows_isolated/agent_workflow_async/tools/communication_timing.py",
+      "start_line": 13,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "track_message_received",
+      "file_path": "awe/workflows_isolated/agent_workflow_async/tools/communication_timing.py",
+      "start_line": 70,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "check_communication_timing",
+      "file_path": "awe/workflows_isolated/agent_workflow_async/tools/communication_timing.py",
+      "start_line": 119,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "get_agent_communication_status",
+      "file_path": "awe/workflows_isolated/agent_workflow_async/tools/communication_timing.py",
+      "start_line": 224,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "check_coordinator_timing_status",
+      "file_path": "awe/workflows_isolated/agent_workflow_async/tools/coordinator_timing.py",
+      "start_line": 9,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "get_agent_communication_summary",
+      "file_path": "awe/workflows_isolated/agent_workflow_async/tools/coordinator_timing.py",
+      "start_line": 46,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "register_with_worker",
+      "file_path": "awe/workflows_isolated/agent_workflow_async/worker.py",
+      "start_line": 103,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "is_tool_allowed",
+      "file_path": "awe/workflows_isolated/assistant/allowed_tools.py",
+      "start_line": 33,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "GetAvailableToolsHandler::name",
+      "file_path": "awe/workflows_isolated/assistant/tool_handlers.py",
+      "start_line": 45,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "GetAvailableToolsHandler::description",
+      "file_path": "awe/workflows_isolated/assistant/tool_handlers.py",
+      "start_line": 50,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "GetAvailableToolsHandler::parameters",
+      "file_path": "awe/workflows_isolated/assistant/tool_handlers.py",
+      "start_line": 58,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "GetAvailableToolsHandler::handle",
+      "file_path": "awe/workflows_isolated/assistant/tool_handlers.py",
+      "start_line": 72,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "ExecutionPlan::get_next_agents",
+      "file_path": "awe/workflows_isolated/base.py",
+      "start_line": 30,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "EventDetailsBase::to_dict",
+      "file_path": "awe/workflows_isolated/event_types.py",
+      "start_line": 17,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "ReadContextHandler::name",
+      "file_path": "awe/workflows_isolated/shared/tools/context_handlers.py",
+      "start_line": 18,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "ReadContextHandler::category",
+      "file_path": "awe/workflows_isolated/shared/tools/context_handlers.py",
+      "start_line": 22,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "ReadContextHandler::description",
+      "file_path": "awe/workflows_isolated/shared/tools/context_handlers.py",
+      "start_line": 26,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "ReadContextHandler::parameters",
+      "file_path": "awe/workflows_isolated/shared/tools/context_handlers.py",
+      "start_line": 34,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "ReadContextHandler::handle",
+      "file_path": "awe/workflows_isolated/shared/tools/context_handlers.py",
+      "start_line": 44,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "ReadFullContextHandler::name",
+      "file_path": "awe/workflows_isolated/shared/tools/context_handlers.py",
+      "start_line": 103,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "ReadFullContextHandler::category",
+      "file_path": "awe/workflows_isolated/shared/tools/context_handlers.py",
+      "start_line": 107,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "ReadFullContextHandler::description",
+      "file_path": "awe/workflows_isolated/shared/tools/context_handlers.py",
+      "start_line": 111,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "ReadFullContextHandler::parameters",
+      "file_path": "awe/workflows_isolated/shared/tools/context_handlers.py",
+      "start_line": 119,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "ReadFullContextHandler::handle",
+      "file_path": "awe/workflows_isolated/shared/tools/context_handlers.py",
+      "start_line": 126,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "WriteContextHandler::name",
+      "file_path": "awe/workflows_isolated/shared/tools/context_handlers.py",
+      "start_line": 191,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "WriteContextHandler::category",
+      "file_path": "awe/workflows_isolated/shared/tools/context_handlers.py",
+      "start_line": 195,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "WriteContextHandler::description",
+      "file_path": "awe/workflows_isolated/shared/tools/context_handlers.py",
+      "start_line": 199,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "WriteContextHandler::parameters",
+      "file_path": "awe/workflows_isolated/shared/tools/context_handlers.py",
+      "start_line": 207,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "WriteContextHandler::handle",
+      "file_path": "awe/workflows_isolated/shared/tools/context_handlers.py",
+      "start_line": 223,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "register_tool",
+      "file_path": "awe/workflows_isolated/shared/tools/registry.py",
+      "start_line": 213,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "SendSlackNotificationHandler::name",
+      "file_path": "awe/workflows_isolated/shared/tools/slack_handlers.py",
+      "start_line": 14,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "SendSlackNotificationHandler::category",
+      "file_path": "awe/workflows_isolated/shared/tools/slack_handlers.py",
+      "start_line": 19,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "SendSlackNotificationHandler::description",
+      "file_path": "awe/workflows_isolated/shared/tools/slack_handlers.py",
+      "start_line": 24,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "SendSlackNotificationHandler::parameters",
+      "file_path": "awe/workflows_isolated/shared/tools/slack_handlers.py",
+      "start_line": 29,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "SendSlackNotificationHandler::handle",
+      "file_path": "awe/workflows_isolated/shared/tools/slack_handlers.py",
+      "start_line": 62,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "get_litellm_debug_logger_status",
+      "file_path": "awe/workflows_isolated/shared/utils/litellm_debug_logger.py",
+      "start_line": 99,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "ensure_litellm_debug_logger_initialized",
+      "file_path": "awe/workflows_isolated/shared/utils/litellm_debug_logger.py",
+      "start_line": 119,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "DisableCSRFForAPIMiddleware::process_view",
+      "file_path": "core/middleware.py",
+      "start_line": 20,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "get_env_variable",
+      "file_path": "core/settings/base.py",
+      "start_line": 46,
+      "kind": "function",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "DisableMigrations::__contains__",
+      "file_path": "core/settings/test.py",
+      "start_line": 47,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "DisableMigrations::__getitem__",
+      "file_path": "core/settings/test.py",
+      "start_line": 50,
+      "kind": "method",
+      "language": "python",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    }
+  ],
+  "filters_applied": [
+    "kind ∈ {function, method}",
+    "in-degree(calls) = 0",
+    "name ∉ {main, init, __init__, __enter__, __exit__, __call__, __repr__, __str__, __hash__, __eq__, constructor}",
+    "name does not start with Test/Benchmark/test_/it_",
+    "file_path does not look like a test file",
+    "is_exported = 1 → treated as library API and skipped",
+    "go: leading capital → treated as exported (workaround for broken is_exported)",
+    "method whose parent class has inbound instantiates OR any called method → skipped"
+  ]
+}

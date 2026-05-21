@@ -1,0 +1,52 @@
+{
+  "meter": "dead_code",
+  "version": "v2",
+  "db_path": "/tmp/cg_bench_ts/.codegraph/codegraph.db",
+  "total_function_method": 199,
+  "no_caller_raw": 29,
+  "after_filters": 4,
+  "candidates": [
+    {
+      "qualified_name": "readJSON",
+      "file_path": "src/app.ts",
+      "start_line": 1022,
+      "kind": "function",
+      "language": "typescript",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "readOptionalJSON",
+      "file_path": "src/app.ts",
+      "start_line": 1033,
+      "kind": "function",
+      "language": "typescript",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "EventHub::subscribers",
+      "file_path": "src/events.ts",
+      "start_line": 78,
+      "kind": "method",
+      "language": "typescript",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    },
+    {
+      "qualified_name": "EventHub::fetch",
+      "file_path": "src/events.ts",
+      "start_line": 85,
+      "kind": "method",
+      "language": "typescript",
+      "reason": "in-degree(calls)=0 \u0026 not exported \u0026 parent class not instantiated"
+    }
+  ],
+  "filters_applied": [
+    "kind ∈ {function, method}",
+    "in-degree(calls) = 0",
+    "name ∉ {main, init, __init__, __enter__, __exit__, __call__, __repr__, __str__, __hash__, __eq__, constructor}",
+    "name does not start with Test/Benchmark/test_/it_",
+    "file_path does not look like a test file",
+    "is_exported = 1 → treated as library API and skipped",
+    "go: leading capital → treated as exported (workaround for broken is_exported)",
+    "method whose parent class has inbound instantiates OR any called method → skipped"
+  ]
+}
