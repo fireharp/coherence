@@ -167,6 +167,20 @@ func loadCallsiteBlastConfig(ontPath string) cgnative.Config {
 	}
 }
 
+// loadDeadCodeConfig is the dead_code counterpart of loadCallsiteBlastConfig.
+// Same fallback semantics: missing ontology / missing block → disabled.
+func loadDeadCodeConfig(ontPath string) cgnative.DeadCodeConfig {
+	ont, err := ontology.Load(ontPath)
+	if err != nil || ont == nil {
+		return cgnative.DeadCodeConfig{}
+	}
+	c := ont.OptionalEngines.DeadCode
+	return cgnative.DeadCodeConfig{
+		Enabled:  c.Enabled,
+		MaxItems: c.MaxItems,
+	}
+}
+
 func resolveOntologyPath(rootDir string, args parsedArgs) string {
 	raw, _ := args.flags["ontology"].(string)
 	if raw == "" {
@@ -455,6 +469,7 @@ func runEvaluation(sub string, fs fileSet, args parsedArgs, rootDir, ontPath str
 			opts.LLMFindings = llmRes.Findings
 		}
 		opts.CallsiteBlastRadius = loadCallsiteBlastConfig(ontPath)
+		opts.DeadCode = loadDeadCodeConfig(ontPath)
 		if rep, err := drift.ComputeWith(rootDir, ontPath, opts); err == nil {
 			driftReport = &rep
 			driftVerdict = rep.Verdict
@@ -904,6 +919,7 @@ func run() int {
 	case "drift":
 		opts := drift.ComputeOptions{
 			CallsiteBlastRadius: loadCallsiteBlastConfig(ontPath),
+			DeadCode:            loadDeadCodeConfig(ontPath),
 		}
 		rep, err := drift.ComputeWith(rootDir, ontPath, opts)
 		if err != nil {

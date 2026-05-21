@@ -18,11 +18,7 @@ artifacts, endpoints, and evidence.
 
 ```bash
 # install from the latest GitHub release
-mkdir -p ~/.local/bin
-OS="$(uname -s | tr '[:upper:]' '[:lower:]')"
-ARCH="$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/')"
-curl -fsSL "https://github.com/fireharp/coherence/releases/latest/download/coherence_${OS}_${ARCH}.tar.gz" \
-  | tar -xz -C ~/.local/bin coherence
+curl -fsSL https://github.com/fireharp/coherence/releases/latest/download/install.sh | sh
 
 # add repo rules, a pre-commit hook, a drift baseline, and the Codex skill
 coherence init --template=agent-repo
@@ -64,11 +60,7 @@ look at.
 
 ```bash
 # latest release binary; writes ~/.local/bin/coherence
-mkdir -p ~/.local/bin
-OS="$(uname -s | tr '[:upper:]' '[:lower:]')"
-ARCH="$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/')"
-curl -fsSL "https://github.com/fireharp/coherence/releases/latest/download/coherence_${OS}_${ARCH}.tar.gz" \
-  | tar -xz -C ~/.local/bin coherence
+curl -fsSL https://github.com/fireharp/coherence/releases/latest/download/install.sh | sh
 
 # fallback: install from the latest tagged source
 go install github.com/fireharp/coherence/cmd/coherence@latest
@@ -735,6 +727,7 @@ Plus one **optional engine** (opt-in via `ontology.yml`, off by default):
 | Meter | Input | Output |
 |---|---|---|
 | `callsite_blast_radius` | base+current snapshot Go-file diff + native `go/ast` extractor | for each changed top-level Go function, direct + transitive caller counts (`score` = max direct production callers). Telemetry-only — doesn't promote the verdict. Native extractor produces correctly package-qualified call edges; see [`docs/meters/callsite_blast_radius.md`](docs/meters/callsite_blast_radius.md). Enable with `optional_engines.callsite_blast_radius.enabled: true` in `ontology.yml`. |
+| `dead_code`             | full module scan via native `go/ast` extractor | list of unexported Go top-level functions with zero inbound resolved calls (`score` = count). Conservative; function-value passes show up as false positives. Telemetry-only. See [`docs/meters/dead_code.md`](docs/meters/dead_code.md). Enable with `optional_engines.dead_code.enabled: true`. |
 
 Each meter also contributes to a top-level `verdict`:
 

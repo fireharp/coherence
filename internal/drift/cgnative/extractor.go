@@ -21,6 +21,7 @@ package cgnative
 import (
 	"fmt"
 	"go/ast"
+	"go/build"
 	"go/parser"
 	"go/token"
 	"os"
@@ -125,6 +126,14 @@ func extractInternal(opt Options) (Report, []FuncRef) {
 			return nil
 		}
 		if !opt.IncludeTests && strings.HasSuffix(p, "_test.go") {
+			return nil
+		}
+		// Honor `//go:build` constraints. Files excluded from the
+		// default build context (e.g. `//go:build synthcorpus`,
+		// `//go:build linux` on macOS) are skipped so the extractor
+		// matches what `go build` actually compiles.
+		ctx := build.Default
+		if match, err := ctx.MatchFile(filepath.Dir(p), filepath.Base(p)); err == nil && !match {
 			return nil
 		}
 		f, err := parser.ParseFile(fset, p, nil, parser.ParseComments)

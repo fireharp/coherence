@@ -59,4 +59,4 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG: ${{ steps.release.outputs.tag_name }}
         run: |
-          gh release upload "$TAG" dist/coherence_*.tar.gz dist/checksums.txt --clobber
+          gh release upload "$TAG" dist/coherence_*.tar.gz dist/checksums.txt scripts/install.sh --clobber

@@ -69,20 +69,25 @@ field is always present in `drift.json` with `enabled: false`.
 | Meter | One-liner |
 |-------|-----------|
 | [`callsite_blast_radius`](meters/callsite_blast_radius.md) | Caller fan-in for each Go top-level function whose semantic hash changed. Native `go/ast` extractor, no external deps. |
+| [`dead_code`](meters/dead_code.md) | Unexported Go top-level functions with zero inbound resolved calls. Built on the same extractor — both meters compose for one parse pass. |
 
 ---
 
 ## Non-drift checks
 
 These run outside `coherence drift` — they fire from `scan`, `check`,
-`review`, or `watch`.
+`review`, or `watch`, or they're foundational signal sources every
+meter consumes.
 
 | Check | When it runs | Page |
 |-------|--------------|------|
 | Ontology rule engine | `scan --staged`, `check --ref=...`, `review` | [`rules_engine.md`](checks/rules_engine.md) |
 | Staged typed-ID scan | `scan --staged`, `check --ref=...`, `review` | [`staged_id_scan.md`](checks/staged_id_scan.md) |
 | LLM contradiction pass | `scan --staged --llm`, `review --llm` | [`llm_contradiction.md`](checks/llm_contradiction.md) |
-| Graph build (16 extraction passes) | `coherence index` | [`graph_extractors.md`](checks/graph_extractors.md) |
+| Graph build (16 extraction passes) | `coherence index` (also recomputed in-memory by drift/review/watch) | [`graph_extractors.md`](checks/graph_extractors.md) |
+| Snapshot + semantic hashing | `coherence index` (also recomputed in-memory by drift/review/watch) | [`snapshot.md`](checks/snapshot.md) |
+| Doctor (env + setup validation) | `coherence doctor` | [`doctor.md`](checks/doctor.md) |
+| Outcome contract (JSON shape) | every `--json` command | [`outcome_contract.md`](checks/outcome_contract.md) |
 
 ---
 
