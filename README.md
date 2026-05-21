@@ -716,6 +716,12 @@ today (all 9 GOAL.md M4 meters plus 10 extras):
 | `orphaned_metric_aliases` | base+current metric diff + frontend scan | frontend string refs to metric names removed/renamed in current |
 | `dangling_imports`        | TS + Python source re-scan + relative-path resolution (incl. ESM `.js`/`.ts` suffix swap) | count of `./x` (TS) or `from .x` (Py) imports whose target isn't in the tracked set (warn-level — breaks the build); entries carry `lang: "ts"` / `lang: "py"`. TS resolver follows the Node ESM convention where source imports `./foo.js` and resolves to `./foo.ts` on disk |
 
+Plus one **optional engine** (opt-in via `ontology.yml`, off by default):
+
+| Meter | Input | Output |
+|---|---|---|
+| `callsite_blast_radius` | base+current snapshot Go-file diff + native `go/ast` extractor | for each changed top-level Go function, direct + transitive caller counts (`score` = max direct production callers). Telemetry-only — doesn't promote the verdict. Native extractor produces correctly package-qualified call edges; see [`docs/meters/callsite_blast_radius.md`](docs/meters/callsite_blast_radius.md). Enable with `optional_engines.callsite_blast_radius.enabled: true` in `ontology.yml`. |
+
 Each meter also contributes to a top-level `verdict`:
 
 - `warn` — actionable findings (broken rules or uncovered stories).
