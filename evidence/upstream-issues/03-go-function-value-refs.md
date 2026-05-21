@@ -1,5 +1,14 @@
 # Go extractor: function values are not tracked as references
 
+**Scope note (iteration 24 cross-check):** This bug **also reproduces
+on Python**. `argparse` subcommands wired via `set_defaults(func=foo)`
+get the same dead-code false positive on copycat that we see on
+coherence. The fix below is described for Go; the resolver behavior
+that needs to change is the same for Python.
+
+---
+
+
 **Version:** codegraph 0.8.0
 
 ## Summary

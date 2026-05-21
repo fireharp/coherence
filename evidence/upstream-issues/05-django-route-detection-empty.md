@@ -2,6 +2,16 @@
 
 **Version:** codegraph 0.8.0
 
+**Scope clarification (added during iteration 23 cross-validation):**
+The bug is **Django-specific**, not "framework routes generally broken".
+On a tinkershop test (a real Go project using `net/http.ServeMux`),
+codegraph correctly detected 4 `mux.HandleFunc("GET /path", ...)`
+routes. So the framework-route layer *is* wired in for the Go stdlib
+mux pattern. The issue below is specifically about Django's
+`urls.py` patterns.
+
+---
+
 ## Summary
 
 The README lists Django as a supported framework for route extraction (`path()`, `re_path()`, `url()`, `include()` in `urls.py`, with CBV `.as_view()` handling). On a 507-file Django project with textbook `urls.py` files, codegraph extracts zero `route` nodes.
