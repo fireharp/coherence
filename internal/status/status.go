@@ -10,11 +10,11 @@ import (
 	"strings"
 	"time"
 
-	"coherence/internal/git"
-	"coherence/internal/graph"
-	"coherence/internal/ontology"
-	"coherence/internal/report"
-	"coherence/internal/rules"
+	"github.com/fireharp/coherence/internal/git"
+	"github.com/fireharp/coherence/internal/graph"
+	"github.com/fireharp/coherence/internal/ontology"
+	"github.com/fireharp/coherence/internal/report"
+	"github.com/fireharp/coherence/internal/rules"
 )
 
 // Path returns the canonical STATUS.md path for the given repo root.

@@ -5,9 +5,9 @@ import (
 	"strings"
 	"testing"
 
-	"coherence/internal/graph"
-	"coherence/internal/llm"
-	"coherence/internal/snapshot"
+	"github.com/fireharp/coherence/internal/graph"
+	"github.com/fireharp/coherence/internal/llm"
+	"github.com/fireharp/coherence/internal/snapshot"
 )
 
 func snapshotEmpty() snapshot.Snapshot {

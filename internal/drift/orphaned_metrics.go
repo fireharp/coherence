@@ -6,8 +6,8 @@ import (
 	"sort"
 	"strings"
 
-	"coherence/internal/git"
-	"coherence/internal/graph"
+	"github.com/fireharp/coherence/internal/git"
+	"github.com/fireharp/coherence/internal/graph"
 )
 
 // computeOrphanedMetricAliases detects the "metric renamed in frontend

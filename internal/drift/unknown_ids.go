@@ -7,9 +7,9 @@ import (
 	"sort"
 	"strings"
 
-	"coherence/internal/git"
-	"coherence/internal/graph"
-	"coherence/internal/ids"
+	"github.com/fireharp/coherence/internal/git"
+	"github.com/fireharp/coherence/internal/graph"
+	"github.com/fireharp/coherence/internal/ids"
 )
 
 // typedIDInCodeRe finds US-###, ADR-###, IDR-### tokens anywhere in a

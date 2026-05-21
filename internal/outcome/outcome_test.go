@@ -3,7 +3,7 @@ package outcome
 import (
 	"testing"
 
-	"coherence/internal/rules"
+	"github.com/fireharp/coherence/internal/rules"
 )
 
 func TestScanCleanStagedDirtyWorktreeRecommendsReview(t *testing.T) {

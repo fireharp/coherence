@@ -13,7 +13,7 @@ import (
 	"strings"
 	"time"
 
-	"coherence/internal/git"
+	"github.com/fireharp/coherence/internal/git"
 )
 
 // Kind is the per-file semantic classification.

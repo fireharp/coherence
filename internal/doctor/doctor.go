@@ -11,7 +11,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"coherence/internal/ontology"
+	"github.com/fireharp/coherence/internal/ontology"
 )
 
 // Check is a single doctor result.

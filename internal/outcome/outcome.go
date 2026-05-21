@@ -2,7 +2,7 @@
 // scan/check/review/watch/drift. See GOAL.md "Common JSON outcome fields".
 package outcome
 
-import "coherence/internal/rules"
+import "github.com/fireharp/coherence/internal/rules"
 
 // Regression mirrors drift.RegressionEntry for the top-level outcome
 // surface so an agent reading just the outcome can iterate regressions

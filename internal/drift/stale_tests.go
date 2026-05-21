@@ -4,8 +4,8 @@ import (
 	"sort"
 	"strings"
 
-	"coherence/internal/graph"
-	"coherence/internal/snapshot"
+	"github.com/fireharp/coherence/internal/graph"
+	"github.com/fireharp/coherence/internal/snapshot"
 )
 
 // computeStaleTests walks `verifies` edges (test:<path> → file:<path>) and

@@ -19,13 +19,13 @@ import (
 	"strings"
 	"time"
 
-	"coherence/internal/drift/cgnative"
-	"coherence/internal/git"
-	"coherence/internal/graph"
-	"coherence/internal/llm"
-	"coherence/internal/ontology"
-	"coherence/internal/rules"
-	"coherence/internal/snapshot"
+	"github.com/fireharp/coherence/internal/drift/cgnative"
+	"github.com/fireharp/coherence/internal/git"
+	"github.com/fireharp/coherence/internal/graph"
+	"github.com/fireharp/coherence/internal/llm"
+	"github.com/fireharp/coherence/internal/ontology"
+	"github.com/fireharp/coherence/internal/rules"
+	"github.com/fireharp/coherence/internal/snapshot"
 )
 
 // Verdict values are returned both as the report's overall conclusion and as
@@ -422,7 +422,12 @@ type Report struct {
 	// ontology.yml. When disabled, the field is present with
 	// `enabled: false` and zero values throughout.
 	CallsiteBlastRadius cgnative.Result `json:"callsite_blast_radius"`
-	Regressions         Regressions     `json:"regressions"`
+	// DeadCode is the second optional native-Go meter — lists unexported
+	// top-level functions with zero inbound resolved calls. Same shape
+	// rules as CallsiteBlastRadius: disabled by default, enable via
+	// `optional_engines.dead_code.enabled: true` in ontology.yml.
+	DeadCode    cgnative.DeadCodeResult `json:"dead_code"`
+	Regressions Regressions             `json:"regressions"`
 	// ActiveMeters is the canonical list of meter names that
 	// contributed signal to the verdict — exactly the meters whose
 	// individual gates fired. Lets agents triage at a glance without
@@ -456,6 +461,9 @@ type ComputeOptions struct {
 	// CallsiteBlastRadius configures the optional native-Go call-graph
 	// meter (see internal/drift/cgnative). Zero value = disabled.
 	CallsiteBlastRadius cgnative.Config
+	// DeadCode configures the optional dead_code meter from cgnative.
+	// Zero value = disabled.
+	DeadCode cgnative.DeadCodeConfig
 }
 
 // Compute is the convenience wrapper for the common case: run every
@@ -556,6 +564,9 @@ func ComputeWith(rootDir, ontologyPath string, opts ComputeOptions) (Report, err
 	// `enabled: false` so the JSON shape is stable.
 	report.CallsiteBlastRadius = cgnative.Compute(rootDir, opts.CallsiteBlastRadius, baseSnap, &currentSnap)
 
+	// Optional meter: dead_code (also off by default; same shape rules).
+	report.DeadCode = cgnative.ComputeDeadCode(rootDir, opts.DeadCode)
+
 	report.Regressions = aggregateRegressions(report)
 	report.ActiveMeters = activeMeters(report)
 	report.SilencedMeters = silencedMeters(report)
@@ -649,6 +660,15 @@ func activeMeters(r Report) []string {
 	}
 	if r.DanglingImports.Score > 0 {
 		out = append(out, "dangling_imports")
+	}
+	// Optional engine — surfaced as active when enabled AND signal is
+	// non-zero. Informational only; the meter does not promote the
+	// verdict (telemetry-only, see callsite_blast_radius doc).
+	if r.CallsiteBlastRadius.Enabled && r.CallsiteBlastRadius.Score > 0 {
+		out = append(out, "callsite_blast_radius")
+	}
+	if r.DeadCode.Enabled && r.DeadCode.Score > 0 {
+		out = append(out, "dead_code")
 	}
 	return out
 }
@@ -2343,6 +2363,28 @@ func Human(r Report) string {
 	fmt.Fprintf(&b, "  stale_tests:            %d test(s) with changed source but no test edit\n", r.StaleTests.Score)
 	fmt.Fprintf(&b, "  orphaned_metric_aliases:%d frontend reference(s) to renamed/removed metric(s)\n", r.OrphanedMetricAliases.Score)
 	fmt.Fprintf(&b, "  dangling_imports:       %d TS import(s) to unresolved relative path(s)\n", r.DanglingImports.Score)
+	if r.CallsiteBlastRadius.Enabled {
+		if r.CallsiteBlastRadius.BaseAvailable {
+			top := ""
+			if len(r.CallsiteBlastRadius.TopBlastSymbols) > 0 {
+				top = " top: " + strings.Join(r.CallsiteBlastRadius.TopBlastSymbols, ", ")
+			}
+			fmt.Fprintf(&b, "  callsite_blast_radius:  score=%d (%d changed Go symbol(s), depth=%d)%s\n",
+				r.CallsiteBlastRadius.Score,
+				len(r.CallsiteBlastRadius.ChangedSymbols),
+				r.CallsiteBlastRadius.Depth, top)
+		} else {
+			fmt.Fprintln(&b, "  callsite_blast_radius:  n/a (no base snapshot)")
+		}
+	}
+	if r.DeadCode.Enabled {
+		first := ""
+		if len(r.DeadCode.Candidates) > 0 {
+			first = " first: " + r.DeadCode.Candidates[0].Symbol
+		}
+		fmt.Fprintf(&b, "  dead_code:              %d unreferenced unexported func(s)%s\n",
+			r.DeadCode.Score, first)
+	}
 	if len(r.Explanations) > 0 {
 		fmt.Fprintln(&b, "\nexplanations:")
 		for _, e := range r.Explanations {

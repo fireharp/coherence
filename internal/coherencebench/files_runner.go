@@ -6,9 +6,9 @@ import (
 	"os/exec"
 	"path/filepath"
 
-	"coherence/internal/drift"
-	"coherence/internal/graph"
-	"coherence/internal/snapshot"
+	"github.com/fireharp/coherence/internal/drift"
+	"github.com/fireharp/coherence/internal/graph"
+	"github.com/fireharp/coherence/internal/snapshot"
 )
 
 const defaultEmptyOntology = "version: 1\nrules: []\n"

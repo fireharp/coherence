@@ -4,8 +4,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"coherence/internal/glob"
-	"coherence/internal/ontology"
+	"github.com/fireharp/coherence/internal/glob"
+	"github.com/fireharp/coherence/internal/ontology"
 )
 
 // extractOntology adds rule and command nodes (plus suggests edges) for the

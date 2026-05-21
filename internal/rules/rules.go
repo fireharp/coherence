@@ -4,8 +4,8 @@ package rules
 import (
 	"strings"
 
-	"coherence/internal/glob"
-	"coherence/internal/ontology"
+	"github.com/fireharp/coherence/internal/glob"
+	"github.com/fireharp/coherence/internal/ontology"
 )
 
 // Finding is the per-rule output emitted under the top-level "findings" key of

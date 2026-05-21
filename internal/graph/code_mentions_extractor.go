@@ -6,7 +6,7 @@ import (
 	"regexp"
 	"strings"
 
-	"coherence/internal/ids"
+	"github.com/fireharp/coherence/internal/ids"
 )
 
 // Code-level typed-id mention extractor (Pass 14). Mirrors the markdown

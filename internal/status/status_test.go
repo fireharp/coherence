@@ -7,11 +7,11 @@ import (
 	"path/filepath"
 	"testing"
 
-	"coherence/internal/drift"
-	"coherence/internal/graph"
-	"coherence/internal/ontology"
-	"coherence/internal/report"
-	"coherence/internal/rules"
+	"github.com/fireharp/coherence/internal/drift"
+	"github.com/fireharp/coherence/internal/graph"
+	"github.com/fireharp/coherence/internal/ontology"
+	"github.com/fireharp/coherence/internal/report"
+	"github.com/fireharp/coherence/internal/rules"
 )
 
 func indexAndWrite(t *testing.T, dir string) {

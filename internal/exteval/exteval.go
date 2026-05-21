@@ -14,7 +14,7 @@ import (
 	"sort"
 	"strings"
 
-	"coherence/internal/graph"
+	"github.com/fireharp/coherence/internal/graph"
 )
 
 // Category labels for grouping sample results.

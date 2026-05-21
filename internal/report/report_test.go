@@ -7,9 +7,9 @@ import (
 	"strings"
 	"testing"
 
-	"coherence/internal/llm"
-	"coherence/internal/outcome"
-	"coherence/internal/rules"
+	"github.com/fireharp/coherence/internal/llm"
+	"github.com/fireharp/coherence/internal/outcome"
+	"github.com/fireharp/coherence/internal/rules"
 )
 
 func TestPayloadJSONShape(t *testing.T) {

@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"coherence/internal/graph"
+	"github.com/fireharp/coherence/internal/graph"
 )
 
 func metricGitInit(t *testing.T, files map[string]string) string {

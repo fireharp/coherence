@@ -15,25 +15,25 @@ import (
 	"syscall"
 	"time"
 
-	"coherence/internal/bench"
-	"coherence/internal/coherencebench"
-	"coherence/internal/doctor"
-	"coherence/internal/drift"
-	"coherence/internal/drift/cgnative"
-	"coherence/internal/exteval"
-	"coherence/internal/git"
-	"coherence/internal/graph"
-	"coherence/internal/ids"
-	"coherence/internal/initcmd"
-	"coherence/internal/llm"
-	"coherence/internal/ontology"
-	"coherence/internal/outcome"
-	"coherence/internal/report"
-	"coherence/internal/rules"
-	"coherence/internal/snapshot"
-	"coherence/internal/status"
-	"coherence/internal/templates"
-	"coherence/internal/watch"
+	"github.com/fireharp/coherence/internal/bench"
+	"github.com/fireharp/coherence/internal/coherencebench"
+	"github.com/fireharp/coherence/internal/doctor"
+	"github.com/fireharp/coherence/internal/drift"
+	"github.com/fireharp/coherence/internal/drift/cgnative"
+	"github.com/fireharp/coherence/internal/exteval"
+	"github.com/fireharp/coherence/internal/git"
+	"github.com/fireharp/coherence/internal/graph"
+	"github.com/fireharp/coherence/internal/ids"
+	"github.com/fireharp/coherence/internal/initcmd"
+	"github.com/fireharp/coherence/internal/llm"
+	"github.com/fireharp/coherence/internal/ontology"
+	"github.com/fireharp/coherence/internal/outcome"
+	"github.com/fireharp/coherence/internal/report"
+	"github.com/fireharp/coherence/internal/rules"
+	"github.com/fireharp/coherence/internal/snapshot"
+	"github.com/fireharp/coherence/internal/status"
+	"github.com/fireharp/coherence/internal/templates"
+	"github.com/fireharp/coherence/internal/watch"
 )
 
 const usage = `coherence <subcommand> [flags]
@@ -1024,7 +1024,7 @@ func runVersion(jsonOut bool) int {
 		Time     string `json:"time,omitempty"`
 		GoVer    string `json:"go,omitempty"`
 	}
-	info := versionInfo{Module: "coherence"}
+	info := versionInfo{Module: "github.com/fireharp/coherence"}
 	if bi, ok := debug.ReadBuildInfo(); ok {
 		info.Module = bi.Main.Path
 		info.GoVer = bi.GoVersion

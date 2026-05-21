@@ -12,9 +12,9 @@ import (
 	"strings"
 	"time"
 
-	"coherence/internal/graph"
-	"coherence/internal/snapshot"
-	"coherence/internal/templates"
+	"github.com/fireharp/coherence/internal/graph"
+	"github.com/fireharp/coherence/internal/snapshot"
+	"github.com/fireharp/coherence/internal/templates"
 )
 
 const (

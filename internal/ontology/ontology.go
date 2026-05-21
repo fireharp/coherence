@@ -32,6 +32,9 @@ type OptionalEngines struct {
 	// changed between the baseline snapshot and the current worktree.
 	// Implementation in internal/drift/cgnative.
 	CallsiteBlastRadius CallsiteBlastRadiusConfig `yaml:"callsite_blast_radius"`
+	// DeadCode enables the second native-Go meter: lists unexported
+	// top-level functions with zero inbound resolved calls.
+	DeadCode DeadCodeConfig `yaml:"dead_code"`
 }
 
 // CallsiteBlastRadiusConfig mirrors cgnative.Config but is declared here so
@@ -41,6 +44,12 @@ type CallsiteBlastRadiusConfig struct {
 	Enabled    bool `yaml:"enabled"`
 	Depth      int  `yaml:"depth"`       // default 2 when unset
 	MaxSymbols int  `yaml:"max_symbols"` // default 50 when unset
+}
+
+// DeadCodeConfig mirrors cgnative.DeadCodeConfig. Keep fields in sync.
+type DeadCodeConfig struct {
+	Enabled  bool `yaml:"enabled"`
+	MaxItems int  `yaml:"max_items"` // default 50 when unset
 }
 
 // Load reads, parses, and validates an ontology YAML file. Mirrors the checks

@@ -16,7 +16,7 @@ fi
 
 if ! command -v coherence >/dev/null 2>&1; then
   echo "coherence: binary not found on PATH; skipping pre-commit checks" >&2
-  echo "          (install with: go install <module>/cmd/coherence@latest)" >&2
+  echo "          (install with: go install github.com/fireharp/coherence/cmd/coherence@latest)" >&2
   exit 0
 fi
 

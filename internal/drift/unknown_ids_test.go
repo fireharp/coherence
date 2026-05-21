@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"coherence/internal/graph"
+	"github.com/fireharp/coherence/internal/graph"
 )
 
 func idsGitInit(t *testing.T, files map[string]string) string {

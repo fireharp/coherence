@@ -8,7 +8,7 @@ import (
 	"sort"
 	"strings"
 
-	"coherence/internal/git"
+	"github.com/fireharp/coherence/internal/git"
 )
 
 // brokenLinkRe matches markdown inline links: `[text](target)`. Captures

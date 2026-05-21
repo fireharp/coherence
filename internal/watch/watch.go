@@ -8,7 +8,7 @@ import (
 	"context"
 	"time"
 
-	"coherence/internal/snapshot"
+	"github.com/fireharp/coherence/internal/snapshot"
 )
 
 // Tick is one observed repository state — used to detect change between

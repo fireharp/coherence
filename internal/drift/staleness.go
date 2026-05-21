@@ -5,8 +5,8 @@ import (
 	"strings"
 	"time"
 
-	"coherence/internal/git"
-	"coherence/internal/graph"
+	"github.com/fireharp/coherence/internal/git"
+	"github.com/fireharp/coherence/internal/graph"
 )
 
 // stalenessThresholdDays is the default age above which a file is considered

@@ -75,14 +75,40 @@ type callEdge struct {
 	line              int
 }
 
+// FuncRef is the minimal pointer to one indexed function or method —
+// (pkg, name, file_path, line, is_method, is_exported). Exposed so meters
+// can enumerate every known func without re-walking the tree.
+type FuncRef struct {
+	Pkg        string
+	Name       string
+	File       string
+	Line       int
+	IsMethod   bool
+	IsExported bool
+}
+
+// ExtractWithDefs is Extract plus an enumerated list of every top-level
+// function and method declaration seen during the walk. Same Report,
+// plus the def list as a second return value.
+func ExtractWithDefs(opt Options) (Report, []FuncRef) {
+	r, defs := extractInternal(opt)
+	return r, defs
+}
+
 // Extract walks the Go module rooted at opt.Root and returns a Report
 // containing all resolved direct-call edges. Methods, chained selectors,
 // and function-value references are honestly skipped.
 func Extract(opt Options) Report {
+	r, _ := extractInternal(opt)
+	return r
+}
+
+func extractInternal(opt Options) (Report, []FuncRef) {
 	r := Report{Root: opt.Root, Target: opt.Target}
 	fset := token.NewFileSet()
 	files := map[string]*fileInfo{}
 	funcs := map[string]funcDef{}
+	defs := []FuncRef{}
 
 	walkErr := filepath.WalkDir(opt.Root, func(p string, d os.DirEntry, err error) error {
 		if err != nil {
@@ -131,10 +157,19 @@ func Extract(opt Options) Report {
 			}
 			pos := fset.Position(fd.Pos())
 			name := fd.Name.Name
-			if fd.Recv != nil && len(fd.Recv.List) > 0 {
+			isMethod := fd.Recv != nil && len(fd.Recv.List) > 0
+			if isMethod {
 				name = receiverName(fd.Recv.List[0].Type) + "::" + fd.Name.Name
 			}
 			funcs[fi.pkg+"."+name] = funcDef{pkg: fi.pkg, name: name, file: p, line: pos.Line}
+			defs = append(defs, FuncRef{
+				Pkg:        fi.pkg,
+				Name:       name,
+				File:       p,
+				Line:       pos.Line,
+				IsMethod:   isMethod,
+				IsExported: ast.IsExported(fd.Name.Name),
+			})
 			r.FunctionsIndexed++
 		}
 		return nil
@@ -234,7 +269,7 @@ func Extract(opt Options) Report {
 		}
 		r.CallersByTarget = byTarget
 	}
-	return r
+	return r, defs
 }
 
 func receiverName(t ast.Expr) string {

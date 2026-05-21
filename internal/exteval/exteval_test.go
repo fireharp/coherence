@@ -3,7 +3,7 @@ package exteval
 import (
 	"testing"
 
-	"coherence/internal/graph"
+	"github.com/fireharp/coherence/internal/graph"
 )
 
 func TestScorePerfectMatch(t *testing.T) {

@@ -7,10 +7,10 @@ import (
 	"path/filepath"
 	"time"
 
-	"coherence/internal/drift"
-	"coherence/internal/llm"
-	"coherence/internal/outcome"
-	"coherence/internal/rules"
+	"github.com/fireharp/coherence/internal/drift"
+	"github.com/fireharp/coherence/internal/llm"
+	"github.com/fireharp/coherence/internal/outcome"
+	"github.com/fireharp/coherence/internal/rules"
 )
 
 // LLM is the JSON object stored under the top-level "llm" key. The pointer

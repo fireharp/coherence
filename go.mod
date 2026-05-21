@@ -1,4 +1,4 @@
-module coherence
+module github.com/fireharp/coherence
 
 go 1.26.3
 

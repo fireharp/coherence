@@ -3,7 +3,7 @@ package rules
 import (
 	"testing"
 
-	"coherence/internal/ontology"
+	"github.com/fireharp/coherence/internal/ontology"
 )
 
 func TestEvaluateCarriesSuggestedCommands(t *testing.T) {

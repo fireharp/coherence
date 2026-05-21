@@ -15,8 +15,8 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	"coherence/internal/ontology"
-	"coherence/internal/rules"
+	"github.com/fireharp/coherence/internal/ontology"
+	"github.com/fireharp/coherence/internal/rules"
 )
 
 //go:embed scenarios

@@ -7,7 +7,7 @@ import (
 	"regexp"
 	"strings"
 
-	"coherence/internal/git"
+	"github.com/fireharp/coherence/internal/git"
 )
 
 // Build walks the tracked file set and applies the MVP extractors to produce

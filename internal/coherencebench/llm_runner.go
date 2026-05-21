@@ -6,7 +6,7 @@ import (
 	"os/exec"
 	"sort"
 
-	"coherence/internal/llm"
+	"github.com/fireharp/coherence/internal/llm"
 )
 
 // runLLMScenario materializes the scenario into a temp git repo (same

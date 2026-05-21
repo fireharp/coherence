@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"coherence/internal/ontology"
+	"github.com/fireharp/coherence/internal/ontology"
 )
 
 func TestNamesIncludesEveryRequiredTemplate(t *testing.T) {

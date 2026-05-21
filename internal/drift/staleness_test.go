@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"coherence/internal/graph"
+	"github.com/fireharp/coherence/internal/graph"
 )
 
 func fixedClock(now time.Time, tracked []string, commits map[string]time.Time) stalenessClock {

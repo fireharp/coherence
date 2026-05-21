@@ -14,8 +14,8 @@ import (
 	"strings"
 	"time"
 
-	"coherence/internal/git"
-	"coherence/internal/snapshot"
+	"github.com/fireharp/coherence/internal/git"
+	"github.com/fireharp/coherence/internal/snapshot"
 )
 
 const (

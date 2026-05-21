@@ -5,8 +5,8 @@ import (
 	"path/filepath"
 	"sort"
 
-	"coherence/internal/git"
-	"coherence/internal/graph"
+	"github.com/fireharp/coherence/internal/git"
+	"github.com/fireharp/coherence/internal/graph"
 )
 
 // computeDanglingImports walks tracked TypeScript and Python source

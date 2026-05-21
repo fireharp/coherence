@@ -3,7 +3,7 @@ package llm
 import (
 	"testing"
 
-	"coherence/internal/snapshot"
+	"github.com/fireharp/coherence/internal/snapshot"
 )
 
 func TestSelectCandidatesFromStagedFiltersToSpecsAndStories(t *testing.T) {

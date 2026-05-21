@@ -10,7 +10,7 @@ import (
 	"regexp"
 	"strings"
 
-	"coherence/internal/git"
+	"github.com/fireharp/coherence/internal/git"
 )
 
 type Index struct {

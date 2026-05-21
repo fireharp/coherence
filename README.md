@@ -17,8 +17,12 @@ artifacts, endpoints, and evidence.
 ## 30-second demo
 
 ```bash
-# install from a clone
-go install ./cmd/coherence
+# install from the latest GitHub release
+mkdir -p ~/.local/bin
+OS="$(uname -s | tr '[:upper:]' '[:lower:]')"
+ARCH="$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/')"
+curl -fsSL "https://github.com/fireharp/coherence/releases/latest/download/coherence_${OS}_${ARCH}.tar.gz" \
+  | tar -xz -C ~/.local/bin coherence
 
 # add repo rules, a pre-commit hook, a drift baseline, and the Codex skill
 coherence init --template=agent-repo
@@ -59,8 +63,18 @@ look at.
 ## Install
 
 ```bash
-go build -o bin/coherence ./cmd/coherence   # local build into ./bin
-go install ./cmd/coherence                  # install to $GOBIN / $GOPATH/bin
+# latest release binary; writes ~/.local/bin/coherence
+mkdir -p ~/.local/bin
+OS="$(uname -s | tr '[:upper:]' '[:lower:]')"
+ARCH="$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/')"
+curl -fsSL "https://github.com/fireharp/coherence/releases/latest/download/coherence_${OS}_${ARCH}.tar.gz" \
+  | tar -xz -C ~/.local/bin coherence
+
+# fallback: install from the latest tagged source
+go install github.com/fireharp/coherence/cmd/coherence@latest
+
+# local development build from a clone
+go build -o bin/coherence ./cmd/coherence
 ```
 
 ## Command reference

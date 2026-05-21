@@ -8,7 +8,7 @@ import (
 	"sort"
 	"strings"
 
-	"coherence/internal/snapshot"
+	"github.com/fireharp/coherence/internal/snapshot"
 )
 
 // Config controls the callsite_blast_radius meter. The zero value disables

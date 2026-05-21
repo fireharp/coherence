@@ -3,8 +3,8 @@ package drift
 import (
 	"testing"
 
-	"coherence/internal/graph"
-	"coherence/internal/snapshot"
+	"github.com/fireharp/coherence/internal/graph"
+	"github.com/fireharp/coherence/internal/snapshot"
 )
 
 func staleSnap(files ...snapshot.FileEntry) snapshot.Snapshot {

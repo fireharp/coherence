@@ -3,7 +3,7 @@ package cgnative
 import (
 	"testing"
 
-	"coherence/internal/snapshot"
+	"github.com/fireharp/coherence/internal/snapshot"
 )
 
 // Disabled meter returns an empty result.
