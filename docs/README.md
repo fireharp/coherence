@@ -61,6 +61,15 @@ they look at.
 | [`orphaned_metric_aliases`](meters/orphaned_metric_aliases.md) | Frontend string refs to metric names removed in the current graph. |
 | [`dangling_imports`](meters/dangling_imports.md) | TS/Python relative-path imports that don't resolve to a tracked file. |
 
+### Optional engines
+
+Opt-in via `optional_engines:` in `ontology.yml`. Off by default; the
+field is always present in `drift.json` with `enabled: false`.
+
+| Meter | One-liner |
+|-------|-----------|
+| [`callsite_blast_radius`](meters/callsite_blast_radius.md) | Caller fan-in for each Go top-level function whose semantic hash changed. Native `go/ast` extractor, no external deps. |
+
 ---
 
 ## Non-drift checks
