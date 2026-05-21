@@ -140,7 +140,16 @@ func main() {
 		ps := computeOne(db, sym, *depth, *topN, *includeTests)
 		r.PerSymbol = append(r.PerSymbol, ps)
 		if !ps.Resolved {
-			r.Warnings = append(r.Warnings, fmt.Sprintf("symbol %q not found in codegraph index", sym))
+			switch ps.SkipReason {
+			case "name_collision_in_codegraph_index":
+				r.Warnings = append(r.Warnings, fmt.Sprintf(
+					"symbol %q skipped: %d collisions in codegraph index (pass pkg.Name to disambiguate)",
+					sym, ps.CollisionCount))
+			case "not_found_in_codegraph_index":
+				r.Warnings = append(r.Warnings, fmt.Sprintf("symbol %q not found in codegraph index", sym))
+			default:
+				r.Warnings = append(r.Warnings, fmt.Sprintf("symbol %q skipped: %s", sym, ps.SkipReason))
+			}
 		}
 	}
 
@@ -202,6 +211,7 @@ func computeOne(db *sql.DB, symbol string, depth, topN int, includeTests bool) P
 		}
 	}
 	if len(matches) == 0 {
+		ps.SkipReason = "not_found_in_codegraph_index"
 		return ps
 	}
 
