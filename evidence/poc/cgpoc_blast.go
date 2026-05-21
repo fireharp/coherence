@@ -61,6 +61,8 @@ type PerSymbol struct {
 	Symbol                       string         `json:"symbol"`
 	FilePath                     string         `json:"file_path,omitempty"`
 	Resolved                     bool           `json:"resolved"`
+	SkipReason                   string         `json:"skip_reason,omitempty"`
+	CollisionCount               int            `json:"collision_count,omitempty"`
 	DirectCallers                int            `json:"direct_callers"`
 	DirectCallersProductionOnly  int            `json:"direct_callers_production_only"`
 	TransitiveCallers            int            `json:"transitive_callers"`
@@ -200,6 +202,19 @@ func computeOne(db *sql.DB, symbol string, depth, topN int, includeTests bool) P
 		}
 	}
 	if len(matches) == 0 {
+		return ps
+	}
+
+	// Name-collision gate (ITERATION-5 §3): codegraph's Go call resolver
+	// does not qualify symbols by package, so when multiple nodes share a
+	// name the caller edges silently collapse onto an arbitrary one. The
+	// signal is contaminated; the right move is to skip and warn rather
+	// than emit a misleading number. Override with a package hint by
+	// passing `pkg.Name` instead of bare `Name`.
+	if len(matches) > 1 && hint == "" {
+		ps.Resolved = false
+		ps.CollisionCount = len(matches)
+		ps.SkipReason = "name_collision_in_codegraph_index"
 		return ps
 	}
 	// Symbol-resolution preference (most specific first), only used when a
