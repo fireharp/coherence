@@ -1,0 +1,4373 @@
+{
+  "meter": "dead_code",
+  "db_path": "/tmp/cg_bench_copycat/.codegraph/codegraph.db",
+  "total_function_method": 909,
+  "no_caller_raw": 726,
+  "after_filters": 726,
+  "candidates": [
+    {
+      "qualified_name": "generate",
+      "file_path": "src/copycat/ask.py",
+      "start_line": 158,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "save",
+      "file_path": "src/copycat/ask.py",
+      "start_line": 423,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "load_asks",
+      "file_path": "src/copycat/ask.py",
+      "start_line": 525,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "check_answer",
+      "file_path": "src/copycat/ask.py",
+      "start_line": 598,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "BenchCell::key",
+      "file_path": "src/copycat/bench.py",
+      "start_line": 67,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "cells_from_lists",
+      "file_path": "src/copycat/bench.py",
+      "start_line": 130,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "compose_run",
+      "file_path": "src/copycat/bench.py",
+      "start_line": 169,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "run",
+      "file_path": "src/copycat/bench.py",
+      "start_line": 418,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "_CreditTrackingDetector::__init__",
+      "file_path": "src/copycat/bench.py",
+      "start_line": 754,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "cell_summary",
+      "file_path": "src/copycat/bench.py",
+      "start_line": 798,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "_non_negative_int",
+      "file_path": "src/copycat/cli.py",
+      "start_line": 108,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "_positive_int",
+      "file_path": "src/copycat/cli.py",
+      "start_line": 124,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "_threshold_float",
+      "file_path": "src/copycat/cli.py",
+      "start_line": 141,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "_cmd_verify",
+      "file_path": "src/copycat/cli.py",
+      "start_line": 223,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "_cmd_scope",
+      "file_path": "src/copycat/cli.py",
+      "start_line": 244,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "_cmd_init",
+      "file_path": "src/copycat/cli.py",
+      "start_line": 257,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "_cmd_rewrite",
+      "file_path": "src/copycat/cli.py",
+      "start_line": 274,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "_cmd_bench",
+      "file_path": "src/copycat/cli.py",
+      "start_line": 466,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "_cmd_probe",
+      "file_path": "src/copycat/cli.py",
+      "start_line": 668,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "_cmd_highlight",
+      "file_path": "src/copycat/cli.py",
+      "start_line": 734,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "_cmd_fix",
+      "file_path": "src/copycat/cli.py",
+      "start_line": 850,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "_cmd_report",
+      "file_path": "src/copycat/cli.py",
+      "start_line": 1022,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "_cmd_bench_compose",
+      "file_path": "src/copycat/cli.py",
+      "start_line": 1155,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "_cmd_profile_show",
+      "file_path": "src/copycat/cli.py",
+      "start_line": 1302,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "_cmd_compose_from_notes",
+      "file_path": "src/copycat/cli.py",
+      "start_line": 1403,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "_cmd_ask_human",
+      "file_path": "src/copycat/cli.py",
+      "start_line": 1639,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "_cmd_apply_human",
+      "file_path": "src/copycat/cli.py",
+      "start_line": 1746,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "_cmd_compose",
+      "file_path": "src/copycat/cli.py",
+      "start_line": 1935,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "_cmd_template_extract",
+      "file_path": "src/copycat/cli.py",
+      "start_line": 2065,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "_cmd_status",
+      "file_path": "src/copycat/cli.py",
+      "start_line": 2131,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "compose",
+      "file_path": "src/copycat/compose.py",
+      "start_line": 113,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "write_draft",
+      "file_path": "src/copycat/compose.py",
+      "start_line": 179,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "SectionAdherence::passes",
+      "file_path": "src/copycat/compose.py",
+      "start_line": 232,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "AdherenceReport::passes",
+      "file_path": "src/copycat/compose.py",
+      "start_line": 244,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "check_adherence",
+      "file_path": "src/copycat/compose.py",
+      "start_line": 251,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "FactsReuseReport::overlap_ratio",
+      "file_path": "src/copycat/compose.py",
+      "start_line": 320,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "check_notes_reuse",
+      "file_path": "src/copycat/compose.py",
+      "start_line": 326,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "check_facts_reuse",
+      "file_path": "src/copycat/compose.py",
+      "start_line": 353,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "Corpus::__len__",
+      "file_path": "src/copycat/corpus.py",
+      "start_line": 59,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "append_human_ask_sample",
+      "file_path": "src/copycat/corpus.py",
+      "start_line": 119,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "load_human_ask",
+      "file_path": "src/copycat/corpus.py",
+      "start_line": 178,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "NoneInjector::style_block",
+      "file_path": "src/copycat/corpus.py",
+      "start_line": 241,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "FewShotStaticInjector::__post_init__",
+      "file_path": "src/copycat/corpus.py",
+      "start_line": 254,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "FewShotStaticInjector::style_block",
+      "file_path": "src/copycat/corpus.py",
+      "start_line": 258,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "FewShotRetrievalInjector::__post_init__",
+      "file_path": "src/copycat/corpus.py",
+      "start_line": 311,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "FewShotRetrievalInjector::style_block",
+      "file_path": "src/copycat/corpus.py",
+      "start_line": 333,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "make_injector",
+      "file_path": "src/copycat/corpus.py",
+      "start_line": 401,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "SectionScore::label",
+      "file_path": "src/copycat/detect.py",
+      "start_line": 83,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "DetectionResult::classification_label",
+      "file_path": "src/copycat/detect.py",
+      "start_line": 112,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "CopyleaksClient::__init__",
+      "file_path": "src/copycat/detect.py",
+      "start_line": 166,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "GPTZeroClient::__init__",
+      "file_path": "src/copycat/detect.py",
+      "start_line": 222,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "GPTZeroClient::detect",
+      "file_path": "src/copycat/detect.py",
+      "start_line": 228,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "run",
+      "file_path": "src/copycat/fix.py",
+      "start_line": 162,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "HighlightReport::flagged_count",
+      "file_path": "src/copycat/highlight.py",
+      "start_line": 51,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "HighlightReport::unflagged_count",
+      "file_path": "src/copycat/highlight.py",
+      "start_line": 55,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "HighlightReport::total_sentences",
+      "file_path": "src/copycat/highlight.py",
+      "start_line": 59,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "run",
+      "file_path": "src/copycat/highlight.py",
+      "start_line": 68,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "ProbeReport::min_ai",
+      "file_path": "src/copycat/probe.py",
+      "start_line": 52,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "ProbeReport::max_ai",
+      "file_path": "src/copycat/probe.py",
+      "start_line": 57,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "run",
+      "file_path": "src/copycat/probe.py",
+      "start_line": 67,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "fit",
+      "file_path": "src/copycat/profile.py",
+      "start_line": 210,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "to_dict",
+      "file_path": "src/copycat/profile.py",
+      "start_line": 254,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "_HTMLTextExtractor::handle_starttag",
+      "file_path": "src/copycat/readers.py",
+      "start_line": 41,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "_HTMLTextExtractor::handle_endtag",
+      "file_path": "src/copycat/readers.py",
+      "start_line": 45,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "_HTMLTextExtractor::handle_data",
+      "file_path": "src/copycat/readers.py",
+      "start_line": 49,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "_read_markdown",
+      "file_path": "src/copycat/readers.py",
+      "start_line": 69,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "_read_html",
+      "file_path": "src/copycat/readers.py",
+      "start_line": 75,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "_read_pdf",
+      "file_path": "src/copycat/readers.py",
+      "start_line": 89,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "_read_txt",
+      "file_path": "src/copycat/readers.py",
+      "start_line": 107,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "read",
+      "file_path": "src/copycat/readers.py",
+      "start_line": 121,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "Chunk::char_count",
+      "file_path": "src/copycat/readers.py",
+      "start_line": 144,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "Chunk::word_count",
+      "file_path": "src/copycat/readers.py",
+      "start_line": 148,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "_parse_verify",
+      "file_path": "src/copycat/report.py",
+      "start_line": 46,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "_parse_probe",
+      "file_path": "src/copycat/report.py",
+      "start_line": 57,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "_parse_highlight",
+      "file_path": "src/copycat/report.py",
+      "start_line": 74,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "_parse_rewrite",
+      "file_path": "src/copycat/report.py",
+      "start_line": 88,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "_parse_fix",
+      "file_path": "src/copycat/report.py",
+      "start_line": 104,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "_parse_bench",
+      "file_path": "src/copycat/report.py",
+      "start_line": 119,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "known_kinds",
+      "file_path": "src/copycat/report.py",
+      "start_line": 160,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "load_events",
+      "file_path": "src/copycat/report.py",
+      "start_line": 178,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "timeline_for",
+      "file_path": "src/copycat/report.py",
+      "start_line": 223,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "recent",
+      "file_path": "src/copycat/report.py",
+      "start_line": 230,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "cell_ranking",
+      "file_path": "src/copycat/report.py",
+      "start_line": 236,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "family_ranking",
+      "file_path": "src/copycat/report.py",
+      "start_line": 271,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "Rewriter::propose",
+      "file_path": "src/copycat/rewrite.py",
+      "start_line": 100,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "GroqRewriter::__init__",
+      "file_path": "src/copycat/rewrite.py",
+      "start_line": 147,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "GroqRewriter::propose",
+      "file_path": "src/copycat/rewrite.py",
+      "start_line": 162,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "GroqComposeClient::__post_init__",
+      "file_path": "src/copycat/rewrite.py",
+      "start_line": 323,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "GroqComposeClient::propose_sections",
+      "file_path": "src/copycat/rewrite.py",
+      "start_line": 327,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "GroqNotesComposeClient::__post_init__",
+      "file_path": "src/copycat/rewrite.py",
+      "start_line": 488,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "AgentRewriter::__post_init__",
+      "file_path": "src/copycat/rewrite.py",
+      "start_line": 664,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "loop_rewrite",
+      "file_path": "src/copycat/rewrite.py",
+      "start_line": 756,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "rewrite_sentences",
+      "file_path": "src/copycat/rewrite.py",
+      "start_line": 985,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "make_groq_rewriter",
+      "file_path": "src/copycat/rewrite.py",
+      "start_line": 1061,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "make_agent_rewriter",
+      "file_path": "src/copycat/rewrite.py",
+      "start_line": 1073,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "find_targets",
+      "file_path": "src/copycat/sentence.py",
+      "start_line": 47,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "top_by_ai_prob",
+      "file_path": "src/copycat/sentence.py",
+      "start_line": 95,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "stitch",
+      "file_path": "src/copycat/sentence.py",
+      "start_line": 113,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "collect",
+      "file_path": "src/copycat/status.py",
+      "start_line": 167,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "Section::__post_init__",
+      "file_path": "src/copycat/templates.py",
+      "start_line": 49,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "Template::__post_init__",
+      "file_path": "src/copycat/templates.py",
+      "start_line": 94,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "FactsPacket::dump",
+      "file_path": "src/copycat/templates.py",
+      "start_line": 416,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "VerifyReport::flagged",
+      "file_path": "src/copycat/verify.py",
+      "start_line": 50,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "run",
+      "file_path": "src/copycat/verify.py",
+      "start_line": 138,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "write",
+      "file_path": "src/copycat/writeback.py",
+      "start_line": 52,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_version_flag",
+      "file_path": "tests/integration/test_cli_binary.py",
+      "start_line": 63,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_python_dash_m_copycat_works",
+      "file_path": "tests/integration/test_cli_binary.py",
+      "start_line": 77,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_help_lists_every_subcommand",
+      "file_path": "tests/integration/test_cli_binary.py",
+      "start_line": 119,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_subcommand_help_does_not_crash",
+      "file_path": "tests/integration/test_cli_binary.py",
+      "start_line": 134,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_template_extract_help_works",
+      "file_path": "tests/integration/test_cli_binary.py",
+      "start_line": 144,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_profile_show_help_works",
+      "file_path": "tests/integration/test_cli_binary.py",
+      "start_line": 151,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_init_writes_copycat_toml",
+      "file_path": "tests/integration/test_cli_binary.py",
+      "start_line": 161,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_init_refuses_existing_without_force",
+      "file_path": "tests/integration/test_cli_binary.py",
+      "start_line": 171,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_scope_lists_files",
+      "file_path": "tests/integration/test_cli_binary.py",
+      "start_line": 184,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_scope_empty_project",
+      "file_path": "tests/integration/test_cli_binary.py",
+      "start_line": 197,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_scope_malformed_toml_friendly_error",
+      "file_path": "tests/integration/test_cli_binary.py",
+      "start_line": 204,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_highlight_corrupted_pdf_friendly_error",
+      "file_path": "tests/integration/test_cli_binary.py",
+      "start_line": 214,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_probe_corrupted_pdf_friendly_error",
+      "file_path": "tests/integration/test_cli_binary.py",
+      "start_line": 227,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_status_runs_clean_on_empty_project",
+      "file_path": "tests/integration/test_cli_binary.py",
+      "start_line": 249,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_status_reports_bench_dir_kind_breakdown",
+      "file_path": "tests/integration/test_cli_binary.py",
+      "start_line": 265,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_report_on_empty_bench_dir",
+      "file_path": "tests/integration/test_cli_binary.py",
+      "start_line": 288,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_report_by_cell_on_empty_bench_dir",
+      "file_path": "tests/integration/test_cli_binary.py",
+      "start_line": 294,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_status_json_emits_parseable_payload",
+      "file_path": "tests/integration/test_cli_binary.py",
+      "start_line": 304,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_report_json_empty_returns_array",
+      "file_path": "tests/integration/test_cli_binary.py",
+      "start_line": 316,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_report_json_with_events_emits_event_list",
+      "file_path": "tests/integration/test_cli_binary.py",
+      "start_line": 324,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_bench_dry_run_summary_is_tight",
+      "file_path": "tests/integration/test_cli_binary.py",
+      "start_line": 344,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_status_json_schema_is_stable",
+      "file_path": "tests/integration/test_cli_binary.py",
+      "start_line": 371,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_report_by_cell_json_schema_is_stable",
+      "file_path": "tests/integration/test_cli_binary.py",
+      "start_line": 399,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_report_event_json_schema_is_stable",
+      "file_path": "tests/integration/test_cli_binary.py",
+      "start_line": 420,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_report_by_cell_json_emits_ranked_array",
+      "file_path": "tests/integration/test_cli_binary.py",
+      "start_line": 437,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_unknown_subcommand_errors",
+      "file_path": "tests/integration/test_cli_binary.py",
+      "start_line": 460,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_verify_nonexistent_path_errors_clearly",
+      "file_path": "tests/integration/test_cli_binary.py",
+      "start_line": 466,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_fix_zero_max_iterations_errors_via_argparse",
+      "file_path": "tests/integration/test_cli_binary.py",
+      "start_line": 484,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_bench_zero_repeats_errors_via_argparse",
+      "file_path": "tests/integration/test_cli_binary.py",
+      "start_line": 497,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_bench_csv_max_iterations_zero_errors_with_clear_message",
+      "file_path": "tests/integration/test_cli_binary.py",
+      "start_line": 506,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_bench_negative_max_credits_errors_loudly",
+      "file_path": "tests/integration/test_cli_binary.py",
+      "start_line": 522,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_probe_negative_max_chunks_errors_loudly",
+      "file_path": "tests/integration/test_cli_binary.py",
+      "start_line": 540,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_fix_corrupted_pdf_friendly_error",
+      "file_path": "tests/integration/test_cli_binary.py",
+      "start_line": 557,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_fix_negative_top_n_errors_loudly",
+      "file_path": "tests/integration/test_cli_binary.py",
+      "start_line": 577,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_verify_negative_limit_errors_loudly",
+      "file_path": "tests/integration/test_cli_binary.py",
+      "start_line": 592,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_bench_negative_limit_errors_loudly",
+      "file_path": "tests/integration/test_cli_binary.py",
+      "start_line": 603,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_verify_existing_path_in_scope_works",
+      "file_path": "tests/integration/test_cli_binary.py",
+      "start_line": 616,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_report_kinds_typo_errors_with_valid_list",
+      "file_path": "tests/integration/test_cli_binary.py",
+      "start_line": 632,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_verify_without_creds_errors_cleanly",
+      "file_path": "tests/integration/test_cli_binary.py",
+      "start_line": 647,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_template_extract_produces_yaml",
+      "file_path": "tests/integration/test_cli_binary.py",
+      "start_line": 679,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_bench_max_iterations_with_non_integer_errors_cleanly",
+      "file_path": "tests/integration/test_cli_binary.py",
+      "start_line": 703,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_bench_unknown_corpus_mode_errors_cleanly",
+      "file_path": "tests/integration/test_cli_binary.py",
+      "start_line": 719,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_bench_unknown_rewrite_mode_errors_cleanly",
+      "file_path": "tests/integration/test_cli_binary.py",
+      "start_line": 735,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_bench_temperatures_above_2_rejected_pre_flight",
+      "file_path": "tests/integration/test_cli_binary.py",
+      "start_line": 751,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_verify_threshold_above_one_errors_loudly",
+      "file_path": "tests/integration/test_cli_binary.py",
+      "start_line": 768,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_fix_threshold_nan_rejected",
+      "file_path": "tests/integration/test_cli_binary.py",
+      "start_line": 786,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_init_unwritable_target_friendly_error",
+      "file_path": "tests/integration/test_cli_binary.py",
+      "start_line": 801,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_template_extract_unwritable_out_path_friendly_error",
+      "file_path": "tests/integration/test_cli_binary.py",
+      "start_line": 816,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_template_extract_out_dash_emits_yaml_to_stdout",
+      "file_path": "tests/integration/test_cli_binary.py",
+      "start_line": 845,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_template_extract_errors_on_directory_passed_as_source",
+      "file_path": "tests/integration/test_cli_binary.py",
+      "start_line": 870,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_template_extract_errors_on_missing_source",
+      "file_path": "tests/integration/test_cli_binary.py",
+      "start_line": 892,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_compose_from_notes_without_groq_key_errors_cleanly",
+      "file_path": "tests/integration/test_cli_binary.py",
+      "start_line": 905,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_compose_from_notes_errors_on_empty_notes",
+      "file_path": "tests/integration/test_cli_binary.py",
+      "start_line": 921,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_profile_show_on_empty_corpus_reports_missing",
+      "file_path": "tests/integration/test_cli_binary.py",
+      "start_line": 938,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_profile_show_with_real_corpus_json_emits_keys",
+      "file_path": "tests/integration/test_cli_binary.py",
+      "start_line": 950,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_ask_human_requires_existing_fix_run",
+      "file_path": "tests/integration/test_cli_binary.py",
+      "start_line": 979,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_apply_human_requires_asks_json_alongside_answers",
+      "file_path": "tests/integration/test_cli_binary.py",
+      "start_line": 994,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_compose_from_notes_out_dash_uses_stdout",
+      "file_path": "tests/integration/test_cli_binary.py",
+      "start_line": 1012,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_compose_out_dash_does_not_crash_on_path_handling",
+      "file_path": "tests/integration/test_cli_binary.py",
+      "start_line": 1040,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_bench_compose_errors_on_missing_template",
+      "file_path": "tests/integration/test_cli_binary.py",
+      "start_line": 1067,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_generate_yields_one_ask_per_accepted_patch_capped_at_max",
+      "file_path": "tests/unit/test_ask.py",
+      "start_line": 43,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_generate_respects_absolute_max",
+      "file_path": "tests/unit/test_ask.py",
+      "start_line": 64,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_generate_picks_paraphrase_when_sentence_has_concrete_and_opinion",
+      "file_path": "tests/unit/test_ask.py",
+      "start_line": 73,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_generate_picks_concrete_detail_when_sentence_is_abstract",
+      "file_path": "tests/unit/test_ask.py",
+      "start_line": 82,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_generate_picks_opinion_when_concrete_but_no_stance",
+      "file_path": "tests/unit/test_ask.py",
+      "start_line": 91,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_pick_ask_type_handles_digit_as_concrete_signal",
+      "file_path": "tests/unit/test_ask.py",
+      "start_line": 100,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_pick_ask_type_handles_past_tense_opinion_verb",
+      "file_path": "tests/unit/test_ask.py",
+      "start_line": 106,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_generate_carries_plateau_reason_as_ask_reason",
+      "file_path": "tests/unit/test_ask.py",
+      "start_line": 112,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_generate_empty_iterations_returns_empty_list",
+      "file_path": "tests/unit/test_ask.py",
+      "start_line": 120,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_generate_invalid_max_asks_raises",
+      "file_path": "tests/unit/test_ask.py",
+      "start_line": 137,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_generate_merges_adjacent_indexes",
+      "file_path": "tests/unit/test_ask.py",
+      "start_line": 143,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_generate_does_not_merge_when_indexes_have_gaps",
+      "file_path": "tests/unit/test_ask.py",
+      "start_line": 163,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_generate_falls_back_to_source_split_when_no_patches",
+      "file_path": "tests/unit/test_ask.py",
+      "start_line": 175,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_render_prompt_paraphrase_contains_sentence_and_instructions",
+      "file_path": "tests/unit/test_ask.py",
+      "start_line": 212,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_render_prompt_unknown_type_raises",
+      "file_path": "tests/unit/test_ask.py",
+      "start_line": 219,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_render_prompt_supports_all_four_ask_types",
+      "file_path": "tests/unit/test_ask.py",
+      "start_line": 224,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_render_asks_md_has_one_section_per_ask",
+      "file_path": "tests/unit/test_ask.py",
+      "start_line": 233,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_save_creates_directory_with_expected_files",
+      "file_path": "tests/unit/test_ask.py",
+      "start_line": 256,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_save_provenance_records_trigger",
+      "file_path": "tests/unit/test_ask.py",
+      "start_line": 270,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_save_then_load_round_trip",
+      "file_path": "tests/unit/test_ask.py",
+      "start_line": 282,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_load_asks_rejects_non_list_root_with_value_error",
+      "file_path": "tests/unit/test_ask.py",
+      "start_line": 298,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_load_asks_rejects_malformed_entry_with_value_error",
+      "file_path": "tests/unit/test_ask.py",
+      "start_line": 309,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_load_asks_rejects_scalar_entry_with_value_error",
+      "file_path": "tests/unit/test_ask.py",
+      "start_line": 321,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_save_under_dot_copycat_human",
+      "file_path": "tests/unit/test_ask.py",
+      "start_line": 328,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_save_sets_owner_only_permissions",
+      "file_path": "tests/unit/test_ask.py",
+      "start_line": 340,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_save_no_asks_raises",
+      "file_path": "tests/unit/test_ask.py",
+      "start_line": 367,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_new_ask_id_distinct_across_tight_calls",
+      "file_path": "tests/unit/test_ask.py",
+      "start_line": 375,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_new_ask_id_format_sortable_and_compact",
+      "file_path": "tests/unit/test_ask.py",
+      "start_line": 386,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_check_answer_empty_fails",
+      "file_path": "tests/unit/test_ask.py",
+      "start_line": 411,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_check_answer_concrete_with_digit_passes_silently",
+      "file_path": "tests/unit/test_ask.py",
+      "start_line": 417,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_check_answer_concrete_with_proper_noun_passes_silently",
+      "file_path": "tests/unit/test_ask.py",
+      "start_line": 427,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_check_answer_warns_when_no_concrete_detail",
+      "file_path": "tests/unit/test_ask.py",
+      "start_line": 437,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_check_answer_warns_when_too_long",
+      "file_path": "tests/unit/test_ask.py",
+      "start_line": 447,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_check_answer_records_word_counts",
+      "file_path": "tests/unit/test_ask.py",
+      "start_line": 456,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_check_answer_warns_on_low_voice_fit",
+      "file_path": "tests/unit/test_ask.py",
+      "start_line": 468,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_check_answer_no_voice_fit_warning_when_no_profile_supplied",
+      "file_path": "tests/unit/test_ask.py",
+      "start_line": 502,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_check_answer_skips_voice_fit_for_very_short_answers",
+      "file_path": "tests/unit/test_ask.py",
+      "start_line": 513,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_check_answer_high_voice_fit_does_not_warn",
+      "file_path": "tests/unit/test_ask.py",
+      "start_line": 527,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "FakeRewriter::propose",
+      "file_path": "tests/unit/test_bench.py",
+      "start_line": 41,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "test_cells_from_lists_cartesian_product",
+      "file_path": "tests/unit/test_bench.py",
+      "start_line": 57,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_cells_from_lists_fills_defaults",
+      "file_path": "tests/unit/test_bench.py",
+      "start_line": 68,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_cells_from_lists_four_way_product_with_corpus",
+      "file_path": "tests/unit/test_bench.py",
+      "start_line": 73,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_cells_from_lists_five_way_product_with_rewrite_modes",
+      "file_path": "tests/unit/test_bench.py",
+      "start_line": 82,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_cells_from_lists_rejects_unknown_corpus_mode",
+      "file_path": "tests/unit/test_bench.py",
+      "start_line": 91,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_cells_from_lists_rejects_unknown_rewrite_mode",
+      "file_path": "tests/unit/test_bench.py",
+      "start_line": 102,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_bench_matrix_two_cells_two_files",
+      "file_path": "tests/unit/test_bench.py",
+      "start_line": 110,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_bench_original_under_threshold_skipped",
+      "file_path": "tests/unit/test_bench.py",
+      "start_line": 158,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_bench_persist_failure_warns_and_returns_report",
+      "file_path": "tests/unit/test_bench.py",
+      "start_line": 178,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_bench_credit_cap_halts",
+      "file_path": "tests/unit/test_bench.py",
+      "start_line": 221,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_bench_persists_json",
+      "file_path": "tests/unit/test_bench.py",
+      "start_line": 253,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_bench_corpus_axis_routes_correct_injector",
+      "file_path": "tests/unit/test_bench.py",
+      "start_line": 279,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_bench_corpus_axis_routes_correct_injector::_Sentinel::__init__",
+      "file_path": "tests/unit/test_bench.py",
+      "start_line": 294,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "test_bench_corpus_axis_routes_correct_injector::_Sentinel::style_block",
+      "file_path": "tests/unit/test_bench.py",
+      "start_line": 297,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "test_bench_fix_mode_writes_fix_files_into_bench_dir_not_source",
+      "file_path": "tests/unit/test_bench.py",
+      "start_line": 329,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_bench_fix_mode_writes_fix_files_into_bench_dir_not_source::FixStub::propose_sentence",
+      "file_path": "tests/unit/test_bench.py",
+      "start_line": 344,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "test_bench_attempts_audit_captures_rejection_reasons",
+      "file_path": "tests/unit/test_bench.py",
+      "start_line": 367,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_bench_attempts_audit_persists_in_json",
+      "file_path": "tests/unit/test_bench.py",
+      "start_line": 400,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_cell_summary_aggregates_rejection_breakdown",
+      "file_path": "tests/unit/test_bench.py",
+      "start_line": 422,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_cell_summary_rejection_breakdown_empty_on_clean_resolve",
+      "file_path": "tests/unit/test_bench.py",
+      "start_line": 450,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_bench_attempts_audit_empty_when_cell_short_circuits",
+      "file_path": "tests/unit/test_bench.py",
+      "start_line": 466,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_bench_dispatches_whole_file_and_fix_modes",
+      "file_path": "tests/unit/test_bench.py",
+      "start_line": 483,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_bench_dispatches_whole_file_and_fix_modes::ScriptedClient::detect",
+      "file_path": "tests/unit/test_bench.py",
+      "start_line": 511,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "test_bench_dispatches_whole_file_and_fix_modes::StubRewriter::propose",
+      "file_path": "tests/unit/test_bench.py",
+      "start_line": 534,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "test_bench_dispatches_whole_file_and_fix_modes::StubRewriter::propose_sentence",
+      "file_path": "tests/unit/test_bench.py",
+      "start_line": 537,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "test_bench_repeats_produces_n_outcomes_per_cell_file",
+      "file_path": "tests/unit/test_bench.py",
+      "start_line": 561,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_bench_repeats_credit_halt_converts_remaining_to_skipped",
+      "file_path": "tests/unit/test_bench.py",
+      "start_line": 586,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_bench_repeats_zero_or_negative_raises",
+      "file_path": "tests/unit/test_bench.py",
+      "start_line": 611,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_cell_summary_stddev_across_repeats",
+      "file_path": "tests/unit/test_bench.py",
+      "start_line": 624,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_cell_summary_stddev_single_sample_is_zero",
+      "file_path": "tests/unit/test_bench.py",
+      "start_line": 645,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_dry_run_skips_all_api_calls",
+      "file_path": "tests/unit/test_bench.py",
+      "start_line": 664,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_dry_run_skips_all_api_calls::ExplodingClient::detect",
+      "file_path": "tests/unit/test_bench.py",
+      "start_line": 672,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "test_dry_run_credit_ceiling_math",
+      "file_path": "tests/unit/test_bench.py",
+      "start_line": 696,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_dry_run_persists_with_dry_run_flag",
+      "file_path": "tests/unit/test_bench.py",
+      "start_line": 715,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_dry_run_with_no_files_in_scope",
+      "file_path": "tests/unit/test_bench.py",
+      "start_line": 735,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_bench_summary_aggregates",
+      "file_path": "tests/unit/test_bench.py",
+      "start_line": 755,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "StubComposeClient::propose_sections",
+      "file_path": "tests/unit/test_bench_compose.py",
+      "start_line": 27,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "StubDetector::detect",
+      "file_path": "tests/unit/test_bench_compose.py",
+      "start_line": 42,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "test_compose_run_produces_outcomes_per_facts_file",
+      "file_path": "tests/unit/test_bench_compose.py",
+      "start_line": 94,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_compose_run_groq_error_is_per_file_skip",
+      "file_path": "tests/unit/test_bench_compose.py",
+      "start_line": 120,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_compose_run_groq_error_is_per_file_skip::_BoomingClient::propose_sections",
+      "file_path": "tests/unit/test_bench_compose.py",
+      "start_line": 132,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "test_compose_run_writes_drafts_to_out_dir",
+      "file_path": "tests/unit/test_bench_compose.py",
+      "start_line": 156,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_compose_run_with_detector_below_threshold_marks_under",
+      "file_path": "tests/unit/test_bench_compose.py",
+      "start_line": 177,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_compose_run_with_detector_above_threshold_marks_over",
+      "file_path": "tests/unit/test_bench_compose.py",
+      "start_line": 194,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_compose_run_without_detector_marks_composed",
+      "file_path": "tests/unit/test_bench_compose.py",
+      "start_line": 211,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_compose_run_requires_existing_template",
+      "file_path": "tests/unit/test_bench_compose.py",
+      "start_line": 230,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_compose_run_rejects_duplicate_facts_stems",
+      "file_path": "tests/unit/test_bench_compose.py",
+      "start_line": 242,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_compose_run_records_write_error_and_continues",
+      "file_path": "tests/unit/test_bench_compose.py",
+      "start_line": 263,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_compose_run_raises_when_out_dir_uncreatable",
+      "file_path": "tests/unit/test_bench_compose.py",
+      "start_line": 298,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_compose_run_requires_at_least_one_facts_file",
+      "file_path": "tests/unit/test_bench_compose.py",
+      "start_line": 317,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_compose_run_skips_empty_facts_with_status",
+      "file_path": "tests/unit/test_bench_compose.py",
+      "start_line": 330,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_compose_run_skips_malformed_facts",
+      "file_path": "tests/unit/test_bench_compose.py",
+      "start_line": 347,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_compose_run_records_missing_fact",
+      "file_path": "tests/unit/test_bench_compose.py",
+      "start_line": 364,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_compose_run_persists_bench_json_with_workflow_family",
+      "file_path": "tests/unit/test_bench_compose.py",
+      "start_line": 384,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_compose_run_report_family_ranking_picks_up_outcome",
+      "file_path": "tests/unit/test_bench_compose.py",
+      "start_line": 407,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_bench_compose_cli_summary_surfaces_metrics",
+      "file_path": "tests/unit/test_bench_compose.py",
+      "start_line": 435,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_compose_run_captures_voice_fit_when_profile_provided",
+      "file_path": "tests/unit/test_bench_compose.py",
+      "start_line": 494,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_compose_run_voice_fit_null_when_no_profile",
+      "file_path": "tests/unit/test_bench_compose.py",
+      "start_line": 520,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_family_ranking_surfaces_voice_fit",
+      "file_path": "tests/unit/test_bench_compose.py",
+      "start_line": 536,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_compose_run_captures_input_and_output_words",
+      "file_path": "tests/unit/test_bench_compose.py",
+      "start_line": 564,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_family_ranking_surfaces_length_delta",
+      "file_path": "tests/unit/test_bench_compose.py",
+      "start_line": 588,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_compose_run_handles_detector_error_without_attribute_error",
+      "file_path": "tests/unit/test_bench_compose.py",
+      "start_line": 611,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_compose_run_handles_detector_error_without_attribute_error::FailingDetector::detect",
+      "file_path": "tests/unit/test_bench_compose.py",
+      "start_line": 624,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "test_compose_run_persists_adherence_and_facts_reuse",
+      "file_path": "tests/unit/test_bench_compose.py",
+      "start_line": 644,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_compose_run_bench_json_carries_metrics",
+      "file_path": "tests/unit/test_bench_compose.py",
+      "start_line": 671,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_compose_run_records_voice_fit_when_profile_supplied",
+      "file_path": "tests/unit/test_bench_compose.py",
+      "start_line": 694,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_family_ranking_surfaces_voice_fit",
+      "file_path": "tests/unit/test_bench_compose.py",
+      "start_line": 721,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_family_ranking_surfaces_compose_metrics",
+      "file_path": "tests/unit/test_bench_compose.py",
+      "start_line": 750,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_resolve_auto_prefers_gptzero_when_both_keys_present",
+      "file_path": "tests/unit/test_cli.py",
+      "start_line": 13,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_resolve_auto_falls_back_to_copyleaks",
+      "file_path": "tests/unit/test_cli.py",
+      "start_line": 22,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_resolve_auto_errors_when_no_creds",
+      "file_path": "tests/unit/test_cli.py",
+      "start_line": 27,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_main_converts_credentials_missing_to_systemexit",
+      "file_path": "tests/unit/test_cli.py",
+      "start_line": 35,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_resolve_extra_paths_expands_tilde",
+      "file_path": "tests/unit/test_cli.py",
+      "start_line": 52,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_find_latest_fix_run_picks_latest_and_skips_unparseable",
+      "file_path": "tests/unit/test_cli.py",
+      "start_line": 69,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_find_latest_fix_run_returns_none_on_perms_drift",
+      "file_path": "tests/unit/test_cli.py",
+      "start_line": 96,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_resolve_extra_paths_tilde_missing_file_still_errors",
+      "file_path": "tests/unit/test_cli.py",
+      "start_line": 116,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_resolve_explicit_choice_passes_through",
+      "file_path": "tests/unit/test_cli.py",
+      "start_line": 129,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_make_client_builds_gptzero_when_chosen",
+      "file_path": "tests/unit/test_cli.py",
+      "start_line": 136,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_make_client_builds_copyleaks_when_chosen",
+      "file_path": "tests/unit/test_cli.py",
+      "start_line": 144,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_make_client_errors_when_chosen_backend_missing",
+      "file_path": "tests/unit/test_cli.py",
+      "start_line": 154,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "_RecordingClient::detect",
+      "file_path": "tests/unit/test_cli.py",
+      "start_line": 203,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "_StubRewriter::propose_sentence",
+      "file_path": "tests/unit/test_cli.py",
+      "start_line": 230,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "test_fix_output_writes_to_sidecar_for_html",
+      "file_path": "tests/unit/test_cli.py",
+      "start_line": 240,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_fix_html_without_output_or_dry_run_errors",
+      "file_path": "tests/unit/test_cli.py",
+      "start_line": 266,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_fix_html_dry_run_ok",
+      "file_path": "tests/unit/test_cli.py",
+      "start_line": 277,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_fix_output_stdout_pipes_clean",
+      "file_path": "tests/unit/test_cli.py",
+      "start_line": 290,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_fix_output_overrides_inplace_for_markdown",
+      "file_path": "tests/unit/test_cli.py",
+      "start_line": 304,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "_NoImprovementClient::detect",
+      "file_path": "tests/unit/test_cli.py",
+      "start_line": 326,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "test_fix_output_writes_latest_under_default_selector",
+      "file_path": "tests/unit/test_cli.py",
+      "start_line": 342,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_fix_legacy_detector_selector_routes_no_improvement_branch",
+      "file_path": "tests/unit/test_cli.py",
+      "start_line": 369,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "_AlreadyHumanClient::detect",
+      "file_path": "tests/unit/test_cli.py",
+      "start_line": 399,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "test_fix_no_op_exits_zero_when_already_under_threshold",
+      "file_path": "tests/unit/test_cli.py",
+      "start_line": 408,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "_StuckRewriter::propose_sentence",
+      "file_path": "tests/unit/test_cli.py",
+      "start_line": 432,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "test_fix_rewriter_stuck_exits_one_with_failure_message",
+      "file_path": "tests/unit/test_cli.py",
+      "start_line": 436,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_highlight_returns_zero_even_when_all_sentences_flagged",
+      "file_path": "tests/unit/test_cli.py",
+      "start_line": 471,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_highlight_returns_zero_when_all_human",
+      "file_path": "tests/unit/test_cli.py",
+      "start_line": 484,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_highlight_too_short_exits_zero_with_friendly_message",
+      "file_path": "tests/unit/test_cli.py",
+      "start_line": 496,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_highlight_too_short_exits_zero_with_friendly_message::_TooShortClient::detect",
+      "file_path": "tests/unit/test_cli.py",
+      "start_line": 506,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "test_fix_too_short_exits_zero_with_friendly_message",
+      "file_path": "tests/unit/test_cli.py",
+      "start_line": 523,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_fix_too_short_exits_zero_with_friendly_message::_TooShortClient::detect",
+      "file_path": "tests/unit/test_cli.py",
+      "start_line": 532,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "test_highlight_surfaces_detector_errors_as_friendly_exit",
+      "file_path": "tests/unit/test_cli.py",
+      "start_line": 546,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_highlight_surfaces_detector_errors_as_friendly_exit::_BoomClient::detect",
+      "file_path": "tests/unit/test_cli.py",
+      "start_line": 559,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "FakeClient::propose_sections",
+      "file_path": "tests/unit/test_compose.py",
+      "start_line": 25,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "test_fill_literal_substitutes_company",
+      "file_path": "tests/unit/test_compose.py",
+      "start_line": 71,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_fill_literal_no_placeholders_passes_through",
+      "file_path": "tests/unit/test_compose.py",
+      "start_line": 76,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_fill_literal_missing_slot_raises",
+      "file_path": "tests/unit/test_compose.py",
+      "start_line": 81,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_fill_literal_rejects_list_slot",
+      "file_path": "tests/unit/test_compose.py",
+      "start_line": 86,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_compose_assembles_in_template_order",
+      "file_path": "tests/unit/test_compose.py",
+      "start_line": 95,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_compose_passes_only_intent_sections_to_client",
+      "file_path": "tests/unit/test_compose.py",
+      "start_line": 107,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_compose_records_sections_filled",
+      "file_path": "tests/unit/test_compose.py",
+      "start_line": 116,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_compose_refuses_empty_facts",
+      "file_path": "tests/unit/test_compose.py",
+      "start_line": 124,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_compose_raises_when_client_omits_section",
+      "file_path": "tests/unit/test_compose.py",
+      "start_line": 130,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_compose_skips_client_when_only_literal_sections",
+      "file_path": "tests/unit/test_compose.py",
+      "start_line": 137,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_cli_errors_when_compose_returns_empty_draft",
+      "file_path": "tests/unit/test_compose.py",
+      "start_line": 150,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_cli_errors_when_compose_returns_empty_draft::_EmptyComposeClient::__call__",
+      "file_path": "tests/unit/test_compose.py",
+      "start_line": 182,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "test_cli_errors_when_compose_returns_empty_draft::_EmptyComposeClient::propose_sections",
+      "file_path": "tests/unit/test_compose.py",
+      "start_line": 184,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "test_compose_strips_whitespace_from_generated_sections",
+      "file_path": "tests/unit/test_compose.py",
+      "start_line": 202,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_compose_missing_fact_in_pattern_raises_before_llm",
+      "file_path": "tests/unit/test_compose.py",
+      "start_line": 209,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_write_draft_creates_parent_dirs",
+      "file_path": "tests/unit/test_compose.py",
+      "start_line": 229,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_adherence_passes_on_exact_match",
+      "file_path": "tests/unit/test_compose.py",
+      "start_line": 268,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_adherence_flags_wrong_sentence_count",
+      "file_path": "tests/unit/test_compose.py",
+      "start_line": 279,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_adherence_flags_over_word_count",
+      "file_path": "tests/unit/test_compose.py",
+      "start_line": 288,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_adherence_literal_sections_always_pass",
+      "file_path": "tests/unit/test_compose.py",
+      "start_line": 298,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_adherence_no_limit_means_pass",
+      "file_path": "tests/unit/test_compose.py",
+      "start_line": 308,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_facts_reuse_high_when_draft_uses_source",
+      "file_path": "tests/unit/test_compose.py",
+      "start_line": 324,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_facts_reuse_low_when_draft_ignores_source",
+      "file_path": "tests/unit/test_compose.py",
+      "start_line": 343,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_facts_reuse_empty_facts_yields_zero",
+      "file_path": "tests/unit/test_compose.py",
+      "start_line": 358,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_facts_reuse_ignores_stop_words",
+      "file_path": "tests/unit/test_compose.py",
+      "start_line": 368,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_notes_reuse_high_when_draft_uses_notes",
+      "file_path": "tests/unit/test_compose.py",
+      "start_line": 384,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_notes_reuse_low_when_draft_ignores_notes",
+      "file_path": "tests/unit/test_compose.py",
+      "start_line": 391,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_notes_reuse_empty_notes_yields_zero",
+      "file_path": "tests/unit/test_compose.py",
+      "start_line": 399,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_facts_reuse_includes_extra_slots",
+      "file_path": "tests/unit/test_compose.py",
+      "start_line": 405,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_groq_compose_prompt_contains_facts_and_sections",
+      "file_path": "tests/unit/test_compose.py",
+      "start_line": 420,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_groq_compose_rejects_non_string_section_values",
+      "file_path": "tests/unit/test_compose.py",
+      "start_line": 449,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_groq_compose_accepts_string_values_only",
+      "file_path": "tests/unit/test_compose.py",
+      "start_line": 489,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_prompt_carries_genre_and_notes",
+      "file_path": "tests/unit/test_compose_from_notes.py",
+      "start_line": 25,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_prompt_includes_voice_constraints_block_when_provided",
+      "file_path": "tests/unit/test_compose_from_notes.py",
+      "start_line": 34,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_prompt_omits_voice_block_when_empty",
+      "file_path": "tests/unit/test_compose_from_notes.py",
+      "start_line": 42,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_system_prompt_states_no_inventing_facts",
+      "file_path": "tests/unit/test_compose_from_notes.py",
+      "start_line": 47,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_system_prompt_instructs_unclear_marker",
+      "file_path": "tests/unit/test_compose_from_notes.py",
+      "start_line": 51,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_compose_from_notes_rejects_empty_notes",
+      "file_path": "tests/unit/test_compose_from_notes.py",
+      "start_line": 59,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_compose_from_notes_requires_api_key",
+      "file_path": "tests/unit/test_compose_from_notes.py",
+      "start_line": 65,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "_StubNotesClient::__init__",
+      "file_path": "tests/unit/test_compose_from_notes.py",
+      "start_line": 95,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "_StubNotesClient::__call__",
+      "file_path": "tests/unit/test_compose_from_notes.py",
+      "start_line": 98,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "_StubNotesClient::compose_from_notes",
+      "file_path": "tests/unit/test_compose_from_notes.py",
+      "start_line": 104,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "test_cli_errors_when_model_returns_empty_draft",
+      "file_path": "tests/unit/test_compose_from_notes.py",
+      "start_line": 125,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_cli_errors_when_model_returns_empty_draft::_EmptyClient::__call__",
+      "file_path": "tests/unit/test_compose_from_notes.py",
+      "start_line": 141,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "test_cli_errors_when_model_returns_empty_draft::_EmptyClient::compose_from_notes",
+      "file_path": "tests/unit/test_compose_from_notes.py",
+      "start_line": 144,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "test_cli_prints_notes_reuse_telemetry_when_notes_have_content",
+      "file_path": "tests/unit/test_compose_from_notes.py",
+      "start_line": 162,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_cli_prints_notes_reuse_telemetry_when_notes_have_content::_ReusingClient::__call__",
+      "file_path": "tests/unit/test_compose_from_notes.py",
+      "start_line": 176,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "test_cli_prints_notes_reuse_telemetry_when_notes_have_content::_ReusingClient::compose_from_notes",
+      "file_path": "tests/unit/test_compose_from_notes.py",
+      "start_line": 179,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "test_cli_prints_voice_fit_when_voice_mumbli_set",
+      "file_path": "tests/unit/test_compose_from_notes.py",
+      "start_line": 197,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_cli_writes_to_stdout_when_out_is_dash",
+      "file_path": "tests/unit/test_compose_from_notes.py",
+      "start_line": 231,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_cli_writes_draft_to_out_on_success",
+      "file_path": "tests/unit/test_compose_from_notes.py",
+      "start_line": 253,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_cli_returns_2_when_notes_missing",
+      "file_path": "tests/unit/test_compose_from_notes.py",
+      "start_line": 275,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_cli_returns_2_when_notes_empty",
+      "file_path": "tests/unit/test_compose_from_notes.py",
+      "start_line": 289,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_cli_returns_2_when_groq_api_key_missing",
+      "file_path": "tests/unit/test_compose_from_notes.py",
+      "start_line": 302,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_voice_constraints_empty_when_voice_is_none",
+      "file_path": "tests/unit/test_compose_from_notes.py",
+      "start_line": 319,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_voice_constraints_empty_when_voice_attr_missing",
+      "file_path": "tests/unit/test_compose_from_notes.py",
+      "start_line": 324,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_voice_constraints_handle_missing_mumbli_file",
+      "file_path": "tests/unit/test_compose_from_notes.py",
+      "start_line": 329,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_voice_constraints_derived_from_corpus",
+      "file_path": "tests/unit/test_compose_from_notes.py",
+      "start_line": 336,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_voice_constraints_lists_human_ask_source_when_present",
+      "file_path": "tests/unit/test_compose_from_notes.py",
+      "start_line": 373,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_voice_constraints_human_ask_weighting_shifts_profile",
+      "file_path": "tests/unit/test_compose_from_notes.py",
+      "start_line": 411,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_load_mumbli_filters_failed_and_length",
+      "file_path": "tests/unit/test_corpus.py",
+      "start_line": 14,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_load_mumbli_limit_caps_samples",
+      "file_path": "tests/unit/test_corpus.py",
+      "start_line": 30,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_load_mumbli_missing_file_returns_empty",
+      "file_path": "tests/unit/test_corpus.py",
+      "start_line": 39,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_append_and_load_human_ask_roundtrip",
+      "file_path": "tests/unit/test_corpus.py",
+      "start_line": 45,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_append_human_ask_creates_parent_dir",
+      "file_path": "tests/unit/test_corpus.py",
+      "start_line": 64,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_append_human_ask_appends_multiple",
+      "file_path": "tests/unit/test_corpus.py",
+      "start_line": 74,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_append_human_ask_rejects_empty_text",
+      "file_path": "tests/unit/test_corpus.py",
+      "start_line": 88,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_append_human_ask_rejects_empty_ask_id",
+      "file_path": "tests/unit/test_corpus.py",
+      "start_line": 95,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_load_human_ask_missing_file_returns_empty",
+      "file_path": "tests/unit/test_corpus.py",
+      "start_line": 102,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_load_mumbli_malformed_json_returns_empty",
+      "file_path": "tests/unit/test_corpus.py",
+      "start_line": 109,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_load_human_ask_unreadable_returns_empty",
+      "file_path": "tests/unit/test_corpus.py",
+      "start_line": 123,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_load_human_ask_skips_malformed_lines",
+      "file_path": "tests/unit/test_corpus.py",
+      "start_line": 147,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_append_human_ask_sets_owner_only_permissions",
+      "file_path": "tests/unit/test_corpus.py",
+      "start_line": 161,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_voice_corpus_path_is_under_gitignored_prefix",
+      "file_path": "tests/unit/test_corpus.py",
+      "start_line": 182,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_load_human_ask_drops_empty_text",
+      "file_path": "tests/unit/test_corpus.py",
+      "start_line": 211,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_corpus_pick_is_deterministic_by_seed",
+      "file_path": "tests/unit/test_corpus.py",
+      "start_line": 225,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_corpus_pick_returns_empty_for_zero_k",
+      "file_path": "tests/unit/test_corpus.py",
+      "start_line": 235,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_none_injector_returns_empty_string",
+      "file_path": "tests/unit/test_corpus.py",
+      "start_line": 240,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_few_shot_static_injector_stable_across_attempts",
+      "file_path": "tests/unit/test_corpus.py",
+      "start_line": 246,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_few_shot_static_injector_empty_corpus",
+      "file_path": "tests/unit/test_corpus.py",
+      "start_line": 258,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_make_injector_none",
+      "file_path": "tests/unit/test_corpus.py",
+      "start_line": 263,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_make_injector_mumbli",
+      "file_path": "tests/unit/test_corpus.py",
+      "start_line": 268,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_make_injector_rejects_unknown_mode",
+      "file_path": "tests/unit/test_corpus.py",
+      "start_line": 283,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_retrieval_injector_picks_overlapping_sample_first",
+      "file_path": "tests/unit/test_corpus.py",
+      "start_line": 296,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_retrieval_injector_query_changes_picks",
+      "file_path": "tests/unit/test_corpus.py",
+      "start_line": 311,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_retrieval_injector_empty_query_falls_back_to_random_pick",
+      "file_path": "tests/unit/test_corpus.py",
+      "start_line": 327,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_retrieval_injector_no_overlap_falls_back_to_random",
+      "file_path": "tests/unit/test_corpus.py",
+      "start_line": 335,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_retrieval_injector_empty_corpus",
+      "file_path": "tests/unit/test_corpus.py",
+      "start_line": 343,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_retrieval_injector_deterministic_top_k",
+      "file_path": "tests/unit/test_corpus.py",
+      "start_line": 348,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_make_injector_mumbli_retrieval",
+      "file_path": "tests/unit/test_corpus.py",
+      "start_line": 364,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_parse_no_results_array",
+      "file_path": "tests/unit/test_detect.py",
+      "start_line": 14,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_parse_single_result_proxies_classification",
+      "file_path": "tests/unit/test_detect.py",
+      "start_line": 31,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_parse_multi_result_preserves_each",
+      "file_path": "tests/unit/test_detect.py",
+      "start_line": 50,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_parse_handles_malformed_classification_gracefully",
+      "file_path": "tests/unit/test_detect.py",
+      "start_line": 73,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_parse_empty_summary_defaults_to_zero",
+      "file_path": "tests/unit/test_detect.py",
+      "start_line": 89,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_parse_non_numeric_score_defaults_to_zero",
+      "file_path": "tests/unit/test_detect.py",
+      "start_line": 97,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_parse_gptzero_non_numeric_score_defaults_to_zero",
+      "file_path": "tests/unit/test_detect.py",
+      "start_line": 106,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_parse_gptzero_canonical_response",
+      "file_path": "tests/unit/test_detect.py",
+      "start_line": 151,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_parse_gptzero_captures_sentence_text_and_generated_prob",
+      "file_path": "tests/unit/test_detect.py",
+      "start_line": 169,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_parse_gptzero_mixed_classification",
+      "file_path": "tests/unit/test_detect.py",
+      "start_line": 199,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_parse_gptzero_empty_documents_does_not_crash",
+      "file_path": "tests/unit/test_detect.py",
+      "start_line": 217,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_gptzero_client_sends_x_api_key_and_user_agent",
+      "file_path": "tests/unit/test_detect.py",
+      "start_line": 225,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_gptzero_client_sends_x_api_key_and_user_agent::FakeResp::read",
+      "file_path": "tests/unit/test_detect.py",
+      "start_line": 232,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "test_gptzero_client_sends_x_api_key_and_user_agent::FakeResp::__enter__",
+      "file_path": "tests/unit/test_detect.py",
+      "start_line": 235,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "test_gptzero_client_sends_x_api_key_and_user_agent::FakeResp::__exit__",
+      "file_path": "tests/unit/test_detect.py",
+      "start_line": 238,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "test_gptzero_client_too_short_raises_before_request",
+      "file_path": "tests/unit/test_detect.py",
+      "start_line": 262,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_gptzero_client_http_error_wraps_into_gptzero_error",
+      "file_path": "tests/unit/test_detect.py",
+      "start_line": 274,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_gptzero_client_requires_api_key",
+      "file_path": "tests/unit/test_detect.py",
+      "start_line": 293,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_gptzero_client_network_failure_wraps_into_gptzero_error",
+      "file_path": "tests/unit/test_detect.py",
+      "start_line": 298,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_gptzero_client_non_json_response_wraps_into_gptzero_error",
+      "file_path": "tests/unit/test_detect.py",
+      "start_line": 316,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_gptzero_client_non_json_response_wraps_into_gptzero_error::FakeResp::__enter__",
+      "file_path": "tests/unit/test_detect.py",
+      "start_line": 324,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "test_gptzero_client_non_json_response_wraps_into_gptzero_error::FakeResp::__exit__",
+      "file_path": "tests/unit/test_detect.py",
+      "start_line": 325,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "test_gptzero_client_non_json_response_wraps_into_gptzero_error::FakeResp::read",
+      "file_path": "tests/unit/test_detect.py",
+      "start_line": 326,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "test_post_json_network_failure_returns_zero_status",
+      "file_path": "tests/unit/test_detect.py",
+      "start_line": 336,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "_FakeFile::__init__",
+      "file_path": "tests/unit/test_detect.py",
+      "start_line": 355,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "_FakeFile::read",
+      "file_path": "tests/unit/test_detect.py",
+      "start_line": 358,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "_FakeFile::close",
+      "file_path": "tests/unit/test_detect.py",
+      "start_line": 361,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "test_load_env_basic_kv",
+      "file_path": "tests/unit/test_env.py",
+      "start_line": 20,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_load_env_handles_export_prefix",
+      "file_path": "tests/unit/test_env.py",
+      "start_line": 32,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_load_env_skips_blank_keys",
+      "file_path": "tests/unit/test_env.py",
+      "start_line": 41,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_load_env_unreadable_warns_and_continues",
+      "file_path": "tests/unit/test_env.py",
+      "start_line": 49,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_load_env_falls_back_to_os_environ",
+      "file_path": "tests/unit/test_env.py",
+      "start_line": 73,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "FixedSentencesClient::detect",
+      "file_path": "tests/unit/test_fix.py",
+      "start_line": 29,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "ReplacementRewriter::propose_sentence",
+      "file_path": "tests/unit/test_fix.py",
+      "start_line": 70,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "test_single_pass_resolved_on_first_iter",
+      "file_path": "tests/unit/test_fix.py",
+      "start_line": 82,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_no_op_when_original_under_threshold",
+      "file_path": "tests/unit/test_fix.py",
+      "start_line": 105,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_loop_converges_after_three_iters",
+      "file_path": "tests/unit/test_fix.py",
+      "start_line": 126,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_loop_aborts_when_no_rewrites_accepted",
+      "file_path": "tests/unit/test_fix.py",
+      "start_line": 156,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_loop_caps_at_max_iterations_and_stays_unresolved",
+      "file_path": "tests/unit/test_fix.py",
+      "start_line": 175,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_loop_default_selector_keeps_latest_even_after_regression",
+      "file_path": "tests/unit/test_fix.py",
+      "start_line": 199,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_loop_detector_selector_keeps_lowest_score_source",
+      "file_path": "tests/unit/test_fix.py",
+      "start_line": 224,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_latest_stitched_source_tracks_no_improvement_patch",
+      "file_path": "tests/unit/test_fix.py",
+      "start_line": 244,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_fix_persists_json_without_raw_text",
+      "file_path": "tests/unit/test_fix.py",
+      "start_line": 275,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_accepted_patches_captured_in_memory",
+      "file_path": "tests/unit/test_fix.py",
+      "start_line": 301,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_persisted_json_strips_accepted_patches",
+      "file_path": "tests/unit/test_fix.py",
+      "start_line": 323,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_accepted_patches_empty_when_all_rejected",
+      "file_path": "tests/unit/test_fix.py",
+      "start_line": 345,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_invalid_max_iterations_raises",
+      "file_path": "tests/unit/test_fix.py",
+      "start_line": 361,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_plateau_fires_on_accepted_but_no_movement",
+      "file_path": "tests/unit/test_fix.py",
+      "start_line": 397,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_plateau_does_not_fire_when_score_actively_improving",
+      "file_path": "tests/unit/test_fix.py",
+      "start_line": 412,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_plateau_does_not_fire_when_no_iterations",
+      "file_path": "tests/unit/test_fix.py",
+      "start_line": 428,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_plateau_fires_on_rejection_dominance",
+      "file_path": "tests/unit/test_fix.py",
+      "start_line": 434,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_plateau_fires_on_rewriter_error_dominance",
+      "file_path": "tests/unit/test_fix.py",
+      "start_line": 449,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_plateau_does_not_fire_below_attempt_floor",
+      "file_path": "tests/unit/test_fix.py",
+      "start_line": 469,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_plateau_reason_persisted_in_bench_json",
+      "file_path": "tests/unit/test_fix.py",
+      "start_line": 484,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_plateau_does_not_override_resolved",
+      "file_path": "tests/unit/test_fix.py",
+      "start_line": 505,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "FakeMultiSentenceClient::detect",
+      "file_path": "tests/unit/test_highlight.py",
+      "start_line": 18,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "FakeDocLevelOnlyClient::detect",
+      "file_path": "tests/unit/test_highlight.py",
+      "start_line": 53,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "test_highlight_multi_sentence_breakdown",
+      "file_path": "tests/unit/test_highlight.py",
+      "start_line": 77,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_highlight_persists_json",
+      "file_path": "tests/unit/test_highlight.py",
+      "start_line": 94,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_highlight_persist_failure_warns_and_returns",
+      "file_path": "tests/unit/test_highlight.py",
+      "start_line": 109,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_highlight_handles_doc_level_only_detector",
+      "file_path": "tests/unit/test_highlight.py",
+      "start_line": 138,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_highlight_empty_sections_emits_doc_verdict_row",
+      "file_path": "tests/unit/test_highlight.py",
+      "start_line": 147,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_highlight_empty_sections_emits_doc_verdict_row::EmptySectionsClient::detect",
+      "file_path": "tests/unit/test_highlight.py",
+      "start_line": 154,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "test_highlight_threshold_zero_exit_code_flow",
+      "file_path": "tests/unit/test_highlight.py",
+      "start_line": 177,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "write",
+      "file_path": "tests/unit/test_markers.py",
+      "start_line": 6,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_md_frontmatter_true",
+      "file_path": "tests/unit/test_markers.py",
+      "start_line": 13,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_md_frontmatter_false",
+      "file_path": "tests/unit/test_markers.py",
+      "start_line": 18,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_md_no_frontmatter",
+      "file_path": "tests/unit/test_markers.py",
+      "start_line": 23,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_md_frontmatter_without_copycat_key",
+      "file_path": "tests/unit/test_markers.py",
+      "start_line": 28,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_html_marker_true",
+      "file_path": "tests/unit/test_markers.py",
+      "start_line": 33,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_html_marker_false_case_insensitive",
+      "file_path": "tests/unit/test_markers.py",
+      "start_line": 38,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_html_no_marker",
+      "file_path": "tests/unit/test_markers.py",
+      "start_line": 43,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_pdf_sidecar_true",
+      "file_path": "tests/unit/test_markers.py",
+      "start_line": 48,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_pdf_no_sidecar",
+      "file_path": "tests/unit/test_markers.py",
+      "start_line": 54,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_md_sidecar_overrides_when_no_frontmatter",
+      "file_path": "tests/unit/test_markers.py",
+      "start_line": 59,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "FakeClient::detect",
+      "file_path": "tests/unit/test_probe.py",
+      "start_line": 21,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "test_probe_short_file_single_chunk",
+      "file_path": "tests/unit/test_probe.py",
+      "start_line": 49,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_probe_multiple_chunks_each_scored",
+      "file_path": "tests/unit/test_probe.py",
+      "start_line": 63,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_probe_halts_remaining_chunks_after_credit_error",
+      "file_path": "tests/unit/test_probe.py",
+      "start_line": 81,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_probe_max_chunks_caps_credit_spend",
+      "file_path": "tests/unit/test_probe.py",
+      "start_line": 99,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_probe_persist_failure_warns_and_returns",
+      "file_path": "tests/unit/test_probe.py",
+      "start_line": 112,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_probe_writes_bench_json",
+      "file_path": "tests/unit/test_probe.py",
+      "start_line": 145,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_probe_surfaces_multi_section_breakdown",
+      "file_path": "tests/unit/test_probe.py",
+      "start_line": 163,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_probe_surfaces_multi_section_breakdown::MultiSectionClient::detect",
+      "file_path": "tests/unit/test_probe.py",
+      "start_line": 171,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "test_probe_no_sections_when_single_result",
+      "file_path": "tests/unit/test_probe.py",
+      "start_line": 209,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_probe_no_sections_when_single_result::SingleSectionClient::detect",
+      "file_path": "tests/unit/test_probe.py",
+      "start_line": 215,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "test_probe_handles_too_short",
+      "file_path": "tests/unit/test_probe.py",
+      "start_line": 240,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_probe_handles_too_short::ShortRejectingClient::detect",
+      "file_path": "tests/unit/test_probe.py",
+      "start_line": 246,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "test_extract_empty_returns_zero_profile",
+      "file_path": "tests/unit/test_profile.py",
+      "start_line": 27,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_extract_whitespace_only_treated_as_empty",
+      "file_path": "tests/unit/test_profile.py",
+      "start_line": 35,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_extract_note_preserved",
+      "file_path": "tests/unit/test_profile.py",
+      "start_line": 40,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_extract_counts_words",
+      "file_path": "tests/unit/test_profile.py",
+      "start_line": 48,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_extract_mean_sentence_length",
+      "file_path": "tests/unit/test_profile.py",
+      "start_line": 54,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_extract_median_sentence_length",
+      "file_path": "tests/unit/test_profile.py",
+      "start_line": 60,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_extract_stddev_zero_when_single_sentence",
+      "file_path": "tests/unit/test_profile.py",
+      "start_line": 66,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_extract_fragment_rate_detects_no_verb",
+      "file_path": "tests/unit/test_profile.py",
+      "start_line": 71,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_extract_em_dash_per_1k",
+      "file_path": "tests/unit/test_profile.py",
+      "start_line": 77,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_extract_hedge_rate",
+      "file_path": "tests/unit/test_profile.py",
+      "start_line": 83,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_extract_transition_rate",
+      "file_path": "tests/unit/test_profile.py",
+      "start_line": 89,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_extract_direct_opener_counts_i_plus_verb_at_line_start",
+      "file_path": "tests/unit/test_profile.py",
+      "start_line": 94,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_extract_compression_equals_mean_sentence_len",
+      "file_path": "tests/unit/test_profile.py",
+      "start_line": 103,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_alex_sample_has_shorter_sentences_than_ai_long",
+      "file_path": "tests/unit/test_profile.py",
+      "start_line": 111,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_alex_sample_more_direct_openers_than_ai_long",
+      "file_path": "tests/unit/test_profile.py",
+      "start_line": 117,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_fit_returns_zero_for_empty_text",
+      "file_path": "tests/unit/test_profile.py",
+      "start_line": 126,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_fit_returns_zero_when_profile_is_empty",
+      "file_path": "tests/unit/test_profile.py",
+      "start_line": 131,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_fit_higher_for_same_style_than_different_style",
+      "file_path": "tests/unit/test_profile.py",
+      "start_line": 136,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_fit_bounded_in_unit_interval",
+      "file_path": "tests/unit/test_profile.py",
+      "start_line": 147,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_fit_self_similarity_is_high",
+      "file_path": "tests/unit/test_profile.py",
+      "start_line": 154,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_to_dict_contains_all_scalar_fields",
+      "file_path": "tests/unit/test_profile.py",
+      "start_line": 165,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_to_dict_values_rounded",
+      "file_path": "tests/unit/test_profile.py",
+      "start_line": 189,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_profile_show_human_readable",
+      "file_path": "tests/unit/test_profile_show_cli.py",
+      "start_line": 50,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_profile_show_json",
+      "file_path": "tests/unit/test_profile_show_cli.py",
+      "start_line": 66,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_profile_show_returns_1_when_corpus_empty",
+      "file_path": "tests/unit/test_profile_show_cli.py",
+      "start_line": 97,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_profile_show_returns_1_when_corpus_missing",
+      "file_path": "tests/unit/test_profile_show_cli.py",
+      "start_line": 109,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_profile_show_json_when_empty_emits_error_object",
+      "file_path": "tests/unit/test_profile_show_cli.py",
+      "start_line": 116,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_profile_show_rejects_unknown_voice",
+      "file_path": "tests/unit/test_profile_show_cli.py",
+      "start_line": 130,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_profile_show_human_ask_reads_local_corpus",
+      "file_path": "tests/unit/test_profile_show_cli.py",
+      "start_line": 141,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_profile_show_human_ask_empty_returns_1",
+      "file_path": "tests/unit/test_profile_show_cli.py",
+      "start_line": 164,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_profile_show_blended_combines_both_corpora",
+      "file_path": "tests/unit/test_profile_show_cli.py",
+      "start_line": 179,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_profile_show_blended_with_no_corpora_returns_1",
+      "file_path": "tests/unit/test_profile_show_cli.py",
+      "start_line": 203,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_profile_show_blended_json_emits_full_profile",
+      "file_path": "tests/unit/test_profile_show_cli.py",
+      "start_line": 213,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_md_strips_frontmatter",
+      "file_path": "tests/unit/test_readers.py",
+      "start_line": 8,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_md_without_frontmatter_returns_body",
+      "file_path": "tests/unit/test_readers.py",
+      "start_line": 17,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_html_strips_tags",
+      "file_path": "tests/unit/test_readers.py",
+      "start_line": 25,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_unsupported_suffix_raises",
+      "file_path": "tests/unit/test_readers.py",
+      "start_line": 39,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_corrupted_pdf_raises_valueerror_not_pypdf_error",
+      "file_path": "tests/unit/test_readers.py",
+      "start_line": 46,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_normalize_collapses_whitespace_and_blank_runs",
+      "file_path": "tests/unit/test_readers.py",
+      "start_line": 62,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_chunk_text_empty_returns_no_chunks",
+      "file_path": "tests/unit/test_readers.py",
+      "start_line": 67,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_chunk_text_short_text_returns_single_chunk",
+      "file_path": "tests/unit/test_readers.py",
+      "start_line": 72,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_chunk_text_splits_on_paragraph_break",
+      "file_path": "tests/unit/test_readers.py",
+      "start_line": 81,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_chunk_text_falls_back_to_sentence_then_word_breaks",
+      "file_path": "tests/unit/test_readers.py",
+      "start_line": 93,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_chunk_text_chunks_cover_source_in_order",
+      "file_path": "tests/unit/test_readers.py",
+      "start_line": 103,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_chunk_text_no_whitespace_blob_hard_cuts",
+      "file_path": "tests/unit/test_readers.py",
+      "start_line": 114,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_chunk_text_merges_tiny_tail",
+      "file_path": "tests/unit/test_readers.py",
+      "start_line": 122,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_load_events_empty_dir",
+      "file_path": "tests/unit/test_report.py",
+      "start_line": 14,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_load_events_handles_path_that_is_a_file_not_a_dir",
+      "file_path": "tests/unit/test_report.py",
+      "start_line": 21,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_load_events_survives_iterdir_race",
+      "file_path": "tests/unit/test_report.py",
+      "start_line": 29,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_load_events_skips_malformed_entries_without_crashing",
+      "file_path": "tests/unit/test_report.py",
+      "start_line": 50,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_load_events_parses_all_six_shapes",
+      "file_path": "tests/unit/test_report.py",
+      "start_line": 68,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_load_events_skips_unknown_and_malformed",
+      "file_path": "tests/unit/test_report.py",
+      "start_line": 123,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_timeline_for_filters_and_sorts_by_run_id",
+      "file_path": "tests/unit/test_report.py",
+      "start_line": 146,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_kinds_filter",
+      "file_path": "tests/unit/test_report.py",
+      "start_line": 175,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_recent_returns_newest_first",
+      "file_path": "tests/unit/test_report.py",
+      "start_line": 188,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_known_kinds_matches_parser_table",
+      "file_path": "tests/unit/test_report.py",
+      "start_line": 200,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_cell_ranking_aggregates_across_runs_ascending",
+      "file_path": "tests/unit/test_report.py",
+      "start_line": 215,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_cell_ranking_ignores_non_bench_events",
+      "file_path": "tests/unit/test_report.py",
+      "start_line": 239,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_cell_ranking_skips_outcomes_without_score",
+      "file_path": "tests/unit/test_report.py",
+      "start_line": 250,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_cell_ranking_empty_input",
+      "file_path": "tests/unit/test_report.py",
+      "start_line": 263,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_cell_ranking_single_sample_stddev_zero",
+      "file_path": "tests/unit/test_report.py",
+      "start_line": 267,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_family_ranking_aggregates_ascending",
+      "file_path": "tests/unit/test_report.py",
+      "start_line": 284,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_family_ranking_skips_events_without_family",
+      "file_path": "tests/unit/test_report.py",
+      "start_line": 301,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_family_ranking_ignores_non_bench_events",
+      "file_path": "tests/unit/test_report.py",
+      "start_line": 313,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_family_ranking_skips_unscored_outcomes",
+      "file_path": "tests/unit/test_report.py",
+      "start_line": 325,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_family_ranking_empty_input",
+      "file_path": "tests/unit/test_report.py",
+      "start_line": 334,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_parse_bench_fills_legacy_family_when_field_missing",
+      "file_path": "tests/unit/test_report.py",
+      "start_line": 338,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "FakeDetector::detect",
+      "file_path": "tests/unit/test_rewrite.py",
+      "start_line": 17,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "FakeRewriter::propose",
+      "file_path": "tests/unit/test_rewrite.py",
+      "start_line": 40,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "test_no_op_when_score_already_under_threshold",
+      "file_path": "tests/unit/test_rewrite.py",
+      "start_line": 47,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_resolved_on_first_passing_score",
+      "file_path": "tests/unit/test_rewrite.py",
+      "start_line": 61,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_length_guard_rejects_bloat",
+      "file_path": "tests/unit/test_rewrite.py",
+      "start_line": 78,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_identical_rewrite_rejected",
+      "file_path": "tests/unit/test_rewrite.py",
+      "start_line": 95,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_unresolved_when_no_attempt_passes_threshold",
+      "file_path": "tests/unit/test_rewrite.py",
+      "start_line": 109,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_trend_abort_after_two_regressions_off_best",
+      "file_path": "tests/unit/test_rewrite.py",
+      "start_line": 123,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_groq_error_stops_loop",
+      "file_path": "tests/unit/test_rewrite.py",
+      "start_line": 139,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_groq_error_stops_loop::ExplodingRewriter::propose",
+      "file_path": "tests/unit/test_rewrite.py",
+      "start_line": 141,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "test_clean_model_output_strips_code_fences",
+      "file_path": "tests/unit/test_rewrite.py",
+      "start_line": 158,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_clean_model_output_strips_file_wrapper",
+      "file_path": "tests/unit/test_rewrite.py",
+      "start_line": 163,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_agent_stage_resolves_after_groq_exhausts",
+      "file_path": "tests/unit/test_rewrite.py",
+      "start_line": 171,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_groq_resolves_short_circuits_agent_stage",
+      "file_path": "tests/unit/test_rewrite.py",
+      "start_line": 199,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_groq_error_does_not_block_agent_stage",
+      "file_path": "tests/unit/test_rewrite.py",
+      "start_line": 221,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_groq_error_does_not_block_agent_stage::ExplodingGroq::propose",
+      "file_path": "tests/unit/test_rewrite.py",
+      "start_line": 225,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "test_copyleaks_error_aborts_pipeline",
+      "file_path": "tests/unit/test_rewrite.py",
+      "start_line": 251,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_copyleaks_error_aborts_pipeline::BoomDetector::detect",
+      "file_path": "tests/unit/test_rewrite.py",
+      "start_line": 255,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "test_missing_rewriter_and_stages_raises",
+      "file_path": "tests/unit/test_rewrite.py",
+      "start_line": 278,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_agent_rewriter_runs_subprocess",
+      "file_path": "tests/unit/test_rewrite.py",
+      "start_line": 292,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_agent_rewriter_strips_credentials_from_subprocess_env",
+      "file_path": "tests/unit/test_rewrite.py",
+      "start_line": 319,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_agent_rewriter_strips_credentials_from_propose_sentence_too",
+      "file_path": "tests/unit/test_rewrite.py",
+      "start_line": 354,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_agent_rewriter_nonzero_exit_raises",
+      "file_path": "tests/unit/test_rewrite.py",
+      "start_line": 381,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_agent_rewriter_timeout_raises",
+      "file_path": "tests/unit/test_rewrite.py",
+      "start_line": 396,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_agent_rewriter_requires_cmd",
+      "file_path": "tests/unit/test_rewrite.py",
+      "start_line": 408,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_groq_rewriter_network_failure_wraps_into_groq_error",
+      "file_path": "tests/unit/test_rewrite.py",
+      "start_line": 413,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_groq_rewriter_non_json_success_wraps_into_groq_error",
+      "file_path": "tests/unit/test_rewrite.py",
+      "start_line": 431,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_groq_rewriter_non_json_success_wraps_into_groq_error::FakeResp::__enter__",
+      "file_path": "tests/unit/test_rewrite.py",
+      "start_line": 435,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "test_groq_rewriter_non_json_success_wraps_into_groq_error::FakeResp::__exit__",
+      "file_path": "tests/unit/test_rewrite.py",
+      "start_line": 436,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "test_groq_rewriter_non_json_success_wraps_into_groq_error::FakeResp::read",
+      "file_path": "tests/unit/test_rewrite.py",
+      "start_line": 437,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "test_agent_rewriter_missing_binary_raises_agent_error",
+      "file_path": "tests/unit/test_rewrite.py",
+      "start_line": 447,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_agent_rewriter_sentence_missing_binary_raises_agent_error",
+      "file_path": "tests/unit/test_rewrite.py",
+      "start_line": 468,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_make_agent_rewriter_parses_shell_string",
+      "file_path": "tests/unit/test_rewrite.py",
+      "start_line": 482,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_clean_model_output_strips_wrapping_fence",
+      "file_path": "tests/unit/test_rewrite.py",
+      "start_line": 494,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_clean_model_output_preserves_content_ending_in_backticks",
+      "file_path": "tests/unit/test_rewrite.py",
+      "start_line": 500,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_clean_model_output_preserves_mid_content_backticks",
+      "file_path": "tests/unit/test_rewrite.py",
+      "start_line": 509,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_clean_model_output_leaves_inline_backticks_alone",
+      "file_path": "tests/unit/test_rewrite.py",
+      "start_line": 517,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_clean_sentence_strips_ascii_double_quote_wrap",
+      "file_path": "tests/unit/test_rewrite.py",
+      "start_line": 523,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_clean_sentence_strips_ascii_single_quote_wrap",
+      "file_path": "tests/unit/test_rewrite.py",
+      "start_line": 528,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_clean_sentence_strips_smart_double_quote_wrap",
+      "file_path": "tests/unit/test_rewrite.py",
+      "start_line": 532,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_clean_sentence_strips_smart_single_quote_wrap",
+      "file_path": "tests/unit/test_rewrite.py",
+      "start_line": 539,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_clean_sentence_strips_guillemet_wrap",
+      "file_path": "tests/unit/test_rewrite.py",
+      "start_line": 543,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_clean_sentence_does_not_strip_mismatched_quotes",
+      "file_path": "tests/unit/test_rewrite.py",
+      "start_line": 549,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_clean_sentence_preserves_internal_quotes",
+      "file_path": "tests/unit/test_rewrite.py",
+      "start_line": 557,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_groq_rewriter_default_injector_is_none",
+      "file_path": "tests/unit/test_rewrite.py",
+      "start_line": 566,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_groq_rewriter_injects_corpus_into_user_prompt",
+      "file_path": "tests/unit/test_rewrite.py",
+      "start_line": 572,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_groq_rewriter_injects_corpus_into_user_prompt::FakeResp::read",
+      "file_path": "tests/unit/test_rewrite.py",
+      "start_line": 576,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "test_groq_rewriter_injects_corpus_into_user_prompt::FakeResp::__enter__",
+      "file_path": "tests/unit/test_rewrite.py",
+      "start_line": 579,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "test_groq_rewriter_injects_corpus_into_user_prompt::FakeResp::__exit__",
+      "file_path": "tests/unit/test_rewrite.py",
+      "start_line": 582,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "test_groq_rewriter_no_injector_no_style_block",
+      "file_path": "tests/unit/test_rewrite.py",
+      "start_line": 615,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_groq_rewriter_no_injector_no_style_block::FakeResp::read",
+      "file_path": "tests/unit/test_rewrite.py",
+      "start_line": 619,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "test_groq_rewriter_no_injector_no_style_block::FakeResp::__enter__",
+      "file_path": "tests/unit/test_rewrite.py",
+      "start_line": 622,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "test_groq_rewriter_no_injector_no_style_block::FakeResp::__exit__",
+      "file_path": "tests/unit/test_rewrite.py",
+      "start_line": 625,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "test_groq_rewriter_passes_query_to_retrieval_injector",
+      "file_path": "tests/unit/test_rewrite.py",
+      "start_line": 640,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_groq_rewriter_passes_query_to_retrieval_injector::RecordingInjector::style_block",
+      "file_path": "tests/unit/test_rewrite.py",
+      "start_line": 645,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "test_groq_rewriter_passes_query_to_retrieval_injector::FakeResp::read",
+      "file_path": "tests/unit/test_rewrite.py",
+      "start_line": 650,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "test_groq_rewriter_passes_query_to_retrieval_injector::FakeResp::__enter__",
+      "file_path": "tests/unit/test_rewrite.py",
+      "start_line": 653,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "test_groq_rewriter_passes_query_to_retrieval_injector::FakeResp::__exit__",
+      "file_path": "tests/unit/test_rewrite.py",
+      "start_line": 656,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "_mock_groq_response::FakeResp::read",
+      "file_path": "tests/unit/test_rewrite.py",
+      "start_line": 673,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "_mock_groq_response::FakeResp::__enter__",
+      "file_path": "tests/unit/test_rewrite.py",
+      "start_line": 676,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "_mock_groq_response::FakeResp::__exit__",
+      "file_path": "tests/unit/test_rewrite.py",
+      "start_line": 679,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "test_propose_sentence_builds_expected_prompt",
+      "file_path": "tests/unit/test_rewrite.py",
+      "start_line": 690,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_propose_sentence_strips_tag_and_quote_wrapping",
+      "file_path": "tests/unit/test_rewrite.py",
+      "start_line": 708,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_rewrite_sentences_happy_path",
+      "file_path": "tests/unit/test_rewrite.py",
+      "start_line": 715,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_rewrite_sentences_happy_path::StubRewriter::propose_sentence",
+      "file_path": "tests/unit/test_rewrite.py",
+      "start_line": 723,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "test_rewrite_sentences_rejects_too_long_and_identical",
+      "file_path": "tests/unit/test_rewrite.py",
+      "start_line": 738,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_rewrite_sentences_rejects_too_long_and_identical::StubRewriter::propose_sentence",
+      "file_path": "tests/unit/test_rewrite.py",
+      "start_line": 746,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "test_rewrite_sentences_handles_rewriter_error",
+      "file_path": "tests/unit/test_rewrite.py",
+      "start_line": 762,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_rewrite_sentences_handles_rewriter_error::BoomRewriter::propose_sentence",
+      "file_path": "tests/unit/test_rewrite.py",
+      "start_line": 767,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "test_agent_rewriter_propose_sentence",
+      "file_path": "tests/unit/test_rewrite.py",
+      "start_line": 780,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_agent_rewriter_injects_corpus_into_stdin",
+      "file_path": "tests/unit/test_rewrite.py",
+      "start_line": 800,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_bench_run_id_collision_safe",
+      "file_path": "tests/unit/test_run_id_collisions.py",
+      "start_line": 26,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_fix_run_id_collision_safe",
+      "file_path": "tests/unit/test_run_id_collisions.py",
+      "start_line": 30,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_probe_run_id_collision_safe",
+      "file_path": "tests/unit/test_run_id_collisions.py",
+      "start_line": 34,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_highlight_run_id_collision_safe",
+      "file_path": "tests/unit/test_run_id_collisions.py",
+      "start_line": 38,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_verify_run_id_collision_safe",
+      "file_path": "tests/unit/test_run_id_collisions.py",
+      "start_line": 42,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_report_parser_handles_microsecond_run_ids",
+      "file_path": "tests/unit/test_run_id_collisions.py",
+      "start_line": 46,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_config_matches_glob",
+      "file_path": "tests/unit/test_scope.py",
+      "start_line": 20,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_marker_false_excludes_config_match",
+      "file_path": "tests/unit/test_scope.py",
+      "start_line": 28,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_marker_true_promotes_orphan",
+      "file_path": "tests/unit/test_scope.py",
+      "start_line": 41,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_malformed_toml_raises_scope_config_error",
+      "file_path": "tests/unit/test_scope.py",
+      "start_line": 58,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_glob_matches_skips_pattern_on_oserror",
+      "file_path": "tests/unit/test_scope.py",
+      "start_line": 71,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_missing_config_returns_empty",
+      "file_path": "tests/unit/test_scope.py",
+      "start_line": 104,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_marker_sweep_skips_dot_copycat",
+      "file_path": "tests/unit/test_scope.py",
+      "start_line": 110,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_marker_sweep_skips_git_and_noise_dirs",
+      "file_path": "tests/unit/test_scope.py",
+      "start_line": 136,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_extra_paths_added_to_scope",
+      "file_path": "tests/unit/test_scope.py",
+      "start_line": 156,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_find_targets_locates_sequential_matches",
+      "file_path": "tests/unit/test_sentence.py",
+      "start_line": 35,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_find_targets_handles_duplicate_sentences_via_cursor",
+      "file_path": "tests/unit/test_sentence.py",
+      "start_line": 51,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_find_targets_skips_unfindable_sentences",
+      "file_path": "tests/unit/test_sentence.py",
+      "start_line": 64,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_find_targets_skips_sections_without_text",
+      "file_path": "tests/unit/test_sentence.py",
+      "start_line": 76,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_find_targets_flagged_only_false_includes_human",
+      "file_path": "tests/unit/test_sentence.py",
+      "start_line": 88,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_find_targets_preserves_original_section_index_after_skips",
+      "file_path": "tests/unit/test_sentence.py",
+      "start_line": 99,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_top_by_ai_prob_picks_highest_in_source_order",
+      "file_path": "tests/unit/test_sentence.py",
+      "start_line": 110,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_top_by_ai_prob_edge_cases",
+      "file_path": "tests/unit/test_sentence.py",
+      "start_line": 124,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_stitch_applies_rewrites_in_reverse_offset_order",
+      "file_path": "tests/unit/test_sentence.py",
+      "start_line": 133,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_stitch_with_no_rewrites_returns_source_unchanged",
+      "file_path": "tests/unit/test_sentence.py",
+      "start_line": 147,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_stitch_raises_on_out_of_range_offsets",
+      "file_path": "tests/unit/test_sentence.py",
+      "start_line": 151,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_no_unused_imports_in_src",
+      "file_path": "tests/unit/test_static_audits.py",
+      "start_line": 53,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_no_mutable_default_arguments_in_src",
+      "file_path": "tests/unit/test_static_audits.py",
+      "start_line": 69,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_no_unused_private_top_level_defs_in_src",
+      "file_path": "tests/unit/test_static_audits.py",
+      "start_line": 113,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_check_env_no_dotenv",
+      "file_path": "tests/unit/test_status.py",
+      "start_line": 22,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_check_env_partial_keys",
+      "file_path": "tests/unit/test_status.py",
+      "start_line": 29,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_check_env_never_exposes_value",
+      "file_path": "tests/unit/test_status.py",
+      "start_line": 44,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_detector_auto_picks_gptzero_when_both_present",
+      "file_path": "tests/unit/test_status.py",
+      "start_line": 57,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_detector_auto_falls_back_to_copyleaks",
+      "file_path": "tests/unit/test_status.py",
+      "start_line": 66,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_detector_auto_no_creds",
+      "file_path": "tests/unit/test_status.py",
+      "start_line": 73,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_check_mumbli_missing",
+      "file_path": "tests/unit/test_status.py",
+      "start_line": 83,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_check_mumbli_parses_and_filters",
+      "file_path": "tests/unit/test_status.py",
+      "start_line": 89,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_check_mumbli_includes_voice_profile_when_samples_present",
+      "file_path": "tests/unit/test_status.py",
+      "start_line": 103,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_check_mumbli_no_profile_when_no_usable_samples",
+      "file_path": "tests/unit/test_status.py",
+      "start_line": 138,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_check_mumbli_unparseable",
+      "file_path": "tests/unit/test_status.py",
+      "start_line": 147,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_check_mumbli_wrong_root_type",
+      "file_path": "tests/unit/test_status.py",
+      "start_line": 154,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_check_bench_dir_missing",
+      "file_path": "tests/unit/test_status.py",
+      "start_line": 164,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_check_bench_dir_survives_stat_race",
+      "file_path": "tests/unit/test_status.py",
+      "start_line": 169,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_check_bench_dir_file_instead_of_dir",
+      "file_path": "tests/unit/test_status.py",
+      "start_line": 199,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_check_bench_dir_counts_by_kind",
+      "file_path": "tests/unit/test_status.py",
+      "start_line": 208,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_check_scope_no_toml",
+      "file_path": "tests/unit/test_status.py",
+      "start_line": 227,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_check_scope_counts_files",
+      "file_path": "tests/unit/test_status.py",
+      "start_line": 233,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_collect_bundles_all_checks",
+      "file_path": "tests/unit/test_status.py",
+      "start_line": 249,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_section_pattern_only_is_literal",
+      "file_path": "tests/unit/test_templates.py",
+      "start_line": 18,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_section_intent_only_is_not_literal",
+      "file_path": "tests/unit/test_templates.py",
+      "start_line": 23,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_section_requires_pattern_or_intent",
+      "file_path": "tests/unit/test_templates.py",
+      "start_line": 28,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_section_requires_name",
+      "file_path": "tests/unit/test_templates.py",
+      "start_line": 33,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_template_from_dict",
+      "file_path": "tests/unit/test_templates.py",
+      "start_line": 70,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_template_section_lookup_raises_on_unknown",
+      "file_path": "tests/unit/test_templates.py",
+      "start_line": 79,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_template_requires_sections",
+      "file_path": "tests/unit/test_templates.py",
+      "start_line": 85,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_template_rejects_duplicate_section_names",
+      "file_path": "tests/unit/test_templates.py",
+      "start_line": 90,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_template_round_trip",
+      "file_path": "tests/unit/test_templates.py",
+      "start_line": 103,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_template_to_dict_drops_empty_style",
+      "file_path": "tests/unit/test_templates.py",
+      "start_line": 111,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_template_to_dict_drops_none_section_fields",
+      "file_path": "tests/unit/test_templates.py",
+      "start_line": 121,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_template_load_rejects_non_mapping",
+      "file_path": "tests/unit/test_templates.py",
+      "start_line": 129,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_template_load_normalizes_malformed_yaml_to_valueerror",
+      "file_path": "tests/unit/test_templates.py",
+      "start_line": 136,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_template_load_normalizes_oserror_to_valueerror",
+      "file_path": "tests/unit/test_templates.py",
+      "start_line": 146,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_facts_load_normalizes_malformed_yaml_to_valueerror",
+      "file_path": "tests/unit/test_templates.py",
+      "start_line": 170,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_facts_from_dict",
+      "file_path": "tests/unit/test_templates.py",
+      "start_line": 191,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_facts_get_common_slot",
+      "file_path": "tests/unit/test_templates.py",
+      "start_line": 198,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_facts_get_extra_slot",
+      "file_path": "tests/unit/test_templates.py",
+      "start_line": 204,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_facts_get_missing_returns_none",
+      "file_path": "tests/unit/test_templates.py",
+      "start_line": 209,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_facts_is_empty",
+      "file_path": "tests/unit/test_templates.py",
+      "start_line": 214,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_facts_round_trip",
+      "file_path": "tests/unit/test_templates.py",
+      "start_line": 220,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_facts_empty_lists_not_emitted",
+      "file_path": "tests/unit/test_templates.py",
+      "start_line": 228,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_facts_load_rejects_non_mapping",
+      "file_path": "tests/unit/test_templates.py",
+      "start_line": 235,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_style_defaults_empty",
+      "file_path": "tests/unit/test_templates.py",
+      "start_line": 245,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_extract_pleo_shape",
+      "file_path": "tests/unit/test_templates.py",
+      "start_line": 272,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_extract_greeting_uses_company_token",
+      "file_path": "tests/unit/test_templates.py",
+      "start_line": 287,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_extract_greeting_literal_without_company_token",
+      "file_path": "tests/unit/test_templates.py",
+      "start_line": 294,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_extract_body_sentence_counts",
+      "file_path": "tests/unit/test_templates.py",
+      "start_line": 301,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_extract_max_words_rounded_to_5",
+      "file_path": "tests/unit/test_templates.py",
+      "start_line": 312,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_extract_signoff_pattern_preserved",
+      "file_path": "tests/unit/test_templates.py",
+      "start_line": 321,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_extract_drops_title",
+      "file_path": "tests/unit/test_templates.py",
+      "start_line": 331,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_extract_no_headings",
+      "file_path": "tests/unit/test_templates.py",
+      "start_line": 341,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_extract_empty_file_raises",
+      "file_path": "tests/unit/test_templates.py",
+      "start_line": 359,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_extract_default_style_short_blunt",
+      "file_path": "tests/unit/test_templates.py",
+      "start_line": 366,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_extract_handles_non_utf8_source_gracefully",
+      "file_path": "tests/unit/test_templates.py",
+      "start_line": 374,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_template_load_handles_non_utf8_yaml",
+      "file_path": "tests/unit/test_templates.py",
+      "start_line": 392,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_extract_round_trips_through_yaml",
+      "file_path": "tests/unit/test_templates.py",
+      "start_line": 406,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "StubClient::detect",
+      "file_path": "tests/unit/test_verify.py",
+      "start_line": 49,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "test_multi_section_populates_sentence_counts",
+      "file_path": "tests/unit/test_verify.py",
+      "start_line": 53,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_single_section_keeps_sentence_counts_none",
+      "file_path": "tests/unit/test_verify.py",
+      "start_line": 68,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_empty_sections_keeps_sentence_counts_none",
+      "file_path": "tests/unit/test_verify.py",
+      "start_line": 81,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_threshold_boundary",
+      "file_path": "tests/unit/test_verify.py",
+      "start_line": 93,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_too_short_returns_skipped_status",
+      "file_path": "tests/unit/test_verify.py",
+      "start_line": 101,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_too_short_returns_skipped_status::TooShortClient::detect",
+      "file_path": "tests/unit/test_verify.py",
+      "start_line": 108,
+      "kind": "method"
+    },
+    {
+      "qualified_name": "test_verify_report_serializes_sentence_counts",
+      "file_path": "tests/unit/test_verify.py",
+      "start_line": 118,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_verify_persistence_failure_returns_report_with_warning",
+      "file_path": "tests/unit/test_verify.py",
+      "start_line": 134,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_version_matches_pyproject_toml",
+      "file_path": "tests/unit/test_version.py",
+      "start_line": 16,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_md_split_preserves_frontmatter",
+      "file_path": "tests/unit/test_writeback.py",
+      "start_line": 8,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_md_split_no_frontmatter_has_empty_prefix",
+      "file_path": "tests/unit/test_writeback.py",
+      "start_line": 16,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_txt_split_is_passthrough",
+      "file_path": "tests/unit/test_writeback.py",
+      "start_line": 24,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_html_split_raises",
+      "file_path": "tests/unit/test_writeback.py",
+      "start_line": 32,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_is_supported_only_md_and_txt",
+      "file_path": "tests/unit/test_writeback.py",
+      "start_line": 39,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_write_reassembles_correctly",
+      "file_path": "tests/unit/test_writeback.py",
+      "start_line": 54,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_assemble_strips_trailing_whitespace_and_adds_single_newline",
+      "file_path": "tests/unit/test_writeback.py",
+      "start_line": 60,
+      "kind": "function"
+    },
+    {
+      "qualified_name": "test_write_propagates_oserror_when_target_is_directory",
+      "file_path": "tests/unit/test_writeback.py",
+      "start_line": 65,
+      "kind": "function"
+    }
+  ],
+  "filters_applied": [
+    "kind in (function,method)",
+    "in-degree(calls)==0",
+    "name not in {main, init}",
+    "name does not start with Test/Benchmark",
+    "file_path does not end with _test.go",
+    "capital-leading name treated as exported (library API): excluded as candidate"
+  ]
+}
