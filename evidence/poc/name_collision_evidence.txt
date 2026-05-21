@@ -1,0 +1,19 @@
+All Build nodes:
+function:29ef9999984301334f214ac06d381b3b|function|Build|Build|internal/graph/extractors.go|15
+method:a1fb28a2f01b6b6837ffe0bbdd068dea|method|Build|Builder::Build|internal/graph/graph.go|162
+function:ea925493ea4ccf1a480165f472fcf945|function|Build|Build|internal/ids/ids.go|138
+
+Production callers attributed to Builder::Build (method, graph.go:162):
+evaluate|cmd/coherence/main.go|275
+runEvaluation|cmd/coherence/main.go|408
+run|cmd/coherence/main.go|538
+run|cmd/coherence/main.go|538
+materializeScenario|internal/coherencebench/files_runner.go|61
+ComputeWith|internal/drift/drift.go|459
+runOne|internal/exteval/exteval.go|106
+Build|internal/graph/extractors.go|15
+buildBaseline|internal/initcmd/initcmd.go|174
+
+Production callers attributed to graph.Build (function, extractors.go:15):
+
+Production callers attributed to ids.Build (function, ids/ids.go:138):

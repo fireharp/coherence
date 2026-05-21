@@ -1,0 +1,164 @@
+{
+  "engine": "codegraph",
+  "meter_candidate": "callsite_blast_radius",
+  "target_symbol": "graph.Build (file: internal/graph/graph.go)",
+  "granularity": "symbol-level, directed, calls-edge only",
+  "transitive_caller_count": 298,
+  "distinct_files": 32,
+  "production_caller_count": 18,
+  "test_caller_count": 280,
+  "direct_caller_count_by_grep": 7,
+  "how_it_works": "recursive CTE over edges where kind=calls, traversing target\u2192source up to depth 5",
+  "first_30_callers_by_depth": [
+    {
+      "qualified_name": "runEvaluation",
+      "file_path": "cmd/coherence/main.go",
+      "min_depth": 1
+    },
+    {
+      "qualified_name": "run",
+      "file_path": "cmd/coherence/main.go",
+      "min_depth": 1
+    },
+    {
+      "qualified_name": "evaluate",
+      "file_path": "cmd/coherence/main.go",
+      "min_depth": 1
+    },
+    {
+      "qualified_name": "materializeScenario",
+      "file_path": "internal/coherencebench/files_runner.go",
+      "min_depth": 1
+    },
+    {
+      "qualified_name": "ComputeWith",
+      "file_path": "internal/drift/drift.go",
+      "min_depth": 1
+    },
+    {
+      "qualified_name": "runOne",
+      "file_path": "internal/exteval/exteval.go",
+      "min_depth": 1
+    },
+    {
+      "qualified_name": "Build",
+      "file_path": "internal/graph/extractors.go",
+      "min_depth": 1
+    },
+    {
+      "qualified_name": "TestExtractOntologyDeduplicatesCommandNodes",
+      "file_path": "internal/graph/ontology_extractor_test.go",
+      "min_depth": 1
+    },
+    {
+      "qualified_name": "TestExtractOntologyEmitsRuleAndCommandNodes",
+      "file_path": "internal/graph/ontology_extractor_test.go",
+      "min_depth": 1
+    },
+    {
+      "qualified_name": "TestExtractOntologySilentlySkipsMissingFile",
+      "file_path": "internal/graph/ontology_extractor_test.go",
+      "min_depth": 1
+    },
+    {
+      "qualified_name": "buildBaseline",
+      "file_path": "internal/initcmd/initcmd.go",
+      "min_depth": 1
+    },
+    {
+      "qualified_name": "indexAndWrite",
+      "file_path": "internal/status/status_test.go",
+      "min_depth": 1
+    },
+    {
+      "qualified_name": "runWatchLoop",
+      "file_path": "cmd/coherence/main.go",
+      "min_depth": 2
+    },
+    {
+      "qualified_name": "main",
+      "file_path": "cmd/coherence/main.go",
+      "min_depth": 2
+    },
+    {
+      "qualified_name": "runFilesScenario",
+      "file_path": "internal/coherencebench/files_runner.go",
+      "min_depth": 2
+    },
+    {
+      "qualified_name": "runLLMScenario",
+      "file_path": "internal/coherencebench/llm_runner.go",
+      "min_depth": 2
+    },
+    {
+      "qualified_name": "Compute",
+      "file_path": "internal/drift/drift.go",
+      "min_depth": 2
+    },
+    {
+      "qualified_name": "RunAll",
+      "file_path": "internal/exteval/exteval.go",
+      "min_depth": 2
+    },
+    {
+      "qualified_name": "TestCodeMentionsNoTypedIDsEmitsNothing",
+      "file_path": "internal/graph/code_mentions_extractor_test.go",
+      "min_depth": 2
+    },
+    {
+      "qualified_name": "TestCodeMentionsSkipsMarkdown",
+      "file_path": "internal/graph/code_mentions_extractor_test.go",
+      "min_depth": 2
+    },
+    {
+      "qualified_name": "TestCodeMentionsDedupedPerFile",
+      "file_path": "internal/graph/code_mentions_extractor_test.go",
+      "min_depth": 2
+    },
+    {
+      "qualified_name": "TestCodeMentionsSkipsUnknownIDs",
+      "file_path": "internal/graph/code_mentions_extractor_test.go",
+      "min_depth": 2
+    },
+    {
+      "qualified_name": "TestCodeMentionsRespectsBuilderEdgeIdempotency",
+      "file_path": "internal/graph/code_mentions_extractor_test.go",
+      "min_depth": 2
+    },
+    {
+      "qualified_name": "TestCodeMentionsEmitsEdgeForKnownTypedID",
+      "file_path": "internal/graph/code_mentions_extractor_test.go",
+      "min_depth": 2
+    },
+    {
+      "qualified_name": "TestCodeMentionsAllowsADRAndIDR",
+      "file_path": "internal/graph/code_mentions_extractor_test.go",
+      "min_depth": 2
+    },
+    {
+      "qualified_name": "TestCodeMentionsSkipsQuotedFixturePaths",
+      "file_path": "internal/graph/code_mentions_extractor_test.go",
+      "min_depth": 2
+    },
+    {
+      "qualified_name": "TestCodeMentionsSkipsBacktickInlineCode",
+      "file_path": "internal/graph/code_mentions_extractor_test.go",
+      "min_depth": 2
+    },
+    {
+      "qualified_name": "TestTSEndpointExpressRoutes",
+      "file_path": "internal/graph/endpoints_ts_py_test.go",
+      "min_depth": 2
+    },
+    {
+      "qualified_name": "TestPyEndpointDynamicPathSkipped",
+      "file_path": "internal/graph/endpoints_ts_py_test.go",
+      "min_depth": 2
+    },
+    {
+      "qualified_name": "TestPyEndpointInsideCommentsAndDocstringsIgnored",
+      "file_path": "internal/graph/endpoints_ts_py_test.go",
+      "min_depth": 2
+    }
+  ]
+}

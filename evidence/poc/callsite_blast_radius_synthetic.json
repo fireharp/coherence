@@ -1,0 +1,66 @@
+{
+  "meter": "callsite_blast_radius",
+  "version": "v1",
+  "db_path": "/tmp/cg_synth/.codegraph/codegraph.db",
+  "depth": 3,
+  "changed_symbols": [
+    "helperA",
+    "nestedHelper",
+    "orphanedInternal"
+  ],
+  "per_symbol": [
+    {
+      "symbol": "helperA",
+      "file_path": "src/main.go",
+      "resolved": true,
+      "direct_callers": 2,
+      "direct_callers_production_only": 2,
+      "transitive_callers": 5,
+      "transitive_caller_files": 1,
+      "top_direct_callers": [
+        {
+          "qualified_name": "RegisterExportedAPI",
+          "file_path": "src/main.go",
+          "is_test": false
+        },
+        {
+          "qualified_name": "activeHandler",
+          "file_path": "src/main.go",
+          "is_test": false
+        }
+      ]
+    },
+    {
+      "symbol": "nestedHelper",
+      "file_path": "src/main.go",
+      "resolved": true,
+      "direct_callers": 1,
+      "direct_callers_production_only": 1,
+      "transitive_callers": 3,
+      "transitive_caller_files": 1,
+      "top_direct_callers": [
+        {
+          "qualified_name": "helperB",
+          "file_path": "src/main.go",
+          "is_test": false
+        }
+      ]
+    },
+    {
+      "symbol": "orphanedInternal",
+      "file_path": "src/main.go",
+      "resolved": true,
+      "direct_callers": 0,
+      "direct_callers_production_only": 0,
+      "transitive_callers": 0,
+      "transitive_caller_files": 0,
+      "top_direct_callers": []
+    }
+  ],
+  "score": 2,
+  "top_blast_symbols": [
+    "helperA",
+    "nestedHelper"
+  ],
+  "warnings": []
+}

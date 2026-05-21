@@ -1,0 +1,15 @@
+{
+  "engine": "coherence",
+  "meter": "blast_radius",
+  "granularity": "file-level, undirected, all edge kinds",
+  "score": 422,
+  "base_available": true,
+  "top_impacted_changed_nodes": [
+    "file:internal/drift/drift.go",
+    "file:internal/graph/graph.go",
+    "file:cmd/coherence/main.go",
+    "file:internal/coherencebench/coherencebench.go",
+    "file:internal/status/status.go"
+  ],
+  "how_it_works": "sum over each touched-by-diff node of len(undirected 1-hop neighborhood in current graph)"
+}
