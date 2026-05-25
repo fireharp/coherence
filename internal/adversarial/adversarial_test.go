@@ -434,7 +434,7 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 	if report.Pass {
 		t.Fatalf("expected exploration demo to keep the run non-passing: %+v", report.Summary)
 	}
-	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 36 || report.Summary.FalsePositives != 0 {
+	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 37 || report.Summary.FalsePositives != 0 {
 		t.Fatalf("unexpected failures: %+v", report.Summary)
 	}
 	if report.Summary.Skipped != 1 {
@@ -799,6 +799,16 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 		goIntegration.FalseNegatives[0] != "stale_tests" ||
 		len(goIntegration.FalsePositives) != 0 {
 		t.Fatalf("Go integration stale test result=%+v, want false negative for stale_tests", *goIntegration)
+	}
+	blockADR := findResult(report.Results, "ADV-058-adr-capitalized-supersedes-demo")
+	if blockADR == nil {
+		t.Fatal("missing ADV-058 exploration demo result")
+	}
+	if blockADR.Classification != ClassificationMiss ||
+		len(blockADR.FalseNegatives) != 1 ||
+		blockADR.FalseNegatives[0] != "stale_decision_links" ||
+		len(blockADR.FalsePositives) != 0 {
+		t.Fatalf("ADR capitalized supersedes result=%+v, want false negative for stale_decision_links", *blockADR)
 	}
 }
 

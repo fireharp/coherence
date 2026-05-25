@@ -703,6 +703,18 @@ export const registry = { requiredStory };
 			Selector:       Selector{PathGlob: "pkg/risk/risk.go"},
 			Edit:           Edit{Old: "return score >= 7", New: "return score >= 9"},
 		},
+		{
+			ID:             "ADV-058-adr-capitalized-supersedes-demo",
+			Description:    "Add a successor ADR using capitalized Supersedes frontmatter; stale_decision_links relies on lowercase relation keys.",
+			Operation:      opAddFile,
+			TargetKinds:    []graph.NodeKind{graph.NodeADR},
+			ExpectedMeters: []string{"stale_decision_links"},
+			Selector:       Selector{IDPrefix: "adr:ADR-001"},
+			Edit: Edit{
+				Path:    "docs/decisions/ADR-072.md",
+				Content: "---\nid: ADR-072\nSupersedes: ADR-001\n---\n# ADR-072 Capitalized Successor\n\nUse the new capitalized relation policy.\n",
+			},
+		},
 	}
 }
 
