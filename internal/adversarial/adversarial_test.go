@@ -434,7 +434,7 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 	if report.Pass {
 		t.Fatalf("expected exploration demo to keep the run non-passing: %+v", report.Summary)
 	}
-	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 37 || report.Summary.FalsePositives != 0 {
+	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 38 || report.Summary.FalsePositives != 0 {
 		t.Fatalf("unexpected failures: %+v", report.Summary)
 	}
 	if report.Summary.Skipped != 1 {
@@ -809,6 +809,16 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 		blockADR.FalseNegatives[0] != "stale_decision_links" ||
 		len(blockADR.FalsePositives) != 0 {
 		t.Fatalf("ADR capitalized supersedes result=%+v, want false negative for stale_decision_links", *blockADR)
+	}
+	chainedEndpoint := findResult(report.Results, "ADV-059-ts-route-chain-endpoint-demo")
+	if chainedEndpoint == nil {
+		t.Fatal("missing ADV-059 exploration demo result")
+	}
+	if chainedEndpoint.Classification != ClassificationMiss ||
+		len(chainedEndpoint.FalseNegatives) != 1 ||
+		chainedEndpoint.FalseNegatives[0] != "orphan_endpoints" ||
+		len(chainedEndpoint.FalsePositives) != 0 {
+		t.Fatalf("TS chained endpoint result=%+v, want false negative for orphan_endpoints", *chainedEndpoint)
 	}
 }
 

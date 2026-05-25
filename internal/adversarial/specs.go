@@ -715,6 +715,25 @@ export const registry = { requiredStory };
 				Content: "---\nid: ADR-072\nSupersedes: ADR-001\n---\n# ADR-072 Capitalized Successor\n\nUse the new capitalized relation policy.\n",
 			},
 		},
+		{
+			ID:             "ADV-059-ts-route-chain-endpoint-demo",
+			Description:    "Add an Express chained route registration; endpoint extraction sees direct verb calls but misses router.route(path).get(handler).",
+			Operation:      opAddFile,
+			TargetKinds:    []graph.NodeKind{graph.NodeFile},
+			ExpectedMeters: []string{"orphan_endpoints"},
+			Selector:       Selector{PathGlob: "AGENTS.md"},
+			Edit: Edit{
+				Path: "src/chained-api.ts",
+				Content: `const router = express.Router();
+
+router.route("/api/chained-orders").get(getChainedOrders);
+
+function getChainedOrders(req, res) {
+	res.send("ok");
+}
+`,
+			},
+		},
 	}
 }
 
