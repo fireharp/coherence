@@ -792,6 +792,18 @@ function getChainedOrders(req, res) {
 			Selector:       Selector{PathGlob: "crates/risk/src/lib.rs"},
 			Edit:           Edit{Old: "{ 7 }", New: "{ 9 }"},
 		},
+		{
+			ID:             "ADV-065-json-typed-id-demo",
+			Description:    "Add production JSON config with an unresolved typed ID; unknown_id_references sanitizes double-quoted string values.",
+			Operation:      opAddFile,
+			TargetKinds:    []graph.NodeKind{graph.NodeFile},
+			ExpectedMeters: []string{"unknown_id_references"},
+			Selector:       Selector{PathGlob: "AGENTS.md"},
+			Edit: Edit{
+				Path:    "config/story-routing.json",
+				Content: "{\n  \"fallback_story\": \"US-999\"\n}\n",
+			},
+		},
 	}
 }
 

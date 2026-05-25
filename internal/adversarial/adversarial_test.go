@@ -434,7 +434,7 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 	if report.Pass {
 		t.Fatalf("expected exploration demo to keep the run non-passing: %+v", report.Summary)
 	}
-	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 43 || report.Summary.FalsePositives != 0 {
+	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 44 || report.Summary.FalsePositives != 0 {
 		t.Fatalf("unexpected failures: %+v", report.Summary)
 	}
 	if report.Summary.Skipped != 1 {
@@ -869,6 +869,16 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 		rustStale.FalseNegatives[0] != "stale_tests" ||
 		len(rustStale.FalsePositives) != 0 {
 		t.Fatalf("Rust stale test result=%+v, want false negative for stale_tests", *rustStale)
+	}
+	jsonID := findResult(report.Results, "ADV-065-json-typed-id-demo")
+	if jsonID == nil {
+		t.Fatal("missing ADV-065 exploration demo result")
+	}
+	if jsonID.Classification != ClassificationMiss ||
+		len(jsonID.FalseNegatives) != 1 ||
+		jsonID.FalseNegatives[0] != "unknown_id_references" ||
+		len(jsonID.FalsePositives) != 0 {
+		t.Fatalf("JSON typed ID result=%+v, want false negative for unknown_id_references", *jsonID)
 	}
 }
 
