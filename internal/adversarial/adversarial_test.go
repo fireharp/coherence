@@ -434,7 +434,7 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 	if report.Pass {
 		t.Fatalf("expected exploration demo to keep the run non-passing: %+v", report.Summary)
 	}
-	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 41 || report.Summary.FalsePositives != 0 {
+	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 42 || report.Summary.FalsePositives != 0 {
 		t.Fatalf("unexpected failures: %+v", report.Summary)
 	}
 	if report.Summary.Skipped != 1 {
@@ -849,6 +849,16 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 		tsCycle.FalseNegatives[0] != "dependency_cycles" ||
 		len(tsCycle.FalsePositives) != 0 {
 		t.Fatalf("TS dependency cycle result=%+v, want false negative for dependency_cycles", *tsCycle)
+	}
+	quotedStory := findResult(report.Results, "ADV-063-quoted-user-story-id-demo")
+	if quotedStory == nil {
+		t.Fatal("missing ADV-063 exploration demo result")
+	}
+	if quotedStory.Classification != ClassificationMiss ||
+		len(quotedStory.FalseNegatives) != 1 ||
+		quotedStory.FalseNegatives[0] != "unimplemented_stories" ||
+		len(quotedStory.FalsePositives) != 0 {
+		t.Fatalf("quoted story ID result=%+v, want false negative for unimplemented_stories", *quotedStory)
 	}
 }
 

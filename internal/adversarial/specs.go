@@ -770,6 +770,19 @@ function getChainedOrders(req, res) {
 				New: "import { a } from '../a';\nexport const c = a;\n",
 			},
 		},
+		{
+			ID:                      "ADV-063-quoted-user-story-id-demo",
+			Description:             "Add an unimplemented Markdown user story with a YAML-quoted id; story extraction only accepts unquoted id scalars.",
+			Operation:               opAddFile,
+			TargetKinds:             []graph.NodeKind{graph.NodeDirectory},
+			ExpectedMeters:          []string{"unimplemented_stories"},
+			AllowedSideEffectMeters: []string{"trace_coverage", "path_loss", "neighborhood_drift", "semantic_movement"},
+			Selector:                Selector{IDPrefix: "dir:docs/user-stories"},
+			Edit: Edit{
+				Path:    "docs/user-stories/checkout-flow.md",
+				Content: "---\nid: \"US-063\"\n---\n# Checkout Flow Story\n",
+			},
+		},
 	}
 }
 
