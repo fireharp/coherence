@@ -804,6 +804,15 @@ function getChainedOrders(req, res) {
 				Content: "{\n  \"fallback_story\": \"US-999\"\n}\n",
 			},
 		},
+		{
+			ID:             "ADV-066-yaml-metric-alias-demo",
+			Description:    "Rename a metric whose only stale alias is in a YAML dashboard config; orphaned_metric_aliases scans JSON but not YAML data files.",
+			Operation:      opRenameFile,
+			TargetKinds:    []graph.NodeKind{graph.NodeMetric},
+			ExpectedMeters: []string{"orphaned_metric_aliases"},
+			Selector:       Selector{PathGlob: "metrics/yaml_only.yaml"},
+			Edit:           Edit{NewPath: "metrics/yaml_only_v2.yaml"},
+		},
 	}
 }
 

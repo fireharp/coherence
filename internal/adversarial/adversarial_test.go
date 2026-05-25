@@ -434,7 +434,7 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 	if report.Pass {
 		t.Fatalf("expected exploration demo to keep the run non-passing: %+v", report.Summary)
 	}
-	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 44 || report.Summary.FalsePositives != 0 {
+	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 45 || report.Summary.FalsePositives != 0 {
 		t.Fatalf("unexpected failures: %+v", report.Summary)
 	}
 	if report.Summary.Skipped != 1 {
@@ -879,6 +879,16 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 		jsonID.FalseNegatives[0] != "unknown_id_references" ||
 		len(jsonID.FalsePositives) != 0 {
 		t.Fatalf("JSON typed ID result=%+v, want false negative for unknown_id_references", *jsonID)
+	}
+	yamlMetric := findResult(report.Results, "ADV-066-yaml-metric-alias-demo")
+	if yamlMetric == nil {
+		t.Fatal("missing ADV-066 exploration demo result")
+	}
+	if yamlMetric.Classification != ClassificationMiss ||
+		len(yamlMetric.FalseNegatives) != 1 ||
+		yamlMetric.FalseNegatives[0] != "orphaned_metric_aliases" ||
+		len(yamlMetric.FalsePositives) != 0 {
+		t.Fatalf("YAML metric alias result=%+v, want false negative for orphaned_metric_aliases", *yamlMetric)
 	}
 }
 
