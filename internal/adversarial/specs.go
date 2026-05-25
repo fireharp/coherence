@@ -826,6 +826,27 @@ function getChainedOrders(req, res) {
 				Content: "# Titled Link\n\nSee [guide](missing-title-target.md \"Guide\").\n",
 			},
 		},
+		{
+			ID:             "ADV-068-go-gin-route-demo",
+			Description:    "Add an untested Gin-style Go route using uppercase GET; endpoint extraction recognizes title-case router methods only.",
+			Operation:      opAddFile,
+			TargetKinds:    []graph.NodeKind{graph.NodeFile},
+			ExpectedMeters: []string{"orphan_endpoints"},
+			Selector:       Selector{PathGlob: "AGENTS.md"},
+			Edit: Edit{
+				Path: "pkg/policy/gin_endpoint.go",
+				Content: `package policy
+
+type GinRouter interface {
+	GET(string, func())
+}
+
+func MountGinRoutes(router GinRouter) {
+	router.GET("/api/gin-orders", func() {})
+}
+`,
+			},
+		},
 	}
 }
 

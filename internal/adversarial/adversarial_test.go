@@ -434,7 +434,7 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 	if report.Pass {
 		t.Fatalf("expected exploration demo to keep the run non-passing: %+v", report.Summary)
 	}
-	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 46 || report.Summary.FalsePositives != 0 {
+	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 47 || report.Summary.FalsePositives != 0 {
 		t.Fatalf("unexpected failures: %+v", report.Summary)
 	}
 	if report.Summary.Skipped != 1 {
@@ -899,6 +899,16 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 		titleLink.FalseNegatives[0] != "broken_links" ||
 		len(titleLink.FalsePositives) != 0 {
 		t.Fatalf("Markdown title link result=%+v, want false negative for broken_links", *titleLink)
+	}
+	ginRoute := findResult(report.Results, "ADV-068-go-gin-route-demo")
+	if ginRoute == nil {
+		t.Fatal("missing ADV-068 exploration demo result")
+	}
+	if ginRoute.Classification != ClassificationMiss ||
+		len(ginRoute.FalseNegatives) != 1 ||
+		ginRoute.FalseNegatives[0] != "orphan_endpoints" ||
+		len(ginRoute.FalsePositives) != 0 {
+		t.Fatalf("Go Gin route result=%+v, want false negative for orphan_endpoints", *ginRoute)
 	}
 }
 
