@@ -66,6 +66,7 @@ Update this table when a batch lands or when a report is exported.
 | Typed IDs stored as production data | `ADV-053` | `unknown_id_references` misses unresolved IDs inside quoted code strings | Decide when data-bearing string literals should be scanned for typed IDs |
 | Docs-as-UI metric aliases | `ADV-054` | `orphaned_metric_aliases` misses MDX component prop aliases | Decide whether MDX should be scanned as frontend surface for metrics |
 | Go package import deletion | `ADV-055` | `dangling_imports` misses removed Go packages still imported by other packages | Decide whether Go import resolution belongs in `dangling_imports` |
+| Markdown non-inline link syntaxes | `ADV-027`, `ADV-029`, `ADV-045`, `ADV-056` | `broken_links` misses reference-style, HTML, wiki, and angle-autolink references | Decide how much Markdown syntax coverage the link meter should own |
 
 ## Candidate Queue
 

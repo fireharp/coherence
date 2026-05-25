@@ -434,7 +434,7 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 	if report.Pass {
 		t.Fatalf("expected exploration demo to keep the run non-passing: %+v", report.Summary)
 	}
-	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 34 || report.Summary.FalsePositives != 0 {
+	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 35 || report.Summary.FalsePositives != 0 {
 		t.Fatalf("unexpected failures: %+v", report.Summary)
 	}
 	if report.Summary.Skipped != 1 {
@@ -779,6 +779,16 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 		goImport.FalseNegatives[0] != "dangling_imports" ||
 		len(goImport.FalsePositives) != 0 {
 		t.Fatalf("Go dangling import result=%+v, want false negative for dangling_imports", *goImport)
+	}
+	angleLink := findResult(report.Results, "ADV-056-markdown-angle-autolink-demo")
+	if angleLink == nil {
+		t.Fatal("missing ADV-056 exploration demo result")
+	}
+	if angleLink.Classification != ClassificationMiss ||
+		len(angleLink.FalseNegatives) != 1 ||
+		angleLink.FalseNegatives[0] != "broken_links" ||
+		len(angleLink.FalsePositives) != 0 {
+		t.Fatalf("Markdown angle autolink result=%+v, want false negative for broken_links", *angleLink)
 	}
 }
 

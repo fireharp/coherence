@@ -681,6 +681,19 @@ export const registry = { requiredStory };
 			ExpectedMeters: []string{"dangling_imports"},
 			Selector:       Selector{PathGlob: "internal/b/b.go"},
 		},
+		{
+			ID:                      "ADV-056-markdown-angle-autolink-demo",
+			Description:             "Add a local Markdown angle autolink to a missing file; broken_links only scans inline [text](target) links.",
+			Operation:               opAddFile,
+			TargetKinds:             []graph.NodeKind{graph.NodeFile},
+			ExpectedMeters:          []string{"broken_links"},
+			AllowedSideEffectMeters: []string{"neighborhood_drift", "semantic_movement", "blast_radius", "staleness"},
+			Selector:                Selector{PathGlob: "AGENTS.md"},
+			Edit: Edit{
+				Path:    "docs/ref/angle-autolink.md",
+				Content: "# Angle Autolink\n\nSee <missing-angle-target.md>.\n",
+			},
+		},
 	}
 }
 
