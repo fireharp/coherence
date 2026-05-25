@@ -434,7 +434,7 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 	if report.Pass {
 		t.Fatalf("expected exploration demo to keep the run non-passing: %+v", report.Summary)
 	}
-	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 35 || report.Summary.FalsePositives != 0 {
+	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 36 || report.Summary.FalsePositives != 0 {
 		t.Fatalf("unexpected failures: %+v", report.Summary)
 	}
 	if report.Summary.Skipped != 1 {
@@ -789,6 +789,16 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 		angleLink.FalseNegatives[0] != "broken_links" ||
 		len(angleLink.FalsePositives) != 0 {
 		t.Fatalf("Markdown angle autolink result=%+v, want false negative for broken_links", *angleLink)
+	}
+	goIntegration := findResult(report.Results, "ADV-057-go-integration-test-stale-demo")
+	if goIntegration == nil {
+		t.Fatal("missing ADV-057 exploration demo result")
+	}
+	if goIntegration.Classification != ClassificationMiss ||
+		len(goIntegration.FalseNegatives) != 1 ||
+		goIntegration.FalseNegatives[0] != "stale_tests" ||
+		len(goIntegration.FalsePositives) != 0 {
+		t.Fatalf("Go integration stale test result=%+v, want false negative for stale_tests", *goIntegration)
 	}
 }
 

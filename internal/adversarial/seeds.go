@@ -73,6 +73,22 @@ func TestApprove(t *testing.T) {
 	}
 }
 `,
+		"pkg/risk/risk.go": `package risk
+
+func Assess(score int) bool {
+	return score >= 7
+}
+`,
+		"pkg/risk/risk_integration_test.go": `package risk
+
+import "testing"
+
+func TestRiskIntegration(t *testing.T) {
+	if !Assess(8) {
+		t.Fatal("expected acceptable risk")
+	}
+}
+`,
 		"internal/a/a.go": `package a
 
 import "example.com/adversarial/internal/b"

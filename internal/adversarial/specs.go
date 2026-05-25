@@ -694,6 +694,15 @@ export const registry = { requiredStory };
 				Content: "# Angle Autolink\n\nSee <missing-angle-target.md>.\n",
 			},
 		},
+		{
+			ID:             "ADV-057-go-integration-test-stale-demo",
+			Description:    "Change Go source covered only by an integration-style _test file; stale_tests reverse maps only exact source-name test files.",
+			Operation:      opReplaceText,
+			TargetKinds:    []graph.NodeKind{graph.NodeFile},
+			ExpectedMeters: []string{"stale_tests"},
+			Selector:       Selector{PathGlob: "pkg/risk/risk.go"},
+			Edit:           Edit{Old: "return score >= 7", New: "return score >= 9"},
+		},
 	}
 }
 
