@@ -847,6 +847,25 @@ func MountGinRoutes(router GinRouter) {
 `,
 			},
 		},
+		{
+			ID:             "ADV-069-adr-quoted-supersedes-key-demo",
+			Description:    "Add a successor ADR using a quoted YAML supersedes key; stale_decision_links only sees bare relation keys.",
+			Operation:      opAddFile,
+			TargetKinds:    []graph.NodeKind{graph.NodeADR},
+			ExpectedMeters: []string{"stale_decision_links"},
+			Selector:       Selector{IDPrefix: "adr:ADR-001"},
+			Edit: Edit{
+				Path: "docs/decisions/ADR-" + "073.md",
+				Content: `---
+id: ` + "ADR-073" + `
+"supersedes": ` + "ADR-001" + `
+---
+# ` + "ADR-073" + ` Quoted Key Successor
+
+Use the YAML quoted-key successor policy.
+`,
+			},
+		},
 	}
 }
 

@@ -434,7 +434,7 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 	if report.Pass {
 		t.Fatalf("expected exploration demo to keep the run non-passing: %+v", report.Summary)
 	}
-	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 47 || report.Summary.FalsePositives != 0 {
+	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 48 || report.Summary.FalsePositives != 0 {
 		t.Fatalf("unexpected failures: %+v", report.Summary)
 	}
 	if report.Summary.Skipped != 1 {
@@ -909,6 +909,16 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 		ginRoute.FalseNegatives[0] != "orphan_endpoints" ||
 		len(ginRoute.FalsePositives) != 0 {
 		t.Fatalf("Go Gin route result=%+v, want false negative for orphan_endpoints", *ginRoute)
+	}
+	quotedKeyADR := findResult(report.Results, "ADV-069-adr-quoted-supersedes-key-demo")
+	if quotedKeyADR == nil {
+		t.Fatal("missing ADV-069 exploration demo result")
+	}
+	if quotedKeyADR.Classification != ClassificationMiss ||
+		len(quotedKeyADR.FalseNegatives) != 1 ||
+		quotedKeyADR.FalseNegatives[0] != "stale_decision_links" ||
+		len(quotedKeyADR.FalsePositives) != 0 {
+		t.Fatalf("ADR quoted-key supersedes result=%+v, want false negative for stale_decision_links", *quotedKeyADR)
 	}
 }
 
