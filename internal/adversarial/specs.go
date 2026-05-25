@@ -734,6 +734,15 @@ function getChainedOrders(req, res) {
 `,
 			},
 		},
+		{
+			ID:             "ADV-060-svelte-metric-alias-demo",
+			Description:    "Rename a metric whose only stale frontend alias is in a Svelte component; orphaned_metric_aliases does not scan .svelte files.",
+			Operation:      opRenameFile,
+			TargetKinds:    []graph.NodeKind{graph.NodeMetric},
+			ExpectedMeters: []string{"orphaned_metric_aliases"},
+			Selector:       Selector{PathGlob: "metrics/svelte_only.yaml"},
+			Edit:           Edit{NewPath: "metrics/svelte_only_v2.yaml"},
+		},
 	}
 }
 

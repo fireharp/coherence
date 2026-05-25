@@ -115,23 +115,30 @@ func BuildFixtureVersion() string { return "v1" }
 		"metrics/revenue.yaml":     "version: 1\nmeasures:\n  - name: net_revenue\n",
 		"metrics/vue_only.yaml":    "version: 1\nmeasures:\n  - name: vue_only\n",
 		"metrics/mdx_only.yaml":    "version: 1\nmeasures:\n  - name: mdx_only\n",
+		"metrics/svelte_only.yaml": "version: 1\nmeasures:\n  - name: svelte_only\n",
 		"frontend/dashboard.ts":    "export const dashboard = { metric: \"signup_rate\" };\n",
 		"frontend/splitMetric.ts":  "export const splitMetric = \"churn\" + \"_rate\";\nexport const dashboard = { metric: splitMetric };\n",
 		"frontend/revenue.ts":      "export const revenueMetric = \"net_revenue\";\n",
 		"frontend/MetricCard.vue":  "<script setup>\nconst metric = \"vue_only\";\n</script>\n<template>{{ metric }}</template>\n",
-		"styles/app.css":           "@import \"./tokens.css\";\n.button { color: var(--brand); }\n",
-		"styles/tokens.css":        ":root { --brand: #0369a1; }\n",
-		"src/util.ts":              "export const util = 1;\n",
-		"src/usesUtil.ts":          "import { util } from './util';\nexport const value = util;\n",
-		"src/reexported.ts":        "export const reexported = 1;\n",
-		"src/barrel.ts":            "export { reexported } from './reexported';\nexport * from './reexported';\n",
-		"src/lazy.ts":              "export const lazy = 1;\n",
-		"src/loadLazy.ts":          "export async function loadLazy() {\n  return import('./lazy');\n}\n",
-		"src/cjsDep.ts":            "export const requiredValue = 1;\n",
-		"src/requireConsumer.ts":   "const dep = require(\"./cjsDep\");\nexport const requiredValue = dep.requiredValue;\n",
-		"src/importEqualsDep.ts":   "export const importEqualsValue = 1;\n",
-		"src/importEqualsUser.ts":  "import dep = require(\"./importEqualsDep\");\nexport const importEqualsValue = dep.importEqualsValue;\n",
-		"src/multilineDep.ts":      "export const multilineValue = 1;\n",
+		"frontend/MetricBadge.svelte": `<script>
+  export let metric = "svelte_only";
+</script>
+
+<span>{metric}</span>
+`,
+		"styles/app.css":          "@import \"./tokens.css\";\n.button { color: var(--brand); }\n",
+		"styles/tokens.css":       ":root { --brand: #0369a1; }\n",
+		"src/util.ts":             "export const util = 1;\n",
+		"src/usesUtil.ts":         "import { util } from './util';\nexport const value = util;\n",
+		"src/reexported.ts":       "export const reexported = 1;\n",
+		"src/barrel.ts":           "export { reexported } from './reexported';\nexport * from './reexported';\n",
+		"src/lazy.ts":             "export const lazy = 1;\n",
+		"src/loadLazy.ts":         "export async function loadLazy() {\n  return import('./lazy');\n}\n",
+		"src/cjsDep.ts":           "export const requiredValue = 1;\n",
+		"src/requireConsumer.ts":  "const dep = require(\"./cjsDep\");\nexport const requiredValue = dep.requiredValue;\n",
+		"src/importEqualsDep.ts":  "export const importEqualsValue = 1;\n",
+		"src/importEqualsUser.ts": "import dep = require(\"./importEqualsDep\");\nexport const importEqualsValue = dep.importEqualsValue;\n",
+		"src/multilineDep.ts":     "export const multilineValue = 1;\n",
 		"src/multilineImport.ts": `import {
   multilineValue,
 } from "./multilineDep";
