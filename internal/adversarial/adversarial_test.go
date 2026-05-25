@@ -434,7 +434,7 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 	if report.Pass {
 		t.Fatalf("expected exploration demo to keep the run non-passing: %+v", report.Summary)
 	}
-	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 48 || report.Summary.FalsePositives != 0 {
+	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 49 || report.Summary.FalsePositives != 0 {
 		t.Fatalf("unexpected failures: %+v", report.Summary)
 	}
 	if report.Summary.Skipped != 1 {
@@ -919,6 +919,16 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 		quotedKeyADR.FalseNegatives[0] != "stale_decision_links" ||
 		len(quotedKeyADR.FalsePositives) != 0 {
 		t.Fatalf("ADR quoted-key supersedes result=%+v, want false negative for stale_decision_links", *quotedKeyADR)
+	}
+	testImport := findResult(report.Results, "ADV-070-ts-test-dangling-import-demo")
+	if testImport == nil {
+		t.Fatal("missing ADV-070 exploration demo result")
+	}
+	if testImport.Classification != ClassificationMiss ||
+		len(testImport.FalseNegatives) != 1 ||
+		testImport.FalseNegatives[0] != "dangling_imports" ||
+		len(testImport.FalsePositives) != 0 {
+		t.Fatalf("TS test dangling import result=%+v, want false negative for dangling_imports", *testImport)
 	}
 }
 

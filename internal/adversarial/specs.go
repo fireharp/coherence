@@ -866,6 +866,14 @@ Use the YAML quoted-key successor policy.
 `,
 			},
 		},
+		{
+			ID:             "ADV-070-ts-test-dangling-import-demo",
+			Description:    "Remove a TypeScript source imported only from a __tests__ file; dangling_imports skips test files.",
+			Operation:      opRemoveFile,
+			TargetKinds:    []graph.NodeKind{graph.NodeFile},
+			ExpectedMeters: []string{"dangling_imports"},
+			Selector:       Selector{PathGlob: "src/widget.ts"},
+		},
 	}
 }
 
