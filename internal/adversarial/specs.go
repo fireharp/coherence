@@ -813,6 +813,19 @@ function getChainedOrders(req, res) {
 			Selector:       Selector{PathGlob: "metrics/yaml_only.yaml"},
 			Edit:           Edit{NewPath: "metrics/yaml_only_v2.yaml"},
 		},
+		{
+			ID:                      "ADV-067-markdown-title-link-demo",
+			Description:             "Add a broken Markdown inline link with a title attribute; broken_links only parses bare inline targets.",
+			Operation:               opAddFile,
+			TargetKinds:             []graph.NodeKind{graph.NodeFile},
+			ExpectedMeters:          []string{"broken_links"},
+			AllowedSideEffectMeters: []string{"neighborhood_drift", "semantic_movement", "blast_radius", "staleness"},
+			Selector:                Selector{PathGlob: "AGENTS.md"},
+			Edit: Edit{
+				Path:    "docs/ref/title-link.md",
+				Content: "# Titled Link\n\nSee [guide](missing-title-target.md \"Guide\").\n",
+			},
+		},
 	}
 }
 
