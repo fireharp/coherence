@@ -65,6 +65,7 @@ Update this table when a batch lands or when a report is exported.
 | Python route registration APIs | `ADV-052` | `orphan_endpoints` misses FastAPI `add_api_route` registrations | Add parser coverage for literal non-decorator route registration APIs |
 | Typed IDs stored as production data | `ADV-053` | `unknown_id_references` misses unresolved IDs inside quoted code strings | Decide when data-bearing string literals should be scanned for typed IDs |
 | Docs-as-UI metric aliases | `ADV-054` | `orphaned_metric_aliases` misses MDX component prop aliases | Decide whether MDX should be scanned as frontend surface for metrics |
+| Go package import deletion | `ADV-055` | `dangling_imports` misses removed Go packages still imported by other packages | Decide whether Go import resolution belongs in `dangling_imports` |
 
 ## Candidate Queue
 

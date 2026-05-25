@@ -673,6 +673,14 @@ export const registry = { requiredStory };
 			Selector:       Selector{PathGlob: "metrics/mdx_only.yaml"},
 			Edit:           Edit{NewPath: "metrics/mdx_only_v2.yaml"},
 		},
+		{
+			ID:             "ADV-055-go-dangling-import-demo",
+			Description:    "Remove a Go package file still imported by another package; dangling_imports only scans TypeScript and Python imports.",
+			Operation:      opRemoveFile,
+			TargetKinds:    []graph.NodeKind{graph.NodeFile},
+			ExpectedMeters: []string{"dangling_imports"},
+			Selector:       Selector{PathGlob: "internal/b/b.go"},
+		},
 	}
 }
 

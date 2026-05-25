@@ -434,7 +434,7 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 	if report.Pass {
 		t.Fatalf("expected exploration demo to keep the run non-passing: %+v", report.Summary)
 	}
-	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 33 || report.Summary.FalsePositives != 0 {
+	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 34 || report.Summary.FalsePositives != 0 {
 		t.Fatalf("unexpected failures: %+v", report.Summary)
 	}
 	if report.Summary.Skipped != 1 {
@@ -769,6 +769,16 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 		mdxMetric.FalseNegatives[0] != "orphaned_metric_aliases" ||
 		len(mdxMetric.FalsePositives) != 0 {
 		t.Fatalf("MDX metric prop result=%+v, want false negative for orphaned_metric_aliases", *mdxMetric)
+	}
+	goImport := findResult(report.Results, "ADV-055-go-dangling-import-demo")
+	if goImport == nil {
+		t.Fatal("missing ADV-055 exploration demo result")
+	}
+	if goImport.Classification != ClassificationMiss ||
+		len(goImport.FalseNegatives) != 1 ||
+		goImport.FalseNegatives[0] != "dangling_imports" ||
+		len(goImport.FalsePositives) != 0 {
+		t.Fatalf("Go dangling import result=%+v, want false negative for dangling_imports", *goImport)
 	}
 }
 
