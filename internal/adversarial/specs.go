@@ -650,6 +650,20 @@ app.add_api_route("/api/manual-orders", manual_orders, methods=["GET"])
 `,
 			},
 		},
+		{
+			ID:             "ADV-053-quoted-code-typed-id-demo",
+			Description:    "Add production code that stores an unresolved typed ID as quoted data; unknown_id_references sanitizes double-quoted strings.",
+			Operation:      opAddFile,
+			TargetKinds:    []graph.NodeKind{graph.NodeFile},
+			ExpectedMeters: []string{"unknown_id_references"},
+			Selector:       Selector{PathGlob: "AGENTS.md"},
+			Edit: Edit{
+				Path: "src/storyRegistry.ts",
+				Content: `export const requiredStory = "US-999";
+export const registry = { requiredStory };
+`,
+			},
+		},
 	}
 }
 

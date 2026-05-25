@@ -63,6 +63,7 @@ Update this table when a batch lands or when a report is exported.
 | TypeScript import syntax variants | `ADV-043`-`ADV-047` | `dangling_imports` misses non-basic import forms | Add parser-backed TS import extraction or expand regex coverage |
 | Frontend non-code import graphs | `ADV-051` | `dangling_imports` misses CSS `@import` references | Decide whether stylesheet imports belong in the repo graph |
 | Python route registration APIs | `ADV-052` | `orphan_endpoints` misses FastAPI `add_api_route` registrations | Add parser coverage for literal non-decorator route registration APIs |
+| Typed IDs stored as production data | `ADV-053` | `unknown_id_references` misses unresolved IDs inside quoted code strings | Decide when data-bearing string literals should be scanned for typed IDs |
 
 ## Candidate Queue
 
@@ -71,5 +72,4 @@ are rejected.
 
 | Candidate | Expected meter | Why it is distinct |
 | --- | --- | --- |
-| Production code stores an unresolved typed ID in a quoted data string, for example `export const requiredStory = "US-999"` | `unknown_id_references` | Existing unknown-ID demos cover skipped agent paths and Markdown docs; this targets quoted strings in ordinary code |
 | Metric alias in MDX component props, for example `<MetricCard metric="mdx_only" />` | `orphaned_metric_aliases` | Existing MDX demos cover story/link extraction; this checks docs-as-UI metric aliases |

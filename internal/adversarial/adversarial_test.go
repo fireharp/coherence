@@ -434,7 +434,7 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 	if report.Pass {
 		t.Fatalf("expected exploration demo to keep the run non-passing: %+v", report.Summary)
 	}
-	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 31 || report.Summary.FalsePositives != 0 {
+	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 32 || report.Summary.FalsePositives != 0 {
 		t.Fatalf("unexpected failures: %+v", report.Summary)
 	}
 	if report.Summary.Skipped != 1 {
@@ -749,6 +749,16 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 		manualRoute.FalseNegatives[0] != "orphan_endpoints" ||
 		len(manualRoute.FalsePositives) != 0 {
 		t.Fatalf("FastAPI manual route result=%+v, want false negative for orphan_endpoints", *manualRoute)
+	}
+	quotedID := findResult(report.Results, "ADV-053-quoted-code-typed-id-demo")
+	if quotedID == nil {
+		t.Fatal("missing ADV-053 exploration demo result")
+	}
+	if quotedID.Classification != ClassificationMiss ||
+		len(quotedID.FalseNegatives) != 1 ||
+		quotedID.FalseNegatives[0] != "unknown_id_references" ||
+		len(quotedID.FalsePositives) != 0 {
+		t.Fatalf("quoted code ID result=%+v, want false negative for unknown_id_references", *quotedID)
 	}
 }
 
