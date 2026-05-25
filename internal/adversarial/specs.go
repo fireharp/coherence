@@ -664,6 +664,15 @@ export const registry = { requiredStory };
 `,
 			},
 		},
+		{
+			ID:             "ADV-054-mdx-metric-prop-demo",
+			Description:    "Rename a metric whose only stale alias is an MDX component prop; orphaned_metric_aliases scans frontend code extensions but not MDX.",
+			Operation:      opRenameFile,
+			TargetKinds:    []graph.NodeKind{graph.NodeMetric},
+			ExpectedMeters: []string{"orphaned_metric_aliases"},
+			Selector:       Selector{PathGlob: "metrics/mdx_only.yaml"},
+			Edit:           Edit{NewPath: "metrics/mdx_only_v2.yaml"},
+		},
 	}
 }
 

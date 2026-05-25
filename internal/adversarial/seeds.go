@@ -98,6 +98,7 @@ func BuildFixtureVersion() string { return "v1" }
 		"metrics/churn_rate.yaml":  "version: 1\nmeasures:\n  - name: churn_rate\n",
 		"metrics/revenue.yaml":     "version: 1\nmeasures:\n  - name: net_revenue\n",
 		"metrics/vue_only.yaml":    "version: 1\nmeasures:\n  - name: vue_only\n",
+		"metrics/mdx_only.yaml":    "version: 1\nmeasures:\n  - name: mdx_only\n",
 		"frontend/dashboard.ts":    "export const dashboard = { metric: \"signup_rate\" };\n",
 		"frontend/splitMetric.ts":  "export const splitMetric = \"churn\" + \"_rate\";\nexport const dashboard = { metric: splitMetric };\n",
 		"frontend/revenue.ts":      "export const revenueMetric = \"net_revenue\";\n",
@@ -219,6 +220,7 @@ Use the original reference-style decision.
 		"docs/ref/html-link.md":       "# HTML Link\n\nSee <a href=\"html-target.md\">the HTML target</a>.\n",
 		"docs/ref/html-target.md":     "# HTML Target\n\nHTML-link target for [US-001](../user-stories/US-001.md).\n",
 		"docs/mdx/guide.mdx":          "# MDX Guide\n\nSee [the MDX target](target.txt).\n",
+		"docs/mdx/MetricDemo.mdx":     "# Metric Demo\n\n<MetricCard metric=\"mdx_only\" />\n",
 		"docs/mdx/target.txt":         "Target linked only from MDX.\n",
 	}
 }
