@@ -434,7 +434,7 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 	if report.Pass {
 		t.Fatalf("expected exploration demo to keep the run non-passing: %+v", report.Summary)
 	}
-	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 52 || report.Summary.FalsePositives != 0 {
+	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 53 || report.Summary.FalsePositives != 0 {
 		t.Fatalf("unexpected failures: %+v", report.Summary)
 	}
 	if report.Summary.Skipped != 1 {
@@ -959,6 +959,16 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 		tomlMetric.FalseNegatives[0] != "orphaned_metric_aliases" ||
 		len(tomlMetric.FalsePositives) != 0 {
 		t.Fatalf("TOML metric alias result=%+v, want false negative for orphaned_metric_aliases", *tomlMetric)
+	}
+	openAPIPath := findResult(report.Results, "ADV-074-openapi-path-endpoint-demo")
+	if openAPIPath == nil {
+		t.Fatal("missing ADV-074 exploration demo result")
+	}
+	if openAPIPath.Classification != ClassificationMiss ||
+		len(openAPIPath.FalseNegatives) != 1 ||
+		openAPIPath.FalseNegatives[0] != "orphan_endpoints" ||
+		len(openAPIPath.FalsePositives) != 0 {
+		t.Fatalf("OpenAPI path result=%+v, want false negative for orphan_endpoints", *openAPIPath)
 	}
 }
 

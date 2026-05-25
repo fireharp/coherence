@@ -912,6 +912,28 @@ fallback_story = "US-999"
 			Selector:       Selector{PathGlob: "metrics/toml_only.yaml"},
 			Edit:           Edit{NewPath: "metrics/toml_only_v2.yaml"},
 		},
+		{
+			ID:             "ADV-074-openapi-path-endpoint-demo",
+			Description:    "Add an untested OpenAPI path; endpoint extraction currently only reads route declarations in source code.",
+			Operation:      opAddFile,
+			TargetKinds:    []graph.NodeKind{graph.NodeFile},
+			ExpectedMeters: []string{"orphan_endpoints"},
+			Selector:       Selector{PathGlob: "AGENTS.md"},
+			Edit: Edit{
+				Path: "openapi.yaml",
+				Content: `openapi: 3.1.0
+info:
+  title: Adversarial API
+  version: "1.0"
+paths:
+  /api/openapi-orders:
+    get:
+      responses:
+        "200":
+          description: OK
+`,
+			},
+		},
 	}
 }
 
