@@ -434,7 +434,7 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 	if report.Pass {
 		t.Fatalf("expected exploration demo to keep the run non-passing: %+v", report.Summary)
 	}
-	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 50 || report.Summary.FalsePositives != 0 {
+	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 51 || report.Summary.FalsePositives != 0 {
 		t.Fatalf("unexpected failures: %+v", report.Summary)
 	}
 	if report.Summary.Skipped != 1 {
@@ -939,6 +939,16 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 		railsRoute.FalseNegatives[0] != "orphan_endpoints" ||
 		len(railsRoute.FalsePositives) != 0 {
 		t.Fatalf("Ruby Rails route result=%+v, want false negative for orphan_endpoints", *railsRoute)
+	}
+	tomlID := findResult(report.Results, "ADV-072-toml-typed-id-demo")
+	if tomlID == nil {
+		t.Fatal("missing ADV-072 exploration demo result")
+	}
+	if tomlID.Classification != ClassificationMiss ||
+		len(tomlID.FalseNegatives) != 1 ||
+		tomlID.FalseNegatives[0] != "unknown_id_references" ||
+		len(tomlID.FalsePositives) != 0 {
+		t.Fatalf("TOML typed ID result=%+v, want false negative for unknown_id_references", *tomlID)
 	}
 }
 

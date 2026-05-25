@@ -889,6 +889,20 @@ end
 `,
 			},
 		},
+		{
+			ID:             "ADV-072-toml-typed-id-demo",
+			Description:    "Add production TOML config with an unresolved typed ID; unknown_id_references sanitizes double-quoted string values.",
+			Operation:      opAddFile,
+			TargetKinds:    []graph.NodeKind{graph.NodeFile},
+			ExpectedMeters: []string{"unknown_id_references"},
+			Selector:       Selector{PathGlob: "AGENTS.md"},
+			Edit: Edit{
+				Path: "config/story-routing.toml",
+				Content: `[routing]
+fallback_story = "US-999"
+`,
+			},
+		},
 	}
 }
 
