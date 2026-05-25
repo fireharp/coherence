@@ -434,7 +434,7 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 	if report.Pass {
 		t.Fatalf("expected exploration demo to keep the run non-passing: %+v", report.Summary)
 	}
-	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 51 || report.Summary.FalsePositives != 0 {
+	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 52 || report.Summary.FalsePositives != 0 {
 		t.Fatalf("unexpected failures: %+v", report.Summary)
 	}
 	if report.Summary.Skipped != 1 {
@@ -949,6 +949,16 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 		tomlID.FalseNegatives[0] != "unknown_id_references" ||
 		len(tomlID.FalsePositives) != 0 {
 		t.Fatalf("TOML typed ID result=%+v, want false negative for unknown_id_references", *tomlID)
+	}
+	tomlMetric := findResult(report.Results, "ADV-073-toml-metric-alias-demo")
+	if tomlMetric == nil {
+		t.Fatal("missing ADV-073 exploration demo result")
+	}
+	if tomlMetric.Classification != ClassificationMiss ||
+		len(tomlMetric.FalseNegatives) != 1 ||
+		tomlMetric.FalseNegatives[0] != "orphaned_metric_aliases" ||
+		len(tomlMetric.FalsePositives) != 0 {
+		t.Fatalf("TOML metric alias result=%+v, want false negative for orphaned_metric_aliases", *tomlMetric)
 	}
 }
 

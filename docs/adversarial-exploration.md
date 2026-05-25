@@ -58,7 +58,7 @@ Update this table when a batch lands or when a report is exported.
 
 | Cluster/theme | Example IDs | Signal | Next useful move |
 | --- | --- | --- | --- |
-| Frontend metric aliases outside scanned TS/JS forms | `ADV-050`, `ADV-060`, `ADV-066` | `orphaned_metric_aliases` misses Vue, Svelte, and YAML dashboard aliases | Try template-literal variants or fix frontend alias extraction |
+| Frontend metric aliases outside scanned TS/JS forms | `ADV-050`, `ADV-060`, `ADV-066`, `ADV-073` | `orphaned_metric_aliases` misses Vue, Svelte, YAML dashboard aliases, and TOML dashboard aliases | Try template-literal variants or fix frontend alias extraction |
 | Markdown-like docs not scanned by link/id meters | `ADV-048`, `ADV-049` | Docs graph sees files that specific meters skip | Decide whether agent-control Markdown variants should be first-class docs |
 | TypeScript import syntax variants | `ADV-043`-`ADV-047` | `dangling_imports` misses non-basic import forms | Add parser-backed TS import extraction or expand regex coverage |
 | Frontend non-code import graphs | `ADV-051` | `dangling_imports` misses CSS `@import` references | Decide whether stylesheet imports belong in the repo graph |

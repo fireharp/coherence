@@ -903,6 +903,15 @@ fallback_story = "US-999"
 `,
 			},
 		},
+		{
+			ID:             "ADV-073-toml-metric-alias-demo",
+			Description:    "Rename a metric whose only stale alias is in a TOML dashboard config; orphaned_metric_aliases scans JSON but not TOML data files.",
+			Operation:      opRenameFile,
+			TargetKinds:    []graph.NodeKind{graph.NodeMetric},
+			ExpectedMeters: []string{"orphaned_metric_aliases"},
+			Selector:       Selector{PathGlob: "metrics/toml_only.yaml"},
+			Edit:           Edit{NewPath: "metrics/toml_only_v2.yaml"},
+		},
 	}
 }
 

@@ -125,6 +125,7 @@ func BuildFixtureVersion() string { return "v1" }
 		"metrics/mdx_only.yaml":    "version: 1\nmeasures:\n  - name: mdx_only\n",
 		"metrics/svelte_only.yaml": "version: 1\nmeasures:\n  - name: svelte_only\n",
 		"metrics/yaml_only.yaml":   "version: 1\nmeasures:\n  - name: yaml_only\n",
+		"metrics/toml_only.yaml":   "version: 1\nmeasures:\n  - name: toml_only\n",
 		"frontend/dashboard.ts":    "export const dashboard = { metric: \"signup_rate\" };\n",
 		"frontend/splitMetric.ts":  "export const splitMetric = \"churn\" + \"_rate\";\nexport const dashboard = { metric: splitMetric };\n",
 		"frontend/revenue.ts":      "export const revenueMetric = \"net_revenue\";\n",
@@ -136,6 +137,7 @@ func BuildFixtureVersion() string { return "v1" }
 <span>{metric}</span>
 `,
 		"frontend/metric-config.yaml": "widgets:\n  - metric: yaml_only\n",
+		"frontend/metric-config.toml": "[[widgets]]\nmetric = \"toml_only\"\n",
 		"styles/app.css":              "@import \"./tokens.css\";\n.button { color: var(--brand); }\n",
 		"styles/tokens.css":           ":root { --brand: #0369a1; }\n",
 		"src/util.ts":                 "export const util = 1;\n",
