@@ -434,7 +434,7 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 	if report.Pass {
 		t.Fatalf("expected exploration demo to keep the run non-passing: %+v", report.Summary)
 	}
-	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 40 || report.Summary.FalsePositives != 0 {
+	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 41 || report.Summary.FalsePositives != 0 {
 		t.Fatalf("unexpected failures: %+v", report.Summary)
 	}
 	if report.Summary.Skipped != 1 {
@@ -839,6 +839,16 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 		nextRoute.FalseNegatives[0] != "orphan_endpoints" ||
 		len(nextRoute.FalsePositives) != 0 {
 		t.Fatalf("Next route handler result=%+v, want false negative for orphan_endpoints", *nextRoute)
+	}
+	tsCycle := findResult(report.Results, "ADV-062-ts-dependency-cycle-demo")
+	if tsCycle == nil {
+		t.Fatal("missing ADV-062 exploration demo result")
+	}
+	if tsCycle.Classification != ClassificationMiss ||
+		len(tsCycle.FalseNegatives) != 1 ||
+		tsCycle.FalseNegatives[0] != "dependency_cycles" ||
+		len(tsCycle.FalsePositives) != 0 {
+		t.Fatalf("TS dependency cycle result=%+v, want false negative for dependency_cycles", *tsCycle)
 	}
 }
 

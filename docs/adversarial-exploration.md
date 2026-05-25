@@ -63,6 +63,7 @@ Update this table when a batch lands or when a report is exported.
 | TypeScript import syntax variants | `ADV-043`-`ADV-047` | `dangling_imports` misses non-basic import forms | Add parser-backed TS import extraction or expand regex coverage |
 | Frontend non-code import graphs | `ADV-051` | `dangling_imports` misses CSS `@import` references | Decide whether stylesheet imports belong in the repo graph |
 | Route declaration APIs | `ADV-052`, `ADV-059`, `ADV-061` | `orphan_endpoints` misses FastAPI `add_api_route`, Express chained registrations, and Next file-system handlers | Add parser coverage for literal non-decorator, chained, and framework file-system route declarations |
+| File-level dependency cycles | `ADV-062` | `dependency_cycles` misses TypeScript import cycles represented as file-to-file edges | Decide whether cycle detection should normalize file-level edges or keep package-only scope |
 | Typed IDs stored as production data | `ADV-053` | `unknown_id_references` misses unresolved IDs inside quoted code strings | Decide when data-bearing string literals should be scanned for typed IDs |
 | Docs-as-UI metric aliases | `ADV-054` | `orphaned_metric_aliases` misses MDX component prop aliases | Decide whether MDX should be scanned as frontend surface for metrics |
 | Go package import deletion | `ADV-055` | `dangling_imports` misses removed Go packages still imported by other packages | Decide whether Go import resolution belongs in `dangling_imports` |
@@ -77,7 +78,6 @@ are rejected.
 
 | Candidate | Expected meter | Why it is distinct |
 | --- | --- | --- |
-| TypeScript file-level dependency cycle | `dependency_cycles` | Existing cycle hit is Go/package-shaped; TS imports produce file-level `depends_on` edges that may not be walked by the cycle meter |
 | Quoted Markdown frontmatter ID | `unimplemented_stories` | Normal `.md` story docs with YAML-quoted `id` values can evade the current unquoted frontmatter ID regex |
 | Rust stale test coverage | `stale_tests` | Rust tests are recognized as test files, but `.rs` source-to-test reverse mapping is intentionally absent |
 

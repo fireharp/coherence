@@ -758,6 +758,18 @@ function getChainedOrders(req, res) {
 `,
 			},
 		},
+		{
+			ID:             "ADV-062-ts-dependency-cycle-demo",
+			Description:    "Close a TypeScript import cycle across files; dependency_cycles currently walks package-directory edges.",
+			Operation:      opReplaceText,
+			TargetKinds:    []graph.NodeKind{graph.NodeFile},
+			ExpectedMeters: []string{"dependency_cycles"},
+			Selector:       Selector{PathGlob: "src/c/index.ts"},
+			Edit: Edit{
+				Old: "export const c = 1;\n",
+				New: "import { a } from '../a';\nexport const c = a;\n",
+			},
+		},
 	}
 }
 
