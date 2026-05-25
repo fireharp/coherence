@@ -62,6 +62,7 @@ Update this table when a batch lands or when a report is exported.
 | Markdown-like docs not scanned by link/id meters | `ADV-048`, `ADV-049` | Docs graph sees files that specific meters skip | Decide whether agent-control Markdown variants should be first-class docs |
 | TypeScript import syntax variants | `ADV-043`-`ADV-047` | `dangling_imports` misses non-basic import forms | Add parser-backed TS import extraction or expand regex coverage |
 | Frontend non-code import graphs | `ADV-051` | `dangling_imports` misses CSS `@import` references | Decide whether stylesheet imports belong in the repo graph |
+| Python route registration APIs | `ADV-052` | `orphan_endpoints` misses FastAPI `add_api_route` registrations | Add parser coverage for literal non-decorator route registration APIs |
 
 ## Candidate Queue
 
@@ -71,5 +72,4 @@ are rejected.
 | Candidate | Expected meter | Why it is distinct |
 | --- | --- | --- |
 | Production code stores an unresolved typed ID in a quoted data string, for example `export const requiredStory = "US-999"` | `unknown_id_references` | Existing unknown-ID demos cover skipped agent paths and Markdown docs; this targets quoted strings in ordinary code |
-| FastAPI route registered with `app.add_api_route("/api/manual-orders", handler, methods=["GET"])` | `orphan_endpoints` | Existing Python endpoint demos cover dynamic paths and dotted decorators, not literal non-decorator registrations |
 | Metric alias in MDX component props, for example `<MetricCard metric="mdx_only" />` | `orphaned_metric_aliases` | Existing MDX demos cover story/link extraction; this checks docs-as-UI metric aliases |

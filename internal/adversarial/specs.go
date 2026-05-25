@@ -630,6 +630,26 @@ def dotted_orders():
 			ExpectedMeters: []string{"dangling_imports"},
 			Selector:       Selector{PathGlob: "styles/tokens.css"},
 		},
+		{
+			ID:             "ADV-052-fastapi-add-api-route-demo",
+			Description:    "Add an untested FastAPI route registered with add_api_route; endpoint extraction only scans decorator syntax.",
+			Operation:      opAddFile,
+			TargetKinds:    []graph.NodeKind{graph.NodeFile},
+			ExpectedMeters: []string{"orphan_endpoints"},
+			Selector:       Selector{PathGlob: "AGENTS.md"},
+			Edit: Edit{
+				Path: "pyapp/manual_route.py",
+				Content: `from fastapi import FastAPI
+
+app = FastAPI()
+
+def manual_orders():
+    return {"ok": True}
+
+app.add_api_route("/api/manual-orders", manual_orders, methods=["GET"])
+`,
+			},
+		},
 	}
 }
 

@@ -434,7 +434,7 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 	if report.Pass {
 		t.Fatalf("expected exploration demo to keep the run non-passing: %+v", report.Summary)
 	}
-	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 30 || report.Summary.FalsePositives != 0 {
+	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 31 || report.Summary.FalsePositives != 0 {
 		t.Fatalf("unexpected failures: %+v", report.Summary)
 	}
 	if report.Summary.Skipped != 1 {
@@ -739,6 +739,16 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 		cssImport.FalseNegatives[0] != "dangling_imports" ||
 		len(cssImport.FalsePositives) != 0 {
 		t.Fatalf("CSS import result=%+v, want false negative for dangling_imports", *cssImport)
+	}
+	manualRoute := findResult(report.Results, "ADV-052-fastapi-add-api-route-demo")
+	if manualRoute == nil {
+		t.Fatal("missing ADV-052 exploration demo result")
+	}
+	if manualRoute.Classification != ClassificationMiss ||
+		len(manualRoute.FalseNegatives) != 1 ||
+		manualRoute.FalseNegatives[0] != "orphan_endpoints" ||
+		len(manualRoute.FalsePositives) != 0 {
+		t.Fatalf("FastAPI manual route result=%+v, want false negative for orphan_endpoints", *manualRoute)
 	}
 }
 
