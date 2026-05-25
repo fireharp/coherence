@@ -783,6 +783,15 @@ function getChainedOrders(req, res) {
 				Content: "---\nid: \"US-063\"\n---\n# Checkout Flow Story\n",
 			},
 		},
+		{
+			ID:             "ADV-064-rust-stale-test-demo",
+			Description:    "Change Rust source covered by a root tests/ integration test; stale_tests has no Rust source-to-test reverse mapping.",
+			Operation:      opReplaceText,
+			TargetKinds:    []graph.NodeKind{graph.NodeFile},
+			ExpectedMeters: []string{"stale_tests"},
+			Selector:       Selector{PathGlob: "crates/risk/src/lib.rs"},
+			Edit:           Edit{Old: "{ 7 }", New: "{ 9 }"},
+		},
 	}
 }
 

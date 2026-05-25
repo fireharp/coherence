@@ -89,6 +89,14 @@ func TestRiskIntegration(t *testing.T) {
 	}
 }
 `,
+		"crates/risk/src/lib.rs": "pub fn risk_limit() -> i32 { 7 }\n",
+		"tests/risk_limit_test.rs": `use risk::risk_limit;
+
+#[test]
+fn checks_limit() {
+    assert_eq!(risk_limit(), 7);
+}
+`,
 		"internal/a/a.go": `package a
 
 import "example.com/adversarial/internal/b"

@@ -69,7 +69,7 @@ Update this table when a batch lands or when a report is exported.
 | Docs-as-UI metric aliases | `ADV-054` | `orphaned_metric_aliases` misses MDX component prop aliases | Decide whether MDX should be scanned as frontend surface for metrics |
 | Go package import deletion | `ADV-055` | `dangling_imports` misses removed Go packages still imported by other packages | Decide whether Go import resolution belongs in `dangling_imports` |
 | Markdown non-inline link syntaxes | `ADV-027`, `ADV-029`, `ADV-045`, `ADV-056` | `broken_links` misses reference-style, HTML, wiki, and angle-autolink references | Decide how much Markdown syntax coverage the link meter should own |
-| Integration-style test naming | `ADV-039`, `ADV-043`, `ADV-057` | `stale_tests` misses tests that exercise source behavior but do not reverse-map by filename | Decide whether import/call relationships should supplement filename pairing |
+| Test coverage mapping gaps | `ADV-039`, `ADV-043`, `ADV-057`, `ADV-064` | `stale_tests` misses tests that exercise source behavior but do not reverse-map by filename or supported language | Decide whether import/call relationships should supplement filename pairing |
 | ADR supersession frontmatter shapes | `ADV-026`, `ADV-036`, `ADV-058` | `stale_decision_links` misses raw/reference citations and capitalized relation keys | Decide whether relation extraction should use a YAML parser |
 
 ## Candidate Queue
@@ -79,7 +79,7 @@ are rejected.
 
 | Candidate | Expected meter | Why it is distinct |
 | --- | --- | --- |
-| Rust stale test coverage | `stale_tests` | Rust tests are recognized as test files, but `.rs` source-to-test reverse mapping is intentionally absent |
+| Unassigned | TBD | Add the next promising miss after reviewing the latest clusters |
 
 ## Rejected Hypotheses
 
