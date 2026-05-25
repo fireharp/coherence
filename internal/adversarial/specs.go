@@ -874,6 +874,21 @@ Use the YAML quoted-key successor policy.
 			ExpectedMeters: []string{"dangling_imports"},
 			Selector:       Selector{PathGlob: "src/widget.ts"},
 		},
+		{
+			ID:             "ADV-071-ruby-rails-route-demo",
+			Description:    "Add an untested Rails-style route; endpoint extraction has no Ruby route parser.",
+			Operation:      opAddFile,
+			TargetKinds:    []graph.NodeKind{graph.NodeFile},
+			ExpectedMeters: []string{"orphan_endpoints"},
+			Selector:       Selector{PathGlob: "AGENTS.md"},
+			Edit: Edit{
+				Path: "config/routes.rb",
+				Content: `Rails.application.routes.draw do
+  get "/api/rails-orders", to: "orders#index"
+end
+`,
+			},
+		},
 	}
 }
 
