@@ -434,7 +434,7 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 	if report.Pass {
 		t.Fatalf("expected exploration demo to keep the run non-passing: %+v", report.Summary)
 	}
-	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 39 || report.Summary.FalsePositives != 0 {
+	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 40 || report.Summary.FalsePositives != 0 {
 		t.Fatalf("unexpected failures: %+v", report.Summary)
 	}
 	if report.Summary.Skipped != 1 {
@@ -829,6 +829,16 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 		svelteMetric.FalseNegatives[0] != "orphaned_metric_aliases" ||
 		len(svelteMetric.FalsePositives) != 0 {
 		t.Fatalf("Svelte metric alias result=%+v, want false negative for orphaned_metric_aliases", *svelteMetric)
+	}
+	nextRoute := findResult(report.Results, "ADV-061-next-route-handler-demo")
+	if nextRoute == nil {
+		t.Fatal("missing ADV-061 exploration demo result")
+	}
+	if nextRoute.Classification != ClassificationMiss ||
+		len(nextRoute.FalseNegatives) != 1 ||
+		nextRoute.FalseNegatives[0] != "orphan_endpoints" ||
+		len(nextRoute.FalsePositives) != 0 {
+		t.Fatalf("Next route handler result=%+v, want false negative for orphan_endpoints", *nextRoute)
 	}
 }
 

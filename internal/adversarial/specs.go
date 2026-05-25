@@ -743,6 +743,21 @@ function getChainedOrders(req, res) {
 			Selector:       Selector{PathGlob: "metrics/svelte_only.yaml"},
 			Edit:           Edit{NewPath: "metrics/svelte_only_v2.yaml"},
 		},
+		{
+			ID:             "ADV-061-next-route-handler-demo",
+			Description:    "Add an untested Next.js file-system route handler; endpoint extraction requires explicit route registration calls.",
+			Operation:      opAddFile,
+			TargetKinds:    []graph.NodeKind{graph.NodeFile},
+			ExpectedMeters: []string{"orphan_endpoints"},
+			Selector:       Selector{PathGlob: "AGENTS.md"},
+			Edit: Edit{
+				Path: "app/api/audit-events/route.ts",
+				Content: `export async function GET() {
+	return Response.json({ ok: true });
+}
+`,
+			},
+		},
 	}
 }
 
