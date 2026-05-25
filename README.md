@@ -290,14 +290,17 @@ coherence bench                                # default: template eval suite
 coherence bench --suite=templates              # explicit
 coherence bench --suite=coherencebench         # the CB-### internal suite
 coherence bench --suite=external               # M7 external-style evaluations
-coherence bench --suite=all --write-report     # internal + Markdown report
+coherence bench --suite=adversarial            # graph-seeded adversarial mutations
+coherence bench --suite=all --write-report     # templates + CB + adversarial
 coherence bench --template=go-cli              # single template shortcut
 coherence bench --suite=external --json        # machine-readable
 ```
 
-Exit code is `1` when any scenario fails. `--write-report` writes a
-human-readable Markdown summary to `.coherence/runs/YYYY-MM-DD/index.md`
-(linked from `STATUS.md`).
+Exit code is `1` when any non-adversarial scenario fails. The adversarial
+suite is telemetry by default and fails only with `--strict`. `--write-report`
+writes a human-readable Markdown summary to `.coherence/runs/YYYY-MM-DD/index.md`
+(linked from `STATUS.md`) for the template/CoherenceBench suites, and writes
+adversarial artifacts under `.coherence/adversarial/`.
 
 ### Template eval suite
 
@@ -408,6 +411,71 @@ The harness is intentionally minimal — extending it with real SWE-bench
 tasks (issue text + base-commit repo + gold patch) only requires more
 samples, not more plumbing. Results are reported **separately from the
 internal CB suite**, matching M7's acceptance criterion.
+
+### Adversarial evaluations
+
+`coherence bench --suite=adversarial` materializes temporary repos, writes a
+baseline snapshot + graph, applies graph-seeded mutations, runs the drift
+pipeline, and scores expected meters against `drift.active_meters`. Source
+repos are never mutated.
+
+By default the suite uses an embedded agent-style Go/TypeScript repo covering
+the deterministic meter families. The first 20 built-in mutations are
+deterministic; the LLM contradiction mutation is ordered last and runs only when
+enabled. Real corpora are local-manifest only:
+
+```yaml
+version: 1
+repos:
+  - id: coherence-self
+    path: .
+    tags: [agent-repo, go]
+    weight: 2
+    include: ["**"]
+    exclude: [".coherence/**", "vendor/**"]
+```
+
+Useful flags:
+
+```bash
+coherence bench --suite=adversarial --iterations=100 --seed=7 --jobs=4
+coherence bench --suite=adversarial --corpus-manifest=corpus.yml --json
+coherence bench --suite=adversarial --write-report
+coherence bench --suite=adversarial --refine-from=.coherence/adversarial/runs/<run>
+coherence bench --suite=adversarial --cycles=5 --iterations=20 --write-report
+coherence bench --suite=adversarial --llm --llm-specs
+coherence bench --suite=adversarial --export-report=docs/adversarial.md
+```
+
+Default CI behavior is telemetry: misses are reported in JSON, clusters, and
+the rolling leaderboard, but the command exits 0 unless `--strict` is passed.
+The built-in suite is intentionally allowed to contain exploration demos that
+miss today, so `pass=false` is a research signal, not a failed implementation
+milestone.
+For the commit cadence and durable experiment ledger, see
+[`docs/adversarial-exploration.md`](docs/adversarial-exploration.md).
+`--write-report` writes `.coherence/adversarial/runs/<run>/` with JSONL,
+summary JSON, miss clusters, refinement suggestions, and updates
+`.coherence/adversarial/leaderboard.json` with rolling run, per-meter, and
+per-mutation hit/FN/FP rates. The summary includes both `by_meter` (expected
+meters plus unexpected active meters from false positives) and
+`by_expected_meter` for compatibility. `--llm-specs` optionally asks Groq for
+additional mutation specs using graph summaries only; generated specs are
+recorded under `.coherence/adversarial/specs/` after schema validation and a
+deterministic dry-run, and the run summary records whether expansion was
+requested, skipped, accepted, or failed without failing the deterministic bench.
+Mutation specs can declare `skip_conditions.require_env`,
+`skip_conditions.require_files`, and
+`skip_conditions.require_optional_engines`; unmet preconditions produce
+`skipped` iterations rather than errors. Edit paths and required-file paths must
+stay inside the materialized repo and cannot target `.git/` or `.coherence/`.
+`--export-report` writes only under the repo root. `--llm` enables LLM
+contradiction mutations when `GROQ_API_KEY` is also present. `--refine-from`
+accepts a run directory or
+`summary.json`, prioritizes mutations from prior miss clusters or skips/errors,
+and advances the seed when `--seed` is not supplied. `--cycles=N` runs that same
+refine loop repeatedly in one command, forcing per-cycle report artifacts so
+each pass can seed the next hypothesis.
 
 `coherence index` walks the tracked file set (`git ls-files`) and writes
 `.coherence/snapshot.json`. Each file gets:

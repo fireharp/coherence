@@ -11,10 +11,12 @@ import (
 	"os/signal"
 	"path/filepath"
 	"runtime/debug"
+	"strconv"
 	"strings"
 	"syscall"
 	"time"
 
+	"github.com/fireharp/coherence/internal/adversarial"
 	"github.com/fireharp/coherence/internal/bench"
 	"github.com/fireharp/coherence/internal/coherencebench"
 	"github.com/fireharp/coherence/internal/doctor"
@@ -50,8 +52,11 @@ const usage = `coherence <subcommand> [flags]
                                           live worktree signal loop (--strict applies to --once only)
                                           (--once = single fire; default = streaming)
   doctor [--json] [--ontology=path]       validate ontology, hook, .gitignore
-  bench [--suite=templates|coherencebench|external|all] [--template=<name>]
-        [--json] [--write-report]          run shipped scenario / eval suites
+  bench [--suite=templates|coherencebench|external|adversarial|all] [--template=<name>]
+        [--json] [--write-report] [--strict] [--llm] run shipped scenario / eval suites
+        adversarial flags: [--corpus-manifest=path] [--iterations=N] [--seed=N]
+        [--jobs=N] [--taxonomy=path] [--llm-specs] [--refine-from=path]
+        [--cycles=N] [--export-report=path]
   index [--json] [--dry-run]              write .coherence/snapshot.json (Merkle + semantic hashes)
   diff [--base=path] [--json]             compare current snapshot to base
   drift [--json|--summary] [--strict]     compute drift meters → .coherence/drift.json (--summary: 1-line; --strict: exit 1 on telemetry)
@@ -104,6 +109,16 @@ func boolFlag(args parsedArgs, name string) bool {
 func stringFlag(args parsedArgs, name, fallback string) string {
 	if v, ok := args.flags[name].(string); ok && v != "" {
 		return v
+	}
+	return fallback
+}
+
+func intFlag(args parsedArgs, name string, fallback int) int {
+	if v, ok := args.flags[name].(string); ok && v != "" {
+		var out int
+		if _, err := fmt.Sscanf(v, "%d", &out); err == nil {
+			return out
+		}
 	}
 	return fallback
 }
@@ -1075,12 +1090,12 @@ func runBench(args parsedArgs, rootDir string) int {
 	suite := stringFlag(args, "suite", "templates")
 	writeMD := boolFlag(args, "write-report")
 	switch suite {
-	case "all", "coherencebench", "cb", "templates":
+	case "all", "coherencebench", "cb", "templates", "adversarial", "adv":
 		// supported
 	default:
 		if writeMD {
 			fmt.Fprintf(os.Stderr,
-				"coherence: --write-report only applies to --suite=all|coherencebench|templates (got %q); flag will be ignored\n",
+				"coherence: --write-report only applies to --suite=all|coherencebench|templates|adversarial (got %q); flag will be ignored\n",
 				suite)
 		}
 	}
@@ -1109,6 +1124,53 @@ func runBench(args parsedArgs, rootDir string) int {
 	}
 
 	switch suite {
+	case "adversarial", "adv":
+		advOpts, err := adversarialOptions(args, rootDir, false)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, "coherence: fatal:", err)
+			return 2
+		}
+		if advOpts.Cycles > 1 {
+			loop, err := adversarial.RunCycles(advOpts)
+			if err != nil {
+				fmt.Fprintln(os.Stderr, "coherence: fatal:", err)
+				return 2
+			}
+			if jsonOut {
+				enc := json.NewEncoder(os.Stdout)
+				enc.SetIndent("", "  ")
+				if err := enc.Encode(loop); err != nil {
+					fmt.Fprintln(os.Stderr, "coherence: fatal:", err)
+					return 2
+				}
+			} else {
+				fmt.Print(adversarial.HumanLoop(loop))
+			}
+			if boolFlag(args, "strict") && !loop.Pass {
+				return 1
+			}
+			return 0
+		}
+		adv, err := adversarial.Run(advOpts)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, "coherence: fatal:", err)
+			return 2
+		}
+		if jsonOut {
+			enc := json.NewEncoder(os.Stdout)
+			enc.SetIndent("", "  ")
+			if err := enc.Encode(adv); err != nil {
+				fmt.Fprintln(os.Stderr, "coherence: fatal:", err)
+				return 2
+			}
+		} else {
+			fmt.Print(adversarial.Human(adv))
+		}
+		if boolFlag(args, "strict") && !adv.Pass {
+			return 1
+		}
+		return 0
+
 	case "coherencebench", "cb":
 		cb := coherencebench.RunAll()
 		if jsonOut {
@@ -1196,10 +1258,21 @@ func runBench(args parsedArgs, rootDir string) int {
 			return 2
 		}
 		cb := coherencebench.RunAll()
+		advOpts, err := adversarialOptions(args, rootDir, true)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, "coherence: fatal:", err)
+			return 2
+		}
+		adv, err := adversarial.Run(advOpts)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, "coherence: fatal:", err)
+			return 2
+		}
 		combined := map[string]any{
 			"templates":      tpl,
 			"coherencebench": cb,
-			"pass":           tpl.Pass && cb.Pass,
+			"adversarial":    adv,
+			"pass":           tpl.Pass && cb.Pass && (!boolFlag(args, "strict") || adv.Pass),
 		}
 		if jsonOut {
 			enc := json.NewEncoder(os.Stdout)
@@ -1212,6 +1285,8 @@ func runBench(args parsedArgs, rootDir string) int {
 			fmt.Print(bench.Human(tpl))
 			fmt.Println()
 			fmt.Print(coherencebench.Human(cb))
+			fmt.Println()
+			fmt.Print(adversarial.Human(adv))
 		}
 		if writeMD {
 			rep := coherencebench.CombinedReport{
@@ -1233,13 +1308,81 @@ func runBench(args parsedArgs, rootDir string) int {
 				fmt.Printf("coherence: wrote %s\n", rel)
 			}
 		}
-		if !tpl.Pass || !cb.Pass {
+		if !tpl.Pass || !cb.Pass || (boolFlag(args, "strict") && !adv.Pass) {
 			return 1
 		}
 		return 0
 
 	default:
-		fmt.Fprintf(os.Stderr, "coherence: unknown --suite %q (use templates|coherencebench|all)\n", suite)
+		fmt.Fprintf(os.Stderr, "coherence: unknown --suite %q (use templates|coherencebench|external|adversarial|all)\n", suite)
 		return 2
 	}
+}
+
+func adversarialOptions(args parsedArgs, rootDir string, allSuite bool) (adversarial.Options, error) {
+	manifest := stringFlag(args, "corpus-manifest", "")
+	if allSuite && manifest == "" {
+		// Explicitly keep --suite=all on the embedded corpus unless the
+		// caller opts into local real repos with --corpus-manifest.
+		manifest = ""
+	}
+	iterations, err := positiveIntFlag(args, "iterations", 0)
+	if err != nil {
+		return adversarial.Options{}, err
+	}
+	cycles, err := positiveIntFlag(args, "cycles", 1)
+	if err != nil {
+		return adversarial.Options{}, err
+	}
+	jobs, err := positiveIntFlag(args, "jobs", 1)
+	if err != nil {
+		return adversarial.Options{}, err
+	}
+	seed, err := strictIntFlag(args, "seed", 0)
+	if err != nil {
+		return adversarial.Options{}, err
+	}
+	return adversarial.Options{
+		RootDir:      rootDir,
+		ManifestPath: manifest,
+		TaxonomyPath: stringFlag(args, "taxonomy", ""),
+		RefineFrom:   stringFlag(args, "refine-from", ""),
+		Iterations:   iterations,
+		Cycles:       cycles,
+		Seed:         int64(seed),
+		Jobs:         jobs,
+		LLM:          boolFlag(args, "llm"),
+		LLMSpecs:     boolFlag(args, "llm-specs"),
+		Strict:       boolFlag(args, "strict"),
+		WriteReport:  boolFlag(args, "write-report"),
+		ExportReport: stringFlag(args, "export-report", ""),
+		JSONOut:      boolFlag(args, "json"),
+	}, nil
+}
+
+func positiveIntFlag(args parsedArgs, name string, fallback int) (int, error) {
+	n, err := strictIntFlag(args, name, fallback)
+	if err != nil {
+		return 0, err
+	}
+	if _, ok := args.flags[name]; ok && n <= 0 {
+		return 0, fmt.Errorf("--%s must be > 0 (got %d)", name, n)
+	}
+	return n, nil
+}
+
+func strictIntFlag(args parsedArgs, name string, fallback int) (int, error) {
+	v, ok := args.flags[name]
+	if !ok {
+		return fallback, nil
+	}
+	raw, ok := v.(string)
+	if !ok || strings.TrimSpace(raw) == "" {
+		return 0, fmt.Errorf("--%s requires an integer value", name)
+	}
+	n, err := strconv.Atoi(strings.TrimSpace(raw))
+	if err != nil {
+		return 0, fmt.Errorf("--%s must be an integer (got %q)", name, raw)
+	}
+	return n, nil
 }
