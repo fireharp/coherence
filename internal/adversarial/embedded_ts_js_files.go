@@ -4,6 +4,8 @@ func embeddedTSJSFiles() map[string]string {
 	return map[string]string{
 		"src/util.ts":             "export const util = 1;\n",
 		"src/usesUtil.ts":         "import { util } from './util';\nexport const value = util;\n",
+		"src/assetConsumer.ts":    "import config from \"config.json\";\nexport const policyAssetName = config.name;\n",
+		"config.json":             "{\n  \"name\": \"policy\"\n}\n",
 		"src/reexported.ts":       "export const reexported = 1;\n",
 		"src/barrel.ts":           "export { reexported } from './reexported';\nexport * from './reexported';\n",
 		"src/lazy.ts":             "export const lazy = 1;\n",

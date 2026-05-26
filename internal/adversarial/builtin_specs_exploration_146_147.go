@@ -2,7 +2,7 @@ package adversarial
 
 import "github.com/fireharp/coherence/internal/graph"
 
-func builtinExplorationSpecs146() []Spec {
+func builtinExplorationSpecs146To147() []Spec {
 	return []Spec{
 		{
 			ID:             "ADV-146-html-anchor-support-path-loss-fp-demo",
@@ -15,6 +15,14 @@ func builtinExplorationSpecs146() []Spec {
 				Old: `See [US-001](../user-stories/US-001.md).`,
 				New: `See <a href="../user-stories/US-001.md">US-001</a>.`,
 			},
+		},
+		{
+			ID:             "ADV-147-json-asset-bare-import-demo",
+			Description:    "Remove a JSON asset imported through a bare/root TypeScript specifier; dangling_imports ignores non-relative specs.",
+			Operation:      opRemoveFile,
+			TargetKinds:    []graph.NodeKind{graph.NodeFile},
+			ExpectedMeters: []string{"dangling_imports"},
+			Selector:       Selector{PathGlob: "config.json"},
 		},
 	}
 }

@@ -62,7 +62,7 @@ Update this table when a batch lands or when a report is exported.
 | Markdown-like docs not scanned by link/id meters | `ADV-048`, `ADV-049` | Docs graph sees files that specific meters skip | Decide whether agent-control Markdown variants should be first-class docs |
 | TypeScript import syntax variants | `ADV-043`-`ADV-047` | `dangling_imports` misses non-basic import forms | Add parser-backed TS import extraction or expand regex coverage |
 | Python import syntax variants | `ADV-025`, `ADV-033`, `ADV-035`, `ADV-079` | `dangling_imports` misses dynamic imports, absolute package imports, plain `import` statements, and `from . import sibling` forms | Decide whether Python import resolution should parse imported names in addition to module specifiers |
-| Frontend non-code import graphs | `ADV-051` | `dangling_imports` misses CSS `@import` references | Decide whether stylesheet imports belong in the repo graph |
+| Frontend non-code import graphs | `ADV-051`, `ADV-147` | `dangling_imports` misses CSS `@import` references and bare/root asset imports such as `config.json` | Decide whether stylesheet and bundler-resolved asset imports belong in the repo graph |
 | Test-file import graphs | `ADV-070` | `dangling_imports` misses build-breaking imports that only appear in test files | Decide whether test files need a separate lower-noise import integrity pass |
 | Route declaration APIs | `ADV-052`, `ADV-059`, `ADV-061`, `ADV-068`, `ADV-071`, `ADV-074`, `ADV-080`, `ADV-087`, `ADV-093`, `ADV-097`, `ADV-098`, `ADV-110`, `ADV-113`, `ADV-127`, `ADV-132` | `orphan_endpoints` misses FastAPI `add_api_route`, Express chained registrations, optional-chaining and bracket-property registrations, Next file-system handlers, Gin-style Go routes, Rails route files, OpenAPI path specs, Java Spring annotations, gorilla/mux `HandleFunc(...).Methods(...)`, Kotlin Ktor, NestJS decorator routes, Go 1.22 ServeMux method patterns, and Laravel PHP routes | Add parser coverage for literal non-decorator, chained, decorator, framework-specific, and contract-level route declarations |
 | File-level dependency cycles | `ADV-062`, `ADV-077` | `dependency_cycles` misses TypeScript import cycles represented as file-to-file edges and Python same-package file cycles | Decide whether cycle detection should normalize file-level edges or keep package-only scope |
@@ -97,7 +97,6 @@ are rejected.
 
 | Candidate | Expected meter | Why it is distinct |
 | --- | --- | --- |
-| JSON asset import deletion | `dangling_imports` | Tests bare/root asset imports (`import data from "config.json"`) whose target is a non-source asset; relative `./config.json` is expected to hit today |
 | Raw typed-ID trace mention | `trace_coverage` | Tests story coverage expressed as plain `US-###` text instead of Markdown links; needs an isolated fixture that does not perturb semantic-movement calibration |
 | Covered-file endpoint laundering | `orphan_endpoints` | Tests an untested endpoint added to a source file that already has one tested endpoint; current endpoint coverage is file-level, not route-level |
 | Self-link story coverage | `trace_coverage` | Tests a story doc linking to itself; current trace coverage counts any incoming mention to the defining doc, including self-citations |
