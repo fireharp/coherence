@@ -1035,6 +1035,20 @@ func (policyEngine) unusedDecisionBranch() bool { return false }
 			Selector:       Selector{PathGlob: "metrics/template_only.yaml"},
 			Edit:           Edit{NewPath: "metrics/template_only_v2.yaml"},
 		},
+		{
+			ID:             "ADV-083-production-scenario-typed-id-demo",
+			Description:    "Add production scenario config with an unresolved typed ID; unknown_id_references skips any path segment named scenarios.",
+			Operation:      opAddFile,
+			TargetKinds:    []graph.NodeKind{graph.NodeFile},
+			ExpectedMeters: []string{"unknown_id_references"},
+			Selector:       Selector{PathGlob: "AGENTS.md"},
+			Edit: Edit{
+				Path: "src/scenarios/onboarding.yaml",
+				Content: `name: onboarding
+required_story: US-999
+`,
+			},
+		},
 	}
 }
 

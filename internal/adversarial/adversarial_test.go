@@ -434,7 +434,7 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 	if report.Pass {
 		t.Fatalf("expected exploration demo to keep the run non-passing: %+v", report.Summary)
 	}
-	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 61 || report.Summary.FalsePositives != 0 {
+	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 62 || report.Summary.FalsePositives != 0 {
 		t.Fatalf("unexpected failures: %+v", report.Summary)
 	}
 	if report.Summary.Skipped != 1 {
@@ -1049,6 +1049,16 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 		templateMetric.FalseNegatives[0] != "orphaned_metric_aliases" ||
 		len(templateMetric.FalsePositives) != 0 {
 		t.Fatalf("template literal metric result=%+v, want false negative for orphaned_metric_aliases", *templateMetric)
+	}
+	prodScenarioID := findResult(report.Results, "ADV-083-production-scenario-typed-id-demo")
+	if prodScenarioID == nil {
+		t.Fatal("missing ADV-083 exploration demo result")
+	}
+	if prodScenarioID.Classification != ClassificationMiss ||
+		len(prodScenarioID.FalseNegatives) != 1 ||
+		prodScenarioID.FalseNegatives[0] != "unknown_id_references" ||
+		len(prodScenarioID.FalsePositives) != 0 {
+		t.Fatalf("production scenario ID result=%+v, want false negative for unknown_id_references", *prodScenarioID)
 	}
 }
 
