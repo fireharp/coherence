@@ -1285,6 +1285,21 @@ type Query {
 `,
 			},
 		},
+		{
+			ID:             "ADV-100-dockerfile-copy-dangling-demo",
+			Description:    "Add a Dockerfile COPY instruction for a missing local file; dangling_imports does not parse build-system operands.",
+			Operation:      opAddFile,
+			TargetKinds:    []graph.NodeKind{graph.NodeFile},
+			ExpectedMeters: []string{"dangling_imports"},
+			Selector:       Selector{PathGlob: "AGENTS.md"},
+			Edit: Edit{
+				Path: "Dockerfile",
+				Content: `FROM scratch
+
+COPY docker/policy-entrypoint.sh /app/policy-entrypoint.sh
+`,
+			},
+		},
 	}
 }
 

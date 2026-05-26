@@ -76,7 +76,7 @@ Update this table when a batch lands or when a report is exported.
 | Optional Go native dead code | `ADV-081` | `dead_code` misses uncalled unexported methods because the native engine only scores top-level functions | Decide whether method-level dead code belongs in the native engine or stays documented as out of scope |
 | Ontology rule trigger deletions | `ADV-088` | `required_edge_breakage` misses deleted trigger files because the dirty-file diff excludes deletions | Decide whether rule evaluation should include deleted paths or classify trigger removals separately |
 | Claim extraction list shapes | `ADV-089` | `claim_support` misses numbered-list requirements because claim extraction only recognizes unordered bullets | Decide whether ordered Markdown requirements should be first-class claim nodes |
-| Build-system include graphs | `ADV-090` | `dangling_imports` misses deleted Makefile include files because dependency extraction only covers source-language imports | Decide whether build-system include directives belong in the import integrity meter |
+| Build-system include graphs | `ADV-090`, `ADV-100` | `dangling_imports` misses Makefile include files and Dockerfile `COPY` operands because dependency extraction only covers source-language imports | Decide whether build-system include directives belong in the import integrity meter |
 | Markdown concept heading shapes | `ADV-091`, `ADV-095` | `path_loss` misses support loss under H3-only sections and Setext H1/H2 headings because concept extraction only emits ATX H1/H2 nodes | Decide whether non-ATX and deeper requirement headings are meaningful concepts or intentionally out of scope |
 | Shell source/include graphs | `ADV-092` | `dangling_imports` misses deleted shell libraries sourced by other scripts because shell dependency extraction is command-only | Decide whether shell `source`/`.` includes belong in the import integrity meter |
 | JavaScript source import graphs | `ADV-096` | `dangling_imports` misses production `.js` ESM imports because the source scan only includes TypeScript-family files | Decide whether plain JavaScript belongs in the import integrity meter |
@@ -94,7 +94,6 @@ are rejected.
 | HTML anchor support link | `path_loss` | Tests support paths expressed as raw HTML anchors rather than Markdown links |
 | Markdown table semantic change | `semantic_movement` | Tests meaning changes inside tables, which may not affect semantic hashes if table structure is ignored |
 | Go 1.22 ServeMux method-pattern route | `orphan_endpoints` | Tests `mux.Handle("GET /path", handler)` syntax, distinct from `http.HandleFunc` and verb-named router methods |
-| Dockerfile COPY source deletion | `dangling_imports` | Tests build-system file references expressed as unquoted Dockerfile operands |
 | Protobuf import deletion | `dangling_imports` | Tests schema import/include dependencies outside TS/Python source import scanners |
 | Package script file reference | `dangling_imports` | Tests build-critical script operands inside `package.json` command strings |
 | Markdown task-list claim | `claim_support` | Tests assertive requirements hidden behind task-list checkbox syntax |
@@ -104,6 +103,9 @@ are rejected.
 | OpenAPI local `$ref` deletion | `dangling_imports` | Tests schema component file references in OpenAPI specs |
 | AsciiDoc user story | `unimplemented_stories` | Tests user-story declarations outside Markdown/MDX/YAML document formats |
 | GitLab CI local include deletion | `dangling_imports` | Tests CI include references in `.gitlab-ci.yml` outside source import scanners |
+| Raw typed-ID trace mention | `trace_coverage` | Tests story coverage expressed as plain `US-###` text instead of Markdown links |
+| Go embed operand deletion | `dangling_imports` | Tests `//go:embed` file operands outside Go import extraction |
+| Kustomize resource deletion | `dangling_imports` | Tests deploy manifest include graphs in `kustomization.yaml` |
 
 ## Rejected Hypotheses
 

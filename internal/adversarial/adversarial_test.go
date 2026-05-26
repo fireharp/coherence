@@ -434,7 +434,7 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 	if report.Pass {
 		t.Fatalf("expected exploration demo to keep the run non-passing: %+v", report.Summary)
 	}
-	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 78 || report.Summary.FalsePositives != 0 {
+	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 79 || report.Summary.FalsePositives != 0 {
 		t.Fatalf("unexpected failures: %+v", report.Summary)
 	}
 	if report.Summary.Skipped != 1 {
@@ -1219,6 +1219,16 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 		graphQLImport.FalseNegatives[0] != "dangling_imports" ||
 		len(graphQLImport.FalsePositives) != 0 {
 		t.Fatalf("GraphQL import result=%+v, want false negative for dangling_imports", *graphQLImport)
+	}
+	dockerCopy := findResult(report.Results, "ADV-100-dockerfile-copy-dangling-demo")
+	if dockerCopy == nil {
+		t.Fatal("missing ADV-100 exploration demo result")
+	}
+	if dockerCopy.Classification != ClassificationMiss ||
+		len(dockerCopy.FalseNegatives) != 1 ||
+		dockerCopy.FalseNegatives[0] != "dangling_imports" ||
+		len(dockerCopy.FalsePositives) != 0 {
+		t.Fatalf("Dockerfile COPY result=%+v, want false negative for dangling_imports", *dockerCopy)
 	}
 }
 
