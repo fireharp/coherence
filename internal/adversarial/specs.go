@@ -1300,6 +1300,23 @@ COPY docker/policy-entrypoint.sh /app/policy-entrypoint.sh
 `,
 			},
 		},
+		{
+			ID:             "ADV-101-package-script-dangling-demo",
+			Description:    "Add a package.json script that references a missing local Node script; dangling_imports does not parse package script operands.",
+			Operation:      opAddFile,
+			TargetKinds:    []graph.NodeKind{graph.NodeFile},
+			ExpectedMeters: []string{"dangling_imports"},
+			Selector:       Selector{PathGlob: "AGENTS.md"},
+			Edit: Edit{
+				Path: "package.json",
+				Content: `{
+  "scripts": {
+    "check:policy": "node scripts/missing-policy-check.js"
+  }
+}
+`,
+			},
+		},
 	}
 }
 

@@ -434,7 +434,7 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 	if report.Pass {
 		t.Fatalf("expected exploration demo to keep the run non-passing: %+v", report.Summary)
 	}
-	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 79 || report.Summary.FalsePositives != 0 {
+	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 80 || report.Summary.FalsePositives != 0 {
 		t.Fatalf("unexpected failures: %+v", report.Summary)
 	}
 	if report.Summary.Skipped != 1 {
@@ -1229,6 +1229,16 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 		dockerCopy.FalseNegatives[0] != "dangling_imports" ||
 		len(dockerCopy.FalsePositives) != 0 {
 		t.Fatalf("Dockerfile COPY result=%+v, want false negative for dangling_imports", *dockerCopy)
+	}
+	packageScript := findResult(report.Results, "ADV-101-package-script-dangling-demo")
+	if packageScript == nil {
+		t.Fatal("missing ADV-101 exploration demo result")
+	}
+	if packageScript.Classification != ClassificationMiss ||
+		len(packageScript.FalseNegatives) != 1 ||
+		packageScript.FalseNegatives[0] != "dangling_imports" ||
+		len(packageScript.FalsePositives) != 0 {
+		t.Fatalf("package script result=%+v, want false negative for dangling_imports", *packageScript)
 	}
 }
 
