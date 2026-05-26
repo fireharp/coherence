@@ -1168,6 +1168,31 @@ public final class AuditController {
 			ExpectedMeters: []string{"dangling_imports"},
 			Selector:       Selector{PathGlob: "scripts/policy_lib.sh"},
 		},
+		{
+			ID:             "ADV-093-go-mux-handlefunc-methods-endpoint-demo",
+			Description:    "Add an untested gorilla/mux-style route using HandleFunc(...).Methods(...); endpoint extraction only recognizes http.HandleFunc or verb-named router calls.",
+			Operation:      opAddFile,
+			TargetKinds:    []graph.NodeKind{graph.NodeFile},
+			ExpectedMeters: []string{"orphan_endpoints"},
+			Selector:       Selector{PathGlob: "AGENTS.md"},
+			Edit: Edit{
+				Path: "pkg/policy/mux_endpoint.go",
+				Content: `package policy
+
+type muxRoute interface {
+	Methods(...string)
+}
+
+type muxRouter interface {
+	HandleFunc(string, func()) muxRoute
+}
+
+func MountMuxRoutes(r muxRouter) {
+	r.HandleFunc("/api/mux-orders", func() {}).Methods("GET")
+}
+`,
+			},
+		},
 	}
 }
 

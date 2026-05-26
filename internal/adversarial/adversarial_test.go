@@ -434,7 +434,7 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 	if report.Pass {
 		t.Fatalf("expected exploration demo to keep the run non-passing: %+v", report.Summary)
 	}
-	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 71 || report.Summary.FalsePositives != 0 {
+	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 72 || report.Summary.FalsePositives != 0 {
 		t.Fatalf("unexpected failures: %+v", report.Summary)
 	}
 	if report.Summary.Skipped != 1 {
@@ -1149,6 +1149,16 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 		shellSource.FalseNegatives[0] != "dangling_imports" ||
 		len(shellSource.FalsePositives) != 0 {
 		t.Fatalf("shell source result=%+v, want false negative for dangling_imports", *shellSource)
+	}
+	muxRoute := findResult(report.Results, "ADV-093-go-mux-handlefunc-methods-endpoint-demo")
+	if muxRoute == nil {
+		t.Fatal("missing ADV-093 exploration demo result")
+	}
+	if muxRoute.Classification != ClassificationMiss ||
+		len(muxRoute.FalseNegatives) != 1 ||
+		muxRoute.FalseNegatives[0] != "orphan_endpoints" ||
+		len(muxRoute.FalsePositives) != 0 {
+		t.Fatalf("mux route result=%+v, want false negative for orphan_endpoints", *muxRoute)
 	}
 }
 
