@@ -1140,6 +1140,14 @@ public final class AuditController {
 				New: "1. Must retain audit evidence for every export.",
 			},
 		},
+		{
+			ID:             "ADV-090-makefile-include-dangling-import-demo",
+			Description:    "Remove a Makefile include still required by the root Makefile; dangling_imports only checks source-language import graphs.",
+			Operation:      opRemoveFile,
+			TargetKinds:    []graph.NodeKind{graph.NodeFile},
+			ExpectedMeters: []string{"dangling_imports"},
+			Selector:       Selector{PathGlob: "build/mk/policy.mk"},
+		},
 	}
 }
 

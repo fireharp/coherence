@@ -20,6 +20,12 @@ func embeddedAgentRepo() map[string]string {
 	return map[string]string{
 		"AGENTS.md": "# Agent Notes\n\nKeep docs, tests, metrics, and decisions coherent. See [US-001](docs/user-stories/US-001.md).\n",
 		"go.mod":    "module example.com/adversarial\n\ngo 1.22\n",
+		"Makefile": `include build/mk/policy.mk
+
+check-policy:
+	$(POLICY_CHECK)
+`,
+		"build/mk/policy.mk": "POLICY_CHECK=go test ./pkg/policy\n",
 		"tsconfig.json": `{
   "compilerOptions": {
     "baseUrl": ".",

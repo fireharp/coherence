@@ -434,7 +434,7 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 	if report.Pass {
 		t.Fatalf("expected exploration demo to keep the run non-passing: %+v", report.Summary)
 	}
-	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 68 || report.Summary.FalsePositives != 0 {
+	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 69 || report.Summary.FalsePositives != 0 {
 		t.Fatalf("unexpected failures: %+v", report.Summary)
 	}
 	if report.Summary.Skipped != 1 {
@@ -1119,6 +1119,16 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 		numberedClaim.FalseNegatives[0] != "claim_support" ||
 		len(numberedClaim.FalsePositives) != 0 {
 		t.Fatalf("numbered claim result=%+v, want false negative for claim_support", *numberedClaim)
+	}
+	makeInclude := findResult(report.Results, "ADV-090-makefile-include-dangling-import-demo")
+	if makeInclude == nil {
+		t.Fatal("missing ADV-090 exploration demo result")
+	}
+	if makeInclude.Classification != ClassificationMiss ||
+		len(makeInclude.FalseNegatives) != 1 ||
+		makeInclude.FalseNegatives[0] != "dangling_imports" ||
+		len(makeInclude.FalsePositives) != 0 {
+		t.Fatalf("Makefile include result=%+v, want false negative for dangling_imports", *makeInclude)
 	}
 }
 
