@@ -434,7 +434,7 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 	if report.Pass {
 		t.Fatalf("expected exploration demo to keep the run non-passing: %+v", report.Summary)
 	}
-	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 80 || report.Summary.FalsePositives != 0 {
+	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 81 || report.Summary.FalsePositives != 0 {
 		t.Fatalf("unexpected failures: %+v", report.Summary)
 	}
 	if report.Summary.Skipped != 1 {
@@ -1239,6 +1239,16 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 		packageScript.FalseNegatives[0] != "dangling_imports" ||
 		len(packageScript.FalsePositives) != 0 {
 		t.Fatalf("package script result=%+v, want false negative for dangling_imports", *packageScript)
+	}
+	goEmbed := findResult(report.Results, "ADV-102-go-embed-dangling-demo")
+	if goEmbed == nil {
+		t.Fatal("missing ADV-102 exploration demo result")
+	}
+	if goEmbed.Classification != ClassificationMiss ||
+		len(goEmbed.FalseNegatives) != 1 ||
+		goEmbed.FalseNegatives[0] != "dangling_imports" ||
+		len(goEmbed.FalsePositives) != 0 {
+		t.Fatalf("go embed result=%+v, want false negative for dangling_imports", *goEmbed)
 	}
 }
 

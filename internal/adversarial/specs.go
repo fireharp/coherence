@@ -1317,6 +1317,24 @@ COPY docker/policy-entrypoint.sh /app/policy-entrypoint.sh
 `,
 			},
 		},
+		{
+			ID:             "ADV-102-go-embed-dangling-demo",
+			Description:    "Add a Go source file with a go:embed directive for a missing local asset; dangling_imports does not parse embed operands.",
+			Operation:      opAddFile,
+			TargetKinds:    []graph.NodeKind{graph.NodeFile},
+			ExpectedMeters: []string{"dangling_imports"},
+			Selector:       Selector{PathGlob: "AGENTS.md"},
+			Edit: Edit{
+				Path: "pkg/policy/embed_policy.go",
+				Content: `package policy
+
+import _ "embed"
+
+//go:embed templates/missing-policy.html
+var policyTemplate string
+`,
+			},
+		},
 	}
 }
 

@@ -77,6 +77,7 @@ Update this table when a batch lands or when a report is exported.
 | Ontology rule trigger deletions | `ADV-088` | `required_edge_breakage` misses deleted trigger files because the dirty-file diff excludes deletions | Decide whether rule evaluation should include deleted paths or classify trigger removals separately |
 | Claim extraction list shapes | `ADV-089` | `claim_support` misses numbered-list requirements because claim extraction only recognizes unordered bullets | Decide whether ordered Markdown requirements should be first-class claim nodes |
 | Build-system include graphs | `ADV-090`, `ADV-100`, `ADV-101` | `dangling_imports` misses Makefile include files, Dockerfile `COPY` operands, and package script operands because dependency extraction only covers source-language imports | Decide whether build-system include directives belong in the import integrity meter |
+| Go embed asset graphs | `ADV-102` | `dangling_imports` misses missing `//go:embed` asset operands because Go extraction does not parse embed directives | Decide whether embedded asset operands belong in import integrity |
 | Markdown concept heading shapes | `ADV-091`, `ADV-095` | `path_loss` misses support loss under H3-only sections and Setext H1/H2 headings because concept extraction only emits ATX H1/H2 nodes | Decide whether non-ATX and deeper requirement headings are meaningful concepts or intentionally out of scope |
 | Shell source/include graphs | `ADV-092` | `dangling_imports` misses deleted shell libraries sourced by other scripts because shell dependency extraction is command-only | Decide whether shell `source`/`.` includes belong in the import integrity meter |
 | JavaScript source import graphs | `ADV-096` | `dangling_imports` misses production `.js` ESM imports because the source scan only includes TypeScript-family files | Decide whether plain JavaScript belongs in the import integrity meter |
@@ -103,7 +104,6 @@ are rejected.
 | AsciiDoc user story | `unimplemented_stories` | Tests user-story declarations outside Markdown/MDX/YAML document formats |
 | GitLab CI local include deletion | `dangling_imports` | Tests CI include references in `.gitlab-ci.yml` outside source import scanners |
 | Raw typed-ID trace mention | `trace_coverage` | Tests story coverage expressed as plain `US-###` text instead of Markdown links |
-| Go embed operand deletion | `dangling_imports` | Tests `//go:embed` file operands outside Go import extraction |
 | Kustomize resource deletion | `dangling_imports` | Tests deploy manifest include graphs in `kustomization.yaml` |
 | Mermaid click link target | `broken_links` | Tests links hidden inside Mermaid fenced diagrams |
 | Terraform local module source | `dangling_imports` | Tests HCL module source references outside source import scanners |
@@ -111,6 +111,9 @@ are rejected.
 | Rust module declaration deletion | `dangling_imports` | Tests `mod foo;` module graph integrity outside Rust stale-test coverage |
 | Markdown footnote link target | `broken_links` | Tests footnote definition targets as a distinct Markdown link form |
 | Blockquote claim support | `claim_support` | Tests assertive requirements expressed as blockquotes/admonitions instead of bullets |
+| Markdown image target deletion | `broken_links` | Tests image destinations as a distinct Markdown link surface |
+| Markdown table requirement support | `claim_support` | Tests assertive requirements expressed inside table rows |
+| Docker Compose env file deletion | `dangling_imports` | Tests Compose `env_file` include references outside source import scanners |
 
 ## Rejected Hypotheses
 
