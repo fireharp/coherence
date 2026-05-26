@@ -1049,6 +1049,15 @@ required_story: US-999
 `,
 			},
 		},
+		{
+			ID:             "ADV-084-csharp-stale-test-demo",
+			Description:    "Change C# source covered by an xUnit test; stale_tests has no C# source-to-test reverse mapping.",
+			Operation:      opReplaceText,
+			TargetKinds:    []graph.NodeKind{graph.NodeFile},
+			ExpectedMeters: []string{"stale_tests"},
+			Selector:       Selector{PathGlob: "csharp/RiskPolicy.cs"},
+			Edit:           Edit{Old: "=> 7;", New: "=> 9;"},
+		},
 	}
 }
 

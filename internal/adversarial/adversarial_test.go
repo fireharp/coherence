@@ -434,7 +434,7 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 	if report.Pass {
 		t.Fatalf("expected exploration demo to keep the run non-passing: %+v", report.Summary)
 	}
-	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 62 || report.Summary.FalsePositives != 0 {
+	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 63 || report.Summary.FalsePositives != 0 {
 		t.Fatalf("unexpected failures: %+v", report.Summary)
 	}
 	if report.Summary.Skipped != 1 {
@@ -1059,6 +1059,16 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 		prodScenarioID.FalseNegatives[0] != "unknown_id_references" ||
 		len(prodScenarioID.FalsePositives) != 0 {
 		t.Fatalf("production scenario ID result=%+v, want false negative for unknown_id_references", *prodScenarioID)
+	}
+	csharpStale := findResult(report.Results, "ADV-084-csharp-stale-test-demo")
+	if csharpStale == nil {
+		t.Fatal("missing ADV-084 exploration demo result")
+	}
+	if csharpStale.Classification != ClassificationMiss ||
+		len(csharpStale.FalseNegatives) != 1 ||
+		csharpStale.FalseNegatives[0] != "stale_tests" ||
+		len(csharpStale.FalsePositives) != 0 {
+		t.Fatalf("C# stale test result=%+v, want false negative for stale_tests", *csharpStale)
 	}
 }
 

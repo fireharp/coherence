@@ -117,6 +117,26 @@ final class RiskPolicyTest {
     }
 }
 `,
+		"csharp/RiskPolicy.cs": `namespace Example;
+
+public static class RiskPolicy
+{
+    public static int Limit() => 7;
+}
+`,
+		"csharp/RiskPolicyTests.cs": `using Xunit;
+
+namespace Example.Tests;
+
+public sealed class RiskPolicyTests
+{
+    [Fact]
+    public void ChecksLimit()
+    {
+        Assert.Equal(7, RiskPolicy.Limit());
+    }
+}
+`,
 		"internal/a/a.go": `package a
 
 import "example.com/adversarial/internal/b"
