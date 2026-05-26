@@ -77,6 +77,7 @@ Update this table when a batch lands or when a report is exported.
 | Ontology rule trigger deletions | `ADV-088` | `required_edge_breakage` misses deleted trigger files because the dirty-file diff excludes deletions | Decide whether rule evaluation should include deleted paths or classify trigger removals separately |
 | Claim extraction list shapes | `ADV-089` | `claim_support` misses numbered-list requirements because claim extraction only recognizes unordered bullets | Decide whether ordered Markdown requirements should be first-class claim nodes |
 | Build-system include graphs | `ADV-090` | `dangling_imports` misses deleted Makefile include files because dependency extraction only covers source-language imports | Decide whether build-system include directives belong in the import integrity meter |
+| Markdown concept heading depth | `ADV-091` | `path_loss` misses support loss under H3-only sections because concept extraction only emits H1/H2 nodes | Decide whether H3 requirements are meaningful concepts or intentionally out of scope |
 
 ## Candidate Queue
 
@@ -85,7 +86,7 @@ are rejected.
 
 | Candidate | Expected meter | Why it is distinct |
 | --- | --- | --- |
-| H3 concept support loss | `path_loss` | Tests whether H3-only sections should create concept nodes or stay out of scope |
+| Unassigned | TBD | Add the next promising miss after reviewing the latest clusters |
 
 ## Rejected Hypotheses
 

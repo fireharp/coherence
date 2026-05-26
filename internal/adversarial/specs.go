@@ -1148,6 +1148,18 @@ public final class AuditController {
 			ExpectedMeters: []string{"dangling_imports"},
 			Selector:       Selector{PathGlob: "build/mk/policy.mk"},
 		},
+		{
+			ID:             "ADV-091-h3-concept-path-loss-demo",
+			Description:    "Remove support from an H3-scoped concept; path_loss only extracts H1/H2 concept nodes.",
+			Operation:      opReplaceText,
+			TargetKinds:    []graph.NodeKind{graph.NodeDoc},
+			ExpectedMeters: []string{"path_loss"},
+			Selector:       Selector{PathGlob: "docs/evidence/US-003/proof.md"},
+			Edit: Edit{
+				Old: "See [deep policy source](../../../pkg/policy/policy.go).",
+				New: "See deep policy source.",
+			},
+		},
 	}
 }
 
