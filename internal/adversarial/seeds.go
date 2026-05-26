@@ -226,6 +226,13 @@ test("widget value", () => {
   expect(widgetValue()).toBe(1);
 });
 `,
+		"src/esmWidget.mjs": "export function esmWidgetValue() {\n  return 1;\n}\n",
+		"src/esmWidget.test.mjs": `import { esmWidgetValue } from "./esmWidget.mjs";
+
+test("esm widget value", () => {
+  expect(esmWidgetValue()).toBe(1);
+});
+`,
 		"src/a/index.ts":           "import { b } from '../b';\nexport const a = b;\n",
 		"src/b/index.ts":           "import { c } from '../c';\nexport const b = c;\n",
 		"src/c/index.ts":           "export const c = 1;\n",

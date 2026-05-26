@@ -1193,6 +1193,15 @@ func MountMuxRoutes(r muxRouter) {
 `,
 			},
 		},
+		{
+			ID:             "ADV-094-mjs-stale-test-demo",
+			Description:    "Change an ESM .mjs source covered by a sibling .test.mjs file; stale_tests recognizes .mjs tests but does not reverse-map them to .mjs sources.",
+			Operation:      opReplaceText,
+			TargetKinds:    []graph.NodeKind{graph.NodeFile},
+			ExpectedMeters: []string{"stale_tests"},
+			Selector:       Selector{PathGlob: "src/esmWidget.mjs"},
+			Edit:           Edit{Old: "return 1;", New: "return 2;"},
+		},
 	}
 }
 

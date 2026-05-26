@@ -71,7 +71,7 @@ Update this table when a batch lands or when a report is exported.
 | Docs-as-UI metric aliases | `ADV-054` | `orphaned_metric_aliases` misses MDX component prop aliases | Decide whether MDX should be scanned as frontend surface for metrics |
 | Go package import deletion | `ADV-055` | `dangling_imports` misses removed Go packages still imported by other packages | Decide whether Go import resolution belongs in `dangling_imports` |
 | Markdown link syntaxes beyond bare inline targets | `ADV-027`, `ADV-029`, `ADV-045`, `ADV-056`, `ADV-067`, `ADV-078`, `ADV-085` | `broken_links` misses reference-style, collapsed-reference, HTML, wiki, angle-autolink, titled inline references, and angle-bracket destinations with spaces | Decide how much Markdown syntax coverage the link meter should own |
-| Test coverage mapping gaps | `ADV-039`, `ADV-043`, `ADV-057`, `ADV-064`, `ADV-075`, `ADV-084` | `stale_tests` misses tests that exercise source behavior but do not reverse-map by filename or supported language, including Java/JUnit and C#/xUnit | Decide whether import/call relationships should supplement filename pairing |
+| Test coverage mapping gaps | `ADV-039`, `ADV-043`, `ADV-057`, `ADV-064`, `ADV-075`, `ADV-084`, `ADV-094` | `stale_tests` misses tests that exercise source behavior but do not reverse-map by filename or supported language, including `.mjs` ESM tests, Java/JUnit, and C#/xUnit | Decide whether import/call relationships should supplement filename pairing |
 | ADR supersession frontmatter shapes | `ADV-026`, `ADV-036`, `ADV-058`, `ADV-069`, `ADV-086` | `stale_decision_links` misses raw/reference citations, capitalized relation keys, quoted relation keys, and nested relation maps | Decide whether relation extraction should use a YAML parser |
 | Optional Go native dead code | `ADV-081` | `dead_code` misses uncalled unexported methods because the native engine only scores top-level functions | Decide whether method-level dead code belongs in the native engine or stays documented as out of scope |
 | Ontology rule trigger deletions | `ADV-088` | `required_edge_breakage` misses deleted trigger files because the dirty-file diff excludes deletions | Decide whether rule evaluation should include deleted paths or classify trigger removals separately |
@@ -87,8 +87,12 @@ are rejected.
 
 | Candidate | Expected meter | Why it is distinct |
 | --- | --- | --- |
-| ESM `.mjs` source/test pairing | `stale_tests` | Tests extension parity: `.mjs` tests are recognized as tests but not reverse-mapped to `.mjs` sources |
 | Setext Markdown concept heading | `path_loss` | Tests standard setext H1/H2 headings, distinct from the H3-depth miss in `ADV-091` |
+| Production `.js` ESM import deletion | `dangling_imports` | Tests whether JavaScript source imports are checked alongside TypeScript-family imports |
+| Multiline Python route decorator | `orphan_endpoints` | Tests FastAPI decorators split across lines, distinct from single-line decorator receiver gaps |
+| TypeScript optional-chaining route registration | `orphan_endpoints` | Tests `router?.get(...)` registration syntax, distinct from regular chained route calls |
+| Uppercase user-story frontmatter ID | `unimplemented_stories` | Tests YAML key casing when the filename itself does not expose a typed story ID |
+| GraphQL schema import/include | `dangling_imports` | Tests schema-level dependency integrity outside source-language import extractors |
 
 ## Rejected Hypotheses
 

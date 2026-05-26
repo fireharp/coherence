@@ -434,7 +434,7 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 	if report.Pass {
 		t.Fatalf("expected exploration demo to keep the run non-passing: %+v", report.Summary)
 	}
-	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 72 || report.Summary.FalsePositives != 0 {
+	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 73 || report.Summary.FalsePositives != 0 {
 		t.Fatalf("unexpected failures: %+v", report.Summary)
 	}
 	if report.Summary.Skipped != 1 {
@@ -1159,6 +1159,16 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 		muxRoute.FalseNegatives[0] != "orphan_endpoints" ||
 		len(muxRoute.FalsePositives) != 0 {
 		t.Fatalf("mux route result=%+v, want false negative for orphan_endpoints", *muxRoute)
+	}
+	mjsStale := findResult(report.Results, "ADV-094-mjs-stale-test-demo")
+	if mjsStale == nil {
+		t.Fatal("missing ADV-094 exploration demo result")
+	}
+	if mjsStale.Classification != ClassificationMiss ||
+		len(mjsStale.FalseNegatives) != 1 ||
+		mjsStale.FalseNegatives[0] != "stale_tests" ||
+		len(mjsStale.FalsePositives) != 0 {
+		t.Fatalf("mjs stale test result=%+v, want false negative for stale_tests", *mjsStale)
 	}
 }
 
