@@ -112,6 +112,16 @@ func assertEmbeddedMisses(t *testing.T, results []Result) {
 		{mutationID: "ADV-123-markdown-shortcut-reference-demo", meter: "broken_links"},
 		{mutationID: "ADV-124-blockquote-claim-support-demo", meter: "claim_support"},
 		{mutationID: "ADV-125-table-claim-support-demo", meter: "claim_support"},
+		{mutationID: "ADV-126-uppercase-story-frontmatter-demo", meter: "unimplemented_stories"},
+		{mutationID: "ADV-127-go-servemux-method-pattern-demo", meter: "orphan_endpoints"},
+		{mutationID: "ADV-128-protobuf-import-demo", meter: "dangling_imports"},
+		{mutationID: "ADV-129-markdown-task-list-claim-demo", meter: "claim_support"},
+		{mutationID: "ADV-130-github-reusable-workflow-demo", meter: "dangling_imports"},
+		{mutationID: "ADV-131-kotlin-stale-test-demo", meter: "stale_tests"},
+		{mutationID: "ADV-132-laravel-route-demo", meter: "orphan_endpoints"},
+		{mutationID: "ADV-133-openapi-local-ref-demo", meter: "dangling_imports"},
+		{mutationID: "ADV-134-asciidoc-user-story-demo", meter: "unimplemented_stories"},
+		{mutationID: "ADV-135-gitlab-ci-include-demo", meter: "dangling_imports"},
 	} {
 		t.Run(tc.mutationID, func(t *testing.T) {
 			res := findResult(results, tc.mutationID)

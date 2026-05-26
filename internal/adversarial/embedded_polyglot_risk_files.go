@@ -51,5 +51,23 @@ public sealed class RiskPolicyTests
     }
 }
 `,
+		"kotlin/src/main/kotlin/RiskPolicy.kt": `package example
+
+fun riskLimit(): Int {
+    return 7
+}
+`,
+		"kotlin/src/test/kotlin/RiskPolicyTest.kt": `package example
+
+import kotlin.test.Test
+import kotlin.test.assertEquals
+
+class RiskPolicyTest {
+    @Test
+    fun checksLimit() {
+        assertEquals(7, riskLimit())
+    }
+}
+`,
 	}
 }
