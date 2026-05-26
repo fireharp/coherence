@@ -59,7 +59,7 @@ Use the original reference-style decision.
 		"docs/ref/wiki-target.txt":    "Wiki-style target for reference docs.\n",
 		"docs/ref/refstyle.md":        "# Reference Style\n\nSee [the reference target][target-ref].\n\n[target-ref]: refstyle-target.md\n",
 		"docs/ref/refstyle-target.md": "# Reference Style Target\n\nReference-style target for [US-001](../user-stories/US-001.md).\n",
-		"docs/ref/html-link.md":       "# HTML Link\n\nSee <a href=\"html-target.md\">the HTML target</a>.\n",
+		"docs/ref/html-link.md":       "# HTML Link\n\nSee <a href=\"html-target.md\">the HTML target</a>.\nSee [US-001](../user-stories/US-001.md).\n",
 		"docs/ref/html-target.md":     "# HTML Target\n\nHTML-link target for [US-001](../user-stories/US-001.md).\n",
 		"docs/mdx/guide.mdx":          "# MDX Guide\n\nSee [the MDX target](target.txt).\n",
 		"docs/mdx/MetricDemo.mdx":     "# Metric Demo\n\n<MetricCard metric=\"mdx_only\" />\n",

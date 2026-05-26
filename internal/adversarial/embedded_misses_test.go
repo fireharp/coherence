@@ -146,3 +146,26 @@ func assertEmbeddedMisses(t *testing.T, results []Result) {
 		})
 	}
 }
+
+func assertEmbeddedFalsePositives(t *testing.T, results []Result) {
+	t.Helper()
+	for _, tc := range []struct {
+		mutationID string
+		meter      string
+	}{
+		{mutationID: "ADV-146-html-anchor-support-path-loss-fp-demo", meter: "path_loss"},
+	} {
+		t.Run(tc.mutationID, func(t *testing.T) {
+			res := findResult(results, tc.mutationID)
+			if res == nil {
+				t.Fatalf("missing %s exploration demo result", tc.mutationID)
+			}
+			if res.Classification != ClassificationFP ||
+				len(res.FalseNegatives) != 0 ||
+				len(res.FalsePositives) != 1 ||
+				res.FalsePositives[0] != tc.meter {
+				t.Fatalf("%s result=%+v, want false positive for %s", tc.mutationID, *res, tc.meter)
+			}
+		})
+	}
+}
