@@ -82,6 +82,7 @@ Update this table when a batch lands or when a report is exported.
 | Shell source/include graphs | `ADV-092` | `dangling_imports` misses deleted shell libraries sourced by other scripts because shell dependency extraction is command-only | Decide whether shell `source`/`.` includes belong in the import integrity meter |
 | JavaScript source import graphs | `ADV-096` | `dangling_imports` misses production `.js` ESM imports because the source scan only includes TypeScript-family files | Decide whether plain JavaScript belongs in the import integrity meter |
 | Schema include graphs | `ADV-099` | `dangling_imports` misses GraphQL schema import/include directives because dependency extraction only covers source-language imports | Decide whether schema include directives belong in import integrity |
+| Compose environment include graphs | `ADV-103` | `dangling_imports` misses Docker Compose `env_file` references because deployment YAML include operands are not extracted | Decide whether Compose configuration dependencies belong in import integrity |
 
 ## Candidate Queue
 
@@ -113,7 +114,9 @@ are rejected.
 | Blockquote claim support | `claim_support` | Tests assertive requirements expressed as blockquotes/admonitions instead of bullets |
 | Markdown image target deletion | `broken_links` | Tests image destinations as a distinct Markdown link surface |
 | Markdown table requirement support | `claim_support` | Tests assertive requirements expressed inside table rows |
-| Docker Compose env file deletion | `dangling_imports` | Tests Compose `env_file` include references outside source import scanners |
+| TOML ADR supersession frontmatter | `stale_decision_links` | Tests alternate frontmatter fences and relation parsing outside YAML |
+| Bazel load deletion | `dangling_imports` | Tests Starlark label-based `load()` references outside source import scanners |
+| YAML block-scalar typed ID | `unknown_id_references` | Tests unresolved IDs embedded in multiline YAML scalar data |
 
 ## Rejected Hypotheses
 

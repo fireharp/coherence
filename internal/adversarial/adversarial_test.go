@@ -434,7 +434,7 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 	if report.Pass {
 		t.Fatalf("expected exploration demo to keep the run non-passing: %+v", report.Summary)
 	}
-	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 81 || report.Summary.FalsePositives != 0 {
+	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 82 || report.Summary.FalsePositives != 0 {
 		t.Fatalf("unexpected failures: %+v", report.Summary)
 	}
 	if report.Summary.Skipped != 1 {
@@ -1249,6 +1249,16 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 		goEmbed.FalseNegatives[0] != "dangling_imports" ||
 		len(goEmbed.FalsePositives) != 0 {
 		t.Fatalf("go embed result=%+v, want false negative for dangling_imports", *goEmbed)
+	}
+	composeEnv := findResult(report.Results, "ADV-103-compose-env-file-dangling-demo")
+	if composeEnv == nil {
+		t.Fatal("missing ADV-103 exploration demo result")
+	}
+	if composeEnv.Classification != ClassificationMiss ||
+		len(composeEnv.FalseNegatives) != 1 ||
+		composeEnv.FalseNegatives[0] != "dangling_imports" ||
+		len(composeEnv.FalsePositives) != 0 {
+		t.Fatalf("Compose env_file result=%+v, want false negative for dangling_imports", *composeEnv)
 	}
 }
 

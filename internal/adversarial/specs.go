@@ -1335,6 +1335,23 @@ var policyTemplate string
 `,
 			},
 		},
+		{
+			ID:             "ADV-103-compose-env-file-dangling-demo",
+			Description:    "Add a Docker Compose service that references a missing env_file; dangling_imports does not parse Compose include operands.",
+			Operation:      opAddFile,
+			TargetKinds:    []graph.NodeKind{graph.NodeFile},
+			ExpectedMeters: []string{"dangling_imports"},
+			Selector:       Selector{PathGlob: "AGENTS.md"},
+			Edit: Edit{
+				Path: "docker-compose.yml",
+				Content: `services:
+  policy-worker:
+    image: example/policy-worker:latest
+    env_file:
+      - .env.policy
+`,
+			},
+		},
 	}
 }
 
