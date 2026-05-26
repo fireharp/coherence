@@ -1096,6 +1096,30 @@ Use the nested relation successor policy.
 `,
 			},
 		},
+		{
+			ID:             "ADV-087-spring-getmapping-endpoint-demo",
+			Description:    "Add an untested Spring controller route; endpoint extraction has no Java annotation parser.",
+			Operation:      opAddFile,
+			TargetKinds:    []graph.NodeKind{graph.NodeFile},
+			ExpectedMeters: []string{"orphan_endpoints"},
+			Selector:       Selector{PathGlob: "AGENTS.md"},
+			Edit: Edit{
+				Path: "java/src/main/java/com/example/AuditController.java",
+				Content: `package com.example;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public final class AuditController {
+    @GetMapping("/api/spring-audit-events")
+    public String auditEvents() {
+        return "ok";
+    }
+}
+`,
+			},
+		},
 	}
 }
 

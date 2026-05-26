@@ -434,7 +434,7 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 	if report.Pass {
 		t.Fatalf("expected exploration demo to keep the run non-passing: %+v", report.Summary)
 	}
-	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 65 || report.Summary.FalsePositives != 0 {
+	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 66 || report.Summary.FalsePositives != 0 {
 		t.Fatalf("unexpected failures: %+v", report.Summary)
 	}
 	if report.Summary.Skipped != 1 {
@@ -1089,6 +1089,16 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 		nestedADR.FalseNegatives[0] != "stale_decision_links" ||
 		len(nestedADR.FalsePositives) != 0 {
 		t.Fatalf("nested ADR relation result=%+v, want false negative for stale_decision_links", *nestedADR)
+	}
+	springRoute := findResult(report.Results, "ADV-087-spring-getmapping-endpoint-demo")
+	if springRoute == nil {
+		t.Fatal("missing ADV-087 exploration demo result")
+	}
+	if springRoute.Classification != ClassificationMiss ||
+		len(springRoute.FalseNegatives) != 1 ||
+		springRoute.FalseNegatives[0] != "orphan_endpoints" ||
+		len(springRoute.FalsePositives) != 0 {
+		t.Fatalf("Spring route result=%+v, want false negative for orphan_endpoints", *springRoute)
 	}
 }
 
