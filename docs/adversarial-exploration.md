@@ -84,6 +84,7 @@ Update this table when a batch lands or when a report is exported.
 | Schema include graphs | `ADV-099` | `dangling_imports` misses GraphQL schema import/include directives because dependency extraction only covers source-language imports | Decide whether schema include directives belong in import integrity |
 | Compose environment include graphs | `ADV-103` | `dangling_imports` misses Docker Compose `env_file` references because deployment YAML include operands are not extracted | Decide whether Compose configuration dependencies belong in import integrity |
 | Bazel/Starlark load graphs | `ADV-104` | `dangling_imports` misses Bazel `load()` labels because Starlark dependency labels are not extracted | Decide whether build graph label references belong in import integrity |
+| Notebook code-cell imports | `ADV-105` | `dangling_imports` misses Jupyter notebook imports because `.ipynb` code cells are not extracted as source | Decide whether notebook code belongs in import integrity |
 
 ## Candidate Queue
 
@@ -117,9 +118,11 @@ are rejected.
 | Markdown table requirement support | `claim_support` | Tests assertive requirements expressed inside table rows |
 | TOML ADR supersession frontmatter | `stale_decision_links` | Tests alternate frontmatter fences and relation parsing outside YAML |
 | YAML block-scalar typed ID | `unknown_id_references` | Tests unresolved IDs embedded in multiline YAML scalar data |
-| Jupyter notebook import deletion | `dangling_imports` | Tests imports embedded in `.ipynb` JSON code cells |
 | ASP.NET minimal API route | `orphan_endpoints` | Tests C# fluent `MapGet` route declarations outside current endpoint extractors |
 | SQL migration typed-ID data | `unknown_id_references` | Tests unresolved typed IDs stored in SQL migration string data |
+| Markdown shortcut reference link | `broken_links` | Tests shortcut reference syntax separate from full/collapsed reference links |
+| Static HTML metric alias | `orphaned_metric_aliases` | Tests metric aliases in plain server/static HTML templates |
+| Cargo workspace member deletion | `dangling_imports` | Tests Rust workspace manifest member references outside source imports |
 
 ## Rejected Hypotheses
 

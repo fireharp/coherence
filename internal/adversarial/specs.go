@@ -1370,6 +1370,33 @@ policy_bundle(
 `,
 			},
 		},
+		{
+			ID:             "ADV-105-jupyter-import-dangling-demo",
+			Description:    "Add a Jupyter notebook code cell that imports a missing helper module; dangling_imports does not parse notebook code cells.",
+			Operation:      opAddFile,
+			TargetKinds:    []graph.NodeKind{graph.NodeFile},
+			ExpectedMeters: []string{"dangling_imports"},
+			Selector:       Selector{PathGlob: "AGENTS.md"},
+			Edit: Edit{
+				Path: "notebooks/policy_risk.ipynb",
+				Content: `{
+  "cells": [
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "from helpers.risk_policy import score_policy\n",
+        "score_policy({\"tier\": \"restricted\"})\n"
+      ]
+    }
+  ],
+  "metadata": {},
+  "nbformat": 4,
+  "nbformat_minor": 5
+}
+`,
+			},
+		},
 	}
 }
 
