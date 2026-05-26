@@ -155,6 +155,7 @@ func assertEmbeddedFalsePositives(t *testing.T, results []Result) {
 		meter      string
 	}{
 		{mutationID: "ADV-146-html-anchor-support-path-loss-fp-demo", meter: "path_loss"},
+		{mutationID: "ADV-148-raw-typed-id-trace-coverage-fp-demo", meter: "trace_coverage"},
 	} {
 		t.Run(tc.mutationID, func(t *testing.T) {
 			res := findResult(results, tc.mutationID)
