@@ -74,6 +74,7 @@ Update this table when a batch lands or when a report is exported.
 | Test coverage mapping gaps | `ADV-039`, `ADV-043`, `ADV-057`, `ADV-064`, `ADV-075`, `ADV-084` | `stale_tests` misses tests that exercise source behavior but do not reverse-map by filename or supported language, including Java/JUnit and C#/xUnit | Decide whether import/call relationships should supplement filename pairing |
 | ADR supersession frontmatter shapes | `ADV-026`, `ADV-036`, `ADV-058`, `ADV-069`, `ADV-086` | `stale_decision_links` misses raw/reference citations, capitalized relation keys, quoted relation keys, and nested relation maps | Decide whether relation extraction should use a YAML parser |
 | Optional Go native dead code | `ADV-081` | `dead_code` misses uncalled unexported methods because the native engine only scores top-level functions | Decide whether method-level dead code belongs in the native engine or stays documented as out of scope |
+| Ontology rule trigger deletions | `ADV-088` | `required_edge_breakage` misses deleted trigger files because the dirty-file diff excludes deletions | Decide whether rule evaluation should include deleted paths or classify trigger removals separately |
 
 ## Candidate Queue
 

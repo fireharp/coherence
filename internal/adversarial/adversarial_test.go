@@ -434,7 +434,7 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 	if report.Pass {
 		t.Fatalf("expected exploration demo to keep the run non-passing: %+v", report.Summary)
 	}
-	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 66 || report.Summary.FalsePositives != 0 {
+	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 67 || report.Summary.FalsePositives != 0 {
 		t.Fatalf("unexpected failures: %+v", report.Summary)
 	}
 	if report.Summary.Skipped != 1 {
@@ -1099,6 +1099,16 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 		springRoute.FalseNegatives[0] != "orphan_endpoints" ||
 		len(springRoute.FalsePositives) != 0 {
 		t.Fatalf("Spring route result=%+v, want false negative for orphan_endpoints", *springRoute)
+	}
+	ruleDeletion := findResult(report.Results, "ADV-088-rule-trigger-deletion-demo")
+	if ruleDeletion == nil {
+		t.Fatal("missing ADV-088 exploration demo result")
+	}
+	if ruleDeletion.Classification != ClassificationMiss ||
+		len(ruleDeletion.FalseNegatives) != 1 ||
+		ruleDeletion.FalseNegatives[0] != "required_edge_breakage" ||
+		len(ruleDeletion.FalsePositives) != 0 {
+		t.Fatalf("rule-trigger deletion result=%+v, want false negative for required_edge_breakage", *ruleDeletion)
 	}
 }
 

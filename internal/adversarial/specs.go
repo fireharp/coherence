@@ -1120,6 +1120,14 @@ public final class AuditController {
 `,
 			},
 		},
+		{
+			ID:             "ADV-088-rule-trigger-deletion-demo",
+			Description:    "Delete an ontology-triggering generator source while leaving the generated artifact behind; rule evaluation excludes deleted paths.",
+			Operation:      opRemoveFile,
+			TargetKinds:    []graph.NodeKind{graph.NodeFile},
+			ExpectedMeters: []string{"required_edge_breakage"},
+			Selector:       Selector{PathGlob: "src/build-fixtures.go"},
+		},
 	}
 }
 
