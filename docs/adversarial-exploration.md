@@ -11,9 +11,9 @@ Commit green exploration batches, not every mutation. A good batch is one
 coherent cluster or theme, for example "TypeScript import forms" or "Markdown
 extension blind spots", with:
 
-- one or more `ADV-###` specs in `internal/adversarial/specs.go`
-- seed fixture changes in `internal/adversarial/seeds.go` when needed
-- assertions in `internal/adversarial/adversarial_test.go`
+- one or more `ADV-###` specs in `internal/adversarial/builtin_specs_*.go`
+- seed fixture changes in `internal/adversarial/embedded_*_files.go` when needed
+- assertions in `internal/adversarial/*_test.go`
 - a passing focused adversarial test, full `go test ./...`, build, and
   `coherence review --base=HEAD --worktree --json`
 
@@ -31,9 +31,9 @@ Use these locations to avoid repeating work:
 
 | Record | Location | Purpose |
 | --- | --- | --- |
-| Mutation catalogue | `internal/adversarial/specs.go` | Durable list of explored break attempts and expected meters |
-| Seed repo fixtures | `internal/adversarial/seeds.go` | Minimal synthetic corpus used to reproduce the break |
-| Expected outcomes | `internal/adversarial/adversarial_test.go` | Locked evidence that a demo is a hit, miss, skip, or error |
+| Mutation catalogue | `internal/adversarial/builtin_specs_*.go` | Durable list of explored break attempts and expected meters |
+| Seed repo fixtures | `internal/adversarial/embedded_*_files.go` | Minimal synthetic corpus used to reproduce the break |
+| Expected outcomes | `internal/adversarial/*_test.go` | Locked evidence that a demo is a hit, miss, skip, or error |
 | Local run details | `.coherence/adversarial/runs/<run>/` | Ignored JSONL, summaries, clusters, and suggestions |
 | Rolling trends | `.coherence/adversarial/leaderboard.json` | Ignored local hit/FN/FP rates by meter and mutation kind |
 | Public artifacts | `docs/adversarial-report*.md` | Optional curated exports checked in only when useful |
@@ -64,23 +64,23 @@ Update this table when a batch lands or when a report is exported.
 | Python import syntax variants | `ADV-025`, `ADV-033`, `ADV-035`, `ADV-079` | `dangling_imports` misses dynamic imports, absolute package imports, plain `import` statements, and `from . import sibling` forms | Decide whether Python import resolution should parse imported names in addition to module specifiers |
 | Frontend non-code import graphs | `ADV-051` | `dangling_imports` misses CSS `@import` references | Decide whether stylesheet imports belong in the repo graph |
 | Test-file import graphs | `ADV-070` | `dangling_imports` misses build-breaking imports that only appear in test files | Decide whether test files need a separate lower-noise import integrity pass |
-| Route declaration APIs | `ADV-052`, `ADV-059`, `ADV-061`, `ADV-068`, `ADV-071`, `ADV-074`, `ADV-080`, `ADV-087`, `ADV-093`, `ADV-097`, `ADV-098` | `orphan_endpoints` misses FastAPI `add_api_route`, Express chained registrations, optional-chaining and bracket-property registrations, Next file-system handlers, Gin-style Go routes, Rails route files, OpenAPI path specs, Java Spring annotations, and gorilla/mux `HandleFunc(...).Methods(...)` routes | Add parser coverage for literal non-decorator, chained, framework-specific, and contract-level route declarations |
+| Route declaration APIs | `ADV-052`, `ADV-059`, `ADV-061`, `ADV-068`, `ADV-071`, `ADV-074`, `ADV-080`, `ADV-087`, `ADV-093`, `ADV-097`, `ADV-098`, `ADV-110`, `ADV-113` | `orphan_endpoints` misses FastAPI `add_api_route`, Express chained registrations, optional-chaining and bracket-property registrations, Next file-system handlers, Gin-style Go routes, Rails route files, OpenAPI path specs, Java Spring annotations, gorilla/mux `HandleFunc(...).Methods(...)`, Kotlin Ktor, and NestJS decorator routes | Add parser coverage for literal non-decorator, chained, decorator, framework-specific, and contract-level route declarations |
 | File-level dependency cycles | `ADV-062`, `ADV-077` | `dependency_cycles` misses TypeScript import cycles represented as file-to-file edges and Python same-package file cycles | Decide whether cycle detection should normalize file-level edges or keep package-only scope |
 | User story frontmatter shapes | `ADV-037`, `ADV-063`, `ADV-076` | `unimplemented_stories` misses MDX stories, Markdown stories with quoted frontmatter IDs, and YAML story specs | Decide whether story extraction should use a YAML parser and include MDX |
 | Typed IDs stored as production data | `ADV-053`, `ADV-065`, `ADV-072`, `ADV-083` | `unknown_id_references` misses unresolved IDs inside quoted code strings, JSON/TOML config values, and production scenario configs hidden by fixture-directory heuristics | Decide when data-bearing string literals and scenario/config paths should be scanned for typed IDs |
 | Docs-as-UI metric aliases | `ADV-054` | `orphaned_metric_aliases` misses MDX component prop aliases | Decide whether MDX should be scanned as frontend surface for metrics |
 | Go package import deletion | `ADV-055` | `dangling_imports` misses removed Go packages still imported by other packages | Decide whether Go import resolution belongs in `dangling_imports` |
-| Markdown link syntaxes beyond bare inline targets | `ADV-027`, `ADV-029`, `ADV-045`, `ADV-056`, `ADV-067`, `ADV-078`, `ADV-085` | `broken_links` misses reference-style, collapsed-reference, HTML, wiki, angle-autolink, titled inline references, and angle-bracket destinations with spaces | Decide how much Markdown syntax coverage the link meter should own |
+| Markdown and doc link syntaxes beyond bare inline targets | `ADV-027`, `ADV-029`, `ADV-045`, `ADV-056`, `ADV-067`, `ADV-078`, `ADV-085`, `ADV-109`, `ADV-115` | `broken_links` misses reference-style, collapsed-reference, HTML, wiki, angle-autolink, titled inline references, angle-bracket destinations with spaces, AsciiDoc xrefs, and reStructuredText links | Decide how much non-inline Markdown and adjacent-doc syntax coverage the link meter should own |
 | Test coverage mapping gaps | `ADV-039`, `ADV-043`, `ADV-057`, `ADV-064`, `ADV-075`, `ADV-084`, `ADV-094` | `stale_tests` misses tests that exercise source behavior but do not reverse-map by filename or supported language, including `.mjs` ESM tests, Java/JUnit, and C#/xUnit | Decide whether import/call relationships should supplement filename pairing |
 | ADR supersession frontmatter shapes | `ADV-026`, `ADV-036`, `ADV-058`, `ADV-069`, `ADV-086` | `stale_decision_links` misses raw/reference citations, capitalized relation keys, quoted relation keys, and nested relation maps | Decide whether relation extraction should use a YAML parser |
 | Optional Go native dead code | `ADV-081` | `dead_code` misses uncalled unexported methods because the native engine only scores top-level functions | Decide whether method-level dead code belongs in the native engine or stays documented as out of scope |
 | Ontology rule trigger deletions | `ADV-088` | `required_edge_breakage` misses deleted trigger files because the dirty-file diff excludes deletions | Decide whether rule evaluation should include deleted paths or classify trigger removals separately |
 | Claim extraction list shapes | `ADV-089` | `claim_support` misses numbered-list requirements because claim extraction only recognizes unordered bullets | Decide whether ordered Markdown requirements should be first-class claim nodes |
-| Build-system include graphs | `ADV-090`, `ADV-100`, `ADV-101` | `dangling_imports` misses Makefile include files, Dockerfile `COPY` operands, and package script operands because dependency extraction only covers source-language imports | Decide whether build-system include directives belong in the import integrity meter |
+| Build/config include graphs | `ADV-090`, `ADV-100`, `ADV-101`, `ADV-106`, `ADV-107`, `ADV-108`, `ADV-112`, `ADV-114` | `dangling_imports` misses Makefile include files, Dockerfile `COPY` operands, package script operands, GitHub Actions local actions, Terraform modules, Kustomize resources, TypeScript project references, and Helm chart file refs because dependency extraction only covers source-language imports | Decide whether build/config include directives belong in the import integrity meter |
 | Go embed asset graphs | `ADV-102` | `dangling_imports` misses missing `//go:embed` asset operands because Go extraction does not parse embed directives | Decide whether embedded asset operands belong in import integrity |
 | Markdown concept heading shapes | `ADV-091`, `ADV-095` | `path_loss` misses support loss under H3-only sections and Setext H1/H2 headings because concept extraction only emits ATX H1/H2 nodes | Decide whether non-ATX and deeper requirement headings are meaningful concepts or intentionally out of scope |
 | Shell source/include graphs | `ADV-092` | `dangling_imports` misses deleted shell libraries sourced by other scripts because shell dependency extraction is command-only | Decide whether shell `source`/`.` includes belong in the import integrity meter |
-| JavaScript source import graphs | `ADV-096` | `dangling_imports` misses production `.js` ESM imports because the source scan only includes TypeScript-family files | Decide whether plain JavaScript belongs in the import integrity meter |
+| JavaScript source import graphs | `ADV-096`, `ADV-111` | `dangling_imports` misses production `.js` ESM imports and `.cjs` CommonJS requires because the source scan only includes TypeScript-family files | Decide whether plain JavaScript belongs in the import integrity meter |
 | Schema include graphs | `ADV-099` | `dangling_imports` misses GraphQL schema import/include directives because dependency extraction only covers source-language imports | Decide whether schema include directives belong in import integrity |
 | Compose environment include graphs | `ADV-103` | `dangling_imports` misses Docker Compose `env_file` references because deployment YAML include operands are not extracted | Decide whether Compose configuration dependencies belong in import integrity |
 | Bazel/Starlark load graphs | `ADV-104` | `dangling_imports` misses Bazel `load()` labels because Starlark dependency labels are not extracted | Decide whether build graph label references belong in import integrity |
@@ -107,9 +107,7 @@ are rejected.
 | AsciiDoc user story | `unimplemented_stories` | Tests user-story declarations outside Markdown/MDX/YAML document formats |
 | GitLab CI local include deletion | `dangling_imports` | Tests CI include references in `.gitlab-ci.yml` outside source import scanners |
 | Raw typed-ID trace mention | `trace_coverage` | Tests story coverage expressed as plain `US-###` text instead of Markdown links |
-| Kustomize resource deletion | `dangling_imports` | Tests deploy manifest include graphs in `kustomization.yaml` |
 | Mermaid click link target | `broken_links` | Tests links hidden inside Mermaid fenced diagrams |
-| Terraform local module source | `dangling_imports` | Tests HCL module source references outside source import scanners |
 | CSV metric alias | `orphaned_metric_aliases` | Tests metric references stored in CSV dashboard exports |
 | Rust module declaration deletion | `dangling_imports` | Tests `mod foo;` module graph integrity outside Rust stale-test coverage |
 | Markdown footnote link target | `broken_links` | Tests footnote definition targets as a distinct Markdown link form |

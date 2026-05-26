@@ -92,6 +92,16 @@ func assertEmbeddedMisses(t *testing.T, results []Result) {
 		{mutationID: "ADV-103-compose-env-file-dangling-demo", meter: "dangling_imports"},
 		{mutationID: "ADV-104-bazel-load-dangling-demo", meter: "dangling_imports"},
 		{mutationID: "ADV-105-jupyter-import-dangling-demo", meter: "dangling_imports"},
+		{mutationID: "ADV-106-github-action-local-uses-demo", meter: "dangling_imports"},
+		{mutationID: "ADV-107-terraform-module-source-demo", meter: "dangling_imports"},
+		{mutationID: "ADV-108-kustomize-resource-demo", meter: "dangling_imports"},
+		{mutationID: "ADV-109-asciidoc-xref-demo", meter: "broken_links"},
+		{mutationID: "ADV-110-kotlin-ktor-route-demo", meter: "orphan_endpoints"},
+		{mutationID: "ADV-111-commonjs-require-demo", meter: "dangling_imports"},
+		{mutationID: "ADV-112-tsconfig-reference-demo", meter: "dangling_imports"},
+		{mutationID: "ADV-113-nestjs-decorator-route-demo", meter: "orphan_endpoints"},
+		{mutationID: "ADV-114-helm-template-include-demo", meter: "dangling_imports"},
+		{mutationID: "ADV-115-rst-local-link-demo", meter: "broken_links"},
 	} {
 		t.Run(tc.mutationID, func(t *testing.T) {
 			res := findResult(results, tc.mutationID)
