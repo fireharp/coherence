@@ -991,6 +991,26 @@ title: YAML Story
 			ExpectedMeters: []string{"dangling_imports"},
 			Selector:       Selector{PathGlob: "pyapp/dot_import_dep.py"},
 		},
+		{
+			ID:             "ADV-080-django-urlconf-endpoint-demo",
+			Description:    "Add an untested Django URLConf route; endpoint extraction currently covers decorators and router calls but not urlpatterns.",
+			Operation:      opAddFile,
+			TargetKinds:    []graph.NodeKind{graph.NodeFile},
+			ExpectedMeters: []string{"orphan_endpoints"},
+			Selector:       Selector{PathGlob: "AGENTS.md"},
+			Edit: Edit{
+				Path: "pyapp/django_urls.py",
+				Content: `from django.urls import path
+
+def audit_events(request):
+    return None
+
+urlpatterns = [
+    path("api/django-audit-events/", audit_events, name="audit-events"),
+]
+`,
+			},
+		},
 	}
 }
 

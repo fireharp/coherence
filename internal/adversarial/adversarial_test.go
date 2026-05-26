@@ -434,7 +434,7 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 	if report.Pass {
 		t.Fatalf("expected exploration demo to keep the run non-passing: %+v", report.Summary)
 	}
-	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 58 || report.Summary.FalsePositives != 0 {
+	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 59 || report.Summary.FalsePositives != 0 {
 		t.Fatalf("unexpected failures: %+v", report.Summary)
 	}
 	if report.Summary.Skipped != 1 {
@@ -1019,6 +1019,16 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 		pyDotImport.FalseNegatives[0] != "dangling_imports" ||
 		len(pyDotImport.FalsePositives) != 0 {
 		t.Fatalf("Python dot import result=%+v, want false negative for dangling_imports", *pyDotImport)
+	}
+	djangoURLConf := findResult(report.Results, "ADV-080-django-urlconf-endpoint-demo")
+	if djangoURLConf == nil {
+		t.Fatal("missing ADV-080 exploration demo result")
+	}
+	if djangoURLConf.Classification != ClassificationMiss ||
+		len(djangoURLConf.FalseNegatives) != 1 ||
+		djangoURLConf.FalseNegatives[0] != "orphan_endpoints" ||
+		len(djangoURLConf.FalsePositives) != 0 {
+		t.Fatalf("Django URLConf result=%+v, want false negative for orphan_endpoints", *djangoURLConf)
 	}
 }
 

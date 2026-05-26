@@ -64,7 +64,7 @@ Update this table when a batch lands or when a report is exported.
 | Python import syntax variants | `ADV-025`, `ADV-033`, `ADV-035`, `ADV-079` | `dangling_imports` misses dynamic imports, absolute package imports, plain `import` statements, and `from . import sibling` forms | Decide whether Python import resolution should parse imported names in addition to module specifiers |
 | Frontend non-code import graphs | `ADV-051` | `dangling_imports` misses CSS `@import` references | Decide whether stylesheet imports belong in the repo graph |
 | Test-file import graphs | `ADV-070` | `dangling_imports` misses build-breaking imports that only appear in test files | Decide whether test files need a separate lower-noise import integrity pass |
-| Route declaration APIs | `ADV-052`, `ADV-059`, `ADV-061`, `ADV-068`, `ADV-071`, `ADV-074` | `orphan_endpoints` misses FastAPI `add_api_route`, Express chained registrations, Next file-system handlers, Gin-style Go routes, Rails route files, and OpenAPI path specs | Add parser coverage for literal non-decorator, chained, framework-specific, and contract-level route declarations |
+| Route declaration APIs | `ADV-052`, `ADV-059`, `ADV-061`, `ADV-068`, `ADV-071`, `ADV-074`, `ADV-080` | `orphan_endpoints` misses FastAPI `add_api_route`, Express chained registrations, Next file-system handlers, Gin-style Go routes, Rails route files, OpenAPI path specs, and Django URLConf routes | Add parser coverage for literal non-decorator, chained, framework-specific, and contract-level route declarations |
 | File-level dependency cycles | `ADV-062`, `ADV-077` | `dependency_cycles` misses TypeScript import cycles represented as file-to-file edges and Python same-package file cycles | Decide whether cycle detection should normalize file-level edges or keep package-only scope |
 | User story frontmatter shapes | `ADV-037`, `ADV-063`, `ADV-076` | `unimplemented_stories` misses MDX stories, Markdown stories with quoted frontmatter IDs, and YAML story specs | Decide whether story extraction should use a YAML parser and include MDX |
 | Typed IDs stored as production data | `ADV-053`, `ADV-065`, `ADV-072` | `unknown_id_references` misses unresolved IDs inside quoted code strings, JSON config values, and TOML config values | Decide when data-bearing string literals should be scanned for typed IDs |
@@ -81,7 +81,6 @@ are rejected.
 
 | Candidate | Expected meter | Why it is distinct |
 | --- | --- | --- |
-| `ADV-080-django-urlconf-endpoint-demo` | `orphan_endpoints` | Django `urlpatterns = [path(...)]` declares HTTP routes outside the currently covered decorator/router call shapes |
 | `ADV-081-go-unused-method-dead-code-demo` | `dead_code` | The optional Go dead-code engine scans top-level functions but intentionally skips methods, leaving uncalled unexported methods unmeasured |
 
 ## Rejected Hypotheses
