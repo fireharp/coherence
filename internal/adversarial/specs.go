@@ -1352,6 +1352,24 @@ var policyTemplate string
 `,
 			},
 		},
+		{
+			ID:             "ADV-104-bazel-load-dangling-demo",
+			Description:    "Add a Bazel BUILD file that loads a missing Starlark rule file; dangling_imports does not parse Bazel load labels.",
+			Operation:      opAddFile,
+			TargetKinds:    []graph.NodeKind{graph.NodeFile},
+			ExpectedMeters: []string{"dangling_imports"},
+			Selector:       Selector{PathGlob: "AGENTS.md"},
+			Edit: Edit{
+				Path: "BUILD.bazel",
+				Content: `load("//tools:policy_rules.bzl", "policy_bundle")
+
+policy_bundle(
+    name = "policy_bundle",
+    srcs = ["pkg/policy/policy.go"],
+)
+`,
+			},
+		},
 	}
 }
 
