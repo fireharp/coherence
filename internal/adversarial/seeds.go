@@ -219,6 +219,8 @@ export const multilineImportValue = multilineValue;
 		"src/usesTypes.ts": "/// <reference path=\"./types.d.ts\" />\nexport const enabled = true;\n",
 		"src/aliased.ts":   "export const aliased = 1;\n",
 		"src/usesAlias.ts": "import { aliased } from '@/aliased';\nexport const aliasValue = aliased;\n",
+		"src/jsDep.js":     "export const jsDep = 1;\n",
+		"src/jsUsesDep.js": "import { jsDep } from './jsDep.js';\nexport const jsValue = jsDep;\n",
 		"src/widget.ts":    "export function widgetValue() {\n  return 1;\n}\n",
 		"src/__tests__/widget.test.ts": `import { widgetValue } from "../widget";
 

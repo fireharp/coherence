@@ -79,6 +79,7 @@ Update this table when a batch lands or when a report is exported.
 | Build-system include graphs | `ADV-090` | `dangling_imports` misses deleted Makefile include files because dependency extraction only covers source-language imports | Decide whether build-system include directives belong in the import integrity meter |
 | Markdown concept heading shapes | `ADV-091`, `ADV-095` | `path_loss` misses support loss under H3-only sections and Setext H1/H2 headings because concept extraction only emits ATX H1/H2 nodes | Decide whether non-ATX and deeper requirement headings are meaningful concepts or intentionally out of scope |
 | Shell source/include graphs | `ADV-092` | `dangling_imports` misses deleted shell libraries sourced by other scripts because shell dependency extraction is command-only | Decide whether shell `source`/`.` includes belong in the import integrity meter |
+| JavaScript source import graphs | `ADV-096` | `dangling_imports` misses production `.js` ESM imports because the source scan only includes TypeScript-family files | Decide whether plain JavaScript belongs in the import integrity meter |
 
 ## Candidate Queue
 
@@ -87,7 +88,6 @@ are rejected.
 
 | Candidate | Expected meter | Why it is distinct |
 | --- | --- | --- |
-| Production `.js` ESM import deletion | `dangling_imports` | Tests whether JavaScript source imports are checked alongside TypeScript-family imports |
 | Multiline Python route decorator | `orphan_endpoints` | Tests FastAPI decorators split across lines, distinct from single-line decorator receiver gaps |
 | TypeScript optional-chaining route registration | `orphan_endpoints` | Tests `router?.get(...)` registration syntax, distinct from regular chained route calls |
 | Uppercase user-story frontmatter ID | `unimplemented_stories` | Tests YAML key casing when the filename itself does not expose a typed story ID |
@@ -95,6 +95,9 @@ are rejected.
 | TypeScript bracket route registration | `orphan_endpoints` | Tests `app["get"](...)` syntax, distinct from dotted, chained, and optional-chaining calls |
 | JSON asset import deletion | `dangling_imports` | Tests source imports whose target is a non-source asset resolved by the build system |
 | HTML anchor support link | `path_loss` | Tests support paths expressed as raw HTML anchors rather than Markdown links |
+| Markdown table semantic change | `semantic_movement` | Tests meaning changes inside tables, which may not affect semantic hashes if table structure is ignored |
+| Go 1.22 ServeMux method-pattern route | `orphan_endpoints` | Tests `mux.Handle("GET /path", handler)` syntax, distinct from `http.HandleFunc` and verb-named router methods |
+| Dockerfile COPY source deletion | `dangling_imports` | Tests build-system file references expressed as unquoted Dockerfile operands |
 
 ## Rejected Hypotheses
 

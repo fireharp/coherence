@@ -1218,6 +1218,14 @@ Must keep setext audit requirements connected to implementation evidence.
 `,
 			},
 		},
+		{
+			ID:             "ADV-096-js-esm-dangling-import-demo",
+			Description:    "Remove a JavaScript module still imported by another production .js file; dangling_imports scans TS-family sources but not plain JS sources.",
+			Operation:      opRemoveFile,
+			TargetKinds:    []graph.NodeKind{graph.NodeFile},
+			ExpectedMeters: []string{"dangling_imports"},
+			Selector:       Selector{PathGlob: "src/jsDep.js"},
+		},
 	}
 }
 
