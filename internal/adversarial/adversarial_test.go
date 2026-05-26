@@ -434,7 +434,7 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 	if report.Pass {
 		t.Fatalf("expected exploration demo to keep the run non-passing: %+v", report.Summary)
 	}
-	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 75 || report.Summary.FalsePositives != 0 {
+	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 76 || report.Summary.FalsePositives != 0 {
 		t.Fatalf("unexpected failures: %+v", report.Summary)
 	}
 	if report.Summary.Skipped != 1 {
@@ -1189,6 +1189,16 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 		jsESM.FalseNegatives[0] != "dangling_imports" ||
 		len(jsESM.FalsePositives) != 0 {
 		t.Fatalf("JS ESM import result=%+v, want false negative for dangling_imports", *jsESM)
+	}
+	optionalRoute := findResult(report.Results, "ADV-097-ts-optional-chain-route-demo")
+	if optionalRoute == nil {
+		t.Fatal("missing ADV-097 exploration demo result")
+	}
+	if optionalRoute.Classification != ClassificationMiss ||
+		len(optionalRoute.FalseNegatives) != 1 ||
+		optionalRoute.FalseNegatives[0] != "orphan_endpoints" ||
+		len(optionalRoute.FalsePositives) != 0 {
+		t.Fatalf("optional route result=%+v, want false negative for orphan_endpoints", *optionalRoute)
 	}
 }
 

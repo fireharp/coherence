@@ -1226,6 +1226,29 @@ Must keep setext audit requirements connected to implementation evidence.
 			ExpectedMeters: []string{"dangling_imports"},
 			Selector:       Selector{PathGlob: "src/jsDep.js"},
 		},
+		{
+			ID:             "ADV-097-ts-optional-chain-route-demo",
+			Description:    "Add an untested TypeScript route registered through optional chaining; endpoint extraction only matches direct receiver.method calls.",
+			Operation:      opAddFile,
+			TargetKinds:    []graph.NodeKind{graph.NodeFile},
+			ExpectedMeters: []string{"orphan_endpoints"},
+			Selector:       Selector{PathGlob: "AGENTS.md"},
+			Edit: Edit{
+				Path: "src/optional-route.ts",
+				Content: `const router = maybeRouter();
+
+router?.get("/api/optional-orders", getOptionalOrders);
+
+function maybeRouter() {
+	return express.Router();
+}
+
+function getOptionalOrders(req, res) {
+	res.send("ok");
+}
+`,
+			},
+		},
 	}
 }
 
