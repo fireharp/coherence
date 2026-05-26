@@ -78,6 +78,7 @@ Update this table when a batch lands or when a report is exported.
 | Claim extraction list shapes | `ADV-089` | `claim_support` misses numbered-list requirements because claim extraction only recognizes unordered bullets | Decide whether ordered Markdown requirements should be first-class claim nodes |
 | Build-system include graphs | `ADV-090` | `dangling_imports` misses deleted Makefile include files because dependency extraction only covers source-language imports | Decide whether build-system include directives belong in the import integrity meter |
 | Markdown concept heading depth | `ADV-091` | `path_loss` misses support loss under H3-only sections because concept extraction only emits H1/H2 nodes | Decide whether H3 requirements are meaningful concepts or intentionally out of scope |
+| Shell source/include graphs | `ADV-092` | `dangling_imports` misses deleted shell libraries sourced by other scripts because shell dependency extraction is command-only | Decide whether shell `source`/`.` includes belong in the import integrity meter |
 
 ## Candidate Queue
 
@@ -86,7 +87,9 @@ are rejected.
 
 | Candidate | Expected meter | Why it is distinct |
 | --- | --- | --- |
-| Unassigned | TBD | Add the next promising miss after reviewing the latest clusters |
+| Gorilla/mux `HandleFunc(...).Methods(...)` route | `orphan_endpoints` | Tests Go route registrations that use `HandleFunc` plus chained methods rather than `http.HandleFunc` or verb-named router calls |
+| ESM `.mjs` source/test pairing | `stale_tests` | Tests extension parity: `.mjs` tests are recognized as tests but not reverse-mapped to `.mjs` sources |
+| Setext Markdown concept heading | `path_loss` | Tests standard setext H1/H2 headings, distinct from the H3-depth miss in `ADV-091` |
 
 ## Rejected Hypotheses
 

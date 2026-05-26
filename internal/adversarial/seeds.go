@@ -26,6 +26,16 @@ check-policy:
 	$(POLICY_CHECK)
 `,
 		"build/mk/policy.mk": "POLICY_CHECK=go test ./pkg/policy\n",
+		"scripts/policy_check.sh": `#!/usr/bin/env bash
+set -euo pipefail
+source "./policy_lib.sh"
+check_policy
+`,
+		"scripts/policy_lib.sh": `#!/usr/bin/env bash
+check_policy() {
+	go test ./pkg/policy
+}
+`,
 		"tsconfig.json": `{
   "compilerOptions": {
     "baseUrl": ".",

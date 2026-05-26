@@ -434,7 +434,7 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 	if report.Pass {
 		t.Fatalf("expected exploration demo to keep the run non-passing: %+v", report.Summary)
 	}
-	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 70 || report.Summary.FalsePositives != 0 {
+	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 71 || report.Summary.FalsePositives != 0 {
 		t.Fatalf("unexpected failures: %+v", report.Summary)
 	}
 	if report.Summary.Skipped != 1 {
@@ -1139,6 +1139,16 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 		h3Concept.FalseNegatives[0] != "path_loss" ||
 		len(h3Concept.FalsePositives) != 0 {
 		t.Fatalf("H3 concept result=%+v, want false negative for path_loss", *h3Concept)
+	}
+	shellSource := findResult(report.Results, "ADV-092-shell-source-dangling-import-demo")
+	if shellSource == nil {
+		t.Fatal("missing ADV-092 exploration demo result")
+	}
+	if shellSource.Classification != ClassificationMiss ||
+		len(shellSource.FalseNegatives) != 1 ||
+		shellSource.FalseNegatives[0] != "dangling_imports" ||
+		len(shellSource.FalsePositives) != 0 {
+		t.Fatalf("shell source result=%+v, want false negative for dangling_imports", *shellSource)
 	}
 }
 

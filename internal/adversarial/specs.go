@@ -1160,6 +1160,14 @@ public final class AuditController {
 				New: "See deep policy source.",
 			},
 		},
+		{
+			ID:             "ADV-092-shell-source-dangling-import-demo",
+			Description:    "Remove a shell library sourced by another script; dangling_imports only checks source-language import graphs.",
+			Operation:      opRemoveFile,
+			TargetKinds:    []graph.NodeKind{graph.NodeFile},
+			ExpectedMeters: []string{"dangling_imports"},
+			Selector:       Selector{PathGlob: "scripts/policy_lib.sh"},
+		},
 	}
 }
 
