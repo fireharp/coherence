@@ -11,7 +11,7 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 	if report.Pass {
 		t.Fatalf("expected exploration demo to keep the run non-passing: %+v", report.Summary)
 	}
-	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 124 || report.Summary.FalsePositives != 2 {
+	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 125 || report.Summary.FalsePositives != 2 {
 		t.Fatalf("unexpected failures: %+v", report.Summary)
 	}
 	if report.Summary.Skipped != 1 {

@@ -132,6 +132,7 @@ func assertEmbeddedMisses(t *testing.T, results []Result) {
 		{mutationID: "ADV-144-nginx-include-dangling-demo", meter: "dangling_imports"},
 		{mutationID: "ADV-145-systemd-environment-file-demo", meter: "dangling_imports"},
 		{mutationID: "ADV-147-json-asset-bare-import-demo", meter: "dangling_imports"},
+		{mutationID: "ADV-149-covered-file-endpoint-laundering-demo", meter: "orphan_endpoints"},
 	} {
 		t.Run(tc.mutationID, func(t *testing.T) {
 			res := findResult(results, tc.mutationID)

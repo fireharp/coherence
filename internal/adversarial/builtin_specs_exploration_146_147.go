@@ -2,7 +2,7 @@ package adversarial
 
 import "github.com/fireharp/coherence/internal/graph"
 
-func builtinExplorationSpecs146To148() []Spec {
+func builtinExplorationSpecs146To149() []Spec {
 	return []Spec{
 		{
 			ID:             "ADV-146-html-anchor-support-path-loss-fp-demo",
@@ -35,6 +35,19 @@ func builtinExplorationSpecs146To148() []Spec {
 				Old: `See [US-003](../user-stories/US-003.md).`,
 				New: `See US-003.`,
 			},
+		},
+		{
+			ID:                      "ADV-149-covered-file-endpoint-laundering-demo",
+			Description:             "Add an untested endpoint to a source file that already has one verified endpoint; orphan_endpoints credits coverage at file granularity.",
+			Operation:               opAppendText,
+			TargetKinds:             []graph.NodeKind{graph.NodeFile},
+			ExpectedMeters:          []string{"orphan_endpoints"},
+			AllowedSideEffectMeters: []string{"stale_tests"},
+			Selector:                Selector{PathGlob: "src/api.ts"},
+			Edit: Edit{Text: `
+app.get("/api/admin", getAdmin);
+function getAdmin(req, res) { res.send("admin"); }
+`},
 		},
 	}
 }
