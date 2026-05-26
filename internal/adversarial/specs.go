@@ -970,6 +970,19 @@ title: YAML Story
 				New: "from .cycle_a import value_a\n\nvalue_b = value_a + 1\n",
 			},
 		},
+		{
+			ID:                      "ADV-078-markdown-angle-destination-space-demo",
+			Description:             "Add a broken Markdown link whose destination is angle-bracket wrapped and contains a space; broken_links only parses bare no-whitespace inline targets.",
+			Operation:               opAddFile,
+			TargetKinds:             []graph.NodeKind{graph.NodeFile},
+			ExpectedMeters:          []string{"broken_links"},
+			AllowedSideEffectMeters: []string{"neighborhood_drift", "semantic_movement", "blast_radius", "staleness"},
+			Selector:                Selector{PathGlob: "AGENTS.md"},
+			Edit: Edit{
+				Path:    "docs/ref/angle-destination-space.md",
+				Content: "# Angle Destination Space\n\nSee [guide](<missing guide.md>).\n",
+			},
+		},
 	}
 }
 

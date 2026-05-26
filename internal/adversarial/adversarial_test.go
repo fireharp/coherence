@@ -434,7 +434,7 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 	if report.Pass {
 		t.Fatalf("expected exploration demo to keep the run non-passing: %+v", report.Summary)
 	}
-	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 56 || report.Summary.FalsePositives != 0 {
+	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 57 || report.Summary.FalsePositives != 0 {
 		t.Fatalf("unexpected failures: %+v", report.Summary)
 	}
 	if report.Summary.Skipped != 1 {
@@ -999,6 +999,16 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 		pyCycle.FalseNegatives[0] != "dependency_cycles" ||
 		len(pyCycle.FalsePositives) != 0 {
 		t.Fatalf("Python file cycle result=%+v, want false negative for dependency_cycles", *pyCycle)
+	}
+	angleDestination := findResult(report.Results, "ADV-078-markdown-angle-destination-space-demo")
+	if angleDestination == nil {
+		t.Fatal("missing ADV-078 exploration demo result")
+	}
+	if angleDestination.Classification != ClassificationMiss ||
+		len(angleDestination.FalseNegatives) != 1 ||
+		angleDestination.FalseNegatives[0] != "broken_links" ||
+		len(angleDestination.FalsePositives) != 0 {
+		t.Fatalf("Markdown angle destination result=%+v, want false negative for broken_links", *angleDestination)
 	}
 }
 

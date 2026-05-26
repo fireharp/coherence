@@ -69,7 +69,7 @@ Update this table when a batch lands or when a report is exported.
 | Typed IDs stored as production data | `ADV-053`, `ADV-065`, `ADV-072` | `unknown_id_references` misses unresolved IDs inside quoted code strings, JSON config values, and TOML config values | Decide when data-bearing string literals should be scanned for typed IDs |
 | Docs-as-UI metric aliases | `ADV-054` | `orphaned_metric_aliases` misses MDX component prop aliases | Decide whether MDX should be scanned as frontend surface for metrics |
 | Go package import deletion | `ADV-055` | `dangling_imports` misses removed Go packages still imported by other packages | Decide whether Go import resolution belongs in `dangling_imports` |
-| Markdown link syntaxes beyond bare inline targets | `ADV-027`, `ADV-029`, `ADV-045`, `ADV-056`, `ADV-067` | `broken_links` misses reference-style, HTML, wiki, angle-autolink, and titled inline references | Decide how much Markdown syntax coverage the link meter should own |
+| Markdown link syntaxes beyond bare inline targets | `ADV-027`, `ADV-029`, `ADV-045`, `ADV-056`, `ADV-067`, `ADV-078` | `broken_links` misses reference-style, HTML, wiki, angle-autolink, titled inline references, and angle-bracket destinations with spaces | Decide how much Markdown syntax coverage the link meter should own |
 | Test coverage mapping gaps | `ADV-039`, `ADV-043`, `ADV-057`, `ADV-064`, `ADV-075` | `stale_tests` misses tests that exercise source behavior but do not reverse-map by filename or supported language, including Java/JUnit | Decide whether import/call relationships should supplement filename pairing |
 | ADR supersession frontmatter shapes | `ADV-026`, `ADV-036`, `ADV-058`, `ADV-069` | `stale_decision_links` misses raw/reference citations, capitalized relation keys, and quoted relation keys | Decide whether relation extraction should use a YAML parser |
 
@@ -80,7 +80,9 @@ are rejected.
 
 | Candidate | Expected meter | Why it is distinct |
 | --- | --- | --- |
-| Unassigned | TBD | Add the next promising miss after reviewing the latest clusters |
+| `ADV-079-python-from-dot-import-demo` | `dangling_imports` | `from . import sibling` resolves through package syntax and may survive sibling deletion because the Python import resolver focuses on module paths |
+| `ADV-080-django-urlconf-endpoint-demo` | `orphan_endpoints` | Django `urlpatterns = [path(...)]` declares HTTP routes outside the currently covered decorator/router call shapes |
+| `ADV-081-go-unused-method-dead-code-demo` | `dead_code` | The optional Go dead-code engine scans top-level functions but intentionally skips methods, leaving uncalled unexported methods unmeasured |
 
 ## Rejected Hypotheses
 
