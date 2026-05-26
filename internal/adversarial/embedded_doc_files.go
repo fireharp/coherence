@@ -20,6 +20,10 @@ id: US-003
 See [US-001](../user-stories/US-001.md), [policy source](../../pkg/policy/policy.go), and [threshold source](policy-source.md).
 
 - Must require policy approval before order export.
+
+| control | value |
+| --- | --- |
+| approval threshold | 80 |
 `,
 		"docs/specs/trace.md": `# Trace Coverage Spec
 

@@ -12,6 +12,7 @@ func embeddedMetricFrontendFiles() map[string]string {
 		"metrics/toml_only.yaml":     "version: 1\nmeasures:\n  - name: toml_only\n",
 		"metrics/template_only.yaml": "version: 1\nmeasures:\n  - name: template_only\n",
 		"metrics/html_only.yaml":     "version: 1\nmeasures:\n  - name: html_only\n",
+		"metrics/csv_only.yaml":      "version: 1\nmeasures:\n  - name: csv_only\n",
 		"frontend/dashboard.ts":      "export const dashboard = { metric: \"signup_rate\" };\n",
 		"frontend/splitMetric.ts":    "export const splitMetric = \"churn\" + \"_rate\";\nexport const dashboard = { metric: splitMetric };\n",
 		"frontend/revenue.ts":        "export const revenueMetric = \"net_revenue\";\n",
@@ -28,5 +29,6 @@ func embeddedMetricFrontendFiles() map[string]string {
 		"styles/app.css":              "@import \"./tokens.css\";\n.button { color: var(--brand); }\n",
 		"styles/tokens.css":           ":root { --brand: #0369a1; }\n",
 		"public/dashboard.html":       "<section data-metric=\"html_only\">HTML metric</section>\n",
+		"public/dashboard.csv":        "panel,metric\npolicy,csv_only\n",
 	}
 }

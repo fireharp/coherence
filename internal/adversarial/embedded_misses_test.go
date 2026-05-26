@@ -122,6 +122,11 @@ func assertEmbeddedMisses(t *testing.T, results []Result) {
 		{mutationID: "ADV-133-openapi-local-ref-demo", meter: "dangling_imports"},
 		{mutationID: "ADV-134-asciidoc-user-story-demo", meter: "unimplemented_stories"},
 		{mutationID: "ADV-135-gitlab-ci-include-demo", meter: "dangling_imports"},
+		{mutationID: "ADV-136-markdown-table-semantic-demo", meter: "semantic_movement"},
+		{mutationID: "ADV-137-csv-metric-alias-demo", meter: "orphaned_metric_aliases"},
+		{mutationID: "ADV-138-markdown-footnote-link-demo", meter: "broken_links"},
+		{mutationID: "ADV-139-toml-adr-supersedes-demo", meter: "stale_decision_links"},
+		{mutationID: "ADV-140-sql-double-quoted-typed-id-demo", meter: "unknown_id_references"},
 	} {
 		t.Run(tc.mutationID, func(t *testing.T) {
 			res := findResult(results, tc.mutationID)

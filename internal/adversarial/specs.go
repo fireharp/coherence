@@ -20,5 +20,6 @@ func BuiltinSpecs() []Spec {
 	specs = append(specs, builtinExplorationSpecs121To125()...)
 	specs = append(specs, builtinExplorationSpecs126To130()...)
 	specs = append(specs, builtinExplorationSpecs131To135()...)
+	specs = append(specs, builtinExplorationSpecs136To140()...)
 	return specs
 }
