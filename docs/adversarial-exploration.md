@@ -73,6 +73,7 @@ Update this table when a batch lands or when a report is exported.
 | Markdown link syntaxes beyond bare inline targets | `ADV-027`, `ADV-029`, `ADV-045`, `ADV-056`, `ADV-067`, `ADV-078` | `broken_links` misses reference-style, HTML, wiki, angle-autolink, titled inline references, and angle-bracket destinations with spaces | Decide how much Markdown syntax coverage the link meter should own |
 | Test coverage mapping gaps | `ADV-039`, `ADV-043`, `ADV-057`, `ADV-064`, `ADV-075` | `stale_tests` misses tests that exercise source behavior but do not reverse-map by filename or supported language, including Java/JUnit | Decide whether import/call relationships should supplement filename pairing |
 | ADR supersession frontmatter shapes | `ADV-026`, `ADV-036`, `ADV-058`, `ADV-069` | `stale_decision_links` misses raw/reference citations, capitalized relation keys, and quoted relation keys | Decide whether relation extraction should use a YAML parser |
+| Optional Go native dead code | `ADV-081` | `dead_code` misses uncalled unexported methods because the native engine only scores top-level functions | Decide whether method-level dead code belongs in the native engine or stays documented as out of scope |
 
 ## Candidate Queue
 
@@ -81,7 +82,7 @@ are rejected.
 
 | Candidate | Expected meter | Why it is distinct |
 | --- | --- | --- |
-| `ADV-081-go-unused-method-dead-code-demo` | `dead_code` | The optional Go dead-code engine scans top-level functions but intentionally skips methods, leaving uncalled unexported methods unmeasured |
+| Unassigned | TBD | Add the next promising miss after reviewing the latest clusters |
 
 ## Rejected Hypotheses
 

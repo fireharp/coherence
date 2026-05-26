@@ -1011,6 +1011,21 @@ urlpatterns = [
 `,
 			},
 		},
+		{
+			ID:                      "ADV-081-go-unused-method-dead-code-demo",
+			Description:             "Add an uncalled unexported Go method; optional dead_code only considers top-level functions.",
+			Operation:               opAppendText,
+			TargetKinds:             []graph.NodeKind{graph.NodeFile},
+			ExpectedMeters:          []string{"dead_code"},
+			AllowedSideEffectMeters: []string{"callsite_blast_radius", "stale_tests"},
+			Selector:                Selector{PathGlob: "pkg/policy/policy.go"},
+			SkipConditions:          SkipConditions{RequireOptionalEngines: []string{"dead_code"}},
+			Edit: Edit{Text: `
+type policyEngine struct{}
+
+func (policyEngine) unusedDecisionBranch() bool { return false }
+`},
+		},
 	}
 }
 

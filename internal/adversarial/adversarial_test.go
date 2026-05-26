@@ -434,7 +434,7 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 	if report.Pass {
 		t.Fatalf("expected exploration demo to keep the run non-passing: %+v", report.Summary)
 	}
-	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 59 || report.Summary.FalsePositives != 0 {
+	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 60 || report.Summary.FalsePositives != 0 {
 		t.Fatalf("unexpected failures: %+v", report.Summary)
 	}
 	if report.Summary.Skipped != 1 {
@@ -1029,6 +1029,16 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 		djangoURLConf.FalseNegatives[0] != "orphan_endpoints" ||
 		len(djangoURLConf.FalsePositives) != 0 {
 		t.Fatalf("Django URLConf result=%+v, want false negative for orphan_endpoints", *djangoURLConf)
+	}
+	goUnusedMethod := findResult(report.Results, "ADV-081-go-unused-method-dead-code-demo")
+	if goUnusedMethod == nil {
+		t.Fatal("missing ADV-081 exploration demo result")
+	}
+	if goUnusedMethod.Classification != ClassificationMiss ||
+		len(goUnusedMethod.FalseNegatives) != 1 ||
+		goUnusedMethod.FalseNegatives[0] != "dead_code" ||
+		len(goUnusedMethod.FalsePositives) != 0 {
+		t.Fatalf("Go unused method result=%+v, want false negative for dead_code", *goUnusedMethod)
 	}
 }
 
