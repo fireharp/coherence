@@ -434,7 +434,7 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 	if report.Pass {
 		t.Fatalf("expected exploration demo to keep the run non-passing: %+v", report.Summary)
 	}
-	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 55 || report.Summary.FalsePositives != 0 {
+	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 56 || report.Summary.FalsePositives != 0 {
 		t.Fatalf("unexpected failures: %+v", report.Summary)
 	}
 	if report.Summary.Skipped != 1 {
@@ -989,6 +989,16 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 		yamlStory.FalseNegatives[0] != "unimplemented_stories" ||
 		len(yamlStory.FalsePositives) != 0 {
 		t.Fatalf("YAML user story result=%+v, want false negative for unimplemented_stories", *yamlStory)
+	}
+	pyCycle := findResult(report.Results, "ADV-077-python-file-cycle-demo")
+	if pyCycle == nil {
+		t.Fatal("missing ADV-077 exploration demo result")
+	}
+	if pyCycle.Classification != ClassificationMiss ||
+		len(pyCycle.FalseNegatives) != 1 ||
+		pyCycle.FalseNegatives[0] != "dependency_cycles" ||
+		len(pyCycle.FalsePositives) != 0 {
+		t.Fatalf("Python file cycle result=%+v, want false negative for dependency_cycles", *pyCycle)
 	}
 }
 

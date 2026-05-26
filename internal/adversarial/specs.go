@@ -958,6 +958,18 @@ title: YAML Story
 `,
 			},
 		},
+		{
+			ID:             "ADV-077-python-file-cycle-demo",
+			Description:    "Close a Python import cycle within one package; dependency_cycles aggregates dependencies by directory.",
+			Operation:      opReplaceText,
+			TargetKinds:    []graph.NodeKind{graph.NodeFile},
+			ExpectedMeters: []string{"dependency_cycles"},
+			Selector:       Selector{PathGlob: "pyapp/cycle_b.py"},
+			Edit: Edit{
+				Old: "value_b = 1\n",
+				New: "from .cycle_a import value_a\n\nvalue_b = value_a + 1\n",
+			},
+		},
 	}
 }
 
