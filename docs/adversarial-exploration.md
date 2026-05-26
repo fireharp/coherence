@@ -77,7 +77,7 @@ Update this table when a batch lands or when a report is exported.
 | Ontology rule trigger deletions | `ADV-088` | `required_edge_breakage` misses deleted trigger files because the dirty-file diff excludes deletions | Decide whether rule evaluation should include deleted paths or classify trigger removals separately |
 | Claim extraction list shapes | `ADV-089` | `claim_support` misses numbered-list requirements because claim extraction only recognizes unordered bullets | Decide whether ordered Markdown requirements should be first-class claim nodes |
 | Build-system include graphs | `ADV-090` | `dangling_imports` misses deleted Makefile include files because dependency extraction only covers source-language imports | Decide whether build-system include directives belong in the import integrity meter |
-| Markdown concept heading depth | `ADV-091` | `path_loss` misses support loss under H3-only sections because concept extraction only emits H1/H2 nodes | Decide whether H3 requirements are meaningful concepts or intentionally out of scope |
+| Markdown concept heading shapes | `ADV-091`, `ADV-095` | `path_loss` misses support loss under H3-only sections and Setext H1/H2 headings because concept extraction only emits ATX H1/H2 nodes | Decide whether non-ATX and deeper requirement headings are meaningful concepts or intentionally out of scope |
 | Shell source/include graphs | `ADV-092` | `dangling_imports` misses deleted shell libraries sourced by other scripts because shell dependency extraction is command-only | Decide whether shell `source`/`.` includes belong in the import integrity meter |
 
 ## Candidate Queue
@@ -87,12 +87,14 @@ are rejected.
 
 | Candidate | Expected meter | Why it is distinct |
 | --- | --- | --- |
-| Setext Markdown concept heading | `path_loss` | Tests standard setext H1/H2 headings, distinct from the H3-depth miss in `ADV-091` |
 | Production `.js` ESM import deletion | `dangling_imports` | Tests whether JavaScript source imports are checked alongside TypeScript-family imports |
 | Multiline Python route decorator | `orphan_endpoints` | Tests FastAPI decorators split across lines, distinct from single-line decorator receiver gaps |
 | TypeScript optional-chaining route registration | `orphan_endpoints` | Tests `router?.get(...)` registration syntax, distinct from regular chained route calls |
 | Uppercase user-story frontmatter ID | `unimplemented_stories` | Tests YAML key casing when the filename itself does not expose a typed story ID |
 | GraphQL schema import/include | `dangling_imports` | Tests schema-level dependency integrity outside source-language import extractors |
+| TypeScript bracket route registration | `orphan_endpoints` | Tests `app["get"](...)` syntax, distinct from dotted, chained, and optional-chaining calls |
+| JSON asset import deletion | `dangling_imports` | Tests source imports whose target is a non-source asset resolved by the build system |
+| HTML anchor support link | `path_loss` | Tests support paths expressed as raw HTML anchors rather than Markdown links |
 
 ## Rejected Hypotheses
 

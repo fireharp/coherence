@@ -434,7 +434,7 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 	if report.Pass {
 		t.Fatalf("expected exploration demo to keep the run non-passing: %+v", report.Summary)
 	}
-	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 73 || report.Summary.FalsePositives != 0 {
+	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 74 || report.Summary.FalsePositives != 0 {
 		t.Fatalf("unexpected failures: %+v", report.Summary)
 	}
 	if report.Summary.Skipped != 1 {
@@ -1169,6 +1169,16 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 		mjsStale.FalseNegatives[0] != "stale_tests" ||
 		len(mjsStale.FalsePositives) != 0 {
 		t.Fatalf("mjs stale test result=%+v, want false negative for stale_tests", *mjsStale)
+	}
+	setextConcept := findResult(report.Results, "ADV-095-setext-concept-path-loss-demo")
+	if setextConcept == nil {
+		t.Fatal("missing ADV-095 exploration demo result")
+	}
+	if setextConcept.Classification != ClassificationMiss ||
+		len(setextConcept.FalseNegatives) != 1 ||
+		setextConcept.FalseNegatives[0] != "path_loss" ||
+		len(setextConcept.FalsePositives) != 0 {
+		t.Fatalf("setext concept result=%+v, want false negative for path_loss", *setextConcept)
 	}
 }
 

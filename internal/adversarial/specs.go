@@ -1202,6 +1202,22 @@ func MountMuxRoutes(r muxRouter) {
 			Selector:       Selector{PathGlob: "src/esmWidget.mjs"},
 			Edit:           Edit{Old: "return 1;", New: "return 2;"},
 		},
+		{
+			ID:             "ADV-095-setext-concept-path-loss-demo",
+			Description:    "Add an unsupported Setext H1 concept; path_loss only sees ATX #/## concept headings.",
+			Operation:      opAddFile,
+			TargetKinds:    []graph.NodeKind{graph.NodeDoc},
+			ExpectedMeters: []string{"path_loss"},
+			Selector:       Selector{PathGlob: "docs/specs/feature.md"},
+			Edit: Edit{
+				Path: "docs/specs/setext-concept.md",
+				Content: `Setext Audit Concept
+====================
+
+Must keep setext audit requirements connected to implementation evidence.
+`,
+			},
+		},
 	}
 }
 
