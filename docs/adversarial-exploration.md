@@ -80,6 +80,7 @@ Update this table when a batch lands or when a report is exported.
 | Markdown concept heading shapes | `ADV-091`, `ADV-095` | `path_loss` misses support loss under H3-only sections and Setext H1/H2 headings because concept extraction only emits ATX H1/H2 nodes | Decide whether non-ATX and deeper requirement headings are meaningful concepts or intentionally out of scope |
 | Shell source/include graphs | `ADV-092` | `dangling_imports` misses deleted shell libraries sourced by other scripts because shell dependency extraction is command-only | Decide whether shell `source`/`.` includes belong in the import integrity meter |
 | JavaScript source import graphs | `ADV-096` | `dangling_imports` misses production `.js` ESM imports because the source scan only includes TypeScript-family files | Decide whether plain JavaScript belongs in the import integrity meter |
+| Schema include graphs | `ADV-099` | `dangling_imports` misses GraphQL schema import/include directives because dependency extraction only covers source-language imports | Decide whether schema include directives belong in import integrity |
 
 ## Candidate Queue
 
@@ -88,9 +89,7 @@ are rejected.
 
 | Candidate | Expected meter | Why it is distinct |
 | --- | --- | --- |
-| Multiline Python route decorator | `orphan_endpoints` | Tests FastAPI decorators split across lines, distinct from single-line decorator receiver gaps |
 | Uppercase user-story frontmatter ID | `unimplemented_stories` | Tests YAML key casing when the filename itself does not expose a typed story ID |
-| GraphQL schema import/include | `dangling_imports` | Tests schema-level dependency integrity outside source-language import extractors |
 | JSON asset import deletion | `dangling_imports` | Tests source imports whose target is a non-source asset resolved by the build system |
 | HTML anchor support link | `path_loss` | Tests support paths expressed as raw HTML anchors rather than Markdown links |
 | Markdown table semantic change | `semantic_movement` | Tests meaning changes inside tables, which may not affect semantic hashes if table structure is ignored |
@@ -102,9 +101,13 @@ are rejected.
 | GitHub Actions reusable workflow deletion | `dangling_imports` | Tests workflow-to-workflow references in `uses:` keys outside source import scanners |
 | Kotlin stale test mapping | `stale_tests` | Tests source/test pairing for Kotlin files, distinct from Java and C# stale-test gaps |
 | Laravel PHP route declaration | `orphan_endpoints` | Tests PHP framework route declarations outside the current endpoint extractors |
+| OpenAPI local `$ref` deletion | `dangling_imports` | Tests schema component file references in OpenAPI specs |
+| AsciiDoc user story | `unimplemented_stories` | Tests user-story declarations outside Markdown/MDX/YAML document formats |
+| GitLab CI local include deletion | `dangling_imports` | Tests CI include references in `.gitlab-ci.yml` outside source import scanners |
 
 ## Rejected Hypotheses
 
 | Hypothesis | Outcome | Note |
 | --- | --- | --- |
 | YAML block-list `supersedes:` frontmatter | Hit, not a miss | The relation extractor already recognizes IDs in block-list values, so do not re-add as an adversarial miss |
+| Multiline Python route decorator | Hit, not a miss | The current single-line regex still matches decorators whose first argument starts on the next line because `[^)]*` spans newlines |

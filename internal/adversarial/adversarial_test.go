@@ -434,7 +434,7 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 	if report.Pass {
 		t.Fatalf("expected exploration demo to keep the run non-passing: %+v", report.Summary)
 	}
-	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 77 || report.Summary.FalsePositives != 0 {
+	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 78 || report.Summary.FalsePositives != 0 {
 		t.Fatalf("unexpected failures: %+v", report.Summary)
 	}
 	if report.Summary.Skipped != 1 {
@@ -1209,6 +1209,16 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 		bracketRoute.FalseNegatives[0] != "orphan_endpoints" ||
 		len(bracketRoute.FalsePositives) != 0 {
 		t.Fatalf("bracket route result=%+v, want false negative for orphan_endpoints", *bracketRoute)
+	}
+	graphQLImport := findResult(report.Results, "ADV-099-graphql-import-dangling-demo")
+	if graphQLImport == nil {
+		t.Fatal("missing ADV-099 exploration demo result")
+	}
+	if graphQLImport.Classification != ClassificationMiss ||
+		len(graphQLImport.FalseNegatives) != 1 ||
+		graphQLImport.FalseNegatives[0] != "dangling_imports" ||
+		len(graphQLImport.FalsePositives) != 0 {
+		t.Fatalf("GraphQL import result=%+v, want false negative for dangling_imports", *graphQLImport)
 	}
 }
 

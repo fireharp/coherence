@@ -1268,6 +1268,23 @@ function getBracketOrders(req, res) {
 `,
 			},
 		},
+		{
+			ID:             "ADV-099-graphql-import-dangling-demo",
+			Description:    "Add a GraphQL schema file with an unresolved import/include directive; dangling_imports only checks TS/Python source imports.",
+			Operation:      opAddFile,
+			TargetKinds:    []graph.NodeKind{graph.NodeFile},
+			ExpectedMeters: []string{"dangling_imports"},
+			Selector:       Selector{PathGlob: "AGENTS.md"},
+			Edit: Edit{
+				Path: "schema/query.graphql",
+				Content: `# import "./missing.graphql"
+
+type Query {
+	user: User
+}
+`,
+			},
+		},
 	}
 }
 
