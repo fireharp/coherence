@@ -434,7 +434,7 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 	if report.Pass {
 		t.Fatalf("expected exploration demo to keep the run non-passing: %+v", report.Summary)
 	}
-	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 63 || report.Summary.FalsePositives != 0 {
+	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 64 || report.Summary.FalsePositives != 0 {
 		t.Fatalf("unexpected failures: %+v", report.Summary)
 	}
 	if report.Summary.Skipped != 1 {
@@ -1069,6 +1069,16 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 		csharpStale.FalseNegatives[0] != "stale_tests" ||
 		len(csharpStale.FalsePositives) != 0 {
 		t.Fatalf("C# stale test result=%+v, want false negative for stale_tests", *csharpStale)
+	}
+	collapsedRef := findResult(report.Results, "ADV-085-markdown-collapsed-reference-link-demo")
+	if collapsedRef == nil {
+		t.Fatal("missing ADV-085 exploration demo result")
+	}
+	if collapsedRef.Classification != ClassificationMiss ||
+		len(collapsedRef.FalseNegatives) != 1 ||
+		collapsedRef.FalseNegatives[0] != "broken_links" ||
+		len(collapsedRef.FalsePositives) != 0 {
+		t.Fatalf("Markdown collapsed reference result=%+v, want false negative for broken_links", *collapsedRef)
 	}
 }
 

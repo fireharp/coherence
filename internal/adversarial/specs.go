@@ -1058,6 +1058,24 @@ required_story: US-999
 			Selector:       Selector{PathGlob: "csharp/RiskPolicy.cs"},
 			Edit:           Edit{Old: "=> 7;", New: "=> 9;"},
 		},
+		{
+			ID:                      "ADV-085-markdown-collapsed-reference-link-demo",
+			Description:             "Add a broken Markdown collapsed reference link; broken_links only parses inline parenthesized targets.",
+			Operation:               opAddFile,
+			TargetKinds:             []graph.NodeKind{graph.NodeFile},
+			ExpectedMeters:          []string{"broken_links"},
+			AllowedSideEffectMeters: []string{"neighborhood_drift", "semantic_movement", "blast_radius", "staleness"},
+			Selector:                Selector{PathGlob: "AGENTS.md"},
+			Edit: Edit{
+				Path: "docs/ref/collapsed-reference.md",
+				Content: `# Collapsed Reference
+
+See [guide][].
+
+[guide]: missing-collapsed-target.md
+`,
+			},
+		},
 	}
 }
 
