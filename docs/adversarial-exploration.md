@@ -58,7 +58,7 @@ Update this table when a batch lands or when a report is exported.
 
 | Cluster/theme | Example IDs | Signal | Next useful move |
 | --- | --- | --- | --- |
-| Frontend metric aliases outside scanned TS/JS forms | `ADV-050`, `ADV-060`, `ADV-066`, `ADV-073` | `orphaned_metric_aliases` misses Vue, Svelte, YAML dashboard aliases, and TOML dashboard aliases | Try template-literal variants or fix frontend alias extraction |
+| Frontend metric aliases outside direct substring scan | `ADV-023`, `ADV-050`, `ADV-060`, `ADV-066`, `ADV-073`, `ADV-082` | `orphaned_metric_aliases` misses split TS strings, Vue, Svelte, YAML/TOML dashboard aliases, and template-interpolated names | Fix frontend alias extraction with parser-backed literal folding and config-file coverage |
 | Markdown-like docs not scanned by link/id meters | `ADV-048`, `ADV-049` | Docs graph sees files that specific meters skip | Decide whether agent-control Markdown variants should be first-class docs |
 | TypeScript import syntax variants | `ADV-043`-`ADV-047` | `dangling_imports` misses non-basic import forms | Add parser-backed TS import extraction or expand regex coverage |
 | Python import syntax variants | `ADV-025`, `ADV-033`, `ADV-035`, `ADV-079` | `dangling_imports` misses dynamic imports, absolute package imports, plain `import` statements, and `from . import sibling` forms | Decide whether Python import resolution should parse imported names in addition to module specifiers |

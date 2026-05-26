@@ -1026,6 +1026,15 @@ type policyEngine struct{}
 func (policyEngine) unusedDecisionBranch() bool { return false }
 `},
 		},
+		{
+			ID:             "ADV-082-template-literal-metric-alias-demo",
+			Description:    "Rename a metric whose stale frontend alias is assembled with a template interpolation; orphaned_metric_aliases substring-scans for the complete old name.",
+			Operation:      opRenameFile,
+			TargetKinds:    []graph.NodeKind{graph.NodeMetric},
+			ExpectedMeters: []string{"orphaned_metric_aliases"},
+			Selector:       Selector{PathGlob: "metrics/template_only.yaml"},
+			Edit:           Edit{NewPath: "metrics/template_only_v2.yaml"},
+		},
 	}
 }
 

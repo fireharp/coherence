@@ -434,7 +434,7 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 	if report.Pass {
 		t.Fatalf("expected exploration demo to keep the run non-passing: %+v", report.Summary)
 	}
-	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 60 || report.Summary.FalsePositives != 0 {
+	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 61 || report.Summary.FalsePositives != 0 {
 		t.Fatalf("unexpected failures: %+v", report.Summary)
 	}
 	if report.Summary.Skipped != 1 {
@@ -1039,6 +1039,16 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 		goUnusedMethod.FalseNegatives[0] != "dead_code" ||
 		len(goUnusedMethod.FalsePositives) != 0 {
 		t.Fatalf("Go unused method result=%+v, want false negative for dead_code", *goUnusedMethod)
+	}
+	templateMetric := findResult(report.Results, "ADV-082-template-literal-metric-alias-demo")
+	if templateMetric == nil {
+		t.Fatal("missing ADV-082 exploration demo result")
+	}
+	if templateMetric.Classification != ClassificationMiss ||
+		len(templateMetric.FalseNegatives) != 1 ||
+		templateMetric.FalseNegatives[0] != "orphaned_metric_aliases" ||
+		len(templateMetric.FalsePositives) != 0 {
+		t.Fatalf("template literal metric result=%+v, want false negative for orphaned_metric_aliases", *templateMetric)
 	}
 }
 
