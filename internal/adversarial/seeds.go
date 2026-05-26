@@ -97,6 +97,26 @@ fn checks_limit() {
     assert_eq!(risk_limit(), 7);
 }
 `,
+		"java/src/main/java/com/example/RiskPolicy.java": `package com.example;
+
+public final class RiskPolicy {
+    public static int limit() {
+        return 7;
+    }
+}
+`,
+		"java/src/test/java/com/example/RiskPolicyTest.java": `package com.example;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
+
+final class RiskPolicyTest {
+    @Test
+    void checksLimit() {
+        assertEquals(7, RiskPolicy.limit());
+    }
+}
+`,
 		"internal/a/a.go": `package a
 
 import "example.com/adversarial/internal/b"

@@ -434,7 +434,7 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 	if report.Pass {
 		t.Fatalf("expected exploration demo to keep the run non-passing: %+v", report.Summary)
 	}
-	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 53 || report.Summary.FalsePositives != 0 {
+	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 54 || report.Summary.FalsePositives != 0 {
 		t.Fatalf("unexpected failures: %+v", report.Summary)
 	}
 	if report.Summary.Skipped != 1 {
@@ -969,6 +969,16 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 		openAPIPath.FalseNegatives[0] != "orphan_endpoints" ||
 		len(openAPIPath.FalsePositives) != 0 {
 		t.Fatalf("OpenAPI path result=%+v, want false negative for orphan_endpoints", *openAPIPath)
+	}
+	javaStale := findResult(report.Results, "ADV-075-java-stale-test-demo")
+	if javaStale == nil {
+		t.Fatal("missing ADV-075 exploration demo result")
+	}
+	if javaStale.Classification != ClassificationMiss ||
+		len(javaStale.FalseNegatives) != 1 ||
+		javaStale.FalseNegatives[0] != "stale_tests" ||
+		len(javaStale.FalsePositives) != 0 {
+		t.Fatalf("Java stale test result=%+v, want false negative for stale_tests", *javaStale)
 	}
 }
 

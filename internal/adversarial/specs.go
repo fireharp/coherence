@@ -934,6 +934,15 @@ paths:
 `,
 			},
 		},
+		{
+			ID:             "ADV-075-java-stale-test-demo",
+			Description:    "Change Java source covered by a JUnit test; stale_tests has no Java source-to-test reverse mapping.",
+			Operation:      opReplaceText,
+			TargetKinds:    []graph.NodeKind{graph.NodeFile},
+			ExpectedMeters: []string{"stale_tests"},
+			Selector:       Selector{PathGlob: "java/src/main/java/com/example/RiskPolicy.java"},
+			Edit:           Edit{Old: "return 7;", New: "return 9;"},
+		},
 	}
 }
 
