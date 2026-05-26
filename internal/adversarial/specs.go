@@ -1249,6 +1249,25 @@ function getOptionalOrders(req, res) {
 `,
 			},
 		},
+		{
+			ID:             "ADV-098-ts-bracket-route-demo",
+			Description:    "Add an untested TypeScript route registered through bracket property access; endpoint extraction only matches dotted receiver.method calls.",
+			Operation:      opAddFile,
+			TargetKinds:    []graph.NodeKind{graph.NodeFile},
+			ExpectedMeters: []string{"orphan_endpoints"},
+			Selector:       Selector{PathGlob: "AGENTS.md"},
+			Edit: Edit{
+				Path: "src/bracket-route.ts",
+				Content: `const app = express();
+
+app["get"]("/api/bracket-orders", getBracketOrders);
+
+function getBracketOrders(req, res) {
+	res.send("ok");
+}
+`,
+			},
+		},
 	}
 }
 

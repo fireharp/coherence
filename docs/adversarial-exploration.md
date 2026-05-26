@@ -64,7 +64,7 @@ Update this table when a batch lands or when a report is exported.
 | Python import syntax variants | `ADV-025`, `ADV-033`, `ADV-035`, `ADV-079` | `dangling_imports` misses dynamic imports, absolute package imports, plain `import` statements, and `from . import sibling` forms | Decide whether Python import resolution should parse imported names in addition to module specifiers |
 | Frontend non-code import graphs | `ADV-051` | `dangling_imports` misses CSS `@import` references | Decide whether stylesheet imports belong in the repo graph |
 | Test-file import graphs | `ADV-070` | `dangling_imports` misses build-breaking imports that only appear in test files | Decide whether test files need a separate lower-noise import integrity pass |
-| Route declaration APIs | `ADV-052`, `ADV-059`, `ADV-061`, `ADV-068`, `ADV-071`, `ADV-074`, `ADV-080`, `ADV-087`, `ADV-093`, `ADV-097` | `orphan_endpoints` misses FastAPI `add_api_route`, Express chained registrations, optional-chaining registrations, Next file-system handlers, Gin-style Go routes, Rails route files, OpenAPI path specs, Java Spring annotations, and gorilla/mux `HandleFunc(...).Methods(...)` routes | Add parser coverage for literal non-decorator, chained, framework-specific, and contract-level route declarations |
+| Route declaration APIs | `ADV-052`, `ADV-059`, `ADV-061`, `ADV-068`, `ADV-071`, `ADV-074`, `ADV-080`, `ADV-087`, `ADV-093`, `ADV-097`, `ADV-098` | `orphan_endpoints` misses FastAPI `add_api_route`, Express chained registrations, optional-chaining and bracket-property registrations, Next file-system handlers, Gin-style Go routes, Rails route files, OpenAPI path specs, Java Spring annotations, and gorilla/mux `HandleFunc(...).Methods(...)` routes | Add parser coverage for literal non-decorator, chained, framework-specific, and contract-level route declarations |
 | File-level dependency cycles | `ADV-062`, `ADV-077` | `dependency_cycles` misses TypeScript import cycles represented as file-to-file edges and Python same-package file cycles | Decide whether cycle detection should normalize file-level edges or keep package-only scope |
 | User story frontmatter shapes | `ADV-037`, `ADV-063`, `ADV-076` | `unimplemented_stories` misses MDX stories, Markdown stories with quoted frontmatter IDs, and YAML story specs | Decide whether story extraction should use a YAML parser and include MDX |
 | Typed IDs stored as production data | `ADV-053`, `ADV-065`, `ADV-072`, `ADV-083` | `unknown_id_references` misses unresolved IDs inside quoted code strings, JSON/TOML config values, and production scenario configs hidden by fixture-directory heuristics | Decide when data-bearing string literals and scenario/config paths should be scanned for typed IDs |
@@ -91,7 +91,6 @@ are rejected.
 | Multiline Python route decorator | `orphan_endpoints` | Tests FastAPI decorators split across lines, distinct from single-line decorator receiver gaps |
 | Uppercase user-story frontmatter ID | `unimplemented_stories` | Tests YAML key casing when the filename itself does not expose a typed story ID |
 | GraphQL schema import/include | `dangling_imports` | Tests schema-level dependency integrity outside source-language import extractors |
-| TypeScript bracket route registration | `orphan_endpoints` | Tests `app["get"](...)` syntax, distinct from dotted, chained, and optional-chaining calls |
 | JSON asset import deletion | `dangling_imports` | Tests source imports whose target is a non-source asset resolved by the build system |
 | HTML anchor support link | `path_loss` | Tests support paths expressed as raw HTML anchors rather than Markdown links |
 | Markdown table semantic change | `semantic_movement` | Tests meaning changes inside tables, which may not affect semantic hashes if table structure is ignored |
@@ -100,6 +99,9 @@ are rejected.
 | Protobuf import deletion | `dangling_imports` | Tests schema import/include dependencies outside TS/Python source import scanners |
 | Package script file reference | `dangling_imports` | Tests build-critical script operands inside `package.json` command strings |
 | Markdown task-list claim | `claim_support` | Tests assertive requirements hidden behind task-list checkbox syntax |
+| GitHub Actions reusable workflow deletion | `dangling_imports` | Tests workflow-to-workflow references in `uses:` keys outside source import scanners |
+| Kotlin stale test mapping | `stale_tests` | Tests source/test pairing for Kotlin files, distinct from Java and C# stale-test gaps |
+| Laravel PHP route declaration | `orphan_endpoints` | Tests PHP framework route declarations outside the current endpoint extractors |
 
 ## Rejected Hypotheses
 
