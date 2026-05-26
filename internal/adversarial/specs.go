@@ -943,6 +943,21 @@ paths:
 			Selector:       Selector{PathGlob: "java/src/main/java/com/example/RiskPolicy.java"},
 			Edit:           Edit{Old: "return 7;", New: "return 9;"},
 		},
+		{
+			ID:                      "ADV-076-yaml-user-story-demo",
+			Description:             "Add an unimplemented user story recorded as YAML; story extraction only treats Markdown docs as typed story nodes.",
+			Operation:               opAddFile,
+			TargetKinds:             []graph.NodeKind{graph.NodeDirectory},
+			ExpectedMeters:          []string{"unimplemented_stories"},
+			AllowedSideEffectMeters: []string{"trace_coverage", "path_loss", "neighborhood_drift", "semantic_movement", "unknown_id_references"},
+			Selector:                Selector{IDPrefix: "dir:docs/user-stories"},
+			Edit: Edit{
+				Path: "docs/user-stories/US-076.yaml",
+				Content: `id: US-076
+title: YAML Story
+`,
+			},
+		},
 	}
 }
 

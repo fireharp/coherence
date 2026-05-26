@@ -434,7 +434,7 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 	if report.Pass {
 		t.Fatalf("expected exploration demo to keep the run non-passing: %+v", report.Summary)
 	}
-	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 54 || report.Summary.FalsePositives != 0 {
+	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 55 || report.Summary.FalsePositives != 0 {
 		t.Fatalf("unexpected failures: %+v", report.Summary)
 	}
 	if report.Summary.Skipped != 1 {
@@ -979,6 +979,16 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 		javaStale.FalseNegatives[0] != "stale_tests" ||
 		len(javaStale.FalsePositives) != 0 {
 		t.Fatalf("Java stale test result=%+v, want false negative for stale_tests", *javaStale)
+	}
+	yamlStory := findResult(report.Results, "ADV-076-yaml-user-story-demo")
+	if yamlStory == nil {
+		t.Fatal("missing ADV-076 exploration demo result")
+	}
+	if yamlStory.Classification != ClassificationMiss ||
+		len(yamlStory.FalseNegatives) != 1 ||
+		yamlStory.FalseNegatives[0] != "unimplemented_stories" ||
+		len(yamlStory.FalsePositives) != 0 {
+		t.Fatalf("YAML user story result=%+v, want false negative for unimplemented_stories", *yamlStory)
 	}
 }
 
