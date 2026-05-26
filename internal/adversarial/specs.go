@@ -983,6 +983,14 @@ title: YAML Story
 				Content: "# Angle Destination Space\n\nSee [guide](<missing guide.md>).\n",
 			},
 		},
+		{
+			ID:             "ADV-079-python-from-dot-import-demo",
+			Description:    "Remove a Python sibling module imported via `from . import sibling`; dangling_imports resolves the package rather than the imported name.",
+			Operation:      opRemoveFile,
+			TargetKinds:    []graph.NodeKind{graph.NodeFile},
+			ExpectedMeters: []string{"dangling_imports"},
+			Selector:       Selector{PathGlob: "pyapp/dot_import_dep.py"},
+		},
 	}
 }
 

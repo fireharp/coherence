@@ -61,6 +61,7 @@ Update this table when a batch lands or when a report is exported.
 | Frontend metric aliases outside scanned TS/JS forms | `ADV-050`, `ADV-060`, `ADV-066`, `ADV-073` | `orphaned_metric_aliases` misses Vue, Svelte, YAML dashboard aliases, and TOML dashboard aliases | Try template-literal variants or fix frontend alias extraction |
 | Markdown-like docs not scanned by link/id meters | `ADV-048`, `ADV-049` | Docs graph sees files that specific meters skip | Decide whether agent-control Markdown variants should be first-class docs |
 | TypeScript import syntax variants | `ADV-043`-`ADV-047` | `dangling_imports` misses non-basic import forms | Add parser-backed TS import extraction or expand regex coverage |
+| Python import syntax variants | `ADV-025`, `ADV-033`, `ADV-035`, `ADV-079` | `dangling_imports` misses dynamic imports, absolute package imports, plain `import` statements, and `from . import sibling` forms | Decide whether Python import resolution should parse imported names in addition to module specifiers |
 | Frontend non-code import graphs | `ADV-051` | `dangling_imports` misses CSS `@import` references | Decide whether stylesheet imports belong in the repo graph |
 | Test-file import graphs | `ADV-070` | `dangling_imports` misses build-breaking imports that only appear in test files | Decide whether test files need a separate lower-noise import integrity pass |
 | Route declaration APIs | `ADV-052`, `ADV-059`, `ADV-061`, `ADV-068`, `ADV-071`, `ADV-074` | `orphan_endpoints` misses FastAPI `add_api_route`, Express chained registrations, Next file-system handlers, Gin-style Go routes, Rails route files, and OpenAPI path specs | Add parser coverage for literal non-decorator, chained, framework-specific, and contract-level route declarations |
@@ -80,7 +81,6 @@ are rejected.
 
 | Candidate | Expected meter | Why it is distinct |
 | --- | --- | --- |
-| `ADV-079-python-from-dot-import-demo` | `dangling_imports` | `from . import sibling` resolves through package syntax and may survive sibling deletion because the Python import resolver focuses on module paths |
 | `ADV-080-django-urlconf-endpoint-demo` | `orphan_endpoints` | Django `urlpatterns = [path(...)]` declares HTTP routes outside the currently covered decorator/router call shapes |
 | `ADV-081-go-unused-method-dead-code-demo` | `dead_code` | The optional Go dead-code engine scans top-level functions but intentionally skips methods, leaving uncalled unexported methods unmeasured |
 

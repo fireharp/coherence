@@ -434,7 +434,7 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 	if report.Pass {
 		t.Fatalf("expected exploration demo to keep the run non-passing: %+v", report.Summary)
 	}
-	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 57 || report.Summary.FalsePositives != 0 {
+	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 58 || report.Summary.FalsePositives != 0 {
 		t.Fatalf("unexpected failures: %+v", report.Summary)
 	}
 	if report.Summary.Skipped != 1 {
@@ -1009,6 +1009,16 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 		angleDestination.FalseNegatives[0] != "broken_links" ||
 		len(angleDestination.FalsePositives) != 0 {
 		t.Fatalf("Markdown angle destination result=%+v, want false negative for broken_links", *angleDestination)
+	}
+	pyDotImport := findResult(report.Results, "ADV-079-python-from-dot-import-demo")
+	if pyDotImport == nil {
+		t.Fatal("missing ADV-079 exploration demo result")
+	}
+	if pyDotImport.Classification != ClassificationMiss ||
+		len(pyDotImport.FalseNegatives) != 1 ||
+		pyDotImport.FalseNegatives[0] != "dangling_imports" ||
+		len(pyDotImport.FalsePositives) != 0 {
+		t.Fatalf("Python dot import result=%+v, want false negative for dangling_imports", *pyDotImport)
 	}
 }
 
