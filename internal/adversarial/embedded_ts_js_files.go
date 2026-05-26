@@ -25,7 +25,14 @@ export const multilineImportValue = multilineValue;
 		"src/usesAlias.ts": "import { aliased } from '@/aliased';\nexport const aliasValue = aliased;\n",
 		"src/jsDep.js":     "export const jsDep = 1;\n",
 		"src/jsUsesDep.js": "import { jsDep } from './jsDep.js';\nexport const jsValue = jsDep;\n",
-		"src/widget.ts":    "export function widgetValue() {\n  return 1;\n}\n",
+		"src/login.ts":     "export function loginState() {\n  return \"ok\";\n}\n",
+		"e2e/login.spec.ts": `import { loginState } from "../src/login";
+
+test("login state", () => {
+  expect(loginState()).toBe("ok");
+});
+`,
+		"src/widget.ts": "export function widgetValue() {\n  return 1;\n}\n",
 		"src/__tests__/widget.test.ts": `import { widgetValue } from "../widget";
 
 test("widget value", () => {

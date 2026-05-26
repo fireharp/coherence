@@ -2,7 +2,8 @@ package adversarial
 
 func embeddedPolyglotRiskFiles() map[string]string {
 	return map[string]string{
-		"crates/risk/src/lib.rs": "pub fn risk_limit() -> i32 { 7 }\n",
+		"crates/risk/src/lib.rs":           "pub mod policy_config;\n\npub fn risk_limit() -> i32 { 7 }\n",
+		"crates/risk/src/policy_config.rs": "pub const POLICY_CONFIG: &str = \"default\";\n",
 		"tests/risk_limit_test.rs": `use risk::risk_limit;
 
 #[test]

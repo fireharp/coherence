@@ -102,6 +102,16 @@ func assertEmbeddedMisses(t *testing.T, results []Result) {
 		{mutationID: "ADV-113-nestjs-decorator-route-demo", meter: "orphan_endpoints"},
 		{mutationID: "ADV-114-helm-template-include-demo", meter: "dangling_imports"},
 		{mutationID: "ADV-115-rst-local-link-demo", meter: "broken_links"},
+		{mutationID: "ADV-116-avro-schema-ref-demo", meter: "dangling_imports"},
+		{mutationID: "ADV-117-e2e-stale-test-demo", meter: "stale_tests"},
+		{mutationID: "ADV-118-static-html-metric-alias-demo", meter: "orphaned_metric_aliases"},
+		{mutationID: "ADV-119-mermaid-click-link-demo", meter: "broken_links"},
+		{mutationID: "ADV-120-rust-mod-dangling-demo", meter: "dangling_imports"},
+		{mutationID: "ADV-121-aspnet-minimal-api-route-demo", meter: "orphan_endpoints"},
+		{mutationID: "ADV-122-cargo-workspace-member-demo", meter: "dangling_imports"},
+		{mutationID: "ADV-123-markdown-shortcut-reference-demo", meter: "broken_links"},
+		{mutationID: "ADV-124-blockquote-claim-support-demo", meter: "claim_support"},
+		{mutationID: "ADV-125-table-claim-support-demo", meter: "claim_support"},
 	} {
 		t.Run(tc.mutationID, func(t *testing.T) {
 			res := findResult(results, tc.mutationID)

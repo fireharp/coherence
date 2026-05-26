@@ -58,7 +58,7 @@ Update this table when a batch lands or when a report is exported.
 
 | Cluster/theme | Example IDs | Signal | Next useful move |
 | --- | --- | --- | --- |
-| Frontend metric aliases outside direct substring scan | `ADV-023`, `ADV-050`, `ADV-060`, `ADV-066`, `ADV-073`, `ADV-082` | `orphaned_metric_aliases` misses split TS strings, Vue, Svelte, YAML/TOML dashboard aliases, and template-interpolated names | Fix frontend alias extraction with parser-backed literal folding and config-file coverage |
+| Frontend metric aliases outside direct substring scan | `ADV-023`, `ADV-050`, `ADV-060`, `ADV-066`, `ADV-073`, `ADV-082`, `ADV-118` | `orphaned_metric_aliases` misses split TS strings, Vue, Svelte, YAML/TOML dashboard aliases, static HTML, and template-interpolated names | Fix frontend alias extraction with parser-backed literal folding and config-file coverage |
 | Markdown-like docs not scanned by link/id meters | `ADV-048`, `ADV-049` | Docs graph sees files that specific meters skip | Decide whether agent-control Markdown variants should be first-class docs |
 | TypeScript import syntax variants | `ADV-043`-`ADV-047` | `dangling_imports` misses non-basic import forms | Add parser-backed TS import extraction or expand regex coverage |
 | Python import syntax variants | `ADV-025`, `ADV-033`, `ADV-035`, `ADV-079` | `dangling_imports` misses dynamic imports, absolute package imports, plain `import` statements, and `from . import sibling` forms | Decide whether Python import resolution should parse imported names in addition to module specifiers |
@@ -70,18 +70,20 @@ Update this table when a batch lands or when a report is exported.
 | Typed IDs stored as production data | `ADV-053`, `ADV-065`, `ADV-072`, `ADV-083` | `unknown_id_references` misses unresolved IDs inside quoted code strings, JSON/TOML config values, and production scenario configs hidden by fixture-directory heuristics | Decide when data-bearing string literals and scenario/config paths should be scanned for typed IDs |
 | Docs-as-UI metric aliases | `ADV-054` | `orphaned_metric_aliases` misses MDX component prop aliases | Decide whether MDX should be scanned as frontend surface for metrics |
 | Go package import deletion | `ADV-055` | `dangling_imports` misses removed Go packages still imported by other packages | Decide whether Go import resolution belongs in `dangling_imports` |
-| Markdown and doc link syntaxes beyond bare inline targets | `ADV-027`, `ADV-029`, `ADV-045`, `ADV-056`, `ADV-067`, `ADV-078`, `ADV-085`, `ADV-109`, `ADV-115` | `broken_links` misses reference-style, collapsed-reference, HTML, wiki, angle-autolink, titled inline references, angle-bracket destinations with spaces, AsciiDoc xrefs, and reStructuredText links | Decide how much non-inline Markdown and adjacent-doc syntax coverage the link meter should own |
-| Test coverage mapping gaps | `ADV-039`, `ADV-043`, `ADV-057`, `ADV-064`, `ADV-075`, `ADV-084`, `ADV-094` | `stale_tests` misses tests that exercise source behavior but do not reverse-map by filename or supported language, including `.mjs` ESM tests, Java/JUnit, and C#/xUnit | Decide whether import/call relationships should supplement filename pairing |
+| Markdown and doc link syntaxes beyond bare inline targets | `ADV-027`, `ADV-029`, `ADV-045`, `ADV-056`, `ADV-067`, `ADV-078`, `ADV-085`, `ADV-109`, `ADV-115`, `ADV-119`, `ADV-123` | `broken_links` misses reference-style, collapsed-reference, shortcut-reference, HTML, wiki, angle-autolink, titled inline references, angle-bracket destinations with spaces, Mermaid click links, AsciiDoc xrefs, and reStructuredText links | Decide how much non-inline Markdown and adjacent-doc syntax coverage the link meter should own |
+| Test coverage mapping gaps | `ADV-039`, `ADV-043`, `ADV-057`, `ADV-064`, `ADV-075`, `ADV-084`, `ADV-094`, `ADV-117` | `stale_tests` misses tests that exercise source behavior but do not reverse-map by filename or supported language, including E2E TS tests, `.mjs` ESM tests, Java/JUnit, and C#/xUnit | Decide whether import/call relationships should supplement filename pairing |
 | ADR supersession frontmatter shapes | `ADV-026`, `ADV-036`, `ADV-058`, `ADV-069`, `ADV-086` | `stale_decision_links` misses raw/reference citations, capitalized relation keys, quoted relation keys, and nested relation maps | Decide whether relation extraction should use a YAML parser |
 | Optional Go native dead code | `ADV-081` | `dead_code` misses uncalled unexported methods because the native engine only scores top-level functions | Decide whether method-level dead code belongs in the native engine or stays documented as out of scope |
 | Ontology rule trigger deletions | `ADV-088` | `required_edge_breakage` misses deleted trigger files because the dirty-file diff excludes deletions | Decide whether rule evaluation should include deleted paths or classify trigger removals separately |
-| Claim extraction list shapes | `ADV-089` | `claim_support` misses numbered-list requirements because claim extraction only recognizes unordered bullets | Decide whether ordered Markdown requirements should be first-class claim nodes |
-| Build/config include graphs | `ADV-090`, `ADV-100`, `ADV-101`, `ADV-106`, `ADV-107`, `ADV-108`, `ADV-112`, `ADV-114` | `dangling_imports` misses Makefile include files, Dockerfile `COPY` operands, package script operands, GitHub Actions local actions, Terraform modules, Kustomize resources, TypeScript project references, and Helm chart file refs because dependency extraction only covers source-language imports | Decide whether build/config include directives belong in the import integrity meter |
+| Claim extraction Markdown shapes | `ADV-089`, `ADV-124`, `ADV-125` | `claim_support` misses numbered-list requirements, blockquote requirements, and table-row requirements because claim extraction only recognizes unordered bullets | Decide which Markdown requirement shapes should be first-class claim nodes |
+| Build/config include graphs | `ADV-090`, `ADV-100`, `ADV-101`, `ADV-106`, `ADV-107`, `ADV-108`, `ADV-112`, `ADV-114`, `ADV-122` | `dangling_imports` misses Makefile include files, Dockerfile `COPY` operands, package script operands, GitHub Actions local actions, Terraform modules, Kustomize resources, TypeScript project references, Helm chart file refs, and Cargo workspace members because dependency extraction only covers source-language imports | Decide whether build/config include directives belong in the import integrity meter |
 | Go embed asset graphs | `ADV-102` | `dangling_imports` misses missing `//go:embed` asset operands because Go extraction does not parse embed directives | Decide whether embedded asset operands belong in import integrity |
 | Markdown concept heading shapes | `ADV-091`, `ADV-095` | `path_loss` misses support loss under H3-only sections and Setext H1/H2 headings because concept extraction only emits ATX H1/H2 nodes | Decide whether non-ATX and deeper requirement headings are meaningful concepts or intentionally out of scope |
 | Shell source/include graphs | `ADV-092` | `dangling_imports` misses deleted shell libraries sourced by other scripts because shell dependency extraction is command-only | Decide whether shell `source`/`.` includes belong in the import integrity meter |
 | JavaScript source import graphs | `ADV-096`, `ADV-111` | `dangling_imports` misses production `.js` ESM imports and `.cjs` CommonJS requires because the source scan only includes TypeScript-family files | Decide whether plain JavaScript belongs in the import integrity meter |
-| Schema include graphs | `ADV-099` | `dangling_imports` misses GraphQL schema import/include directives because dependency extraction only covers source-language imports | Decide whether schema include directives belong in import integrity |
+| Schema include graphs | `ADV-099`, `ADV-116` | `dangling_imports` misses GraphQL schema import/include directives and Avro named-type references because dependency extraction only covers source-language imports | Decide whether schema include directives belong in import integrity |
+| Rust source module graphs | `ADV-120` | `dangling_imports` misses deleted Rust module files still declared by `mod` statements because Rust source dependencies are not extracted | Decide whether Rust module resolution belongs in import integrity |
+| C# route declaration APIs | `ADV-121` | `orphan_endpoints` misses ASP.NET minimal API route declarations because endpoint extraction is currently Go/TS/Python focused | Decide whether C# endpoint extraction belongs in route coverage |
 | Compose environment include graphs | `ADV-103` | `dangling_imports` misses Docker Compose `env_file` references because deployment YAML include operands are not extracted | Decide whether Compose configuration dependencies belong in import integrity |
 | Bazel/Starlark load graphs | `ADV-104` | `dangling_imports` misses Bazel `load()` labels because Starlark dependency labels are not extracted | Decide whether build graph label references belong in import integrity |
 | Notebook code-cell imports | `ADV-105` | `dangling_imports` misses Jupyter notebook imports because `.ipynb` code cells are not extracted as source | Decide whether notebook code belongs in import integrity |
@@ -107,20 +109,11 @@ are rejected.
 | AsciiDoc user story | `unimplemented_stories` | Tests user-story declarations outside Markdown/MDX/YAML document formats |
 | GitLab CI local include deletion | `dangling_imports` | Tests CI include references in `.gitlab-ci.yml` outside source import scanners |
 | Raw typed-ID trace mention | `trace_coverage` | Tests story coverage expressed as plain `US-###` text instead of Markdown links |
-| Mermaid click link target | `broken_links` | Tests links hidden inside Mermaid fenced diagrams |
 | CSV metric alias | `orphaned_metric_aliases` | Tests metric references stored in CSV dashboard exports |
-| Rust module declaration deletion | `dangling_imports` | Tests `mod foo;` module graph integrity outside Rust stale-test coverage |
 | Markdown footnote link target | `broken_links` | Tests footnote definition targets as a distinct Markdown link form |
-| Blockquote claim support | `claim_support` | Tests assertive requirements expressed as blockquotes/admonitions instead of bullets |
-| Markdown image target deletion | `broken_links` | Tests image destinations as a distinct Markdown link surface |
-| Markdown table requirement support | `claim_support` | Tests assertive requirements expressed inside table rows |
 | TOML ADR supersession frontmatter | `stale_decision_links` | Tests alternate frontmatter fences and relation parsing outside YAML |
-| YAML block-scalar typed ID | `unknown_id_references` | Tests unresolved IDs embedded in multiline YAML scalar data |
-| ASP.NET minimal API route | `orphan_endpoints` | Tests C# fluent `MapGet` route declarations outside current endpoint extractors |
 | SQL migration typed-ID data | `unknown_id_references` | Tests unresolved typed IDs stored in SQL migration string data |
 | Markdown shortcut reference link | `broken_links` | Tests shortcut reference syntax separate from full/collapsed reference links |
-| Static HTML metric alias | `orphaned_metric_aliases` | Tests metric aliases in plain server/static HTML templates |
-| Cargo workspace member deletion | `dangling_imports` | Tests Rust workspace manifest member references outside source imports |
 
 ## Rejected Hypotheses
 
@@ -128,3 +121,5 @@ are rejected.
 | --- | --- | --- |
 | YAML block-list `supersedes:` frontmatter | Hit, not a miss | The relation extractor already recognizes IDs in block-list values, so do not re-add as an adversarial miss |
 | Multiline Python route decorator | Hit, not a miss | The current single-line regex still matches decorators whose first argument starts on the next line because `[^)]*` spans newlines |
+| Markdown image target deletion | Likely hit, not a miss | The inline-link regex matches the `[alt](target)` substring inside `![alt](target)` |
+| YAML block-scalar typed ID | Likely hit, not a miss | `unknown_id_references` scans non-Markdown block scalar text after only stripping double-quoted and backtick spans |
