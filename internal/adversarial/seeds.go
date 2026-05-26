@@ -259,7 +259,7 @@ id: US-003
 # US-003 Trace Coverage Story
 `,
 		"docs/evidence/US-001/proof.md": "# Evidence\n\nPolicy approval was reviewed for [US-001](../../user-stories/US-001.md).\n",
-		"docs/evidence/US-003/proof.md": "Trace coverage was reviewed.\n",
+		"docs/evidence/US-003/proof.md": "Trace coverage was reviewed.\n1. Must retain audit evidence for every export. See [policy implementation](../../../pkg/policy/policy.go).\n",
 		"docs/specs/policy-source.md":   "# Policy Source\n\nThe policy threshold is 80. See [US-001](../user-stories/US-001.md).\n",
 		"docs/specs/feature.md": `# Policy Feature
 

@@ -434,7 +434,7 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 	if report.Pass {
 		t.Fatalf("expected exploration demo to keep the run non-passing: %+v", report.Summary)
 	}
-	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 67 || report.Summary.FalsePositives != 0 {
+	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 68 || report.Summary.FalsePositives != 0 {
 		t.Fatalf("unexpected failures: %+v", report.Summary)
 	}
 	if report.Summary.Skipped != 1 {
@@ -1109,6 +1109,16 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 		ruleDeletion.FalseNegatives[0] != "required_edge_breakage" ||
 		len(ruleDeletion.FalsePositives) != 0 {
 		t.Fatalf("rule-trigger deletion result=%+v, want false negative for required_edge_breakage", *ruleDeletion)
+	}
+	numberedClaim := findResult(report.Results, "ADV-089-numbered-claim-support-demo")
+	if numberedClaim == nil {
+		t.Fatal("missing ADV-089 exploration demo result")
+	}
+	if numberedClaim.Classification != ClassificationMiss ||
+		len(numberedClaim.FalseNegatives) != 1 ||
+		numberedClaim.FalseNegatives[0] != "claim_support" ||
+		len(numberedClaim.FalsePositives) != 0 {
+		t.Fatalf("numbered claim result=%+v, want false negative for claim_support", *numberedClaim)
 	}
 }
 

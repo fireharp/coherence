@@ -1128,6 +1128,18 @@ public final class AuditController {
 			ExpectedMeters: []string{"required_edge_breakage"},
 			Selector:       Selector{PathGlob: "src/build-fixtures.go"},
 		},
+		{
+			ID:             "ADV-089-numbered-claim-support-demo",
+			Description:    "Remove backing from a numbered requirement; claim_support only extracts unordered bullet claims.",
+			Operation:      opReplaceText,
+			TargetKinds:    []graph.NodeKind{graph.NodeDoc},
+			ExpectedMeters: []string{"claim_support"},
+			Selector:       Selector{PathGlob: "docs/evidence/US-003/proof.md"},
+			Edit: Edit{
+				Old: "1. Must retain audit evidence for every export. See [policy implementation](../../../pkg/policy/policy.go).",
+				New: "1. Must retain audit evidence for every export.",
+			},
+		},
 	}
 }
 

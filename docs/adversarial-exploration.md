@@ -75,6 +75,7 @@ Update this table when a batch lands or when a report is exported.
 | ADR supersession frontmatter shapes | `ADV-026`, `ADV-036`, `ADV-058`, `ADV-069`, `ADV-086` | `stale_decision_links` misses raw/reference citations, capitalized relation keys, quoted relation keys, and nested relation maps | Decide whether relation extraction should use a YAML parser |
 | Optional Go native dead code | `ADV-081` | `dead_code` misses uncalled unexported methods because the native engine only scores top-level functions | Decide whether method-level dead code belongs in the native engine or stays documented as out of scope |
 | Ontology rule trigger deletions | `ADV-088` | `required_edge_breakage` misses deleted trigger files because the dirty-file diff excludes deletions | Decide whether rule evaluation should include deleted paths or classify trigger removals separately |
+| Claim extraction list shapes | `ADV-089` | `claim_support` misses numbered-list requirements because claim extraction only recognizes unordered bullets | Decide whether ordered Markdown requirements should be first-class claim nodes |
 
 ## Candidate Queue
 
@@ -83,7 +84,8 @@ are rejected.
 
 | Candidate | Expected meter | Why it is distinct |
 | --- | --- | --- |
-| Unassigned | TBD | Add the next promising miss after reviewing the latest clusters |
+| H3 concept support loss | `path_loss` | Tests whether H3-only sections should create concept nodes or stay out of scope |
+| Makefile include deletion | `dangling_imports` | Tests build-system include dependencies outside TS/Python/Go/CSS import graphs |
 
 ## Rejected Hypotheses
 
