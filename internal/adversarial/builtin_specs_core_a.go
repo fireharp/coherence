@@ -1,0 +1,102 @@
+package adversarial
+
+import "github.com/fireharp/coherence/internal/graph"
+
+func builtinDeterministicSpecsA() []Spec {
+	return []Spec{
+		{
+			ID:                      "ADV-001-stale-go-test",
+			Description:             "Change a verified Go source without updating its paired test.",
+			Operation:               opReplaceText,
+			TargetKinds:             []graph.NodeKind{graph.NodeFile},
+			ExpectedMeters:          []string{"stale_tests"},
+			AllowedSideEffectMeters: []string{"callsite_blast_radius"},
+			Selector:                Selector{PathGlob: "pkg/policy/policy.go", HasIncomingEdge: string(graph.EdgeVerifies)},
+			Edit:                    Edit{Old: "score >= 80", New: "score >= 90"},
+		},
+		{
+			ID:             "ADV-002-orphaned-metric-alias",
+			Description:    "Rename a metric definition but leave frontend string aliases untouched.",
+			Operation:      opRenameFile,
+			TargetKinds:    []graph.NodeKind{graph.NodeMetric},
+			ExpectedMeters: []string{"orphaned_metric_aliases"},
+			Selector:       Selector{PathGlob: "metrics/signup_rate.yaml"},
+			Edit:           Edit{NewPath: "metrics/signup_rate_v2.yaml"},
+		},
+		{
+			ID:             "ADV-003-dangling-ts-import",
+			Description:    "Remove a TypeScript module that another module imports.",
+			Operation:      opRemoveFile,
+			TargetKinds:    []graph.NodeKind{graph.NodeFile},
+			ExpectedMeters: []string{"dangling_imports"},
+			Selector:       Selector{PathGlob: "src/util.ts"},
+		},
+		{
+			ID:                      "ADV-004-broken-doc-link",
+			Description:             "Delete a markdown target still linked from another doc.",
+			Operation:               opRemoveFile,
+			TargetKinds:             []graph.NodeKind{graph.NodeDoc},
+			ExpectedMeters:          []string{"broken_links"},
+			AllowedSideEffectMeters: []string{"path_loss"},
+			Selector:                Selector{PathGlob: "docs/ref/target.md"},
+		},
+		{
+			ID:             "ADV-005-stale-decision-link",
+			Description:    "Supersede an ADR while older docs still cite the superseded ADR.",
+			Operation:      opAddFile,
+			TargetKinds:    []graph.NodeKind{graph.NodeADR},
+			ExpectedMeters: []string{"stale_decision_links"},
+			Selector:       Selector{IDPrefix: "adr:ADR-001"},
+			Edit: Edit{
+				Path:    "docs/decisions/ADR-002.md",
+				Content: "---\nid: ADR-002\nsupersedes: ADR-001\n---\n# ADR-002\n\nUse the new decision for [US-001](../user-stories/US-001.md).\n",
+			},
+		},
+		{
+			ID:             "ADV-006-trace-coverage-loss",
+			Description:    "Remove the only spec mention that covers a user story.",
+			Operation:      opRemoveLineContaining,
+			TargetKinds:    []graph.NodeKind{graph.NodeDoc},
+			ExpectedMeters: []string{"trace_coverage"},
+			Selector:       Selector{PathGlob: "docs/specs/trace.md"},
+			Edit:           Edit{LineContains: "US-003"},
+		},
+		{
+			ID:             "ADV-007-support-path-loss",
+			Description:    "Remove the only support links from a concept and claim.",
+			Operation:      opRemoveLineContaining,
+			TargetKinds:    []graph.NodeKind{graph.NodeDoc},
+			ExpectedMeters: []string{"path_loss", "claim_support"},
+			Selector:       Selector{PathGlob: "docs/specs/feature.md"},
+			Edit:           Edit{LineContains: "policy source"},
+		},
+		{
+			ID:                      "ADV-008-orphan-endpoint",
+			Description:             "Remove the test that verifies an HTTP endpoint source file.",
+			Operation:               opRemoveFile,
+			TargetKinds:             []graph.NodeKind{graph.NodeTest},
+			ExpectedMeters:          []string{"orphan_endpoints"},
+			AllowedSideEffectMeters: []string{"path_loss", "claim_support"},
+			Selector:                Selector{PathGlob: "src/api.test.ts"},
+		},
+		{
+			ID:             "ADV-009-unknown-typed-id",
+			Description:    "Introduce a code-level typed-id reference with no defining doc.",
+			Operation:      opAppendText,
+			TargetKinds:    []graph.NodeKind{graph.NodeFile},
+			ExpectedMeters: []string{"unknown_id_references"},
+			Selector:       Selector{PathGlob: "pkg/policy/policy.go"},
+			Edit:           Edit{Text: "\n// TODO: reconcile US-999 before release.\n"},
+		},
+		{
+			ID:                      "ADV-010-generated-artifact-break",
+			Description:             "Change a generator source while leaving its generated artifact untouched.",
+			Operation:               opReplaceText,
+			TargetKinds:             []graph.NodeKind{graph.NodeFile},
+			ExpectedMeters:          []string{"required_edge_breakage"},
+			AllowedSideEffectMeters: []string{"callsite_blast_radius"},
+			Selector:                Selector{PathGlob: "src/build-fixtures.go"},
+			Edit:                    Edit{Old: `"v1"`, New: `"v2"`},
+		},
+	}
+}
