@@ -72,7 +72,7 @@ Update this table when a batch lands or when a report is exported.
 | Go package import deletion | `ADV-055` | `dangling_imports` misses removed Go packages still imported by other packages | Decide whether Go import resolution belongs in `dangling_imports` |
 | Markdown link syntaxes beyond bare inline targets | `ADV-027`, `ADV-029`, `ADV-045`, `ADV-056`, `ADV-067`, `ADV-078`, `ADV-085` | `broken_links` misses reference-style, collapsed-reference, HTML, wiki, angle-autolink, titled inline references, and angle-bracket destinations with spaces | Decide how much Markdown syntax coverage the link meter should own |
 | Test coverage mapping gaps | `ADV-039`, `ADV-043`, `ADV-057`, `ADV-064`, `ADV-075`, `ADV-084` | `stale_tests` misses tests that exercise source behavior but do not reverse-map by filename or supported language, including Java/JUnit and C#/xUnit | Decide whether import/call relationships should supplement filename pairing |
-| ADR supersession frontmatter shapes | `ADV-026`, `ADV-036`, `ADV-058`, `ADV-069` | `stale_decision_links` misses raw/reference citations, capitalized relation keys, and quoted relation keys | Decide whether relation extraction should use a YAML parser |
+| ADR supersession frontmatter shapes | `ADV-026`, `ADV-036`, `ADV-058`, `ADV-069`, `ADV-086` | `stale_decision_links` misses raw/reference citations, capitalized relation keys, quoted relation keys, and nested relation maps | Decide whether relation extraction should use a YAML parser |
 | Optional Go native dead code | `ADV-081` | `dead_code` misses uncalled unexported methods because the native engine only scores top-level functions | Decide whether method-level dead code belongs in the native engine or stays documented as out of scope |
 
 ## Candidate Queue

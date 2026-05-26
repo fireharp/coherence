@@ -1076,6 +1076,26 @@ See [guide][].
 `,
 			},
 		},
+		{
+			ID:             "ADV-086-adr-nested-supersedes-demo",
+			Description:    "Add a successor ADR using a nested relation map; stale_decision_links only sees top-level relation keys.",
+			Operation:      opAddFile,
+			TargetKinds:    []graph.NodeKind{graph.NodeADR},
+			ExpectedMeters: []string{"stale_decision_links"},
+			Selector:       Selector{IDPrefix: "adr:ADR-001"},
+			Edit: Edit{
+				Path: "docs/decisions/ADR-" + "086.md",
+				Content: `---
+id: ` + "ADR-086" + `
+relations:
+  supersedes: ` + "ADR-001" + `
+---
+# ` + "ADR-086" + ` Nested Relation Successor
+
+Use the nested relation successor policy.
+`,
+			},
+		},
 	}
 }
 

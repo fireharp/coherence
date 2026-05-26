@@ -434,7 +434,7 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 	if report.Pass {
 		t.Fatalf("expected exploration demo to keep the run non-passing: %+v", report.Summary)
 	}
-	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 64 || report.Summary.FalsePositives != 0 {
+	if report.Summary.Errored != 0 || report.Summary.FalseNegatives != 65 || report.Summary.FalsePositives != 0 {
 		t.Fatalf("unexpected failures: %+v", report.Summary)
 	}
 	if report.Summary.Skipped != 1 {
@@ -1079,6 +1079,16 @@ func TestRunEmbeddedAdversarialNoLLMKey(t *testing.T) {
 		collapsedRef.FalseNegatives[0] != "broken_links" ||
 		len(collapsedRef.FalsePositives) != 0 {
 		t.Fatalf("Markdown collapsed reference result=%+v, want false negative for broken_links", *collapsedRef)
+	}
+	nestedADR := findResult(report.Results, "ADV-086-adr-nested-supersedes-demo")
+	if nestedADR == nil {
+		t.Fatal("missing ADV-086 exploration demo result")
+	}
+	if nestedADR.Classification != ClassificationMiss ||
+		len(nestedADR.FalseNegatives) != 1 ||
+		nestedADR.FalseNegatives[0] != "stale_decision_links" ||
+		len(nestedADR.FalsePositives) != 0 {
+		t.Fatalf("nested ADR relation result=%+v, want false negative for stale_decision_links", *nestedADR)
 	}
 }
 
