@@ -3,10 +3,7 @@
 package adversarial
 
 import (
-	"fmt"
 	"net/http"
-	"sync/atomic"
-	"time"
 
 	"github.com/fireharp/coherence/internal/graph"
 )
@@ -18,8 +15,6 @@ const (
 	ClassificationSkipped = "skipped"
 	ClassificationErrored = "errored"
 )
-
-var runIDCounter atomic.Uint64
 
 // Options configures one adversarial benchmark run.
 type Options struct {
@@ -45,33 +40,6 @@ type Options struct {
 // mutation-spec generator.
 type HTTPDoer interface {
 	Do(req *http.Request) (*http.Response, error)
-}
-
-// Manifest is the corpus manifest accepted by --corpus-manifest.
-type Manifest struct {
-	Version int         `yaml:"version" json:"version"`
-	Repos   []RepoEntry `yaml:"repos" json:"repos"`
-}
-
-// RepoEntry describes one local repo in the adversarial corpus.
-type RepoEntry struct {
-	ID      string   `yaml:"id" json:"id"`
-	Path    string   `yaml:"path" json:"path"`
-	Tags    []string `yaml:"tags,omitempty" json:"tags,omitempty"`
-	Weight  int      `yaml:"weight,omitempty" json:"weight,omitempty"`
-	Include []string `yaml:"include,omitempty" json:"include,omitempty"`
-	Exclude []string `yaml:"exclude,omitempty" json:"exclude,omitempty"`
-}
-
-type corpusRepo struct {
-	RepoEntry
-	Files map[string]string
-}
-
-// TaxonomyFile is the optional external mutation catalog.
-type TaxonomyFile struct {
-	Version  int    `yaml:"version" json:"version"`
-	Mutation []Spec `yaml:"mutations" json:"mutations"`
 }
 
 // Spec is the mutation DSL. Built-in and LLM-generated specs share this
@@ -200,85 +168,4 @@ type MeterStats struct {
 	HitRate           float64 `json:"hit_rate"`
 	FalseNegativeRate float64 `json:"false_negative_rate"`
 	FalsePositiveRate float64 `json:"false_positive_rate"`
-}
-
-// Report is the JSON output from one adversarial run.
-type Report struct {
-	RunID       string       `json:"run_id"`
-	GeneratedAt string       `json:"generated_at"`
-	Seed        int64        `json:"seed"`
-	Iterations  int          `json:"iterations"`
-	Pass        bool         `json:"pass"`
-	Strict      bool         `json:"strict"`
-	RefineFrom  string       `json:"refine_from,omitempty"`
-	Repos       []string     `json:"repos"`
-	Specs       []string     `json:"specs"`
-	LLMSpecs    LLMExpansion `json:"llm_specs"`
-	Summary     Summary      `json:"summary"`
-	Clusters    []Cluster    `json:"clusters"`
-	Refinements []Refinement `json:"refinements"`
-	Results     []Result     `json:"results"`
-	ReportDir   string       `json:"report_dir,omitempty"`
-	ExportPath  string       `json:"export_path,omitempty"`
-	NextCommand string       `json:"next_command,omitempty"`
-}
-
-// LLMExpansion records optional Groq-generated taxonomy expansion status.
-type LLMExpansion struct {
-	Requested bool   `json:"requested"`
-	Enabled   bool   `json:"enabled"`
-	Accepted  int    `json:"accepted"`
-	Skipped   string `json:"skipped"`
-	Error     string `json:"error"`
-}
-
-// LoopReport is emitted when the adversarial bench runs multiple refinement
-// cycles in one command.
-type LoopReport struct {
-	GeneratedAt string   `json:"generated_at"`
-	Cycles      int      `json:"cycles"`
-	Pass        bool     `json:"pass"`
-	Strict      bool     `json:"strict"`
-	Runs        []Report `json:"runs"`
-	Final       Report   `json:"final"`
-	NextCommand string   `json:"next_command,omitempty"`
-}
-
-type leaderboard struct {
-	Runs            []leaderboardRun              `json:"runs"`
-	ByMeter         map[string][]leaderboardPoint `json:"by_meter,omitempty"`
-	ByExpectedMeter map[string][]leaderboardPoint `json:"by_expected_meter,omitempty"`
-	ByMutation      map[string][]leaderboardPoint `json:"by_mutation,omitempty"`
-}
-
-type leaderboardRun struct {
-	RunID             string  `json:"run_id"`
-	GeneratedAt       string  `json:"generated_at"`
-	Iterations        int     `json:"iterations"`
-	Hits              int     `json:"hits"`
-	FalseNegatives    int     `json:"false_negatives"`
-	FalsePositives    int     `json:"false_positives"`
-	Skipped           int     `json:"skipped"`
-	Errored           int     `json:"errored"`
-	HitRate           float64 `json:"hit_rate"`
-	FalseNegativeRate float64 `json:"false_negative_rate"`
-	FalsePositiveRate float64 `json:"false_positive_rate"`
-}
-
-type leaderboardPoint struct {
-	RunID             string  `json:"run_id"`
-	GeneratedAt       string  `json:"generated_at"`
-	Total             int     `json:"total"`
-	Hits              int     `json:"hits"`
-	FalseNegatives    int     `json:"false_negatives"`
-	FalsePositives    int     `json:"false_positives"`
-	Skipped           int     `json:"skipped"`
-	Errored           int     `json:"errored"`
-	HitRate           float64 `json:"hit_rate"`
-	FalseNegativeRate float64 `json:"false_negative_rate"`
-	FalsePositiveRate float64 `json:"false_positive_rate"`
-}
-
-func defaultRunID(t time.Time) string {
-	return "adv-" + t.UTC().Format("20060102T150405.000000000Z") + fmt.Sprintf("-%06d", runIDCounter.Add(1))
 }

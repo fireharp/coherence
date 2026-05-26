@@ -2,18 +2,12 @@ package adversarial
 
 import (
 	"bytes"
-	"crypto/sha256"
-	"encoding/binary"
 	"encoding/json"
 	"fmt"
 	"io"
-	"math/rand"
 	"net/http"
 	"os"
-	"path/filepath"
-	"sort"
 	"strings"
-	"time"
 
 	"github.com/fireharp/coherence/internal/graph"
 )
@@ -121,73 +115,6 @@ func groqModel() string {
 	return "llama-3.3-70b-versatile"
 }
 
-func llmSpecPrompt(g graph.Graph, existing []Spec) string {
-	var b strings.Builder
-	fmt.Fprintln(&b, "Return JSON shaped exactly as: {\"version\":1,\"mutations\":[...]}.")
-	fmt.Fprintln(&b, "Each mutation must include id, operation, target_kinds, expected_meters, selector, edit.")
-	fmt.Fprintln(&b, "Use optional skip_conditions.require_env, require_files, or require_optional_engines for explicit preconditions.")
-	fmt.Fprintf(&b, "Allowed operations: %s.\n", strings.Join(operationNames(), ", "))
-	fmt.Fprintln(&b, "Do not include repository file contents. Use only this graph summary.")
-	fmt.Fprintf(&b, "Existing mutation ids to avoid: %s.\n\n", strings.Join(specIDs(existing), ", "))
-	fmt.Fprintln(&b, "Graph nodes:")
-	for _, line := range graphNodeSummary(g, 80) {
-		fmt.Fprintln(&b, line)
-	}
-	fmt.Fprintln(&b, "Graph edges:")
-	for _, line := range graphEdgeSummary(g, 120) {
-		fmt.Fprintln(&b, line)
-	}
-	return b.String()
-}
-
-func operationNames() []string {
-	out := make([]string, 0, len(validOperations))
-	for op := range validOperations {
-		out = append(out, op)
-	}
-	sort.Strings(out)
-	return out
-}
-
-func graphNodeSummary(g graph.Graph, max int) []string {
-	nodes := append([]graph.Node(nil), g.Nodes...)
-	sort.Slice(nodes, func(i, j int) bool {
-		if nodes[i].Kind != nodes[j].Kind {
-			return nodes[i].Kind < nodes[j].Kind
-		}
-		return nodes[i].ID < nodes[j].ID
-	})
-	out := []string{}
-	for i, n := range nodes {
-		if i >= max {
-			break
-		}
-		out = append(out, fmt.Sprintf("- kind=%s id=%s path=%s", n.Kind, n.ID, n.Path))
-	}
-	return out
-}
-
-func graphEdgeSummary(g graph.Graph, max int) []string {
-	edges := append([]graph.Edge(nil), g.Edges...)
-	sort.Slice(edges, func(i, j int) bool {
-		if edges[i].Kind != edges[j].Kind {
-			return edges[i].Kind < edges[j].Kind
-		}
-		if edges[i].From != edges[j].From {
-			return edges[i].From < edges[j].From
-		}
-		return edges[i].To < edges[j].To
-	})
-	out := []string{}
-	for i, e := range edges {
-		if i >= max {
-			break
-		}
-		out = append(out, fmt.Sprintf("- kind=%s from=%s to=%s", e.Kind, e.From, e.To))
-	}
-	return out
-}
-
 func parseLLMSpecs(content string) ([]Spec, error) {
 	content = strings.TrimSpace(content)
 	content = strings.TrimPrefix(content, "```json")
@@ -205,106 +132,4 @@ func parseLLMSpecs(content string) ([]Spec, error) {
 		return nil, fmt.Errorf("generated taxonomy unsupported version %d", tf.Version)
 	}
 	return tf.Mutation, nil
-}
-
-func applicableGeneratedSpecs(repo corpusRepo, generated, existing []Spec) []Spec {
-	seen := map[string]bool{}
-	for _, s := range existing {
-		seen[s.ID] = true
-	}
-	out := []Spec{}
-	for _, s := range generated {
-		if seen[s.ID] {
-			continue
-		}
-		if _, ok := envSkipReason(s); ok {
-			continue
-		}
-		if !dryRunApplicable(repo, s) {
-			continue
-		}
-		seen[s.ID] = true
-		out = append(out, s)
-	}
-	return out
-}
-
-func dryRunApplicable(repo corpusRepo, spec Spec) bool {
-	dir, err := materializeRepo(repo)
-	if err != nil {
-		return false
-	}
-	defer os.RemoveAll(dir)
-	if _, ok := optionalEngineSkipReason(dir, spec); ok {
-		return false
-	}
-	g, err := graph.Load(dir)
-	if err != nil {
-		return false
-	}
-	target := Target{}
-	if spec.Operation != opBackdateHead {
-		var ok bool
-		target, ok = selectTarget(g, spec, randForApplicability(spec.ID))
-		if !ok {
-			return false
-		}
-	}
-	if _, ok := fileSkipReason(dir, spec); ok {
-		return false
-	}
-	return applyMutation(dir, spec, target) == nil
-}
-
-func randForApplicability(id string) *rand.Rand {
-	sum := sha256.Sum256([]byte(id))
-	seed := int64(binary.BigEndian.Uint64(sum[:8]))
-	return rand.New(rand.NewSource(seed))
-}
-
-func writeGeneratedSpecs(rootDir string, specs []Spec) error {
-	if len(specs) == 0 {
-		return nil
-	}
-	data, err := json.MarshalIndent(TaxonomyFile{Version: 1, Mutation: specs}, "", "  ")
-	if err != nil {
-		return err
-	}
-	data = append(data, '\n')
-	rootAbs, err := filepath.Abs(rootDir)
-	if err != nil {
-		return err
-	}
-	stem := "llm-" + time.Now().UTC().Format("20060102T150405.000000000Z")
-	for i := 0; i < 1000; i++ {
-		name := stem
-		if i > 0 {
-			name += fmt.Sprintf("-%03d", i)
-		}
-		dst := filepath.Join(rootAbs, ".coherence", "adversarial", "specs", name+".json")
-		if err := prepareOutputParent(rootAbs, dst); err != nil {
-			return err
-		}
-		if err := writeFileExclusive(dst, data, 0o644); err != nil {
-			if os.IsExist(err) {
-				continue
-			}
-			return err
-		}
-		return nil
-	}
-	return fmt.Errorf("could not allocate generated spec filename under %s", filepath.Join(rootAbs, ".coherence", "adversarial", "specs"))
-}
-
-func writeFileExclusive(path string, data []byte, perm os.FileMode) error {
-	f, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_EXCL, perm)
-	if err != nil {
-		return err
-	}
-	_, writeErr := f.Write(data)
-	closeErr := f.Close()
-	if writeErr != nil {
-		return writeErr
-	}
-	return closeErr
 }
