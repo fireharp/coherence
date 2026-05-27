@@ -5,6 +5,7 @@ func embeddedTSJSFiles() map[string]string {
 		"src/util.ts":             "export const util = 1;\n",
 		"src/usesUtil.ts":         "import { util } from './util';\nexport const value = util;\n",
 		"src/assetConsumer.ts":    "import config from \"config.json\";\nexport const policyAssetName = config.name;\n",
+		"src/url-policy.ts":       "export const policyEndpoint = \"https://api/v1\";\n",
 		"config.json":             "{\n  \"name\": \"policy\"\n}\n",
 		"src/reexported.ts":       "export const reexported = 1;\n",
 		"src/barrel.ts":           "export { reexported } from './reexported';\nexport * from './reexported';\n",
@@ -25,6 +26,12 @@ export const multilineImportValue = multilineValue;
 		"src/usesTypes.ts": "/// <reference path=\"./types.d.ts\" />\nexport const enabled = true;\n",
 		"src/aliased.ts":   "export const aliased = 1;\n",
 		"src/usesAlias.ts": "import { aliased } from '@/aliased';\nexport const aliasValue = aliased;\n",
+		"src/url-policy.test.ts": `import { policyEndpoint } from "./url-policy";
+
+test("policy endpoint URL", () => {
+  expect(policyEndpoint.startsWith(\"https://\")).toBe(true);
+});
+`,
 		"src/jsDep.js":     "export const jsDep = 1;\n",
 		"src/jsUsesDep.js": "import { jsDep } from './jsDep.js';\nexport const jsValue = jsDep;\n",
 		"src/login.ts":     "export function loginState() {\n  return \"ok\";\n}\n",

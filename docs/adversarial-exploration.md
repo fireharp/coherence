@@ -90,6 +90,7 @@ Update this table when a batch lands or when a report is exported.
 | Bazel/Starlark load graphs | `ADV-104` | `dangling_imports` misses Bazel `load()` labels because Starlark dependency labels are not extracted | Decide whether build graph label references belong in import integrity |
 | Notebook code-cell imports | `ADV-105` | `dangling_imports` misses Jupyter notebook imports because `.ipynb` code cells are not extracted as source | Decide whether notebook code belongs in import integrity |
 | Support syntaxes that should count but do not | `ADV-146`, `ADV-148` | False-positive demos: `path_loss` ignores raw HTML anchors that preserve support, and `trace_coverage` ignores plain `US-###` references that preserve traceability | Decide whether graph mentions should parse HTML anchors and typed-id prose references, or whether those syntaxes should be explicitly discouraged |
+| URL string semantic no-op | `ADV-150` | `stale_tests` misses URL-string updates like `https://api/v1` to `https://api/v2` because C-style semantic hashing strips `//` inside strings | Decide whether stale-tests should keep URL-ish string literals semantically intact |
 
 ## Candidate Queue
 
@@ -100,7 +101,6 @@ are rejected.
 | --- | --- | --- |
 | Self-link story coverage | `trace_coverage` | Tests a story doc linking to itself; current trace coverage counts any incoming mention to the defining doc, including self-citations |
 | Dependency support laundering | `path_loss` / `claim_support` | Tests a feature doc linked to an importer whose dependency has tests; support BFS traverses `depends_on` undirected, so dependency tests may over-credit the importer |
-| URL literal semantic no-op | `stale_tests` | Tests a URL string edit such as `https://api/v1` to `https://api/v2`; current C-style semantic stripping can erase `//...` inside strings before stale-test comparison |
 
 ## Rejected Hypotheses
 
