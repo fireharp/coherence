@@ -27,6 +27,7 @@ import (
 	"github.com/fireharp/coherence/internal/graph"
 	"github.com/fireharp/coherence/internal/ids"
 	"github.com/fireharp/coherence/internal/initcmd"
+	"github.com/fireharp/coherence/internal/lifecyclebench"
 	"github.com/fireharp/coherence/internal/llm"
 	"github.com/fireharp/coherence/internal/ontology"
 	"github.com/fireharp/coherence/internal/outcome"
@@ -52,7 +53,7 @@ const usage = `coherence <subcommand> [flags]
                                           live worktree signal loop (--strict applies to --once only)
                                           (--once = single fire; default = streaming)
   doctor [--json] [--ontology=path]       validate ontology, hook, .gitignore
-  bench [--suite=templates|coherencebench|external|adversarial|all] [--template=<name>]
+  bench [--suite=templates|coherencebench|external|adversarial|lifecycle|all] [--template=<name>]
         [--json] [--write-report] [--strict] [--llm] run shipped scenario / eval suites
         adversarial flags: [--corpus-manifest=path] [--iterations=N] [--seed=N]
         [--jobs=N] [--taxonomy=path] [--llm-specs] [--refine-from=path]
@@ -1090,12 +1091,12 @@ func runBench(args parsedArgs, rootDir string) int {
 	suite := stringFlag(args, "suite", "templates")
 	writeMD := boolFlag(args, "write-report")
 	switch suite {
-	case "all", "coherencebench", "cb", "templates", "adversarial", "adv":
+	case "all", "coherencebench", "cb", "templates", "adversarial", "adv", "lifecycle":
 		// supported
 	default:
 		if writeMD {
 			fmt.Fprintf(os.Stderr,
-				"coherence: --write-report only applies to --suite=all|coherencebench|templates|adversarial (got %q); flag will be ignored\n",
+				"coherence: --write-report only applies to --suite=all|coherencebench|templates|adversarial|lifecycle (got %q); flag will be ignored\n",
 				suite)
 		}
 	}
@@ -1124,6 +1125,40 @@ func runBench(args parsedArgs, rootDir string) int {
 	}
 
 	switch suite {
+	case "lifecycle":
+		life, err := lifecyclebench.RunDefault()
+		if err != nil {
+			fmt.Fprintln(os.Stderr, "coherence: fatal:", err)
+			return 2
+		}
+		if writeMD {
+			paths, err := lifecyclebench.WriteReport(rootDir, life)
+			if err != nil {
+				fmt.Fprintln(os.Stderr, "coherence: warning: could not write lifecycle report:", err)
+			} else {
+				life.ReportPaths = map[string]string{"json": paths.JSON, "html": paths.HTML}
+				if !jsonOut {
+					if rel, err := filepath.Rel(rootDir, paths.HTML); err == nil {
+						fmt.Printf("coherence: wrote %s\n", rel)
+					}
+				}
+			}
+		}
+		if jsonOut {
+			enc := json.NewEncoder(os.Stdout)
+			enc.SetIndent("", "  ")
+			if err := enc.Encode(life); err != nil {
+				fmt.Fprintln(os.Stderr, "coherence: fatal:", err)
+				return 2
+			}
+		} else {
+			fmt.Print(lifecyclebench.Human(life))
+		}
+		if !life.Pass {
+			return 1
+		}
+		return 0
+
 	case "adversarial", "adv":
 		advOpts, err := adversarialOptions(args, rootDir, false)
 		if err != nil {
@@ -1296,9 +1331,8 @@ func runBench(args parsedArgs, rootDir string) int {
 				TemplateFail:        tpl.Counts.Fail,
 				CoherenceBenchSuite: cb,
 				KnownLimitations: []string{
-					"CB-004 needs file-content scaffolding (IDs scanner reads diff content, not paths).",
-					"CB-006 needs the LLM contradiction harness wired into bench (M6).",
-					"CB-008, CB-011, CB-012, CB-013, CB-014, CB-015 need the graph/Merkle/drift layers (M2-M4).",
+					"LLM-mode CoherenceBench scenarios skip unless GROQ_API_KEY is set.",
+					"Adversarial exploration demos are allowed to expose known misses unless --strict is requested.",
 				},
 			}
 			out, err := coherencebench.WriteMarkdown(rootDir, rep)
@@ -1314,7 +1348,7 @@ func runBench(args parsedArgs, rootDir string) int {
 		return 0
 
 	default:
-		fmt.Fprintf(os.Stderr, "coherence: unknown --suite %q (use templates|coherencebench|external|adversarial|all)\n", suite)
+		fmt.Fprintf(os.Stderr, "coherence: unknown --suite %q (use templates|coherencebench|external|adversarial|lifecycle|all)\n", suite)
 		return 2
 	}
 }

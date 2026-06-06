@@ -1,0 +1,232 @@
+id: lifecycle-demo
+name: Managed vs unmanaged lifecycle demo
+selected_meters:
+  - required_edge_breakage
+  - stale_tests
+  - orphan_endpoints
+  - orphaned_metric_aliases
+  - broken_links
+  - stale_decision_links
+  - regressions
+baseline:
+  ontology.yml: |
+    version: 1
+    rules:
+      - id: fixture-source-needs-output
+        when: ["src/build-fixtures.go"]
+        expect_any: ["fixtures/dashboard.json"]
+        severity: error
+        message: "Fixture source changed; regenerate fixtures/dashboard.json."
+  README.md: |
+    # Policy Service
+
+    See [the auth spec](docs/specs/auth.md).
+  docs/index.md: |
+    # Docs
+
+    See [the auth spec](specs/auth.md).
+  docs/specs/auth.md: |
+    # Auth Spec
+
+    Per [ADR-007](../decisions/ADR-007.md), policy authentication uses the original threshold model.
+  docs/decisions/ADR-007.md: |
+    ---
+    id: ADR-007
+    ---
+    # ADR-007 - Original auth approach
+  pkg/policy.go: |
+    package pkg
+
+    func Approve(score int) bool {
+        return score >= 50
+    }
+  pkg/policy_test.go: |
+    package pkg
+
+    import "testing"
+
+    func TestApprove(t *testing.T) {
+        if !Approve(60) {
+            t.Fatal("expected approval at 60")
+        }
+    }
+  server.go: |
+    package main
+
+    import "net/http"
+
+    func login(w http.ResponseWriter, r *http.Request) {}
+
+    func init() {
+        http.HandleFunc("/login", login)
+    }
+  server_test.go: |
+    package main
+
+    import "testing"
+
+    func TestLogin(t *testing.T) {}
+  rill/metrics/success_rate.yaml: |
+    version: 1
+    type: metric_view
+    measures:
+      - name: success_rate
+        expression: COUNT(*) FILTER (WHERE outcome = 'success')
+  frontend/dashboard.ts: |
+    export const dashboard = {
+        title: "Outcome",
+        metric: "success_rate",
+    };
+  src/build-fixtures.go: |
+    package fixtures
+
+    func Build() string { return "v1" }
+  fixtures/dashboard.json: |
+    {
+      "version": "v1",
+      "metrics": ["success_rate"]
+    }
+steps:
+  - id: stale-test
+    name: Source changes without test update
+    issue:
+      files:
+        pkg/policy.go: |
+          package pkg
+
+          func Approve(score int) bool {
+              return score >= 80
+          }
+    managed_repair:
+      files:
+        pkg/policy_test.go: |
+          package pkg
+
+          import "testing"
+
+          func TestApprove(t *testing.T) {
+              if Approve(79) {
+                  t.Fatal("expected rejection below 80")
+              }
+              if !Approve(80) {
+                  t.Fatal("expected approval at 80")
+              }
+          }
+    expected:
+      managed:
+        verdicts: ["clean", "telemetry"]
+      unmanaged:
+        active_meters: ["stale_tests"]
+  - id: orphan-endpoint
+    name: Endpoint loses its only test
+    issue:
+      remove:
+        - server_test.go
+    managed_repair:
+      files:
+        server_test.go: |
+          package main
+
+          import "testing"
+
+          func TestLogin(t *testing.T) {}
+    expected:
+      managed:
+        verdicts: ["clean", "telemetry"]
+      unmanaged:
+        active_meters: ["orphan_endpoints", "stale_tests"]
+  - id: metric-alias
+    name: Metric renamed without frontend update
+    issue:
+      files:
+        rill/metrics/conversion_rate.yaml: |
+          version: 1
+          type: metric_view
+          measures:
+            - name: conversion_rate
+              expression: COUNT(*) FILTER (WHERE outcome IN ('success','converted'))
+      remove:
+        - rill/metrics/success_rate.yaml
+    managed_repair:
+      files:
+        frontend/dashboard.ts: |
+          export const dashboard = {
+              title: "Outcome",
+              metric: "conversion_rate",
+          };
+        fixtures/dashboard.json: |
+          {
+            "version": "v1",
+            "metrics": ["conversion_rate"]
+          }
+    expected:
+      managed:
+        verdicts: ["clean", "telemetry"]
+      unmanaged:
+        active_meters: ["orphaned_metric_aliases", "orphan_endpoints", "stale_tests"]
+  - id: broken-link
+    name: Documentation points at a removed page
+    issue:
+      files:
+        docs/index.md: |
+          # Docs
+
+          See [the removed spec](specs/removed.md).
+    managed_repair:
+      files:
+        docs/index.md: |
+          # Docs
+
+          See [the auth spec](specs/auth.md).
+    expected:
+      managed:
+        verdicts: ["clean", "telemetry"]
+      unmanaged:
+        active_meters: ["broken_links", "orphaned_metric_aliases", "orphan_endpoints", "stale_tests"]
+  - id: stale-decision
+    name: Superseded ADR is still cited as active
+    issue:
+      files:
+        docs/decisions/ADR-014.md: |
+          ---
+          id: ADR-014
+          supersedes: ADR-007
+          ---
+          # ADR-014 - New auth approach
+    managed_repair:
+      files:
+        docs/specs/auth.md: |
+          # Auth Spec
+
+          Per [ADR-014](../decisions/ADR-014.md), policy authentication uses the current threshold model.
+    expected:
+      managed:
+        verdicts: ["clean", "telemetry"]
+      unmanaged:
+        active_meters: ["stale_decision_links", "broken_links", "orphaned_metric_aliases", "orphan_endpoints", "stale_tests"]
+  - id: generated-artifact
+    name: Generator changes without refreshed fixture
+    issue:
+      files:
+        src/build-fixtures.go: |
+          package fixtures
+
+          func Build() string { return "v2-with-conversion-rate" }
+    managed_repair:
+      files:
+        fixtures/dashboard.json: |
+          {
+            "version": "v2",
+            "metrics": ["conversion_rate"]
+          }
+    expected:
+      managed:
+        verdicts: ["clean", "telemetry"]
+      unmanaged:
+        active_meters:
+          - required_edge_breakage
+          - stale_decision_links
+          - broken_links
+          - orphaned_metric_aliases
+          - orphan_endpoints
+          - stale_tests

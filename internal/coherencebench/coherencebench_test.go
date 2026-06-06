@@ -400,6 +400,7 @@ func TestWriteMarkdownProducesIndexFile(t *testing.T) {
 	for _, frag := range []string{
 		"Template eval suite",
 		"CoherenceBench",
+		"Skipped (for example LLM scenarios without credentials): 8",
 		"| CB-001 | deterministic | ok |",
 		"| CB-008 | skip | skip |",
 		"Known limitations",

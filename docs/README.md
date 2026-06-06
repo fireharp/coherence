@@ -22,7 +22,8 @@ docs/
 ├── README.md            ← you are here
 ├── meters/              ← 19 drift meters
 ├── checks/              ← non-drift signal sources
-└── scenarios/           ← CB-### benchmark catalog
+├── scenarios/           ← CB-### benchmark catalog
+└── lifecycle-benchmark-demo.md
 ```
 
 ---
@@ -166,3 +167,6 @@ coherence bench --suite=coherencebench
 positive + CB-022 negative; skipped automatically when GROQ_API_KEY
 isn't set). When the LLM scenarios run, the suite reports
 **precision / recall / F1** across them.
+
+For the managed-vs-unmanaged visual benchmark, see
+[`lifecycle-benchmark-demo.md`](lifecycle-benchmark-demo.md).

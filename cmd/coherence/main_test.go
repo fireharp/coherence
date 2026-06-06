@@ -194,6 +194,72 @@ func TestUsageMentionsAdversarialFlags(t *testing.T) {
 	}
 }
 
+func TestUsageMentionsLifecycleSuite(t *testing.T) {
+	if !strings.Contains(usage, "lifecycle") {
+		t.Fatal("usage missing lifecycle suite")
+	}
+}
+
+func TestRunBenchLifecycleSmoke(t *testing.T) {
+	args := parseArgs([]string{"--suite=lifecycle", "--json"})
+	exit, out := captureStdout(t, func() int { return runBench(args, t.TempDir()) })
+	if exit != 0 {
+		t.Fatalf("runBench lifecycle = %d, want 0\n%s", exit, out)
+	}
+	var payload struct {
+		Pass   bool `json:"pass"`
+		Counts struct {
+			Steps int `json:"steps"`
+			Fail  int `json:"fail"`
+		} `json:"counts"`
+		FinalHealth map[string]int `json:"final_health"`
+		Results     []struct {
+			Lane         string   `json:"lane"`
+			StepID       string   `json:"step_id"`
+			ActiveMeters []string `json:"active_meters"`
+		} `json:"results"`
+	}
+	if err := json.Unmarshal([]byte(out), &payload); err != nil {
+		t.Fatalf("decode output: %v\n%s", err, out)
+	}
+	if !payload.Pass || payload.Counts.Steps != 6 || payload.Counts.Fail != 0 {
+		t.Fatalf("unexpected lifecycle payload: %+v", payload)
+	}
+	if payload.FinalHealth["managed"] != 100 || payload.FinalHealth["unmanaged"] != 0 {
+		t.Fatalf("final health=%v, want managed=100 unmanaged=0", payload.FinalHealth)
+	}
+	if len(payload.Results) != 12 {
+		t.Fatalf("results=%d, want 12", len(payload.Results))
+	}
+	last := payload.Results[len(payload.Results)-1]
+	if last.Lane != "unmanaged" || last.StepID != "generated-artifact" || !containsString(last.ActiveMeters, "required_edge_breakage") {
+		t.Fatalf("unexpected final result: %+v", last)
+	}
+}
+
+func TestRunBenchLifecycleWriteReportSmoke(t *testing.T) {
+	root := t.TempDir()
+	args := parseArgs([]string{"--suite=lifecycle", "--write-report", "--json"})
+	exit, out := captureStdout(t, func() int { return runBench(args, root) })
+	if exit != 0 {
+		t.Fatalf("runBench lifecycle write-report = %d, want 0\n%s", exit, out)
+	}
+	var payload struct {
+		ReportPaths map[string]string `json:"report_paths"`
+	}
+	if err := json.Unmarshal([]byte(out), &payload); err != nil {
+		t.Fatalf("decode output: %v\n%s", err, out)
+	}
+	for _, key := range []string{"json", "html"} {
+		if payload.ReportPaths[key] == "" {
+			t.Fatalf("missing report path %s in output:\n%s", key, out)
+		}
+		if _, err := os.Stat(payload.ReportPaths[key]); err != nil {
+			t.Fatalf("missing lifecycle report %s: %v", key, err)
+		}
+	}
+}
+
 func TestRunBenchAdversarialSmoke(t *testing.T) {
 	t.Setenv("GROQ_API_KEY", "")
 	args := parseArgs([]string{"--suite=adversarial", "--iterations=1", "--json"})

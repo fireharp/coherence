@@ -64,7 +64,7 @@ func renderMarkdown(r CombinedReport) string {
 		fmt.Fprintf(&b, "- Scenarios: %d\n", cb.Counts.Total)
 		fmt.Fprintf(&b, "- Pass: %d\n", cb.Counts.Pass)
 		fmt.Fprintf(&b, "- Fail: %d\n", cb.Counts.Fail)
-		fmt.Fprintf(&b, "- Skipped (deferred to graph/semantic milestones): %d\n", cb.Counts.Skipped)
+		fmt.Fprintf(&b, "- Skipped (for example LLM scenarios without credentials): %d\n", cb.Counts.Skipped)
 		cbVerdict := "`pass`"
 		if !cb.Pass {
 			cbVerdict = "`fail`"
