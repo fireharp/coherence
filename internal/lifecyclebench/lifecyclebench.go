@@ -149,12 +149,16 @@ type ScenarioCounts struct {
 	RepairCases                      int `json:"repair_cases"`
 	Hit                              int `json:"hit"`
 	HitWithUnexpectedMeter           int `json:"hit_with_unexpected_meter"`
+	OracleHits                       int `json:"oracle_hits"`
 	FalseNegative                    int `json:"false_negative"`
 	FalseNegativeWithUnexpectedMeter int `json:"false_negative_with_unexpected_meter"`
 	FalsePositive                    int `json:"false_positive"`
 	FalsePositiveCases               int `json:"false_positive_cases"`
 	FalsePositiveMeterAttributions   int `json:"false_positive_meter_attributions"`
 	DetectionHits                    int `json:"detection_hits"`
+	PositiveDetectionHits            int `json:"positive_detection_hits"`
+	SpecificityCleanCases            int `json:"specificity_clean_cases"`
+	KnownLimitExpectedFalseNegatives int `json:"known_limit_expected_false_negatives"`
 	SpecificityFailures              int `json:"specificity_failures"`
 	BoundaryExpected                 int `json:"boundary_expected"`
 	Skipped                          int `json:"skipped"`
@@ -163,22 +167,25 @@ type ScenarioCounts struct {
 
 // MeterStats summarizes oracle accounting per meter.
 type MeterStats struct {
-	PositiveCases     int     `json:"positive_cases"`
-	NegativeControls  int     `json:"negative_controls"`
-	KnownLimits       int     `json:"known_limits"`
-	Hits              int     `json:"hits"`
-	TruePositives     int     `json:"true_positives"`
-	TrueNegatives     int     `json:"true_negatives"`
-	FalseNegatives    int     `json:"false_negatives"`
-	FalsePositives    int     `json:"false_positives"`
-	RepairCases       int     `json:"repair_cases"`
-	RepairSuccesses   int     `json:"repair_successes"`
-	Skipped           int     `json:"skipped"`
-	Errored           int     `json:"errored"`
-	Recall            float64 `json:"recall"`
-	Precision         float64 `json:"precision"`
-	FalsePositiveRate float64 `json:"false_positive_rate"`
-	RepairSuccessRate float64 `json:"repair_success_rate"`
+	PositiveCases                     int     `json:"positive_cases"`
+	NegativeControls                  int     `json:"negative_controls"`
+	KnownLimits                       int     `json:"known_limits"`
+	Hits                              int     `json:"hits"`
+	TruePositives                     int     `json:"true_positives"`
+	PositiveDetectionHits             int     `json:"positive_detection_hits"`
+	TrueNegatives                     int     `json:"true_negatives"`
+	FalseNegatives                    int     `json:"false_negatives"`
+	FalsePositives                    int     `json:"false_positives"`
+	RepairCases                       int     `json:"repair_cases"`
+	RepairSuccesses                   int     `json:"repair_successes"`
+	Skipped                           int     `json:"skipped"`
+	Errored                           int     `json:"errored"`
+	Recall                            float64 `json:"recall"`
+	SupportedRecall                   float64 `json:"supported_recall"`
+	OverallRecallIncludingKnownLimits float64 `json:"overall_recall_including_known_limits"`
+	Precision                         float64 `json:"precision"`
+	FalsePositiveRate                 float64 `json:"false_positive_rate"`
+	RepairSuccessRate                 float64 `json:"repair_success_rate"`
 }
 
 // EvidenceRates summarizes supported and known-boundary recall separately.
@@ -219,6 +226,7 @@ type CaseResult struct {
 	Classification             string             `json:"classification"`
 	ExpectedClassification     string             `json:"expected_classification,omitempty"`
 	Pass                       bool               `json:"pass"`
+	OracleHit                  bool               `json:"oracle_hit"`
 	DetectionHit               bool               `json:"detection_hit"`
 	SpecificityClean           bool               `json:"specificity_clean"`
 	BoundaryExpected           bool               `json:"boundary_expected,omitempty"`
@@ -602,6 +610,7 @@ func fillCaseResult(res *CaseResult, report drift.Report, counts GraphCounts, se
 
 type oracleEvaluation struct {
 	Classification           string
+	OracleHit                bool
 	DetectionHit             bool
 	SpecificityClean         bool
 	MissingMeters            []string
@@ -612,30 +621,33 @@ type oracleEvaluation struct {
 func evaluateOracle(o Oracle, caseType string, actualMeters []string, verdict string) oracleEvaluation {
 	missing := missingValues(o.ExpectedMeters, actualMeters)
 	unexpected := unexpectedValues(actualMeters, append(o.ExpectedMeters, o.AllowedSideEffectMeters...))
-	detectionHit := len(missing) == 0
+	expectedSatisfied := len(missing) == 0
 	specificityClean := len(unexpected) == 0
 	if len(o.Verdicts) > 0 && !contains(o.Verdicts, verdict) {
 		if len(o.ExpectedMeters) == 0 || caseType == CaseTypeNegativeControl {
 			specificityClean = false
 		} else {
-			detectionHit = false
+			expectedSatisfied = false
 		}
 	}
+	detectionHit := len(o.ExpectedMeters) > 0 && expectedSatisfied
+	oracleHit := caseType != CaseTypeKnownLimit && expectedSatisfied && specificityClean
 	classification := ClassificationHit
 	switch {
-	case detectionHit && specificityClean:
+	case expectedSatisfied && specificityClean:
 		classification = ClassificationHit
-	case detectionHit && !specificityClean && len(o.ExpectedMeters) > 0 && caseType != CaseTypeNegativeControl:
+	case expectedSatisfied && !specificityClean && len(o.ExpectedMeters) > 0 && caseType != CaseTypeNegativeControl:
 		classification = ClassificationHitWithFP
-	case detectionHit && !specificityClean:
+	case expectedSatisfied && !specificityClean:
 		classification = ClassificationFalsePositive
-	case !detectionHit && specificityClean:
+	case !expectedSatisfied && specificityClean:
 		classification = ClassificationFalseNegative
 	default:
 		classification = ClassificationFNWithFP
 	}
 	return oracleEvaluation{
 		Classification:           classification,
+		OracleHit:                oracleHit,
 		DetectionHit:             detectionHit,
 		SpecificityClean:         specificityClean,
 		MissingMeters:            missing,
@@ -652,6 +664,7 @@ func classifyOracle(o Oracle, caseType string, actualMeters []string, verdict st
 
 func fillOracleEvaluation(result *CaseResult, eval oracleEvaluation) {
 	result.Classification = eval.Classification
+	result.OracleHit = eval.OracleHit
 	result.DetectionHit = eval.DetectionHit
 	result.SpecificityClean = eval.SpecificityClean
 	result.MissingMeters = eval.MissingMeters
@@ -702,8 +715,22 @@ func accountScenario(counts *ScenarioCounts, result CaseResult) {
 	if result.RepairApplied {
 		counts.RepairCases++
 	}
+	if result.OracleHit {
+		counts.OracleHits++
+	}
 	if result.DetectionHit {
 		counts.DetectionHits++
+	}
+	if result.CaseType == CaseTypePositive && result.DetectionHit {
+		counts.PositiveDetectionHits++
+	}
+	if result.CaseType == CaseTypeNegativeControl && result.SpecificityClean {
+		counts.SpecificityCleanCases++
+	}
+	if result.CaseType == CaseTypeKnownLimit &&
+		result.ExpectedClassification == ClassificationFalseNegative &&
+		result.Classification == ClassificationFalseNegative {
+		counts.KnownLimitExpectedFalseNegatives++
 	}
 	if !result.SpecificityClean {
 		counts.SpecificityFailures++
@@ -769,6 +796,13 @@ func buildByMeter(results []CaseResult) map[string]MeterStats {
 			if !contains(r.UnexpectedMeters, meter) {
 				stats.TrueNegatives++
 			}
+		case CaseTypePositive:
+			if r.DetectionHit {
+				stats.TruePositives++
+				stats.PositiveDetectionHits++
+			} else {
+				stats.FalseNegatives++
+			}
 		default:
 			if r.DetectionHit {
 				stats.TruePositives++
@@ -797,6 +831,8 @@ func buildByMeter(results []CaseResult) map[string]MeterStats {
 	}
 	for meter, stats := range out {
 		stats.Recall = ratio(stats.TruePositives, stats.TruePositives+stats.FalseNegatives)
+		stats.SupportedRecall = ratio(stats.PositiveDetectionHits, stats.PositiveCases)
+		stats.OverallRecallIncludingKnownLimits = stats.Recall
 		stats.Precision = ratio(stats.TruePositives, stats.TruePositives+stats.FalsePositives)
 		stats.FalsePositiveRate = ratio(stats.FalsePositives, stats.FalsePositives+stats.TrueNegatives)
 		stats.RepairSuccessRate = ratio(stats.RepairSuccesses, stats.RepairCases)

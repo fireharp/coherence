@@ -217,10 +217,15 @@ func TestRunBenchEvidenceSmoke(t *testing.T) {
 		ScenarioCounts struct {
 			Total                          int `json:"total"`
 			Fail                           int `json:"fail"`
+			OracleHits                     int `json:"oracle_hits"`
 			FalseNegative                  int `json:"false_negative"`
 			FalsePositive                  int `json:"false_positive"`
 			FalsePositiveCases             int `json:"false_positive_cases"`
 			FalsePositiveMeterAttributions int `json:"false_positive_meter_attributions"`
+			DetectionHits                  int `json:"detection_hits"`
+			PositiveDetectionHits          int `json:"positive_detection_hits"`
+			SpecificityCleanCases          int `json:"specificity_clean_cases"`
+			KnownLimitExpectedFNs          int `json:"known_limit_expected_false_negatives"`
 		} `json:"scenario_counts"`
 		EvidenceRates struct {
 			SupportedRecall                  string `json:"supported_recall"`
@@ -255,6 +260,13 @@ func TestRunBenchEvidenceSmoke(t *testing.T) {
 		payload.ScenarioCounts.FalsePositiveCases != 0 ||
 		payload.ScenarioCounts.FalsePositiveMeterAttributions != 0 {
 		t.Fatalf("unexpected FP/FN counts: %+v", payload.ScenarioCounts)
+	}
+	if payload.ScenarioCounts.OracleHits != 42 ||
+		payload.ScenarioCounts.DetectionHits != 24 ||
+		payload.ScenarioCounts.PositiveDetectionHits != 24 ||
+		payload.ScenarioCounts.SpecificityCleanCases != 18 ||
+		payload.ScenarioCounts.KnownLimitExpectedFNs != 18 {
+		t.Fatalf("unexpected oracle/detection counts: %+v", payload.ScenarioCounts)
 	}
 	if payload.EvidenceRates.SupportedRecall != "24/24" ||
 		payload.EvidenceRates.BoundaryKnownLimitFalseNegatives != "18/18" ||

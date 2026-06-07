@@ -147,6 +147,17 @@ func TestFalsePositiveAttributionUsesActualMeter(t *testing.T) {
 	}
 }
 
+func TestDetectionHitRequiresExpectedMeter(t *testing.T) {
+	negative := evaluateOracle(Oracle{}, CaseTypeNegativeControl, []string{}, "clean")
+	if !negative.OracleHit || negative.DetectionHit || !negative.SpecificityClean {
+		t.Fatalf("negative eval=%+v, want oracle hit, no detection hit, clean specificity", negative)
+	}
+	positive := evaluateOracle(Oracle{ExpectedMeters: []string{"stale_tests"}}, CaseTypePositive, []string{"stale_tests"}, "warn")
+	if !positive.OracleHit || !positive.DetectionHit || !positive.SpecificityClean {
+		t.Fatalf("positive eval=%+v, want oracle hit, detection hit, clean specificity", positive)
+	}
+}
+
 func TestFalsePositiveCaseAndMeterAttributionCountsCanDiverge(t *testing.T) {
 	counts := ScenarioCounts{}
 	accountScenario(&counts, CaseResult{
@@ -200,6 +211,13 @@ func TestRunDefaultEvidenceProtocol(t *testing.T) {
 	if suite.ScenarioCounts.FalseNegative != 18 || suite.ScenarioCounts.FalsePositive != 0 || suite.ScenarioCounts.SpecificityFailures != 0 {
 		t.Fatalf("classification counts=%+v, want 18 known FNs and 0 FPs", suite.ScenarioCounts)
 	}
+	if suite.ScenarioCounts.OracleHits != 42 ||
+		suite.ScenarioCounts.DetectionHits != 24 ||
+		suite.ScenarioCounts.PositiveDetectionHits != 24 ||
+		suite.ScenarioCounts.SpecificityCleanCases != 18 ||
+		suite.ScenarioCounts.KnownLimitExpectedFalseNegatives != 18 {
+		t.Fatalf("oracle/detection counts=%+v", suite.ScenarioCounts)
+	}
 	if suite.EvidenceRates.SupportedRecall != "24/24" ||
 		suite.EvidenceRates.BoundaryFalseNegativeRate != "18/18" ||
 		suite.EvidenceRates.BoundaryKnownLimitFalseNegatives != "18/18" ||
@@ -227,6 +245,9 @@ func TestRunDefaultEvidenceProtocol(t *testing.T) {
 		if stats.FalseNegatives != 3 || stats.RepairCases != 4 || stats.RepairSuccesses != 4 {
 			t.Fatalf("stats for %s=%+v, want three known FNs and four successful repairs", meter, stats)
 		}
+		if stats.PositiveDetectionHits != 4 || stats.SupportedRecall != 1 || stats.OverallRecallIncludingKnownLimits != stats.Recall {
+			t.Fatalf("recall stats for %s=%+v", meter, stats)
+		}
 	}
 	managed := lastForLane(suite, LaneManaged)
 	unmanaged := lastForLane(suite, LaneUnmanaged)
@@ -243,7 +264,8 @@ func TestWriteReportArtifacts(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	paths, err := WriteReport(t.TempDir(), suite)
+	root := t.TempDir()
+	paths, err := WriteReport(root, suite)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -264,12 +286,21 @@ func TestWriteReportArtifacts(t *testing.T) {
 		`"artifact_kind": "coherence_evidence_report"`,
 		`"schema_version": 1`,
 		`"boundary_known_limit_false_negatives": "18/18"`,
+		`"oracle_hits": 42`,
+		`"detection_hits": 24`,
+		`"positive_detection_hits": 24`,
+		`"specificity_clean_cases": 18`,
+		`"known_limit_expected_false_negatives": 18`,
 		`"false_positive_cases": 0`,
 		`"false_positive_meter_attributions": 0`,
+		`"json": ".coherence/runs/`,
 	} {
 		if !strings.Contains(string(jsonBody), want) {
 			t.Fatalf("json report missing %q:\n%s", want, jsonBody)
 		}
+	}
+	if strings.Contains(string(jsonBody), root) {
+		t.Fatalf("json report should not persist absolute temp paths:\n%s", jsonBody)
 	}
 	if strings.Contains(string(jsonBody), "protocol_version") {
 		t.Fatalf("json report should not contain protocol_version:\n%s", jsonBody)
@@ -278,7 +309,7 @@ func TestWriteReportArtifacts(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	for _, want := range []string{"<svg", "Claim Summary", "Meter Matrix", "Systematic Error Register", "Managed vs Unmanaged", "artifact_kind", "schema_version", "boundary_known_limit_false_negatives", "false_positive_meter_attributions"} {
+	for _, want := range []string{"<svg", "Claim Summary", "Meter Matrix", "Systematic Error Register", "Managed vs Unmanaged", "artifact_kind", "schema_version", "oracle_hits", "positive_detection_hits", "boundary_known_limit_false_negatives", "false_positive_meter_attributions", "Supported recall", "Overall recall"} {
 		if !strings.Contains(string(htmlBody), want) {
 			t.Fatalf("html report missing %q:\n%s", want, htmlBody)
 		}

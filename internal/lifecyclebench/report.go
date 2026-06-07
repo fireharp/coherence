@@ -29,7 +29,10 @@ func WriteReport(rootDir string, suite Suite) (ReportPaths, error) {
 	}
 	jsonPath := filepath.Join(dir, "evidence.json")
 	htmlPath := filepath.Join(dir, "evidence.html")
-	suite.ReportPaths = map[string]string{"json": jsonPath, "html": htmlPath}
+	suite.ReportPaths = map[string]string{
+		"json": filepath.ToSlash(filepath.Join(".coherence", "runs", runID, "evidence.json")),
+		"html": filepath.ToSlash(filepath.Join(".coherence", "runs", runID, "evidence.html")),
+	}
 	buf, err := json.MarshalIndent(suite, "", "  ")
 	if err != nil {
 		return ReportPaths{}, err
@@ -158,6 +161,10 @@ func renderRunMetadata(s Suite) string {
 		{"boundary_false_negative_rate", s.EvidenceRates.BoundaryFalseNegativeRate},
 		{"boundary_known_limit_false_negatives", s.EvidenceRates.BoundaryKnownLimitFalseNegatives},
 		{"overall_recall_including_known_limits", s.EvidenceRates.OverallRecallIncludingKnownLimits},
+		{"oracle_hits", fmt.Sprintf("%d", s.ScenarioCounts.OracleHits)},
+		{"positive_detection_hits", fmt.Sprintf("%d", s.ScenarioCounts.PositiveDetectionHits)},
+		{"specificity_clean_cases", fmt.Sprintf("%d", s.ScenarioCounts.SpecificityCleanCases)},
+		{"known_limit_expected_false_negatives", fmt.Sprintf("%d", s.ScenarioCounts.KnownLimitExpectedFalseNegatives)},
 		{"false_positive_cases", fmt.Sprintf("%d", s.ScenarioCounts.FalsePositiveCases)},
 		{"false_positive_meter_attributions", fmt.Sprintf("%d", s.ScenarioCounts.FalsePositiveMeterAttributions)},
 	}
@@ -171,10 +178,10 @@ func renderRunMetadata(s Suite) string {
 func renderMeterMatrix(s Suite) string {
 	meters := sortedMeterKeys(s.ByMeter)
 	var b strings.Builder
-	fmt.Fprintln(&b, "<table><thead><tr><th>Meter</th><th>Positive</th><th>Negative</th><th>Known limits</th><th>TP</th><th>TN</th><th>FN</th><th>FP</th><th>Repair</th><th>Recall</th><th>Precision</th></tr></thead><tbody>")
+	fmt.Fprintln(&b, "<table><thead><tr><th>Meter</th><th>Positive</th><th>Negative</th><th>Known limits</th><th>TP</th><th>TN</th><th>FN</th><th>FP</th><th>Repair</th><th>Supported recall</th><th>Overall recall</th><th>Precision</th></tr></thead><tbody>")
 	for _, meter := range meters {
 		st := s.ByMeter[meter]
-		fmt.Fprintf(&b, "<tr><td class=\"mono\">%s</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td class=\"false_negative\">%d</td><td class=\"false_positive\">%d</td><td>%d/%d</td><td>%.2f</td><td>%.2f</td></tr>",
+		fmt.Fprintf(&b, "<tr><td class=\"mono\">%s</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td class=\"false_negative\">%d</td><td class=\"false_positive\">%d</td><td>%d/%d</td><td>%.2f</td><td>%.2f</td><td>%.2f</td></tr>",
 			html.EscapeString(meter),
 			st.PositiveCases,
 			st.NegativeControls,
@@ -185,7 +192,8 @@ func renderMeterMatrix(s Suite) string {
 			st.FalsePositives,
 			st.RepairSuccesses,
 			st.RepairCases,
-			st.Recall,
+			st.SupportedRecall,
+			st.OverallRecallIncludingKnownLimits,
 			st.Precision)
 	}
 	fmt.Fprintln(&b, "</tbody></table>")
@@ -194,16 +202,17 @@ func renderMeterMatrix(s Suite) string {
 
 func renderFPFNTable(s Suite) string {
 	var b strings.Builder
-	fmt.Fprintln(&b, "<table><thead><tr><th>Case</th><th>Meter</th><th>Classification</th><th>Detection</th><th>Specificity</th><th>Expected</th><th>Actual</th><th>Missing</th><th>Unexpected</th><th>FP attribution</th><th>Systematic error</th></tr></thead><tbody>")
+	fmt.Fprintln(&b, "<table><thead><tr><th>Case</th><th>Meter</th><th>Classification</th><th>Oracle</th><th>Detection</th><th>Specificity</th><th>Expected</th><th>Actual</th><th>Missing</th><th>Unexpected</th><th>FP attribution</th><th>Systematic error</th></tr></thead><tbody>")
 	for _, r := range s.Results {
 		if r.Classification == ClassificationHit {
 			continue
 		}
-		fmt.Fprintf(&b, "<tr><td>%s</td><td class=\"mono\">%s</td><td class=\"%s\">%s</td><td>%t</td><td>%t</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td class=\"mono\">%s</td></tr>",
+		fmt.Fprintf(&b, "<tr><td>%s</td><td class=\"mono\">%s</td><td class=\"%s\">%s</td><td>%t</td><td>%t</td><td>%t</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td class=\"mono\">%s</td></tr>",
 			html.EscapeString(r.Name),
 			html.EscapeString(r.Meter),
 			html.EscapeString(r.Classification),
 			html.EscapeString(r.Classification),
+			r.OracleHit,
 			r.DetectionHit,
 			r.SpecificityClean,
 			html.EscapeString(strings.Join(r.ExpectedMeters, ", ")),

@@ -9,8 +9,8 @@ summary, but every case is now judged by an explicit oracle.
 
 - [`internal/lifecyclebench/lifecyclebench.go`](../internal/lifecyclebench/lifecyclebench.go)
   loads the embedded evidence matrix, materializes temp repos, runs drift, and
-  classifies each case while also recording independent `detection_hit` and
-  `specificity_clean` booleans.
+  classifies each case while also recording independent `oracle_hit`,
+  `detection_hit`, and `specificity_clean` booleans.
 - [`internal/lifecyclebench/demo.yml`](../internal/lifecyclebench/demo.yml)
   is the versionless evidence matrix: claims, baseline files, 60 evidence
   cases, repair cases, negative controls, known limits, and systematic errors.
@@ -61,6 +61,10 @@ detect its expected meter and still fail specificity if an unrelated meter
 fires; that becomes `hit_with_unexpected_meter` and the unexpected meter is
 also listed under `false_positive_attribution`.
 
+`detection_hit` means an expected meter actually fired. Negative controls have
+no expected meters, so their clean result is represented as `oracle_hit: true`,
+`detection_hit: false`, and `specificity_clean: true`.
+
 ## Output Contract
 
 `coherence bench --suite=evidence --json` emits:
@@ -89,6 +93,12 @@ rows live under `lifecycle_summary.results` and remain separate.
 False-positive accounting is split so parsers can distinguish case-level and
 meter-level views:
 
+- `oracle_hits` counts supported positive and negative-control oracle success.
+- `positive_detection_hits` counts positive cases where the expected meter
+  fired.
+- `specificity_clean_cases` counts clean negative controls.
+- `known_limit_expected_false_negatives` counts explicit known-limit boundary
+  misses.
 - `false_positive` remains as a compatibility case count.
 - `false_positive_cases` is the explicit case count.
 - `false_positive_meter_attributions` counts actual unexpected meter
@@ -100,6 +110,10 @@ Known-limit recall reporting includes both the compatibility
 `boundary_false_negative_rate` field and the clearer
 `boundary_known_limit_false_negatives` field.
 
+Per-meter `recall` is retained for compatibility and means overall recall
+including known limits. New per-meter `supported_recall` and
+`overall_recall_including_known_limits` fields make that distinction explicit.
+
 `--write-report` writes:
 
 ```text
@@ -107,10 +121,14 @@ Known-limit recall reporting includes both the compatibility
 .coherence/runs/<run-id>/evidence.html
 ```
 
+Persisted `report_paths` inside `evidence.json` are relative
+`.coherence/runs/<run-id>/...` paths. The CLI stdout payload may still include
+absolute paths returned by the local writer so users can open files directly.
+
 The HTML report is self-contained and includes artifact metadata, schema
 fields, rates, claim summary, meter matrix, run metadata, FP/FN table with
-detection/specificity columns, false-positive attribution, systematic error
-register, managed/unmanaged SVG charts, lifecycle data, and raw artifact
+oracle/detection/specificity columns, false-positive attribution, systematic
+error register, managed/unmanaged SVG charts, lifecycle data, and raw artifact
 references.
 
 ## Commands

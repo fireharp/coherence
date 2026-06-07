@@ -402,8 +402,10 @@ surface. It materializes a tiny policy/metrics service, evaluates each case
 against explicit oracles, and reports `hit`, `hit_with_unexpected_meter`,
 `false_negative`, `false_negative_with_unexpected_meter`, `false_positive`,
 `skipped`, or `errored` classifications. Each result also carries independent
-`detection_hit` and `specificity_clean` booleans. `--suite=lifecycle` is a
-compatibility alias that returns the same canonical evidence JSON.
+`oracle_hit`, `detection_hit`, and `specificity_clean` booleans:
+`detection_hit` means an expected meter actually fired and is no longer true
+for clean negative controls. `--suite=lifecycle` is a compatibility alias that
+returns the same canonical evidence JSON.
 
 The embedded, versionless matrix has exactly 60 evidence cases: six selected
 lifecycle meters, ten cases per meter, with four positives, three negative
@@ -420,9 +422,11 @@ Output includes schema-only artifact metadata (`artifact_kind:
 `false_positive_meter_attributions`; by-meter false positives are attributed to
 the actual unexpected meter. Boundary reporting keeps
 `boundary_false_negative_rate` and adds
-`boundary_known_limit_false_negatives`. `--write-report` emits self-contained
-JSON + HTML evidence reports under an immutable `.coherence/runs/<run-id>/`
-directory with claim tables, FP/FN accounting, a systematic-error register, and
+`boundary_known_limit_false_negatives`. Per-meter `supported_recall` stays
+separate from `overall_recall_including_known_limits`. `--write-report` emits
+self-contained JSON + HTML evidence reports under an immutable
+`.coherence/runs/<run-id>/` directory with relative persisted `report_paths`,
+claim tables, FP/FN accounting, a systematic-error register, and
 managed-vs-unmanaged SVG charts.
 
 ### External-style evaluations (M7)
