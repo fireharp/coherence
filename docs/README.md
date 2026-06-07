@@ -23,7 +23,7 @@ docs/
 ├── meters/              ← 19 drift meters
 ├── checks/              ← non-drift signal sources
 ├── scenarios/           ← CB-### benchmark catalog
-└── lifecycle-benchmark-demo.md
+└── evidence-protocol.md
 ```
 
 ---
@@ -168,5 +168,5 @@ positive + CB-022 negative; skipped automatically when GROQ_API_KEY
 isn't set). When the LLM scenarios run, the suite reports
 **precision / recall / F1** across them.
 
-For the managed-vs-unmanaged visual benchmark, see
-[`lifecycle-benchmark-demo.md`](lifecycle-benchmark-demo.md).
+For the canonical evidence benchmark and managed-vs-unmanaged summary charts,
+see [`evidence-protocol.md`](evidence-protocol.md).

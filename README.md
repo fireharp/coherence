@@ -289,7 +289,8 @@ that the `coherence bench` runner uses to guard against regression.
 coherence bench                                # default: template eval suite
 coherence bench --suite=templates              # explicit
 coherence bench --suite=coherencebench         # the CB-### internal suite
-coherence bench --suite=lifecycle              # managed vs unmanaged demo timeline
+coherence bench --suite=evidence               # canonical evidence protocol
+coherence bench --suite=lifecycle              # compatibility alias for evidence
 coherence bench --suite=external               # M7 external-style evaluations
 coherence bench --suite=adversarial            # graph-seeded adversarial mutations
 coherence bench --suite=all --write-report     # templates + CB + adversarial
@@ -301,7 +302,7 @@ Exit code is `1` when any non-adversarial scenario fails. The adversarial
 suite is telemetry by default and fails only with `--strict`. `--write-report`
 writes a human-readable Markdown summary to `.coherence/runs/YYYY-MM-DD/index.md`
 (linked from `STATUS.md`) for the template/CoherenceBench suites, writes
-lifecycle JSON + HTML charts to `.coherence/runs/YYYY-MM-DD/lifecycle.{json,html}`,
+evidence JSON + HTML charts to `.coherence/runs/YYYY-MM-DD/evidence.{json,html}`,
 and writes adversarial artifacts under `.coherence/adversarial/`.
 
 ### Template eval suite
@@ -394,19 +395,21 @@ The lone remaining skip is **CB-006 (LLM contradiction)** which requires a
 live Groq API key in CI; the materializer is otherwise fully equipped to
 host any future graduation.
 
-### Lifecycle demo
+### Evidence protocol
 
-`coherence bench --suite=lifecycle` materializes the same tiny policy/metrics
-service in two lanes. The managed lane applies each issue, records what
-coherence detected, applies the scripted repair, commits, and refreshes the
-baseline. The unmanaged lane applies the same issues cumulatively with no
-repair, while coherence still measures the resulting drift.
+`coherence bench --suite=evidence` is the canonical deterministic benchmark
+surface. It materializes a tiny policy/metrics service, evaluates each case
+against explicit oracles, and reports `hit`, `false_negative`,
+`false_positive`, `skipped`, or `errored` classifications. `--suite=lifecycle`
+is a compatibility alias that returns the same canonical evidence JSON.
 
-The default demo introduces stale tests, orphan endpoints, metric alias drift,
-broken docs links, stale ADR links, and generated artifact drift. JSON output is
-chart-ready (`results[]` has lane, step, verdict, active meters, regressions,
-selected scores, graph counts, duration, and health). `--write-report` emits a
-self-contained static HTML report with inline SVG charts.
+The embedded matrix covers positive cases, managed repairs, negative controls,
+and known-limit boundary cases for stale tests, orphan endpoints, metric alias
+drift, broken docs links, stale ADR links, and generated artifact drift. Output
+includes `claims[]`, `scenario_counts`, `by_meter`, `systematic_errors[]`,
+`raw_artifacts[]`, `lifecycle_summary`, and `final_health`. `--write-report`
+emits self-contained JSON + HTML evidence reports with claim tables, FP/FN
+accounting, a systematic-error register, and managed-vs-unmanaged SVG charts.
 
 ### External-style evaluations (M7)
 

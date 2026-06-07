@@ -53,7 +53,7 @@ const usage = `coherence <subcommand> [flags]
                                           live worktree signal loop (--strict applies to --once only)
                                           (--once = single fire; default = streaming)
   doctor [--json] [--ontology=path]       validate ontology, hook, .gitignore
-  bench [--suite=templates|coherencebench|external|adversarial|lifecycle|all] [--template=<name>]
+  bench [--suite=templates|coherencebench|external|adversarial|evidence|lifecycle|all] [--template=<name>]
         [--json] [--write-report] [--strict] [--llm] run shipped scenario / eval suites
         adversarial flags: [--corpus-manifest=path] [--iterations=N] [--seed=N]
         [--jobs=N] [--taxonomy=path] [--llm-specs] [--refine-from=path]
@@ -1091,12 +1091,12 @@ func runBench(args parsedArgs, rootDir string) int {
 	suite := stringFlag(args, "suite", "templates")
 	writeMD := boolFlag(args, "write-report")
 	switch suite {
-	case "all", "coherencebench", "cb", "templates", "adversarial", "adv", "lifecycle":
+	case "all", "coherencebench", "cb", "templates", "adversarial", "adv", "evidence", "lifecycle":
 		// supported
 	default:
 		if writeMD {
 			fmt.Fprintf(os.Stderr,
-				"coherence: --write-report only applies to --suite=all|coherencebench|templates|adversarial|lifecycle (got %q); flag will be ignored\n",
+				"coherence: --write-report only applies to --suite=all|coherencebench|templates|adversarial|evidence|lifecycle (got %q); flag will be ignored\n",
 				suite)
 		}
 	}
@@ -1125,7 +1125,7 @@ func runBench(args parsedArgs, rootDir string) int {
 	}
 
 	switch suite {
-	case "lifecycle":
+	case "evidence", "lifecycle":
 		life, err := lifecyclebench.RunDefault()
 		if err != nil {
 			fmt.Fprintln(os.Stderr, "coherence: fatal:", err)
@@ -1134,7 +1134,7 @@ func runBench(args parsedArgs, rootDir string) int {
 		if writeMD {
 			paths, err := lifecyclebench.WriteReport(rootDir, life)
 			if err != nil {
-				fmt.Fprintln(os.Stderr, "coherence: warning: could not write lifecycle report:", err)
+				fmt.Fprintln(os.Stderr, "coherence: warning: could not write evidence report:", err)
 			} else {
 				life.ReportPaths = map[string]string{"json": paths.JSON, "html": paths.HTML}
 				if !jsonOut {
@@ -1348,7 +1348,7 @@ func runBench(args parsedArgs, rootDir string) int {
 		return 0
 
 	default:
-		fmt.Fprintf(os.Stderr, "coherence: unknown --suite %q (use templates|coherencebench|external|adversarial|lifecycle|all)\n", suite)
+		fmt.Fprintf(os.Stderr, "coherence: unknown --suite %q (use templates|coherencebench|external|adversarial|evidence|lifecycle|all)\n", suite)
 		return 2
 	}
 }

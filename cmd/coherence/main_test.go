@@ -194,46 +194,113 @@ func TestUsageMentionsAdversarialFlags(t *testing.T) {
 	}
 }
 
-func TestUsageMentionsLifecycleSuite(t *testing.T) {
+func TestUsageMentionsEvidenceSuites(t *testing.T) {
+	if !strings.Contains(usage, "evidence") {
+		t.Fatal("usage missing evidence suite")
+	}
 	if !strings.Contains(usage, "lifecycle") {
 		t.Fatal("usage missing lifecycle suite")
 	}
 }
 
-func TestRunBenchLifecycleSmoke(t *testing.T) {
-	args := parseArgs([]string{"--suite=lifecycle", "--json"})
+func TestRunBenchEvidenceSmoke(t *testing.T) {
+	args := parseArgs([]string{"--suite=evidence", "--json"})
 	exit, out := captureStdout(t, func() int { return runBench(args, t.TempDir()) })
 	if exit != 0 {
-		t.Fatalf("runBench lifecycle = %d, want 0\n%s", exit, out)
+		t.Fatalf("runBench evidence = %d, want 0\n%s", exit, out)
 	}
 	var payload struct {
-		Pass   bool `json:"pass"`
-		Counts struct {
-			Steps int `json:"steps"`
-			Fail  int `json:"fail"`
-		} `json:"counts"`
+		ID             string `json:"id"`
+		Pass           bool   `json:"pass"`
+		ScenarioCounts struct {
+			Total         int `json:"total"`
+			Fail          int `json:"fail"`
+			FalseNegative int `json:"false_negative"`
+			FalsePositive int `json:"false_positive"`
+		} `json:"scenario_counts"`
+		Claims      []struct{}     `json:"claims"`
+		ByMeter     map[string]any `json:"by_meter"`
 		FinalHealth map[string]int `json:"final_health"`
-		Results     []struct {
-			Lane         string   `json:"lane"`
-			StepID       string   `json:"step_id"`
-			ActiveMeters []string `json:"active_meters"`
-		} `json:"results"`
+		Lifecycle   struct {
+			Results []struct {
+				Lane         string   `json:"lane"`
+				StepID       string   `json:"step_id"`
+				ActiveMeters []string `json:"active_meters"`
+			} `json:"results"`
+		} `json:"lifecycle_summary"`
 	}
 	if err := json.Unmarshal([]byte(out), &payload); err != nil {
 		t.Fatalf("decode output: %v\n%s", err, out)
 	}
-	if !payload.Pass || payload.Counts.Steps != 6 || payload.Counts.Fail != 0 {
-		t.Fatalf("unexpected lifecycle payload: %+v", payload)
+	if payload.ID != "evidence-protocol" || !payload.Pass || payload.ScenarioCounts.Total != 18 || payload.ScenarioCounts.Fail != 0 {
+		t.Fatalf("unexpected evidence payload: %+v", payload)
 	}
-	if payload.FinalHealth["managed"] != 100 || payload.FinalHealth["unmanaged"] != 0 {
-		t.Fatalf("final health=%v, want managed=100 unmanaged=0", payload.FinalHealth)
+	if payload.ScenarioCounts.FalseNegative != 6 || payload.ScenarioCounts.FalsePositive != 0 {
+		t.Fatalf("unexpected FP/FN counts: %+v", payload.ScenarioCounts)
 	}
-	if len(payload.Results) != 12 {
-		t.Fatalf("results=%d, want 12", len(payload.Results))
+	if len(payload.Claims) == 0 || payload.ByMeter["stale_tests"] == nil {
+		t.Fatalf("missing aggregate evidence sections")
 	}
-	last := payload.Results[len(payload.Results)-1]
-	if last.Lane != "unmanaged" || last.StepID != "generated-artifact" || !containsString(last.ActiveMeters, "required_edge_breakage") {
-		t.Fatalf("unexpected final result: %+v", last)
+	if payload.FinalHealth["managed"] <= payload.FinalHealth["unmanaged"] {
+		t.Fatalf("final health=%v, want managed above unmanaged", payload.FinalHealth)
+	}
+	if len(payload.Lifecycle.Results) != 12 {
+		t.Fatalf("lifecycle results=%d, want 12", len(payload.Lifecycle.Results))
+	}
+	last := payload.Lifecycle.Results[len(payload.Lifecycle.Results)-1]
+	if last.Lane != "unmanaged" || last.StepID != "required-edge-positive" || !containsString(last.ActiveMeters, "required_edge_breakage") {
+		t.Fatalf("unexpected final lifecycle result: %+v", last)
+	}
+}
+
+func TestRunBenchLifecycleAliasSmoke(t *testing.T) {
+	args := parseArgs([]string{"--suite=lifecycle", "--json"})
+	exit, out := captureStdout(t, func() int { return runBench(args, t.TempDir()) })
+	if exit != 0 {
+		t.Fatalf("runBench lifecycle alias = %d, want 0\n%s", exit, out)
+	}
+	var payload struct {
+		ID             string `json:"id"`
+		ScenarioCounts struct {
+			Total int `json:"total"`
+		} `json:"scenario_counts"`
+		Lifecycle struct {
+			Results []struct {
+				Lane string `json:"lane"`
+			} `json:"results"`
+		} `json:"lifecycle_summary"`
+	}
+	if err := json.Unmarshal([]byte(out), &payload); err != nil {
+		t.Fatalf("decode output: %v\n%s", err, out)
+	}
+	if payload.ID != "evidence-protocol" || payload.ScenarioCounts.Total != 18 || len(payload.Lifecycle.Results) != 12 {
+		t.Fatalf("unexpected lifecycle alias payload: %+v", payload)
+	}
+}
+
+func TestRunBenchEvidenceWriteReportSmoke(t *testing.T) {
+	root := t.TempDir()
+	args := parseArgs([]string{"--suite=evidence", "--write-report", "--json"})
+	exit, out := captureStdout(t, func() int { return runBench(args, root) })
+	if exit != 0 {
+		t.Fatalf("runBench evidence write-report = %d, want 0\n%s", exit, out)
+	}
+	var payload struct {
+		ReportPaths map[string]string `json:"report_paths"`
+	}
+	if err := json.Unmarshal([]byte(out), &payload); err != nil {
+		t.Fatalf("decode output: %v\n%s", err, out)
+	}
+	if filepath.Base(payload.ReportPaths["json"]) != "evidence.json" || filepath.Base(payload.ReportPaths["html"]) != "evidence.html" {
+		t.Fatalf("unexpected report paths: %+v", payload.ReportPaths)
+	}
+	for _, key := range []string{"json", "html"} {
+		if payload.ReportPaths[key] == "" {
+			t.Fatalf("missing report path %s in output:\n%s", key, out)
+		}
+		if _, err := os.Stat(payload.ReportPaths[key]); err != nil {
+			t.Fatalf("missing evidence report %s: %v", key, err)
+		}
 	}
 }
 
@@ -246,6 +313,13 @@ func TestRunBenchLifecycleWriteReportSmoke(t *testing.T) {
 	}
 	var payload struct {
 		ReportPaths map[string]string `json:"report_paths"`
+		Lifecycle   struct {
+			Results []struct {
+				Lane         string   `json:"lane"`
+				StepID       string   `json:"step_id"`
+				ActiveMeters []string `json:"active_meters"`
+			} `json:"results"`
+		} `json:"lifecycle_summary"`
 	}
 	if err := json.Unmarshal([]byte(out), &payload); err != nil {
 		t.Fatalf("decode output: %v\n%s", err, out)
@@ -255,8 +329,11 @@ func TestRunBenchLifecycleWriteReportSmoke(t *testing.T) {
 			t.Fatalf("missing report path %s in output:\n%s", key, out)
 		}
 		if _, err := os.Stat(payload.ReportPaths[key]); err != nil {
-			t.Fatalf("missing lifecycle report %s: %v", key, err)
+			t.Fatalf("missing evidence report %s: %v", key, err)
 		}
+	}
+	if filepath.Base(payload.ReportPaths["json"]) != "evidence.json" || filepath.Base(payload.ReportPaths["html"]) != "evidence.html" {
+		t.Fatalf("unexpected lifecycle alias report paths: %+v", payload.ReportPaths)
 	}
 }
 

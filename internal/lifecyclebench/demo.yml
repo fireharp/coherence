@@ -1,5 +1,32 @@
-id: lifecycle-demo
-name: Managed vs unmanaged lifecycle demo
+id: evidence-protocol
+name: Coherence evidence protocol
+claims:
+  - id: claim-detection
+    level: falsifiable
+    text: Coherence detects supported lifecycle drift meters when the targeted issue is introduced.
+    meters:
+      - required_edge_breakage
+      - stale_tests
+      - orphan_endpoints
+      - orphaned_metric_aliases
+      - broken_links
+      - stale_decision_links
+  - id: claim-repair
+    level: falsifiable
+    text: Scripted managed repairs clear the targeted finding while the unmanaged lane accumulates findings.
+    meters:
+      - required_edge_breakage
+      - stale_tests
+      - orphan_endpoints
+      - orphaned_metric_aliases
+      - broken_links
+      - stale_decision_links
+  - id: claim-specificity
+    level: falsifiable
+    text: Negative controls do not create unrelated actionable findings beyond explicitly allowed movement meters.
+  - id: claim-boundaries
+    level: accounted-limit
+    text: Unsupported conventions are reported as known limits with false-negative accounting.
 selected_meters:
   - required_edge_breakage
   - stale_tests
@@ -7,7 +34,45 @@ selected_meters:
   - orphaned_metric_aliases
   - broken_links
   - stale_decision_links
+  - active_meter_count
   - regressions
+systematic_errors:
+  - id: ruby-test-convention
+    error_class: false_negative
+    example: Ruby test files are not linked to Ruby sources by the current graph extractor.
+    affects: stale_tests
+    bias: Understates stale-test risk outside supported Go, TypeScript, and Python conventions.
+    accounting: Counted as a known-limit stale_tests false negative.
+  - id: ruby-endpoint-convention
+    error_class: false_negative
+    example: Sinatra-style routes are not extracted as endpoint nodes.
+    affects: orphan_endpoints
+    bias: Understates orphan endpoint risk for unsupported web frameworks.
+    accounting: Counted as a known-limit orphan_endpoints false negative.
+  - id: html-metric-alias
+    error_class: false_negative
+    example: Plain HTML dashboard references are not scanned by the metric alias meter.
+    affects: orphaned_metric_aliases
+    bias: Understates metric alias drift outside scanned frontend file types.
+    accounting: Counted as a known-limit orphaned_metric_aliases false negative.
+  - id: reference-style-links
+    error_class: false_negative
+    example: Markdown reference-style links are outside the current broken-link scanner.
+    affects: broken_links
+    bias: Understates documentation link drift when repos prefer reference definitions.
+    accounting: Counted as a known-limit broken_links false negative.
+  - id: adr-frontmatter-alias
+    error_class: false_negative
+    example: Noncanonical ADR supersession frontmatter is not treated as a supersedes edge.
+    affects: stale_decision_links
+    bias: Understates stale decision citations when repos use unsupported ADR metadata.
+    accounting: Counted as a known-limit stale_decision_links false negative.
+  - id: implicit-generator-contract
+    error_class: false_negative
+    example: Generated artifacts without an ontology rule have no required edge to evaluate.
+    affects: required_edge_breakage
+    bias: Understates generated artifact drift until repos declare the generator contract.
+    accounting: Counted as a known-limit required_edge_breakage false negative.
 baseline:
   ontology.yml: |
     version: 1
@@ -80,15 +145,19 @@ baseline:
   src/build-fixtures.go: |
     package fixtures
 
-    func Build() string { return "v1" }
+    func Build() string { return "stable" }
   fixtures/dashboard.json: |
     {
-      "version": "v1",
-      "metrics": ["success_rate"]
+      "status": "stable",
+      "generated": true
     }
-steps:
-  - id: stale-test
+cases:
+  - id: stale-tests-positive
     name: Source changes without test update
+    claim_id: claim-detection
+    meter: stale_tests
+    type: positive
+    lifecycle_index: 1
     issue:
       files:
         pkg/policy.go: |
@@ -97,7 +166,7 @@ steps:
           func Approve(score int) bool {
               return score >= 80
           }
-    managed_repair:
+    repair:
       files:
         pkg/policy_test.go: |
           package pkg
@@ -112,17 +181,21 @@ steps:
                   t.Fatal("expected approval at 80")
               }
           }
-    expected:
-      managed:
-        verdicts: ["clean", "telemetry"]
-      unmanaged:
-        active_meters: ["stale_tests"]
-  - id: orphan-endpoint
+    oracle:
+      expected_meters: ["stale_tests"]
+      post_repair_expected_meters: []
+      post_repair_allowed_meters: ["blast_radius", "semantic_movement", "neighborhood_drift"]
+      post_repair_verdicts: ["clean", "telemetry"]
+  - id: orphan-endpoint-positive
     name: Endpoint loses its only test
+    claim_id: claim-detection
+    meter: orphan_endpoints
+    type: positive
+    lifecycle_index: 2
     issue:
       remove:
         - server_test.go
-    managed_repair:
+    repair:
       files:
         server_test.go: |
           package main
@@ -130,13 +203,18 @@ steps:
           import "testing"
 
           func TestLogin(t *testing.T) {}
-    expected:
-      managed:
-        verdicts: ["clean", "telemetry"]
-      unmanaged:
-        active_meters: ["orphan_endpoints", "stale_tests"]
-  - id: metric-alias
+    oracle:
+      expected_meters: ["orphan_endpoints"]
+      allowed_side_effect_meters: ["blast_radius"]
+      post_repair_expected_meters: []
+      post_repair_allowed_meters: ["blast_radius", "semantic_movement", "neighborhood_drift"]
+      post_repair_verdicts: ["clean", "telemetry"]
+  - id: metric-alias-positive
     name: Metric renamed without frontend update
+    claim_id: claim-detection
+    meter: orphaned_metric_aliases
+    type: positive
+    lifecycle_index: 3
     issue:
       files:
         rill/metrics/conversion_rate.yaml: |
@@ -147,44 +225,49 @@ steps:
               expression: COUNT(*) FILTER (WHERE outcome IN ('success','converted'))
       remove:
         - rill/metrics/success_rate.yaml
-    managed_repair:
+    repair:
       files:
         frontend/dashboard.ts: |
           export const dashboard = {
               title: "Outcome",
               metric: "conversion_rate",
           };
-        fixtures/dashboard.json: |
-          {
-            "version": "v1",
-            "metrics": ["conversion_rate"]
-          }
-    expected:
-      managed:
-        verdicts: ["clean", "telemetry"]
-      unmanaged:
-        active_meters: ["orphaned_metric_aliases", "orphan_endpoints", "stale_tests"]
-  - id: broken-link
+    oracle:
+      expected_meters: ["orphaned_metric_aliases"]
+      allowed_side_effect_meters: ["neighborhood_drift", "semantic_movement"]
+      post_repair_expected_meters: []
+      post_repair_allowed_meters: ["neighborhood_drift", "semantic_movement", "blast_radius"]
+      post_repair_verdicts: ["clean", "telemetry"]
+  - id: broken-link-positive
     name: Documentation points at a removed page
+    claim_id: claim-detection
+    meter: broken_links
+    type: positive
+    lifecycle_index: 4
     issue:
       files:
         docs/index.md: |
           # Docs
 
           See [the removed spec](specs/removed.md).
-    managed_repair:
+    repair:
       files:
         docs/index.md: |
           # Docs
 
           See [the auth spec](specs/auth.md).
-    expected:
-      managed:
-        verdicts: ["clean", "telemetry"]
-      unmanaged:
-        active_meters: ["broken_links", "orphaned_metric_aliases", "orphan_endpoints", "stale_tests"]
-  - id: stale-decision
+    oracle:
+      expected_meters: ["broken_links"]
+      allowed_side_effect_meters: ["semantic_movement", "neighborhood_drift"]
+      post_repair_expected_meters: []
+      post_repair_allowed_meters: ["semantic_movement", "neighborhood_drift", "blast_radius"]
+      post_repair_verdicts: ["clean", "telemetry"]
+  - id: stale-decision-positive
     name: Superseded ADR is still cited as active
+    claim_id: claim-detection
+    meter: stale_decision_links
+    type: positive
+    lifecycle_index: 5
     issue:
       files:
         docs/decisions/ADR-014.md: |
@@ -192,41 +275,302 @@ steps:
           id: ADR-014
           supersedes: ADR-007
           ---
-          # ADR-014 - New auth approach
-    managed_repair:
+          # ADR-014 - Current auth approach
+    repair:
       files:
         docs/specs/auth.md: |
           # Auth Spec
 
           Per [ADR-014](../decisions/ADR-014.md), policy authentication uses the current threshold model.
-    expected:
-      managed:
-        verdicts: ["clean", "telemetry"]
-      unmanaged:
-        active_meters: ["stale_decision_links", "broken_links", "orphaned_metric_aliases", "orphan_endpoints", "stale_tests"]
-  - id: generated-artifact
+    oracle:
+      expected_meters: ["stale_decision_links"]
+      allowed_side_effect_meters: ["semantic_movement", "neighborhood_drift"]
+      post_repair_expected_meters: []
+      post_repair_allowed_meters: ["semantic_movement", "neighborhood_drift", "blast_radius"]
+      post_repair_verdicts: ["clean", "telemetry"]
+  - id: required-edge-positive
     name: Generator changes without refreshed fixture
+    claim_id: claim-detection
+    meter: required_edge_breakage
+    type: positive
+    lifecycle_index: 6
     issue:
       files:
         src/build-fixtures.go: |
           package fixtures
 
-          func Build() string { return "v2-with-conversion-rate" }
-    managed_repair:
+          func Build() string { return "refreshed" }
+    repair:
       files:
         fixtures/dashboard.json: |
           {
-            "version": "v2",
-            "metrics": ["conversion_rate"]
+            "status": "refreshed",
+            "generated": true
           }
-    expected:
-      managed:
-        verdicts: ["clean", "telemetry"]
-      unmanaged:
-        active_meters:
-          - required_edge_breakage
-          - stale_decision_links
-          - broken_links
-          - orphaned_metric_aliases
-          - orphan_endpoints
-          - stale_tests
+    oracle:
+      expected_meters: ["required_edge_breakage"]
+      allowed_side_effect_meters: ["blast_radius"]
+      post_repair_expected_meters: []
+      post_repair_allowed_meters: ["blast_radius", "semantic_movement", "neighborhood_drift"]
+      post_repair_verdicts: ["clean", "telemetry"]
+  - id: stale-tests-negative
+    name: Source and test update together
+    claim_id: claim-specificity
+    meter: stale_tests
+    type: negative_control
+    issue:
+      files:
+        pkg/policy.go: |
+          package pkg
+
+          func Approve(score int) bool {
+              return score >= 70
+          }
+        pkg/policy_test.go: |
+          package pkg
+
+          import "testing"
+
+          func TestApprove(t *testing.T) {
+              if Approve(69) {
+                  t.Fatal("expected rejection below 70")
+              }
+              if !Approve(70) {
+                  t.Fatal("expected approval at 70")
+              }
+          }
+    oracle:
+      expected_meters: []
+      allowed_side_effect_meters: ["blast_radius", "semantic_movement", "neighborhood_drift"]
+  - id: orphan-endpoint-negative
+    name: Endpoint and test are removed together
+    claim_id: claim-specificity
+    meter: orphan_endpoints
+    type: negative_control
+    issue:
+      remove:
+        - server.go
+        - server_test.go
+    oracle:
+      expected_meters: []
+      allowed_side_effect_meters: ["blast_radius", "semantic_movement", "neighborhood_drift"]
+  - id: metric-alias-negative
+    name: Metric rename updates frontend reference
+    claim_id: claim-specificity
+    meter: orphaned_metric_aliases
+    type: negative_control
+    issue:
+      files:
+        rill/metrics/conversion_rate.yaml: |
+          version: 1
+          type: metric_view
+          measures:
+            - name: conversion_rate
+              expression: COUNT(*) FILTER (WHERE outcome IN ('success','converted'))
+        frontend/dashboard.ts: |
+          export const dashboard = {
+              title: "Outcome",
+              metric: "conversion_rate",
+          };
+      remove:
+        - rill/metrics/success_rate.yaml
+    oracle:
+      expected_meters: []
+      allowed_side_effect_meters: ["neighborhood_drift", "semantic_movement", "blast_radius"]
+  - id: broken-link-negative
+    name: Documentation edit keeps an existing link
+    claim_id: claim-specificity
+    meter: broken_links
+    type: negative_control
+    issue:
+      files:
+        docs/index.md: |
+          # Docs
+
+          The stable guide remains [the auth spec](specs/auth.md).
+    oracle:
+      expected_meters: []
+      allowed_side_effect_meters: ["semantic_movement", "neighborhood_drift"]
+  - id: stale-decision-negative
+    name: Superseding ADR and citing doc move together
+    claim_id: claim-specificity
+    meter: stale_decision_links
+    type: negative_control
+    issue:
+      files:
+        docs/decisions/ADR-014.md: |
+          ---
+          id: ADR-014
+          supersedes: ADR-007
+          ---
+          # ADR-014 - Current auth approach
+        docs/specs/auth.md: |
+          # Auth Spec
+
+          Per [ADR-014](../decisions/ADR-014.md), policy authentication uses the current threshold model.
+    oracle:
+      expected_meters: []
+      allowed_side_effect_meters: ["semantic_movement", "neighborhood_drift", "blast_radius"]
+  - id: required-edge-negative
+    name: Generator and generated fixture update together
+    claim_id: claim-specificity
+    meter: required_edge_breakage
+    type: negative_control
+    issue:
+      files:
+        src/build-fixtures.go: |
+          package fixtures
+
+          func Build() string { return "refreshed" }
+        fixtures/dashboard.json: |
+          {
+            "status": "refreshed",
+            "generated": true
+          }
+    oracle:
+      expected_meters: []
+      allowed_side_effect_meters: ["blast_radius", "semantic_movement", "neighborhood_drift"]
+  - id: stale-tests-ruby-known-limit
+    name: Unsupported Ruby source change leaves test unchanged
+    claim_id: claim-boundaries
+    meter: stale_tests
+    type: known_limit
+    known_limit: true
+    systematic_error_id: ruby-test-convention
+    baseline_overlay:
+      lib/policy.rb: |
+        def approve(score)
+          score >= 50
+        end
+      test/policy_test.rb: |
+        require "minitest/autorun"
+        require_relative "../lib/policy"
+
+        class PolicyTest < Minitest::Test
+          def test_approve
+            assert approve(60)
+          end
+        end
+    issue:
+      files:
+        lib/policy.rb: |
+          def approve(score)
+            score >= 80
+          end
+    oracle:
+      expected_classification: false_negative
+      expected_meters: ["stale_tests"]
+  - id: orphan-endpoint-ruby-known-limit
+    name: Unsupported Ruby route loses its request test
+    claim_id: claim-boundaries
+    meter: orphan_endpoints
+    type: known_limit
+    known_limit: true
+    systematic_error_id: ruby-endpoint-convention
+    baseline_overlay:
+      app.rb: |
+        require "sinatra"
+
+        get "/admin" do
+          "ok"
+        end
+      spec/app_spec.rb: |
+        require_relative "../app"
+
+        describe "admin" do
+          it "responds" do
+          end
+        end
+    issue:
+      remove:
+        - spec/app_spec.rb
+    oracle:
+      expected_classification: false_negative
+      expected_meters: ["orphan_endpoints"]
+  - id: metric-alias-html-known-limit
+    name: Plain HTML keeps a removed metric name
+    claim_id: claim-boundaries
+    meter: orphaned_metric_aliases
+    type: known_limit
+    known_limit: true
+    systematic_error_id: html-metric-alias
+    baseline_overlay:
+      rill/metrics/html_only.yaml: |
+        version: 1
+        type: metric_view
+        measures:
+          - name: html_only
+            expression: COUNT(*)
+      public/dashboard.html: |
+        <section data-metric="html_only"></section>
+    issue:
+      remove:
+        - rill/metrics/html_only.yaml
+    oracle:
+      expected_classification: false_negative
+      expected_meters: ["orphaned_metric_aliases"]
+      allowed_side_effect_meters: ["semantic_movement", "neighborhood_drift"]
+  - id: broken-link-reference-known-limit
+    name: Reference-style Markdown link points at a missing page
+    claim_id: claim-boundaries
+    meter: broken_links
+    type: known_limit
+    known_limit: true
+    systematic_error_id: reference-style-links
+    issue:
+      files:
+        docs/index.md: |
+          # Docs
+
+          See [the removed spec][removed].
+
+          [removed]: specs/removed.md
+    oracle:
+      expected_classification: false_negative
+      expected_meters: ["broken_links"]
+      allowed_side_effect_meters: ["semantic_movement", "neighborhood_drift"]
+  - id: stale-decision-frontmatter-known-limit
+    name: Noncanonical ADR metadata is not treated as supersession
+    claim_id: claim-boundaries
+    meter: stale_decision_links
+    type: known_limit
+    known_limit: true
+    systematic_error_id: adr-frontmatter-alias
+    issue:
+      files:
+        docs/decisions/ADR-014.md: |
+          ---
+          id: ADR-014
+          replaces: ADR-007
+          ---
+          # ADR-014 - Current auth approach
+    oracle:
+      expected_classification: false_negative
+      expected_meters: ["stale_decision_links"]
+      allowed_side_effect_meters: ["semantic_movement", "neighborhood_drift"]
+  - id: required-edge-implicit-generator-known-limit
+    name: Undeclared generator contract changes without output refresh
+    claim_id: claim-boundaries
+    meter: required_edge_breakage
+    type: known_limit
+    known_limit: true
+    systematic_error_id: implicit-generator-contract
+    baseline_overlay:
+      scripts/build-report.go: |
+        package main
+
+        func main() {}
+      reports/latest.json: |
+        {"status":"stable"}
+    issue:
+      files:
+        scripts/build-report.go: |
+          package main
+
+          func main() {
+              println("refreshed")
+          }
+    oracle:
+      expected_classification: false_negative
+      expected_meters: ["required_edge_breakage"]
+      allowed_side_effect_meters: ["blast_radius", "semantic_movement", "neighborhood_drift"]

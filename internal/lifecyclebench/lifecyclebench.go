@@ -1,10 +1,8 @@
-// Package lifecyclebench runs a deterministic benchmark that simulates one
-// demo project over a sequence of changes in managed and unmanaged lanes.
+// Package lifecyclebench runs the deterministic evidence protocol benchmark.
 package lifecyclebench
 
 import (
 	"embed"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
@@ -27,24 +25,51 @@ var demoFS embed.FS
 const (
 	LaneManaged   = "managed"
 	LaneUnmanaged = "unmanaged"
+
+	CaseTypePositive        = "positive"
+	CaseTypeNegativeControl = "negative_control"
+	CaseTypeKnownLimit      = "known_limit"
+
+	ClassificationHit           = "hit"
+	ClassificationFalseNegative = "false_negative"
+	ClassificationFalsePositive = "false_positive"
+	ClassificationSkipped       = "skipped"
+	ClassificationErrored       = "errored"
 )
 
-// Demo is the YAML/scripted benchmark shape.
-type Demo struct {
-	ID             string            `yaml:"id" json:"id"`
-	Name           string            `yaml:"name" json:"name"`
-	SelectedMeters []string          `yaml:"selected_meters" json:"selected_meters"`
-	Baseline       map[string]string `yaml:"baseline" json:"baseline,omitempty"`
-	Steps          []Step            `yaml:"steps" json:"steps"`
+// EvidenceSpec is the embedded YAML protocol shape.
+type EvidenceSpec struct {
+	ID               string            `yaml:"id" json:"id"`
+	Name             string            `yaml:"name" json:"name"`
+	Claims           []Claim           `yaml:"claims" json:"claims"`
+	SelectedMeters   []string          `yaml:"selected_meters" json:"selected_meters"`
+	Baseline         map[string]string `yaml:"baseline" json:"baseline,omitempty"`
+	Cases            []Case            `yaml:"cases" json:"cases"`
+	SystematicErrors []SystematicError `yaml:"systematic_errors" json:"systematic_errors,omitempty"`
 }
 
-// Step is one project lifecycle event.
-type Step struct {
-	ID            string              `yaml:"id" json:"id"`
-	Name          string              `yaml:"name" json:"name"`
-	Issue         Change              `yaml:"issue" json:"issue"`
-	ManagedRepair Change              `yaml:"managed_repair" json:"managed_repair,omitempty"`
-	Expected      map[string]Expected `yaml:"expected" json:"expected,omitempty"`
+// Claim is a falsifiable public claim the evidence protocol evaluates.
+type Claim struct {
+	ID     string   `yaml:"id" json:"id"`
+	Text   string   `yaml:"text" json:"text"`
+	Level  string   `yaml:"level,omitempty" json:"level,omitempty"`
+	Meters []string `yaml:"meters,omitempty" json:"meters,omitempty"`
+}
+
+// Case is one oracle-checked scenario.
+type Case struct {
+	ID                string            `yaml:"id" json:"id"`
+	Name              string            `yaml:"name" json:"name"`
+	ClaimID           string            `yaml:"claim_id" json:"claim_id,omitempty"`
+	Meter             string            `yaml:"meter" json:"meter,omitempty"`
+	CaseType          string            `yaml:"type" json:"type"`
+	LifecycleIndex    int               `yaml:"lifecycle_index,omitempty" json:"lifecycle_index,omitempty"`
+	KnownLimit        bool              `yaml:"known_limit,omitempty" json:"known_limit,omitempty"`
+	SystematicErrorID string            `yaml:"systematic_error_id,omitempty" json:"systematic_error_id,omitempty"`
+	BaselineOverlay   map[string]string `yaml:"baseline_overlay,omitempty" json:"baseline_overlay,omitempty"`
+	Issue             Change            `yaml:"issue" json:"issue"`
+	Repair            Change            `yaml:"repair,omitempty" json:"repair,omitempty"`
+	Oracle            Oracle            `yaml:"oracle" json:"oracle"`
 }
 
 // Change writes and removes files relative to the materialized repository.
@@ -58,36 +83,132 @@ func (c Change) Empty() bool {
 	return len(c.Files) == 0 && len(c.Remove) == 0
 }
 
-// Expected declares the subset of lane behavior the demo promises.
-type Expected struct {
-	Verdict      string   `yaml:"verdict,omitempty" json:"verdict,omitempty"`
-	Verdicts     []string `yaml:"verdicts,omitempty" json:"verdicts,omitempty"`
-	ActiveMeters []string `yaml:"active_meters,omitempty" json:"active_meters,omitempty"`
+// Oracle declares the expected meter behavior for one case.
+type Oracle struct {
+	ExpectedMeters           []string `yaml:"expected_meters,omitempty" json:"expected_meters,omitempty"`
+	AllowedSideEffectMeters  []string `yaml:"allowed_side_effect_meters,omitempty" json:"allowed_side_effect_meters,omitempty"`
+	Verdicts                 []string `yaml:"verdicts,omitempty" json:"verdicts,omitempty"`
+	PostRepairExpectedMeters []string `yaml:"post_repair_expected_meters,omitempty" json:"post_repair_expected_meters,omitempty"`
+	PostRepairAllowedMeters  []string `yaml:"post_repair_allowed_meters,omitempty" json:"post_repair_allowed_meters,omitempty"`
+	PostRepairVerdicts       []string `yaml:"post_repair_verdicts,omitempty" json:"post_repair_verdicts,omitempty"`
+	ExpectedClassification   string   `yaml:"expected_classification,omitempty" json:"expected_classification,omitempty"`
 }
 
-// Suite is the chart-ready benchmark report.
+// Suite is the canonical evidence output.
 type Suite struct {
-	ID             string            `json:"id"`
-	Name           string            `json:"name"`
-	GeneratedAt    string            `json:"generated_at"`
-	Pass           bool              `json:"pass"`
-	Counts         Counts            `json:"counts"`
-	SelectedMeters []string          `json:"selected_meters"`
-	FinalHealth    map[string]int    `json:"final_health"`
-	Results        []StepResult      `json:"results"`
-	ReportPaths    map[string]string `json:"report_paths,omitempty"`
+	ID               string                `json:"id"`
+	Name             string                `json:"name"`
+	GeneratedAt      string                `json:"generated_at"`
+	Pass             bool                  `json:"pass"`
+	Claims           []Claim               `json:"claims"`
+	ScenarioCounts   ScenarioCounts        `json:"scenario_counts"`
+	ByMeter          map[string]MeterStats `json:"by_meter"`
+	SystematicErrors []SystematicError     `json:"systematic_errors"`
+	RawArtifacts     []RawArtifact         `json:"raw_artifacts"`
+	LifecycleSummary LifecycleSummary      `json:"lifecycle_summary"`
+	FinalHealth      map[string]int        `json:"final_health"`
+	SelectedMeters   []string              `json:"selected_meters"`
+	Results          []CaseResult          `json:"results"`
+	ReportPaths      map[string]string     `json:"report_paths,omitempty"`
 }
 
-// Counts summarizes result pass/fail totals.
-type Counts struct {
-	Steps int `json:"steps"`
-	Total int `json:"total"`
-	Pass  int `json:"pass"`
-	Fail  int `json:"fail"`
+// ScenarioCounts summarizes case outcomes.
+type ScenarioCounts struct {
+	Total            int `json:"total"`
+	Pass             int `json:"pass"`
+	Fail             int `json:"fail"`
+	PositiveCases    int `json:"positive_cases"`
+	NegativeControls int `json:"negative_controls"`
+	KnownLimits      int `json:"known_limits"`
+	RepairCases      int `json:"repair_cases"`
+	Hit              int `json:"hit"`
+	FalseNegative    int `json:"false_negative"`
+	FalsePositive    int `json:"false_positive"`
+	Skipped          int `json:"skipped"`
+	Errored          int `json:"errored"`
 }
 
-// StepResult is one lane's state after one lifecycle step.
-type StepResult struct {
+// MeterStats summarizes oracle accounting per meter.
+type MeterStats struct {
+	PositiveCases     int     `json:"positive_cases"`
+	NegativeControls  int     `json:"negative_controls"`
+	KnownLimits       int     `json:"known_limits"`
+	Hits              int     `json:"hits"`
+	TruePositives     int     `json:"true_positives"`
+	TrueNegatives     int     `json:"true_negatives"`
+	FalseNegatives    int     `json:"false_negatives"`
+	FalsePositives    int     `json:"false_positives"`
+	RepairCases       int     `json:"repair_cases"`
+	RepairSuccesses   int     `json:"repair_successes"`
+	Skipped           int     `json:"skipped"`
+	Errored           int     `json:"errored"`
+	Recall            float64 `json:"recall"`
+	Precision         float64 `json:"precision"`
+	FalsePositiveRate float64 `json:"false_positive_rate"`
+	RepairSuccessRate float64 `json:"repair_success_rate"`
+}
+
+// SystematicError records a known limitation or repeated failure mode.
+type SystematicError struct {
+	ID         string `yaml:"id" json:"id"`
+	ErrorClass string `yaml:"error_class" json:"error_class"`
+	Example    string `yaml:"example" json:"example"`
+	Affects    string `yaml:"affects" json:"affects"`
+	Bias       string `yaml:"bias" json:"bias"`
+	Accounting string `yaml:"accounting" json:"accounting"`
+}
+
+// RawArtifact points at raw evidence inputs or generated artifacts.
+type RawArtifact struct {
+	Kind        string `json:"kind"`
+	Path        string `json:"path"`
+	Description string `json:"description"`
+}
+
+// CaseResult is one oracle classification.
+type CaseResult struct {
+	CaseIndex                  int                `json:"case_index"`
+	CaseID                     string             `json:"case_id"`
+	Name                       string             `json:"name"`
+	ClaimID                    string             `json:"claim_id,omitempty"`
+	Meter                      string             `json:"meter,omitempty"`
+	CaseType                   string             `json:"type"`
+	KnownLimit                 bool               `json:"known_limit,omitempty"`
+	SystematicErrorID          string             `json:"systematic_error_id,omitempty"`
+	Classification             string             `json:"classification"`
+	ExpectedClassification     string             `json:"expected_classification,omitempty"`
+	Pass                       bool               `json:"pass"`
+	Verdict                    string             `json:"verdict"`
+	ExpectedMeters             []string           `json:"expected_meters"`
+	AllowedSideEffectMeters    []string           `json:"allowed_side_effect_meters"`
+	ActualMeters               []string           `json:"actual_meters"`
+	MissingMeters              []string           `json:"missing_meters,omitempty"`
+	UnexpectedMeters           []string           `json:"unexpected_meters,omitempty"`
+	RegressionCount            int                `json:"regression_count"`
+	MeterScores                map[string]float64 `json:"meter_scores"`
+	Graph                      GraphCounts        `json:"graph"`
+	DurationMS                 int64              `json:"duration_ms"`
+	HealthScore                int                `json:"health_score"`
+	RepairApplied              bool               `json:"repair_applied,omitempty"`
+	RepairSuccess              bool               `json:"repair_success,omitempty"`
+	PostRepairVerdict          string             `json:"post_repair_verdict,omitempty"`
+	PostRepairExpectedMeters   []string           `json:"post_repair_expected_meters,omitempty"`
+	PostRepairAllowedMeters    []string           `json:"post_repair_allowed_meters,omitempty"`
+	PostRepairActualMeters     []string           `json:"post_repair_actual_meters,omitempty"`
+	PostRepairMissingMeters    []string           `json:"post_repair_missing_meters,omitempty"`
+	PostRepairUnexpectedMeters []string           `json:"post_repair_unexpected_meters,omitempty"`
+	Error                      string             `json:"error,omitempty"`
+}
+
+// LifecycleSummary keeps the managed/unmanaged demonstration as a summary view.
+type LifecycleSummary struct {
+	Results          []LaneResult   `json:"results"`
+	FinalHealth      map[string]int `json:"final_health"`
+	ManagedAdvantage int            `json:"managed_advantage"`
+}
+
+// LaneResult is one managed/unmanaged state after a lifecycle event.
+type LaneResult struct {
 	StepIndex       int                `json:"step_index"`
 	StepID          string             `json:"step_id"`
 	StepName        string             `json:"step_name"`
@@ -100,6 +221,7 @@ type StepResult struct {
 	DurationMS      int64              `json:"duration_ms"`
 	HealthScore     int                `json:"health_score"`
 	RepairApplied   bool               `json:"repair_applied,omitempty"`
+	RepairSuccess   bool               `json:"repair_success,omitempty"`
 	DetectedMeters  []string           `json:"detected_meters,omitempty"`
 	Pass            bool               `json:"pass"`
 	Error           string             `json:"error,omitempty"`
@@ -111,163 +233,417 @@ type GraphCounts struct {
 	Edges int `json:"edges"`
 }
 
-// RunDefault executes the embedded lifecycle demo.
+// RunDefault executes the embedded evidence protocol.
 func RunDefault() (Suite, error) {
 	raw, err := demoFS.ReadFile("demo.yml")
 	if err != nil {
 		return Suite{}, err
 	}
-	return Run(raw)
+	return RunEvidence(raw)
 }
 
-// Run executes a lifecycle demo YAML document.
+// Run executes an evidence protocol YAML document.
 func Run(raw []byte) (Suite, error) {
-	var demo Demo
-	if err := yaml.Unmarshal(raw, &demo); err != nil {
+	return RunEvidence(raw)
+}
+
+// RunEvidence executes an evidence protocol YAML document.
+func RunEvidence(raw []byte) (Suite, error) {
+	var spec EvidenceSpec
+	if err := yaml.Unmarshal(raw, &spec); err != nil {
 		return Suite{}, err
 	}
-	if demo.ID == "" {
-		return Suite{}, errors.New("lifecycle demo missing id")
-	}
-	if len(demo.Baseline) == 0 {
-		return Suite{}, errors.New("lifecycle demo missing baseline")
-	}
-	if len(demo.Steps) == 0 {
-		return Suite{}, errors.New("lifecycle demo missing steps")
+	if err := validateSpec(spec); err != nil {
+		return Suite{}, err
 	}
 
-	root, err := os.MkdirTemp("", "coherence-lifecycle-")
+	generatedAt := time.Now().UTC()
+	suite := Suite{
+		ID:               spec.ID,
+		Name:             spec.Name,
+		GeneratedAt:      generatedAt.Format(time.RFC3339),
+		Pass:             true,
+		Claims:           append([]Claim(nil), spec.Claims...),
+		ByMeter:          map[string]MeterStats{},
+		SystematicErrors: append([]SystematicError(nil), spec.SystematicErrors...),
+		RawArtifacts:     defaultRawArtifacts(generatedAt),
+		SelectedMeters:   sortedCopy(spec.SelectedMeters),
+		FinalHealth:      map[string]int{},
+	}
+
+	for i, c := range spec.Cases {
+		result := runCase(spec.Baseline, c, i+1, spec.SelectedMeters)
+		suite.Results = append(suite.Results, result)
+		accountScenario(&suite.ScenarioCounts, result)
+	}
+	suite.ByMeter = buildByMeter(suite.Results)
+	suite.LifecycleSummary = runLifecycleSummary(spec.Baseline, lifecycleCases(spec.Cases), spec.SelectedMeters)
+	suite.FinalHealth = suite.LifecycleSummary.FinalHealth
+	suite.Pass = suite.ScenarioCounts.Fail == 0 && lifecycleSummaryPass(suite.LifecycleSummary)
+	return suite, nil
+}
+
+func validateSpec(spec EvidenceSpec) error {
+	if spec.ID == "" {
+		return errors.New("evidence protocol missing id")
+	}
+	if len(spec.Baseline) == 0 {
+		return errors.New("evidence protocol missing baseline")
+	}
+	if len(spec.Cases) == 0 {
+		return errors.New("evidence protocol missing cases")
+	}
+	for _, c := range spec.Cases {
+		if c.ID == "" {
+			return errors.New("evidence case missing id")
+		}
+		if c.CaseType == "" {
+			return fmt.Errorf("evidence case %s missing type", c.ID)
+		}
+	}
+	return nil
+}
+
+func runCase(baseline map[string]string, c Case, index int, selected []string) CaseResult {
+	start := time.Now()
+	result := CaseResult{
+		CaseIndex:                index,
+		CaseID:                   c.ID,
+		Name:                     c.Name,
+		ClaimID:                  c.ClaimID,
+		Meter:                    c.Meter,
+		CaseType:                 c.CaseType,
+		KnownLimit:               c.KnownLimit || c.CaseType == CaseTypeKnownLimit,
+		SystematicErrorID:        c.SystematicErrorID,
+		ExpectedMeters:           sortedCopy(c.Oracle.ExpectedMeters),
+		AllowedSideEffectMeters:  sortedCopy(c.Oracle.AllowedSideEffectMeters),
+		ExpectedClassification:   c.Oracle.ExpectedClassification,
+		PostRepairExpectedMeters: sortedCopy(c.Oracle.PostRepairExpectedMeters),
+		PostRepairAllowedMeters:  sortedCopy(c.Oracle.PostRepairAllowedMeters),
+	}
+	if result.ExpectedClassification == "" {
+		result.ExpectedClassification = ClassificationHit
+	}
+
+	repo, cleanup, err := materializeCaseRepo(baseline, c.BaselineOverlay)
 	if err != nil {
-		return Suite{}, err
+		return erroredCase(result, start, err)
+	}
+	defer cleanup()
+
+	if err := applyChange(repo, c.Issue); err != nil {
+		return erroredCase(result, start, err)
+	}
+	if err := git(repo, "add", "-A"); err != nil {
+		return erroredCase(result, start, err)
+	}
+	report, counts, err := measure(repo)
+	if err != nil {
+		return erroredCase(result, start, err)
+	}
+	fillCaseResult(&result, report, counts, selected, start)
+	result.Classification, result.MissingMeters, result.UnexpectedMeters = classifyOracle(c.Oracle, result.CaseType, result.ActualMeters, result.Verdict)
+
+	if !c.Repair.Empty() {
+		result.RepairApplied = true
+		if err := applyChange(repo, c.Repair); err != nil {
+			return erroredCase(result, start, err)
+		}
+		if err := git(repo, "add", "-A"); err != nil {
+			return erroredCase(result, start, err)
+		}
+		post, _, err := measure(repo)
+		if err != nil {
+			return erroredCase(result, start, err)
+		}
+		result.PostRepairVerdict = post.Verdict
+		result.PostRepairActualMeters = sortedCopy(post.ActiveMeters)
+		result.RepairSuccess, result.PostRepairMissingMeters, result.PostRepairUnexpectedMeters = repairMatches(c.Oracle, post.ActiveMeters, post.Verdict)
+	}
+	result.Pass = casePass(result)
+	return result
+}
+
+func erroredCase(result CaseResult, start time.Time, err error) CaseResult {
+	result.Classification = ClassificationErrored
+	result.Error = err.Error()
+	result.DurationMS = elapsedMS(start)
+	return result
+}
+
+func fillCaseResult(res *CaseResult, report drift.Report, counts GraphCounts, selected []string, start time.Time) {
+	res.Verdict = report.Verdict
+	res.ActualMeters = sortedCopy(report.ActiveMeters)
+	res.RegressionCount = report.Regressions.Count
+	res.MeterScores = meterScores(report, selected)
+	res.Graph = counts
+	res.DurationMS = elapsedMS(start)
+	res.HealthScore = healthScore(report.Verdict, len(report.ActiveMeters), report.Regressions.Count)
+}
+
+func classifyOracle(o Oracle, caseType string, actualMeters []string, verdict string) (string, []string, []string) {
+	missing := missingValues(o.ExpectedMeters, actualMeters)
+	unexpected := unexpectedValues(actualMeters, append(o.ExpectedMeters, o.AllowedSideEffectMeters...))
+	if len(o.Verdicts) > 0 && !contains(o.Verdicts, verdict) {
+		if len(o.ExpectedMeters) == 0 || caseType == CaseTypeNegativeControl {
+			return ClassificationFalsePositive, missing, unexpected
+		}
+		return ClassificationFalseNegative, missing, unexpected
+	}
+	if len(missing) > 0 {
+		return ClassificationFalseNegative, missing, unexpected
+	}
+	if len(unexpected) > 0 {
+		return ClassificationFalsePositive, missing, unexpected
+	}
+	return ClassificationHit, missing, unexpected
+}
+
+func repairMatches(o Oracle, actualMeters []string, verdict string) (bool, []string, []string) {
+	missing := missingValues(o.PostRepairExpectedMeters, actualMeters)
+	unexpected := unexpectedValues(actualMeters, append(o.PostRepairExpectedMeters, o.PostRepairAllowedMeters...))
+	if len(o.PostRepairVerdicts) > 0 && !contains(o.PostRepairVerdicts, verdict) {
+		return false, missing, unexpected
+	}
+	return len(missing) == 0 && len(unexpected) == 0, missing, unexpected
+}
+
+func casePass(result CaseResult) bool {
+	if result.Classification == ClassificationErrored || result.Classification == ClassificationSkipped {
+		return false
+	}
+	if result.ExpectedClassification != "" && result.Classification != result.ExpectedClassification {
+		return false
+	}
+	if result.RepairApplied && !result.RepairSuccess {
+		return false
+	}
+	return true
+}
+
+func accountScenario(counts *ScenarioCounts, result CaseResult) {
+	counts.Total++
+	if result.Pass {
+		counts.Pass++
+	} else {
+		counts.Fail++
+	}
+	switch result.CaseType {
+	case CaseTypeNegativeControl:
+		counts.NegativeControls++
+	case CaseTypeKnownLimit:
+		counts.KnownLimits++
+	default:
+		counts.PositiveCases++
+	}
+	if result.KnownLimit && result.CaseType != CaseTypeKnownLimit {
+		counts.KnownLimits++
+	}
+	if result.RepairApplied {
+		counts.RepairCases++
+	}
+	switch result.Classification {
+	case ClassificationHit:
+		counts.Hit++
+	case ClassificationFalseNegative:
+		counts.FalseNegative++
+	case ClassificationFalsePositive:
+		counts.FalsePositive++
+	case ClassificationSkipped:
+		counts.Skipped++
+	case ClassificationErrored:
+		counts.Errored++
+	}
+}
+
+func buildByMeter(results []CaseResult) map[string]MeterStats {
+	out := map[string]MeterStats{}
+	for _, r := range results {
+		meter := r.Meter
+		if meter == "" {
+			meter = "unscoped"
+		}
+		stats := out[meter]
+		switch r.CaseType {
+		case CaseTypeNegativeControl:
+			stats.NegativeControls++
+		case CaseTypeKnownLimit:
+			stats.KnownLimits++
+		default:
+			stats.PositiveCases++
+		}
+		if r.KnownLimit && r.CaseType != CaseTypeKnownLimit {
+			stats.KnownLimits++
+		}
+		switch r.Classification {
+		case ClassificationHit:
+			stats.Hits++
+			if r.CaseType == CaseTypeNegativeControl {
+				stats.TrueNegatives++
+			} else {
+				stats.TruePositives++
+			}
+		case ClassificationFalseNegative:
+			stats.FalseNegatives++
+		case ClassificationFalsePositive:
+			stats.FalsePositives++
+		case ClassificationSkipped:
+			stats.Skipped++
+		case ClassificationErrored:
+			stats.Errored++
+		}
+		if r.RepairApplied {
+			stats.RepairCases++
+			if r.RepairSuccess {
+				stats.RepairSuccesses++
+			}
+		}
+		stats.Recall = ratio(stats.TruePositives, stats.TruePositives+stats.FalseNegatives)
+		stats.Precision = ratio(stats.TruePositives, stats.TruePositives+stats.FalsePositives)
+		stats.FalsePositiveRate = ratio(stats.FalsePositives, stats.FalsePositives+stats.TrueNegatives)
+		stats.RepairSuccessRate = ratio(stats.RepairSuccesses, stats.RepairCases)
+		out[meter] = stats
+	}
+	return out
+}
+
+func lifecycleCases(cases []Case) []Case {
+	out := []Case{}
+	for _, c := range cases {
+		if c.LifecycleIndex > 0 {
+			out = append(out, c)
+		}
+	}
+	sort.Slice(out, func(i, j int) bool {
+		if out[i].LifecycleIndex == out[j].LifecycleIndex {
+			return out[i].ID < out[j].ID
+		}
+		return out[i].LifecycleIndex < out[j].LifecycleIndex
+	})
+	return out
+}
+
+func runLifecycleSummary(baseline map[string]string, cases []Case, selected []string) LifecycleSummary {
+	summary := LifecycleSummary{FinalHealth: map[string]int{}}
+	if len(cases) == 0 {
+		return summary
+	}
+	root, err := os.MkdirTemp("", "coherence-evidence-lifecycle-")
+	if err != nil {
+		summary.Results = append(summary.Results, erroredLane(LaneResult{}, time.Now(), err))
+		return summary
 	}
 	defer os.RemoveAll(root)
 
 	managed := filepath.Join(root, LaneManaged)
 	unmanaged := filepath.Join(root, LaneUnmanaged)
-	if err := materializeRepo(managed, demo.Baseline); err != nil {
-		return Suite{}, fmt.Errorf("managed baseline: %w", err)
+	if err := materializeRepo(managed, baseline); err != nil {
+		summary.Results = append(summary.Results, erroredLane(LaneResult{Lane: LaneManaged}, time.Now(), err))
+		return summary
 	}
-	if err := materializeRepo(unmanaged, demo.Baseline); err != nil {
-		return Suite{}, fmt.Errorf("unmanaged baseline: %w", err)
+	if err := materializeRepo(unmanaged, baseline); err != nil {
+		summary.Results = append(summary.Results, erroredLane(LaneResult{Lane: LaneUnmanaged}, time.Now(), err))
+		return summary
 	}
-
-	suite := Suite{
-		ID:             demo.ID,
-		Name:           demo.Name,
-		GeneratedAt:    time.Now().UTC().Format(time.RFC3339),
-		Pass:           true,
-		SelectedMeters: sortedCopy(demo.SelectedMeters),
-		FinalHealth:    map[string]int{},
+	for _, c := range cases {
+		managedResult := runManagedLifecycleStep(managed, c, selected)
+		unmanagedResult := runUnmanagedLifecycleStep(unmanaged, c, selected)
+		summary.Results = append(summary.Results, managedResult, unmanagedResult)
+		summary.FinalHealth[managedResult.Lane] = managedResult.HealthScore
+		summary.FinalHealth[unmanagedResult.Lane] = unmanagedResult.HealthScore
 	}
-	for i, step := range demo.Steps {
-		managedResult := runManagedStep(managed, i+1, step, demo.SelectedMeters)
-		unmanagedResult := runUnmanagedStep(unmanaged, i+1, step, demo.SelectedMeters)
-		suite.Results = append(suite.Results, managedResult, unmanagedResult)
-	}
-	suite.Counts.Steps = len(demo.Steps)
-	for _, r := range suite.Results {
-		suite.Counts.Total++
-		if r.Pass {
-			suite.Counts.Pass++
-		} else {
-			suite.Counts.Fail++
-			suite.Pass = false
-		}
-		suite.FinalHealth[r.Lane] = r.HealthScore
-	}
-	return suite, nil
+	summary.ManagedAdvantage = summary.FinalHealth[LaneManaged] - summary.FinalHealth[LaneUnmanaged]
+	return summary
 }
 
-func runManagedStep(repo string, index int, step Step, selected []string) StepResult {
+func lifecycleSummaryPass(summary LifecycleSummary) bool {
+	for _, result := range summary.Results {
+		if !result.Pass || result.Error != "" {
+			return false
+		}
+	}
+	return true
+}
+
+func runManagedLifecycleStep(repo string, c Case, selected []string) LaneResult {
 	start := time.Now()
-	res := baseResult(index, step, LaneManaged)
-	if err := applyChange(repo, step.Issue); err != nil {
-		return erroredResult(res, start, err)
+	res := baseLaneResult(c, LaneManaged)
+	if err := applyChange(repo, c.Issue); err != nil {
+		return erroredLane(res, start, err)
 	}
 	if err := git(repo, "add", "-A"); err != nil {
-		return erroredResult(res, start, err)
+		return erroredLane(res, start, err)
 	}
 	detected, err := drift.Compute(repo, filepath.Join(repo, "ontology.yml"))
 	if err != nil {
-		return erroredResult(res, start, err)
+		return erroredLane(res, start, err)
 	}
 	res.DetectedMeters = sortedCopy(detected.ActiveMeters)
 
-	if !step.ManagedRepair.Empty() {
+	if !c.Repair.Empty() {
 		res.RepairApplied = true
-		if err := applyChange(repo, step.ManagedRepair); err != nil {
-			return erroredResult(res, start, err)
+		if err := applyChange(repo, c.Repair); err != nil {
+			return erroredLane(res, start, err)
 		}
 		if err := git(repo, "add", "-A"); err != nil {
-			return erroredResult(res, start, err)
+			return erroredLane(res, start, err)
 		}
 	}
-
 	report, counts, err := measure(repo)
 	if err != nil {
-		return erroredResult(res, start, err)
+		return erroredLane(res, start, err)
 	}
-	fillResult(&res, report, counts, selected, start)
-	res.Pass = matchesExpected(res, step.Expected[LaneManaged])
+	fillLaneResult(&res, report, counts, selected, start)
+	if res.RepairApplied {
+		res.RepairSuccess, _, _ = repairMatches(c.Oracle, report.ActiveMeters, report.Verdict)
+		res.Pass = res.RepairSuccess
+	}
 	if res.Pass {
-		if err := commitIfChanged(repo, "managed "+step.ID); err != nil {
-			return erroredResult(res, start, err)
+		if err := commitIfChanged(repo, "managed "+c.ID); err != nil {
+			return erroredLane(res, start, err)
 		}
 		if err := refreshBaseline(repo); err != nil {
-			return erroredResult(res, start, err)
+			return erroredLane(res, start, err)
 		}
 	}
 	return res
 }
 
-func runUnmanagedStep(repo string, index int, step Step, selected []string) StepResult {
+func runUnmanagedLifecycleStep(repo string, c Case, selected []string) LaneResult {
 	start := time.Now()
-	res := baseResult(index, step, LaneUnmanaged)
-	if err := applyChange(repo, step.Issue); err != nil {
-		return erroredResult(res, start, err)
+	res := baseLaneResult(c, LaneUnmanaged)
+	if err := applyChange(repo, c.Issue); err != nil {
+		return erroredLane(res, start, err)
 	}
 	if err := git(repo, "add", "-A"); err != nil {
-		return erroredResult(res, start, err)
+		return erroredLane(res, start, err)
 	}
 	report, counts, err := measure(repo)
 	if err != nil {
-		return erroredResult(res, start, err)
+		return erroredLane(res, start, err)
 	}
-	fillResult(&res, report, counts, selected, start)
-	res.Pass = matchesExpected(res, step.Expected[LaneUnmanaged])
+	fillLaneResult(&res, report, counts, selected, start)
 	return res
 }
 
-func baseResult(index int, step Step, lane string) StepResult {
-	return StepResult{
-		StepIndex: index,
-		StepID:    step.ID,
-		StepName:  step.Name,
+func baseLaneResult(c Case, lane string) LaneResult {
+	return LaneResult{
+		StepIndex: c.LifecycleIndex,
+		StepID:    c.ID,
+		StepName:  c.Name,
 		Lane:      lane,
 		Pass:      true,
 	}
 }
 
-func erroredResult(res StepResult, start time.Time, err error) StepResult {
+func erroredLane(res LaneResult, start time.Time, err error) LaneResult {
 	res.Pass = false
 	res.Error = err.Error()
 	res.DurationMS = elapsedMS(start)
 	return res
 }
 
-func measure(repo string) (drift.Report, GraphCounts, error) {
-	report, err := drift.Compute(repo, filepath.Join(repo, "ontology.yml"))
-	if err != nil {
-		return drift.Report{}, GraphCounts{}, err
-	}
-	g, err := graph.Build(repo)
-	if err != nil {
-		return drift.Report{}, GraphCounts{}, err
-	}
-	return report, GraphCounts{Nodes: g.Counts.TotalNodes, Edges: g.Counts.TotalEdges}, nil
-}
-
-func fillResult(res *StepResult, report drift.Report, counts GraphCounts, selected []string, start time.Time) {
+func fillLaneResult(res *LaneResult, report drift.Report, counts GraphCounts, selected []string, start time.Time) {
 	res.Verdict = report.Verdict
 	res.ActiveMeters = sortedCopy(report.ActiveMeters)
 	res.RegressionCount = report.Regressions.Count
@@ -275,6 +651,19 @@ func fillResult(res *StepResult, report drift.Report, counts GraphCounts, select
 	res.Graph = counts
 	res.DurationMS = elapsedMS(start)
 	res.HealthScore = healthScore(report.Verdict, len(report.ActiveMeters), report.Regressions.Count)
+}
+
+func materializeCaseRepo(baseline, overlay map[string]string) (string, func(), error) {
+	root, err := os.MkdirTemp("", "coherence-evidence-case-")
+	if err != nil {
+		return "", func() {}, err
+	}
+	files := mergeFiles(baseline, overlay)
+	if err := materializeRepo(root, files); err != nil {
+		os.RemoveAll(root)
+		return "", func() {}, err
+	}
+	return root, func() { os.RemoveAll(root) }, nil
 }
 
 func materializeRepo(repo string, files map[string]string) error {
@@ -386,22 +775,16 @@ func gitOutput(repo string, args ...string) (string, error) {
 	return string(out), nil
 }
 
-func matchesExpected(res StepResult, exp Expected) bool {
-	if res.Error != "" {
-		return false
+func measure(repo string) (drift.Report, GraphCounts, error) {
+	report, err := drift.Compute(repo, filepath.Join(repo, "ontology.yml"))
+	if err != nil {
+		return drift.Report{}, GraphCounts{}, err
 	}
-	if exp.Verdict != "" && res.Verdict != exp.Verdict {
-		return false
+	g, err := graph.Build(repo)
+	if err != nil {
+		return drift.Report{}, GraphCounts{}, err
 	}
-	if len(exp.Verdicts) > 0 && !contains(exp.Verdicts, res.Verdict) {
-		return false
-	}
-	for _, meter := range exp.ActiveMeters {
-		if !contains(res.ActiveMeters, meter) {
-			return false
-		}
-	}
-	return true
+	return report, GraphCounts{Nodes: g.Counts.TotalNodes, Edges: g.Counts.TotalEdges}, nil
 }
 
 func meterScores(r drift.Report, selected []string) map[string]float64 {
@@ -451,6 +834,28 @@ func healthScore(verdict string, activeMeters, regressions int) int {
 	return score
 }
 
+func mergeFiles(base, overlay map[string]string) map[string]string {
+	out := map[string]string{}
+	for k, v := range base {
+		out[k] = v
+	}
+	for k, v := range overlay {
+		out[k] = v
+	}
+	return out
+}
+
+func defaultRawArtifacts(generatedAt time.Time) []RawArtifact {
+	date := generatedAt.UTC().Format("2006-01-02")
+	return []RawArtifact{
+		{Kind: "evidence_json", Path: filepath.ToSlash(filepath.Join(".coherence", "runs", date, "evidence.json")), Description: "Canonical evidence protocol output when --write-report is used."},
+		{Kind: "evidence_html", Path: filepath.ToSlash(filepath.Join(".coherence", "runs", date, "evidence.html")), Description: "Self-contained report with claim, meter, FP/FN, lifecycle, and artifact tables."},
+		{Kind: "coherencebench", Path: "coherence bench --suite=coherencebench --json", Description: "Raw deterministic CB scenario suite for lower-level meter regression checks."},
+		{Kind: "external", Path: "coherence bench --suite=external --json", Description: "External-style precision/recall harness; referenced but not ingested by this protocol yet."},
+		{Kind: "adversarial", Path: "coherence bench --suite=adversarial --json", Description: "Graph-seeded mutation harness; separate from canonical evidence cases."},
+	}
+}
+
 func sortedCopy(vals []string) []string {
 	if len(vals) == 0 {
 		return []string{}
@@ -458,6 +863,26 @@ func sortedCopy(vals []string) []string {
 	out := append([]string(nil), vals...)
 	sort.Strings(out)
 	return out
+}
+
+func missingValues(expected, actual []string) []string {
+	missing := []string{}
+	for _, meter := range expected {
+		if !contains(actual, meter) {
+			missing = append(missing, meter)
+		}
+	}
+	return sortedCopy(missing)
+}
+
+func unexpectedValues(actual, allowed []string) []string {
+	unexpected := []string{}
+	for _, meter := range actual {
+		if !contains(allowed, meter) {
+			unexpected = append(unexpected, meter)
+		}
+	}
+	return sortedCopy(unexpected)
 }
 
 func contains(vals []string, want string) bool {
@@ -469,18 +894,13 @@ func contains(vals []string, want string) bool {
 	return false
 }
 
-func elapsedMS(start time.Time) int64 {
-	return time.Since(start).Milliseconds()
+func ratio(numerator, denominator int) float64 {
+	if denominator == 0 {
+		return 0
+	}
+	return float64(numerator) / float64(denominator)
 }
 
-// MarshalJSON keeps empty result slices stable for chart consumers.
-func (s Suite) MarshalJSON() ([]byte, error) {
-	type alias Suite
-	if s.Results == nil {
-		s.Results = []StepResult{}
-	}
-	if s.FinalHealth == nil {
-		s.FinalHealth = map[string]int{}
-	}
-	return json.Marshal(alias(s))
+func elapsedMS(start time.Time) int64 {
+	return time.Since(start).Milliseconds()
 }
