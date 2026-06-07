@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"sort"
 	"strings"
 	"time"
@@ -26,15 +27,26 @@ const (
 	LaneManaged   = "managed"
 	LaneUnmanaged = "unmanaged"
 
+	ArtifactKindEvidenceReport = "coherence_evidence_report"
+	ArtifactSchemaVersion      = 1
+
 	CaseTypePositive        = "positive"
 	CaseTypeNegativeControl = "negative_control"
 	CaseTypeKnownLimit      = "known_limit"
 
 	ClassificationHit           = "hit"
+	ClassificationHitWithFP     = "hit_with_unexpected_meter"
 	ClassificationFalseNegative = "false_negative"
+	ClassificationFNWithFP      = "false_negative_with_unexpected_meter"
 	ClassificationFalsePositive = "false_positive"
 	ClassificationSkipped       = "skipped"
 	ClassificationErrored       = "errored"
+
+	expectedEvidenceCaseCount       = 60
+	expectedCasesPerMeter           = 10
+	expectedPositiveCasesPerMeter   = 4
+	expectedNegativeCasesPerMeter   = 3
+	expectedKnownLimitCasesPerMeter = 3
 )
 
 // EvidenceSpec is the embedded YAML protocol shape.
@@ -96,13 +108,18 @@ type Oracle struct {
 
 // Suite is the canonical evidence output.
 type Suite struct {
+	ArtifactKind     string                `json:"artifact_kind"`
+	SchemaVersion    int                   `json:"schema_version"`
 	ID               string                `json:"id"`
 	Name             string                `json:"name"`
+	RunID            string                `json:"run_id"`
 	GeneratedAt      string                `json:"generated_at"`
+	RunMetadata      RunMetadata           `json:"run_metadata"`
 	Pass             bool                  `json:"pass"`
 	Claims           []Claim               `json:"claims"`
 	ScenarioCounts   ScenarioCounts        `json:"scenario_counts"`
 	ByMeter          map[string]MeterStats `json:"by_meter"`
+	EvidenceRates    EvidenceRates         `json:"evidence_rates"`
 	SystematicErrors []SystematicError     `json:"systematic_errors"`
 	RawArtifacts     []RawArtifact         `json:"raw_artifacts"`
 	LifecycleSummary LifecycleSummary      `json:"lifecycle_summary"`
@@ -112,20 +129,36 @@ type Suite struct {
 	ReportPaths      map[string]string     `json:"report_paths,omitempty"`
 }
 
+// RunMetadata makes each evidence packet reproducible.
+type RunMetadata struct {
+	GitRevision       string   `json:"git_revision,omitempty"`
+	CoherenceRevision string   `json:"coherence_revision,omitempty"`
+	GoVersion         string   `json:"go_version"`
+	WorktreeDirty     bool     `json:"worktree_dirty"`
+	CommandArgs       []string `json:"command_args,omitempty"`
+}
+
 // ScenarioCounts summarizes case outcomes.
 type ScenarioCounts struct {
-	Total            int `json:"total"`
-	Pass             int `json:"pass"`
-	Fail             int `json:"fail"`
-	PositiveCases    int `json:"positive_cases"`
-	NegativeControls int `json:"negative_controls"`
-	KnownLimits      int `json:"known_limits"`
-	RepairCases      int `json:"repair_cases"`
-	Hit              int `json:"hit"`
-	FalseNegative    int `json:"false_negative"`
-	FalsePositive    int `json:"false_positive"`
-	Skipped          int `json:"skipped"`
-	Errored          int `json:"errored"`
+	Total                            int `json:"total"`
+	Pass                             int `json:"pass"`
+	Fail                             int `json:"fail"`
+	PositiveCases                    int `json:"positive_cases"`
+	NegativeControls                 int `json:"negative_controls"`
+	KnownLimits                      int `json:"known_limits"`
+	RepairCases                      int `json:"repair_cases"`
+	Hit                              int `json:"hit"`
+	HitWithUnexpectedMeter           int `json:"hit_with_unexpected_meter"`
+	FalseNegative                    int `json:"false_negative"`
+	FalseNegativeWithUnexpectedMeter int `json:"false_negative_with_unexpected_meter"`
+	FalsePositive                    int `json:"false_positive"`
+	FalsePositiveCases               int `json:"false_positive_cases"`
+	FalsePositiveMeterAttributions   int `json:"false_positive_meter_attributions"`
+	DetectionHits                    int `json:"detection_hits"`
+	SpecificityFailures              int `json:"specificity_failures"`
+	BoundaryExpected                 int `json:"boundary_expected"`
+	Skipped                          int `json:"skipped"`
+	Errored                          int `json:"errored"`
 }
 
 // MeterStats summarizes oracle accounting per meter.
@@ -146,6 +179,14 @@ type MeterStats struct {
 	Precision         float64 `json:"precision"`
 	FalsePositiveRate float64 `json:"false_positive_rate"`
 	RepairSuccessRate float64 `json:"repair_success_rate"`
+}
+
+// EvidenceRates summarizes supported and known-boundary recall separately.
+type EvidenceRates struct {
+	SupportedRecall                   string `json:"supported_recall"`
+	BoundaryFalseNegativeRate         string `json:"boundary_false_negative_rate"`
+	BoundaryKnownLimitFalseNegatives  string `json:"boundary_known_limit_false_negatives"`
+	OverallRecallIncludingKnownLimits string `json:"overall_recall_including_known_limits"`
 }
 
 // SystematicError records a known limitation or repeated failure mode.
@@ -178,12 +219,16 @@ type CaseResult struct {
 	Classification             string             `json:"classification"`
 	ExpectedClassification     string             `json:"expected_classification,omitempty"`
 	Pass                       bool               `json:"pass"`
+	DetectionHit               bool               `json:"detection_hit"`
+	SpecificityClean           bool               `json:"specificity_clean"`
+	BoundaryExpected           bool               `json:"boundary_expected,omitempty"`
 	Verdict                    string             `json:"verdict"`
 	ExpectedMeters             []string           `json:"expected_meters"`
 	AllowedSideEffectMeters    []string           `json:"allowed_side_effect_meters"`
 	ActualMeters               []string           `json:"actual_meters"`
 	MissingMeters              []string           `json:"missing_meters,omitempty"`
 	UnexpectedMeters           []string           `json:"unexpected_meters,omitempty"`
+	FalsePositiveAttribution   map[string]int     `json:"false_positive_attribution,omitempty"`
 	RegressionCount            int                `json:"regression_count"`
 	MeterScores                map[string]float64 `json:"meter_scores"`
 	Graph                      GraphCounts        `json:"graph"`
@@ -259,6 +304,8 @@ func RunEvidence(raw []byte) (Suite, error) {
 
 	generatedAt := time.Now().UTC()
 	suite := Suite{
+		ArtifactKind:     ArtifactKindEvidenceReport,
+		SchemaVersion:    ArtifactSchemaVersion,
 		ID:               spec.ID,
 		Name:             spec.Name,
 		GeneratedAt:      generatedAt.Format(time.RFC3339),
@@ -266,10 +313,10 @@ func RunEvidence(raw []byte) (Suite, error) {
 		Claims:           append([]Claim(nil), spec.Claims...),
 		ByMeter:          map[string]MeterStats{},
 		SystematicErrors: append([]SystematicError(nil), spec.SystematicErrors...),
-		RawArtifacts:     defaultRawArtifacts(generatedAt),
 		SelectedMeters:   sortedCopy(spec.SelectedMeters),
 		FinalHealth:      map[string]int{},
 	}
+	suite = AttachRunMetadata(suite, "", nil)
 
 	for i, c := range spec.Cases {
 		result := runCase(spec.Baseline, c, i+1, spec.SelectedMeters)
@@ -277,10 +324,35 @@ func RunEvidence(raw []byte) (Suite, error) {
 		accountScenario(&suite.ScenarioCounts, result)
 	}
 	suite.ByMeter = buildByMeter(suite.Results)
+	suite.EvidenceRates = evidenceRates(suite.Results)
 	suite.LifecycleSummary = runLifecycleSummary(spec.Baseline, lifecycleCases(spec.Cases), spec.SelectedMeters)
 	suite.FinalHealth = suite.LifecycleSummary.FinalHealth
 	suite.Pass = suite.ScenarioCounts.Fail == 0 && lifecycleSummaryPass(suite.LifecycleSummary)
 	return suite, nil
+}
+
+// AttachRunMetadata fills reproducibility fields using the real repo when available.
+func AttachRunMetadata(suite Suite, rootDir string, commandArgs []string) Suite {
+	t, err := time.Parse(time.RFC3339, suite.GeneratedAt)
+	if err != nil {
+		t = time.Now().UTC()
+		suite.GeneratedAt = t.Format(time.RFC3339)
+	}
+	rev := gitRevision(rootDir)
+	if suite.RunID == "" || (rev != "" && !strings.Contains(suite.RunID, shortRevision(rev))) {
+		suite.RunID = defaultEvidenceRunID(t, rev)
+	}
+	suite.RunMetadata.GoVersion = runtime.Version()
+	if rev != "" {
+		suite.RunMetadata.GitRevision = rev
+		suite.RunMetadata.CoherenceRevision = rev
+	}
+	suite.RunMetadata.WorktreeDirty = gitWorktreeDirty(rootDir)
+	if len(commandArgs) > 0 {
+		suite.RunMetadata.CommandArgs = append([]string(nil), commandArgs...)
+	}
+	suite.RawArtifacts = defaultRawArtifacts(suite.RunID)
+	return suite
 }
 
 func validateSpec(spec EvidenceSpec) error {
@@ -293,15 +365,160 @@ func validateSpec(spec EvidenceSpec) error {
 	if len(spec.Cases) == 0 {
 		return errors.New("evidence protocol missing cases")
 	}
+	claimIDs := map[string]bool{}
+	for _, claim := range spec.Claims {
+		if claim.ID == "" {
+			return errors.New("evidence claim missing id")
+		}
+		if claimIDs[claim.ID] {
+			return fmt.Errorf("duplicate evidence claim id %s", claim.ID)
+		}
+		claimIDs[claim.ID] = true
+	}
+	systematicErrorIDs := map[string]bool{}
+	for _, systematic := range spec.SystematicErrors {
+		if systematic.ID == "" {
+			return errors.New("systematic error missing id")
+		}
+		if systematicErrorIDs[systematic.ID] {
+			return fmt.Errorf("duplicate systematic error id %s", systematic.ID)
+		}
+		systematicErrorIDs[systematic.ID] = true
+	}
+	caseIDs := map[string]bool{}
+	lifecycleIndices := map[int]string{}
+	selectedMeters := map[string]bool{}
+	for _, meter := range spec.SelectedMeters {
+		if meter == "" {
+			return errors.New("selected meter cannot be empty")
+		}
+		if selectedMeters[meter] {
+			return fmt.Errorf("duplicate selected meter %s", meter)
+		}
+		selectedMeters[meter] = true
+	}
+	if len(spec.Cases) != expectedEvidenceCaseCount {
+		return fmt.Errorf("evidence matrix must contain exactly %d cases, got %d", expectedEvidenceCaseCount, len(spec.Cases))
+	}
+	meterCounts := map[string]map[string]int{}
 	for _, c := range spec.Cases {
 		if c.ID == "" {
 			return errors.New("evidence case missing id")
 		}
-		if c.CaseType == "" {
-			return fmt.Errorf("evidence case %s missing type", c.ID)
+		if caseIDs[c.ID] {
+			return fmt.Errorf("duplicate evidence case id %s", c.ID)
+		}
+		caseIDs[c.ID] = true
+		if !validCaseType(c.CaseType) {
+			return fmt.Errorf("evidence case %s has invalid type %q", c.ID, c.CaseType)
+		}
+		if c.Meter == "" {
+			return fmt.Errorf("evidence case %s missing meter", c.ID)
+		}
+		if !selectedMeters[c.Meter] {
+			return fmt.Errorf("evidence case %s uses unselected meter %s", c.ID, c.Meter)
+		}
+		if meterCounts[c.Meter] == nil {
+			meterCounts[c.Meter] = map[string]int{}
+		}
+		meterCounts[c.Meter]["total"]++
+		meterCounts[c.Meter][c.CaseType]++
+		if c.ClaimID != "" && !claimIDs[c.ClaimID] {
+			return fmt.Errorf("evidence case %s references unknown claim %s", c.ID, c.ClaimID)
+		}
+		if c.LifecycleIndex > 0 {
+			if !originalLifecycleCaseID(c.ID) {
+				return fmt.Errorf("lifecycle_index is only allowed on original lifecycle case %s", c.ID)
+			}
+			if prev := lifecycleIndices[c.LifecycleIndex]; prev != "" {
+				return fmt.Errorf("duplicate lifecycle index %d on %s and %s", c.LifecycleIndex, prev, c.ID)
+			}
+			lifecycleIndices[c.LifecycleIndex] = c.ID
+		}
+		if c.Oracle.ExpectedClassification != "" && !validClassification(c.Oracle.ExpectedClassification) {
+			return fmt.Errorf("evidence case %s has invalid expected classification %q", c.ID, c.Oracle.ExpectedClassification)
+		}
+		if c.CaseType == CaseTypePositive && len(c.Oracle.ExpectedMeters) == 0 {
+			return fmt.Errorf("positive evidence case %s missing expected meters", c.ID)
+		}
+		if c.CaseType == CaseTypePositive && c.Repair.Empty() {
+			return fmt.Errorf("positive evidence case %s missing repair", c.ID)
+		}
+		if c.CaseType == CaseTypePositive && len(c.Oracle.PostRepairVerdicts) == 0 {
+			return fmt.Errorf("positive evidence case %s missing post-repair verdict assertions", c.ID)
+		}
+		if c.CaseType == CaseTypeNegativeControl && len(c.Oracle.ExpectedMeters) > 0 {
+			return fmt.Errorf("negative control %s should not declare expected meters", c.ID)
+		}
+		if c.CaseType == CaseTypeKnownLimit || c.KnownLimit {
+			if c.SystematicErrorID == "" {
+				return fmt.Errorf("known-limit evidence case %s missing systematic_error_id", c.ID)
+			}
+			if !systematicErrorIDs[c.SystematicErrorID] {
+				return fmt.Errorf("known-limit evidence case %s references unknown systematic error %s", c.ID, c.SystematicErrorID)
+			}
+			if c.Oracle.ExpectedClassification == "" {
+				return fmt.Errorf("known-limit evidence case %s missing expected_classification", c.ID)
+			}
+			if c.Oracle.ExpectedClassification != ClassificationFalseNegative {
+				return fmt.Errorf("known-limit evidence case %s expected_classification must be %s", c.ID, ClassificationFalseNegative)
+			}
+		}
+	}
+	if len(lifecycleIndices) != 6 {
+		return fmt.Errorf("evidence matrix must keep exactly 6 lifecycle chart cases, got %d", len(lifecycleIndices))
+	}
+	for _, meter := range spec.SelectedMeters {
+		counts := meterCounts[meter]
+		if counts["total"] != expectedCasesPerMeter {
+			return fmt.Errorf("meter %s must have exactly %d cases, got %d", meter, expectedCasesPerMeter, counts["total"])
+		}
+		if counts[CaseTypePositive] != expectedPositiveCasesPerMeter ||
+			counts[CaseTypeNegativeControl] != expectedNegativeCasesPerMeter ||
+			counts[CaseTypeKnownLimit] != expectedKnownLimitCasesPerMeter {
+			return fmt.Errorf("meter %s distribution must be %d positive / %d negative_control / %d known_limit, got %d/%d/%d",
+				meter,
+				expectedPositiveCasesPerMeter,
+				expectedNegativeCasesPerMeter,
+				expectedKnownLimitCasesPerMeter,
+				counts[CaseTypePositive],
+				counts[CaseTypeNegativeControl],
+				counts[CaseTypeKnownLimit])
 		}
 	}
 	return nil
+}
+
+func originalLifecycleCaseID(id string) bool {
+	switch id {
+	case "stale-tests-positive",
+		"orphan-endpoint-positive",
+		"metric-alias-positive",
+		"broken-link-positive",
+		"stale-decision-positive",
+		"required-edge-positive":
+		return true
+	default:
+		return false
+	}
+}
+
+func validCaseType(caseType string) bool {
+	switch caseType {
+	case CaseTypePositive, CaseTypeNegativeControl, CaseTypeKnownLimit:
+		return true
+	default:
+		return false
+	}
+}
+
+func validClassification(classification string) bool {
+	switch classification {
+	case ClassificationHit, ClassificationHitWithFP, ClassificationFalseNegative, ClassificationFNWithFP, ClassificationFalsePositive, ClassificationSkipped, ClassificationErrored:
+		return true
+	default:
+		return false
+	}
 }
 
 func runCase(baseline map[string]string, c Case, index int, selected []string) CaseResult {
@@ -315,6 +532,7 @@ func runCase(baseline map[string]string, c Case, index int, selected []string) C
 		CaseType:                 c.CaseType,
 		KnownLimit:               c.KnownLimit || c.CaseType == CaseTypeKnownLimit,
 		SystematicErrorID:        c.SystematicErrorID,
+		BoundaryExpected:         c.KnownLimit || c.CaseType == CaseTypeKnownLimit,
 		ExpectedMeters:           sortedCopy(c.Oracle.ExpectedMeters),
 		AllowedSideEffectMeters:  sortedCopy(c.Oracle.AllowedSideEffectMeters),
 		ExpectedClassification:   c.Oracle.ExpectedClassification,
@@ -342,7 +560,7 @@ func runCase(baseline map[string]string, c Case, index int, selected []string) C
 		return erroredCase(result, start, err)
 	}
 	fillCaseResult(&result, report, counts, selected, start)
-	result.Classification, result.MissingMeters, result.UnexpectedMeters = classifyOracle(c.Oracle, result.CaseType, result.ActualMeters, result.Verdict)
+	fillOracleEvaluation(&result, evaluateOracle(c.Oracle, result.CaseType, result.ActualMeters, result.Verdict))
 
 	if !c.Repair.Empty() {
 		result.RepairApplied = true
@@ -366,6 +584,7 @@ func runCase(baseline map[string]string, c Case, index int, selected []string) C
 
 func erroredCase(result CaseResult, start time.Time, err error) CaseResult {
 	result.Classification = ClassificationErrored
+	result.SpecificityClean = true
 	result.Error = err.Error()
 	result.DurationMS = elapsedMS(start)
 	return result
@@ -381,22 +600,63 @@ func fillCaseResult(res *CaseResult, report drift.Report, counts GraphCounts, se
 	res.HealthScore = healthScore(report.Verdict, len(report.ActiveMeters), report.Regressions.Count)
 }
 
-func classifyOracle(o Oracle, caseType string, actualMeters []string, verdict string) (string, []string, []string) {
+type oracleEvaluation struct {
+	Classification           string
+	DetectionHit             bool
+	SpecificityClean         bool
+	MissingMeters            []string
+	UnexpectedMeters         []string
+	FalsePositiveAttribution map[string]int
+}
+
+func evaluateOracle(o Oracle, caseType string, actualMeters []string, verdict string) oracleEvaluation {
 	missing := missingValues(o.ExpectedMeters, actualMeters)
 	unexpected := unexpectedValues(actualMeters, append(o.ExpectedMeters, o.AllowedSideEffectMeters...))
+	detectionHit := len(missing) == 0
+	specificityClean := len(unexpected) == 0
 	if len(o.Verdicts) > 0 && !contains(o.Verdicts, verdict) {
 		if len(o.ExpectedMeters) == 0 || caseType == CaseTypeNegativeControl {
-			return ClassificationFalsePositive, missing, unexpected
+			specificityClean = false
+		} else {
+			detectionHit = false
 		}
-		return ClassificationFalseNegative, missing, unexpected
 	}
-	if len(missing) > 0 {
-		return ClassificationFalseNegative, missing, unexpected
+	classification := ClassificationHit
+	switch {
+	case detectionHit && specificityClean:
+		classification = ClassificationHit
+	case detectionHit && !specificityClean && len(o.ExpectedMeters) > 0 && caseType != CaseTypeNegativeControl:
+		classification = ClassificationHitWithFP
+	case detectionHit && !specificityClean:
+		classification = ClassificationFalsePositive
+	case !detectionHit && specificityClean:
+		classification = ClassificationFalseNegative
+	default:
+		classification = ClassificationFNWithFP
 	}
-	if len(unexpected) > 0 {
-		return ClassificationFalsePositive, missing, unexpected
+	return oracleEvaluation{
+		Classification:           classification,
+		DetectionHit:             detectionHit,
+		SpecificityClean:         specificityClean,
+		MissingMeters:            missing,
+		UnexpectedMeters:         unexpected,
+		FalsePositiveAttribution: falsePositiveAttribution(unexpected),
 	}
-	return ClassificationHit, missing, unexpected
+}
+
+// classifyOracle keeps the small unit-test helper surface stable.
+func classifyOracle(o Oracle, caseType string, actualMeters []string, verdict string) (string, []string, []string) {
+	eval := evaluateOracle(o, caseType, actualMeters, verdict)
+	return eval.Classification, eval.MissingMeters, eval.UnexpectedMeters
+}
+
+func fillOracleEvaluation(result *CaseResult, eval oracleEvaluation) {
+	result.Classification = eval.Classification
+	result.DetectionHit = eval.DetectionHit
+	result.SpecificityClean = eval.SpecificityClean
+	result.MissingMeters = eval.MissingMeters
+	result.UnexpectedMeters = eval.UnexpectedMeters
+	result.FalsePositiveAttribution = eval.FalsePositiveAttribution
 }
 
 func repairMatches(o Oracle, actualMeters []string, verdict string) (bool, []string, []string) {
@@ -442,11 +702,34 @@ func accountScenario(counts *ScenarioCounts, result CaseResult) {
 	if result.RepairApplied {
 		counts.RepairCases++
 	}
+	if result.DetectionHit {
+		counts.DetectionHits++
+	}
+	if !result.SpecificityClean {
+		counts.SpecificityFailures++
+	}
+	if result.BoundaryExpected {
+		counts.BoundaryExpected++
+	}
+	if !result.SpecificityClean {
+		counts.FalsePositiveCases++
+		for _, count := range result.FalsePositiveAttribution {
+			counts.FalsePositiveMeterAttributions += count
+		}
+	}
 	switch result.Classification {
 	case ClassificationHit:
 		counts.Hit++
+	case ClassificationHitWithFP:
+		counts.Hit++
+		counts.HitWithUnexpectedMeter++
+		counts.FalsePositive++
 	case ClassificationFalseNegative:
 		counts.FalseNegative++
+	case ClassificationFNWithFP:
+		counts.FalseNegative++
+		counts.FalseNegativeWithUnexpectedMeter++
+		counts.FalsePositive++
 	case ClassificationFalsePositive:
 		counts.FalsePositive++
 	case ClassificationSkipped:
@@ -475,18 +758,25 @@ func buildByMeter(results []CaseResult) map[string]MeterStats {
 		if r.KnownLimit && r.CaseType != CaseTypeKnownLimit {
 			stats.KnownLimits++
 		}
-		switch r.Classification {
-		case ClassificationHit:
+		if r.Classification == ClassificationHit {
 			stats.Hits++
-			if r.CaseType == CaseTypeNegativeControl {
+		}
+		if r.Classification == ClassificationHitWithFP {
+			stats.Hits++
+		}
+		switch r.CaseType {
+		case CaseTypeNegativeControl:
+			if !contains(r.UnexpectedMeters, meter) {
 				stats.TrueNegatives++
-			} else {
-				stats.TruePositives++
 			}
-		case ClassificationFalseNegative:
-			stats.FalseNegatives++
-		case ClassificationFalsePositive:
-			stats.FalsePositives++
+		default:
+			if r.DetectionHit {
+				stats.TruePositives++
+			} else {
+				stats.FalseNegatives++
+			}
+		}
+		switch r.Classification {
 		case ClassificationSkipped:
 			stats.Skipped++
 		case ClassificationErrored:
@@ -498,6 +788,14 @@ func buildByMeter(results []CaseResult) map[string]MeterStats {
 				stats.RepairSuccesses++
 			}
 		}
+		out[meter] = stats
+		for unexpected := range r.FalsePositiveAttribution {
+			fpStats := out[unexpected]
+			fpStats.FalsePositives += r.FalsePositiveAttribution[unexpected]
+			out[unexpected] = fpStats
+		}
+	}
+	for meter, stats := range out {
 		stats.Recall = ratio(stats.TruePositives, stats.TruePositives+stats.FalseNegatives)
 		stats.Precision = ratio(stats.TruePositives, stats.TruePositives+stats.FalsePositives)
 		stats.FalsePositiveRate = ratio(stats.FalsePositives, stats.FalsePositives+stats.TrueNegatives)
@@ -505,6 +803,53 @@ func buildByMeter(results []CaseResult) map[string]MeterStats {
 		out[meter] = stats
 	}
 	return out
+}
+
+func evidenceRates(results []CaseResult) EvidenceRates {
+	var supportedHits, supportedTotal int
+	var boundaryFN, boundaryTotal int
+	var overallHits, overallTotal int
+	for _, r := range results {
+		if len(r.ExpectedMeters) == 0 {
+			continue
+		}
+		overallTotal++
+		if r.DetectionHit {
+			overallHits++
+		}
+		if r.BoundaryExpected {
+			boundaryTotal++
+			if !r.DetectionHit {
+				boundaryFN++
+			}
+			continue
+		}
+		supportedTotal++
+		if r.DetectionHit {
+			supportedHits++
+		}
+	}
+	return EvidenceRates{
+		SupportedRecall:                   fraction(supportedHits, supportedTotal),
+		BoundaryFalseNegativeRate:         fraction(boundaryFN, boundaryTotal),
+		BoundaryKnownLimitFalseNegatives:  fraction(boundaryFN, boundaryTotal),
+		OverallRecallIncludingKnownLimits: fraction(overallHits, overallTotal),
+	}
+}
+
+func falsePositiveAttribution(unexpected []string) map[string]int {
+	if len(unexpected) == 0 {
+		return nil
+	}
+	out := map[string]int{}
+	for _, meter := range unexpected {
+		out[meter]++
+	}
+	return out
+}
+
+func fraction(numerator, denominator int) string {
+	return fmt.Sprintf("%d/%d", numerator, denominator)
 }
 
 func lifecycleCases(cases []Case) []Case {
@@ -845,15 +1190,52 @@ func mergeFiles(base, overlay map[string]string) map[string]string {
 	return out
 }
 
-func defaultRawArtifacts(generatedAt time.Time) []RawArtifact {
-	date := generatedAt.UTC().Format("2006-01-02")
+func defaultRawArtifacts(runID string) []RawArtifact {
 	return []RawArtifact{
-		{Kind: "evidence_json", Path: filepath.ToSlash(filepath.Join(".coherence", "runs", date, "evidence.json")), Description: "Canonical evidence protocol output when --write-report is used."},
-		{Kind: "evidence_html", Path: filepath.ToSlash(filepath.Join(".coherence", "runs", date, "evidence.html")), Description: "Self-contained report with claim, meter, FP/FN, lifecycle, and artifact tables."},
+		{Kind: "evidence_json", Path: filepath.ToSlash(filepath.Join(".coherence", "runs", runID, "evidence.json")), Description: "Canonical evidence protocol output when --write-report is used."},
+		{Kind: "evidence_html", Path: filepath.ToSlash(filepath.Join(".coherence", "runs", runID, "evidence.html")), Description: "Self-contained report with claim, meter, FP/FN, lifecycle, and artifact tables."},
 		{Kind: "coherencebench", Path: "coherence bench --suite=coherencebench --json", Description: "Raw deterministic CB scenario suite for lower-level meter regression checks."},
 		{Kind: "external", Path: "coherence bench --suite=external --json", Description: "External-style precision/recall harness; referenced but not ingested by this protocol yet."},
-		{Kind: "adversarial", Path: "coherence bench --suite=adversarial --json", Description: "Graph-seeded mutation harness; separate from canonical evidence cases."},
+		{Kind: "adversarial", Path: "coherence bench --suite=adversarial --iterations=1 --seed=1 --json", Description: "Deterministic graph-seeded mutation smoke; separate from canonical evidence cases."},
 	}
+}
+
+func defaultEvidenceRunID(t time.Time, revision string) string {
+	base := t.UTC().Format("2006-01-02T15-04-05Z")
+	if revision == "" {
+		return base
+	}
+	return base + "-" + shortRevision(revision)
+}
+
+func gitRevision(rootDir string) string {
+	if rootDir == "" {
+		return ""
+	}
+	out, err := gitOutput(rootDir, "rev-parse", "HEAD")
+	if err != nil {
+		return ""
+	}
+	return strings.TrimSpace(out)
+}
+
+func gitWorktreeDirty(rootDir string) bool {
+	if rootDir == "" {
+		return false
+	}
+	out, err := gitOutput(rootDir, "status", "--porcelain")
+	if err != nil {
+		return false
+	}
+	return strings.TrimSpace(out) != ""
+}
+
+func shortRevision(revision string) string {
+	revision = strings.TrimSpace(revision)
+	if len(revision) <= 12 {
+		return revision
+	}
+	return revision[:12]
 }
 
 func sortedCopy(vals []string) []string {

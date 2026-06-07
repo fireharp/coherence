@@ -210,14 +210,23 @@ func TestRunBenchEvidenceSmoke(t *testing.T) {
 		t.Fatalf("runBench evidence = %d, want 0\n%s", exit, out)
 	}
 	var payload struct {
+		ArtifactKind   string `json:"artifact_kind"`
+		SchemaVersion  int    `json:"schema_version"`
 		ID             string `json:"id"`
 		Pass           bool   `json:"pass"`
 		ScenarioCounts struct {
-			Total         int `json:"total"`
-			Fail          int `json:"fail"`
-			FalseNegative int `json:"false_negative"`
-			FalsePositive int `json:"false_positive"`
+			Total                          int `json:"total"`
+			Fail                           int `json:"fail"`
+			FalseNegative                  int `json:"false_negative"`
+			FalsePositive                  int `json:"false_positive"`
+			FalsePositiveCases             int `json:"false_positive_cases"`
+			FalsePositiveMeterAttributions int `json:"false_positive_meter_attributions"`
 		} `json:"scenario_counts"`
+		EvidenceRates struct {
+			SupportedRecall                  string `json:"supported_recall"`
+			BoundaryKnownLimitFalseNegatives string `json:"boundary_known_limit_false_negatives"`
+			OverallRecall                    string `json:"overall_recall_including_known_limits"`
+		} `json:"evidence_rates"`
 		Claims      []struct{}     `json:"claims"`
 		ByMeter     map[string]any `json:"by_meter"`
 		FinalHealth map[string]int `json:"final_health"`
@@ -232,11 +241,25 @@ func TestRunBenchEvidenceSmoke(t *testing.T) {
 	if err := json.Unmarshal([]byte(out), &payload); err != nil {
 		t.Fatalf("decode output: %v\n%s", err, out)
 	}
-	if payload.ID != "evidence-protocol" || !payload.Pass || payload.ScenarioCounts.Total != 18 || payload.ScenarioCounts.Fail != 0 {
+	if payload.ArtifactKind != "coherence_evidence_report" || payload.SchemaVersion != 1 {
+		t.Fatalf("unexpected artifact identity: %+v", payload)
+	}
+	if strings.Contains(out, "protocol_version") {
+		t.Fatalf("evidence payload should not expose protocol_version:\n%s", out)
+	}
+	if payload.ID != "evidence-protocol" || !payload.Pass || payload.ScenarioCounts.Total != 60 || payload.ScenarioCounts.Fail != 0 {
 		t.Fatalf("unexpected evidence payload: %+v", payload)
 	}
-	if payload.ScenarioCounts.FalseNegative != 6 || payload.ScenarioCounts.FalsePositive != 0 {
+	if payload.ScenarioCounts.FalseNegative != 18 ||
+		payload.ScenarioCounts.FalsePositive != 0 ||
+		payload.ScenarioCounts.FalsePositiveCases != 0 ||
+		payload.ScenarioCounts.FalsePositiveMeterAttributions != 0 {
 		t.Fatalf("unexpected FP/FN counts: %+v", payload.ScenarioCounts)
+	}
+	if payload.EvidenceRates.SupportedRecall != "24/24" ||
+		payload.EvidenceRates.BoundaryKnownLimitFalseNegatives != "18/18" ||
+		payload.EvidenceRates.OverallRecall != "24/42" {
+		t.Fatalf("unexpected evidence rates: %+v", payload.EvidenceRates)
 	}
 	if len(payload.Claims) == 0 || payload.ByMeter["stale_tests"] == nil {
 		t.Fatalf("missing aggregate evidence sections")
@@ -273,7 +296,7 @@ func TestRunBenchLifecycleAliasSmoke(t *testing.T) {
 	if err := json.Unmarshal([]byte(out), &payload); err != nil {
 		t.Fatalf("decode output: %v\n%s", err, out)
 	}
-	if payload.ID != "evidence-protocol" || payload.ScenarioCounts.Total != 18 || len(payload.Lifecycle.Results) != 12 {
+	if payload.ID != "evidence-protocol" || payload.ScenarioCounts.Total != 60 || len(payload.Lifecycle.Results) != 12 {
 		t.Fatalf("unexpected lifecycle alias payload: %+v", payload)
 	}
 }
@@ -648,16 +671,25 @@ func captureStdout(t *testing.T, fn func() int) (int, string) {
 		t.Fatal(err)
 	}
 	os.Stdout = w
+	type readResult struct {
+		data []byte
+		err  error
+	}
+	out := make(chan readResult, 1)
+	go func() {
+		data, err := io.ReadAll(r)
+		out <- readResult{data: data, err: err}
+	}()
 	exit := fn()
 	if err := w.Close(); err != nil {
 		t.Fatal(err)
 	}
 	os.Stdout = old
-	data, err := io.ReadAll(r)
-	if err != nil {
-		t.Fatal(err)
+	result := <-out
+	if result.err != nil {
+		t.Fatal(result.err)
 	}
-	return exit, string(data)
+	return exit, string(result.data)
 }
 
 func createTinyGitRepo(t *testing.T, dir string) string {

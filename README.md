@@ -302,7 +302,7 @@ Exit code is `1` when any non-adversarial scenario fails. The adversarial
 suite is telemetry by default and fails only with `--strict`. `--write-report`
 writes a human-readable Markdown summary to `.coherence/runs/YYYY-MM-DD/index.md`
 (linked from `STATUS.md`) for the template/CoherenceBench suites, writes
-evidence JSON + HTML charts to `.coherence/runs/YYYY-MM-DD/evidence.{json,html}`,
+evidence JSON + HTML charts to `.coherence/runs/<run-id>/evidence.{json,html}`,
 and writes adversarial artifacts under `.coherence/adversarial/`.
 
 ### Template eval suite
@@ -399,17 +399,31 @@ host any future graduation.
 
 `coherence bench --suite=evidence` is the canonical deterministic benchmark
 surface. It materializes a tiny policy/metrics service, evaluates each case
-against explicit oracles, and reports `hit`, `false_negative`,
-`false_positive`, `skipped`, or `errored` classifications. `--suite=lifecycle`
-is a compatibility alias that returns the same canonical evidence JSON.
+against explicit oracles, and reports `hit`, `hit_with_unexpected_meter`,
+`false_negative`, `false_negative_with_unexpected_meter`, `false_positive`,
+`skipped`, or `errored` classifications. Each result also carries independent
+`detection_hit` and `specificity_clean` booleans. `--suite=lifecycle` is a
+compatibility alias that returns the same canonical evidence JSON.
 
-The embedded matrix covers positive cases, managed repairs, negative controls,
-and known-limit boundary cases for stale tests, orphan endpoints, metric alias
-drift, broken docs links, stale ADR links, and generated artifact drift. Output
-includes `claims[]`, `scenario_counts`, `by_meter`, `systematic_errors[]`,
-`raw_artifacts[]`, `lifecycle_summary`, and `final_health`. `--write-report`
-emits self-contained JSON + HTML evidence reports with claim tables, FP/FN
-accounting, a systematic-error register, and managed-vs-unmanaged SVG charts.
+The embedded, versionless matrix has exactly 60 evidence cases: six selected
+lifecycle meters, ten cases per meter, with four positives, three negative
+controls, and three known-limit cases per meter. The six original lifecycle
+cases remain the only managed/unmanaged chart rows and do not affect
+`scenario_counts.total`.
+
+Output includes schema-only artifact metadata (`artifact_kind:
+"coherence_evidence_report"`, `schema_version: 1`), `run_id`,
+`run_metadata`, `claims[]`, `scenario_counts`, `by_meter`, `evidence_rates`,
+`systematic_errors[]`, `raw_artifacts[]`, `lifecycle_summary`, and
+`final_health`. False positives are counted as both compatibility
+`false_positive` / `false_positive_cases` and
+`false_positive_meter_attributions`; by-meter false positives are attributed to
+the actual unexpected meter. Boundary reporting keeps
+`boundary_false_negative_rate` and adds
+`boundary_known_limit_false_negatives`. `--write-report` emits self-contained
+JSON + HTML evidence reports under an immutable `.coherence/runs/<run-id>/`
+directory with claim tables, FP/FN accounting, a systematic-error register, and
+managed-vs-unmanaged SVG charts.
 
 ### External-style evaluations (M7)
 

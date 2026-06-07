@@ -5,6 +5,8 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"gopkg.in/yaml.v3"
 )
 
 func TestApplyChangeWritesAndRemoves(t *testing.T) {
@@ -97,6 +99,14 @@ func TestOracleClassification(t *testing.T) {
 			actual: []string{"semantic_movement"},
 			want:   ClassificationHit,
 		},
+		{
+			name:   "expected hit with unrelated meter",
+			oracle: Oracle{ExpectedMeters: []string{"stale_tests"}},
+			typ:    CaseTypePositive,
+			actual: []string{"stale_tests", "broken_links"},
+			want:   ClassificationHitWithFP,
+			extra:  []string{"broken_links"},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -111,6 +121,42 @@ func TestOracleClassification(t *testing.T) {
 				t.Fatalf("unexpected=%v, want %v", extra, tt.extra)
 			}
 		})
+	}
+}
+
+func TestFalsePositiveAttributionUsesActualMeter(t *testing.T) {
+	eval := evaluateOracle(Oracle{}, CaseTypeNegativeControl, []string{"broken_links"}, "telemetry")
+	result := CaseResult{
+		Meter:                    "stale_tests",
+		CaseType:                 CaseTypeNegativeControl,
+		Classification:           eval.Classification,
+		DetectionHit:             eval.DetectionHit,
+		SpecificityClean:         eval.SpecificityClean,
+		UnexpectedMeters:         eval.UnexpectedMeters,
+		FalsePositiveAttribution: eval.FalsePositiveAttribution,
+	}
+	stats := buildByMeter([]CaseResult{result})
+	if got := stats["broken_links"].FalsePositives; got != 1 {
+		t.Fatalf("broken_links false positives=%d, want 1", got)
+	}
+	if got := stats["stale_tests"].FalsePositives; got != 0 {
+		t.Fatalf("stale_tests false positives=%d, want 0", got)
+	}
+	if got := stats["stale_tests"].TrueNegatives; got != 1 {
+		t.Fatalf("stale_tests true negatives=%d, want 1", got)
+	}
+}
+
+func TestFalsePositiveCaseAndMeterAttributionCountsCanDiverge(t *testing.T) {
+	counts := ScenarioCounts{}
+	accountScenario(&counts, CaseResult{
+		CaseType:                 CaseTypeNegativeControl,
+		Classification:           ClassificationFalsePositive,
+		SpecificityClean:         false,
+		FalsePositiveAttribution: map[string]int{"broken_links": 1, "stale_tests": 1},
+	})
+	if counts.FalsePositive != 1 || counts.FalsePositiveCases != 1 || counts.FalsePositiveMeterAttributions != 2 {
+		t.Fatalf("counts=%+v, want one FP case and two meter attributions", counts)
 	}
 }
 
@@ -136,14 +182,29 @@ func TestRunDefaultEvidenceProtocol(t *testing.T) {
 	if suite.ID != "evidence-protocol" {
 		t.Fatalf("suite id=%q", suite.ID)
 	}
+	if suite.RunID == "" || suite.RunMetadata.GoVersion == "" {
+		t.Fatalf("missing run metadata: run_id=%q metadata=%+v", suite.RunID, suite.RunMetadata)
+	}
 	if !suite.Pass {
 		t.Fatalf("suite failed: %+v", suite.ScenarioCounts)
 	}
-	if suite.ScenarioCounts.Total != 18 || suite.ScenarioCounts.PositiveCases != 6 || suite.ScenarioCounts.NegativeControls != 6 || suite.ScenarioCounts.KnownLimits != 6 {
-		t.Fatalf("counts=%+v, want 18 total / 6 each kind", suite.ScenarioCounts)
+	if suite.ArtifactKind != ArtifactKindEvidenceReport || suite.SchemaVersion != ArtifactSchemaVersion {
+		t.Fatalf("artifact identity=%s/%d", suite.ArtifactKind, suite.SchemaVersion)
 	}
-	if suite.ScenarioCounts.FalseNegative != 6 || suite.ScenarioCounts.FalsePositive != 0 {
-		t.Fatalf("classification counts=%+v, want 6 known FNs and 0 FPs", suite.ScenarioCounts)
+	if suite.ScenarioCounts.Total != 60 || suite.ScenarioCounts.PositiveCases != 24 || suite.ScenarioCounts.NegativeControls != 18 || suite.ScenarioCounts.KnownLimits != 18 {
+		t.Fatalf("counts=%+v, want 60 total / 24 positive / 18 negative / 18 known", suite.ScenarioCounts)
+	}
+	if suite.ScenarioCounts.RepairCases != 24 {
+		t.Fatalf("repair cases=%d, want 24", suite.ScenarioCounts.RepairCases)
+	}
+	if suite.ScenarioCounts.FalseNegative != 18 || suite.ScenarioCounts.FalsePositive != 0 || suite.ScenarioCounts.SpecificityFailures != 0 {
+		t.Fatalf("classification counts=%+v, want 18 known FNs and 0 FPs", suite.ScenarioCounts)
+	}
+	if suite.EvidenceRates.SupportedRecall != "24/24" ||
+		suite.EvidenceRates.BoundaryFalseNegativeRate != "18/18" ||
+		suite.EvidenceRates.BoundaryKnownLimitFalseNegatives != "18/18" ||
+		suite.EvidenceRates.OverallRecallIncludingKnownLimits != "24/42" {
+		t.Fatalf("evidence rates=%+v", suite.EvidenceRates)
 	}
 	if len(suite.Claims) == 0 || len(suite.SystematicErrors) == 0 || len(suite.RawArtifacts) == 0 {
 		t.Fatalf("missing aggregate evidence sections")
@@ -160,8 +221,11 @@ func TestRunDefaultEvidenceProtocol(t *testing.T) {
 		if !ok {
 			t.Fatalf("missing by_meter stats for %s", meter)
 		}
-		if stats.FalseNegatives != 1 || stats.RepairCases != 1 || stats.RepairSuccesses != 1 {
-			t.Fatalf("stats for %s=%+v, want one known FN and one successful repair", meter, stats)
+		if stats.PositiveCases != 4 || stats.NegativeControls != 3 || stats.KnownLimits != 3 {
+			t.Fatalf("stats for %s=%+v, want 4/3/3 case distribution", meter, stats)
+		}
+		if stats.FalseNegatives != 3 || stats.RepairCases != 4 || stats.RepairSuccesses != 4 {
+			t.Fatalf("stats for %s=%+v, want three known FNs and four successful repairs", meter, stats)
 		}
 	}
 	managed := lastForLane(suite, LaneManaged)
@@ -186,21 +250,118 @@ func TestWriteReportArtifacts(t *testing.T) {
 	if filepath.Base(paths.JSON) != "evidence.json" || filepath.Base(paths.HTML) != "evidence.html" {
 		t.Fatalf("report paths=%+v, want evidence artifacts", paths)
 	}
+	if filepath.Base(filepath.Dir(paths.JSON)) != suite.RunID {
+		t.Fatalf("report dir=%s, want run id %s", filepath.Dir(paths.JSON), suite.RunID)
+	}
 	jsonBody, err := os.ReadFile(paths.JSON)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !strings.Contains(string(jsonBody), `"claims"`) || !strings.Contains(string(jsonBody), `"by_meter"`) {
+	if !strings.Contains(string(jsonBody), `"claims"`) || !strings.Contains(string(jsonBody), `"by_meter"`) || !strings.Contains(string(jsonBody), `"run_metadata"`) {
 		t.Fatalf("json report missing evidence sections:\n%s", jsonBody)
+	}
+	for _, want := range []string{
+		`"artifact_kind": "coherence_evidence_report"`,
+		`"schema_version": 1`,
+		`"boundary_known_limit_false_negatives": "18/18"`,
+		`"false_positive_cases": 0`,
+		`"false_positive_meter_attributions": 0`,
+	} {
+		if !strings.Contains(string(jsonBody), want) {
+			t.Fatalf("json report missing %q:\n%s", want, jsonBody)
+		}
+	}
+	if strings.Contains(string(jsonBody), "protocol_version") {
+		t.Fatalf("json report should not contain protocol_version:\n%s", jsonBody)
 	}
 	htmlBody, err := os.ReadFile(paths.HTML)
 	if err != nil {
 		t.Fatal(err)
 	}
-	for _, want := range []string{"<svg", "Claim Summary", "Meter Matrix", "Systematic Error Register", "Managed vs Unmanaged"} {
+	for _, want := range []string{"<svg", "Claim Summary", "Meter Matrix", "Systematic Error Register", "Managed vs Unmanaged", "artifact_kind", "schema_version", "boundary_known_limit_false_negatives", "false_positive_meter_attributions"} {
 		if !strings.Contains(string(htmlBody), want) {
 			t.Fatalf("html report missing %q:\n%s", want, htmlBody)
 		}
+	}
+}
+
+func TestSafeReportRunIDRejectsUnsafeValues(t *testing.T) {
+	for _, runID := range []string{"", ".", "..", "a/b", `a\b`, "with space", "semi;colon"} {
+		if got, err := safeReportRunID(runID); err == nil {
+			t.Fatalf("safeReportRunID(%q)=%q, want error", runID, got)
+		}
+	}
+	if got, err := safeReportRunID("2026-06-07_abc.DEF-123"); err != nil || got == "" {
+		t.Fatalf("safe run id rejected: got=%q err=%v", got, err)
+	}
+}
+
+func TestAttachRunMetadataUsesCommandArgsAndRevision(t *testing.T) {
+	suite, err := RunDefault()
+	if err != nil {
+		t.Fatal(err)
+	}
+	suite = AttachRunMetadata(suite, "../..", []string{"coherence", "bench", "--suite=evidence"})
+	if suite.RunMetadata.GoVersion == "" || suite.RunMetadata.GitRevision == "" {
+		t.Fatalf("metadata missing Go or git revision: %+v", suite.RunMetadata)
+	}
+	if strings.Join(suite.RunMetadata.CommandArgs, " ") != "coherence bench --suite=evidence" {
+		t.Fatalf("command args=%v", suite.RunMetadata.CommandArgs)
+	}
+	if !strings.Contains(suite.RawArtifacts[0].Path, suite.RunID) {
+		t.Fatalf("raw artifact path %q missing run id %q", suite.RawArtifacts[0].Path, suite.RunID)
+	}
+}
+
+func TestValidateSpecStrictness(t *testing.T) {
+	base := loadDemoSpec(t)
+	if err := validateSpec(base); err != nil {
+		t.Fatalf("demo spec should validate: %v", err)
+	}
+	dup := cloneSpec(t, base)
+	dup.Cases = append(dup.Cases, dup.Cases[0])
+	if err := validateSpec(dup); err == nil {
+		t.Fatal("duplicate case id should fail")
+	}
+	badClaim := cloneSpec(t, base)
+	badClaim.Cases[0].ClaimID = "missing"
+	if err := validateSpec(badClaim); err == nil {
+		t.Fatal("unknown claim should fail")
+	}
+	badKnown := cloneSpec(t, base)
+	badKnown.Cases[0].CaseType = CaseTypeKnownLimit
+	badKnown.Cases[0].SystematicErrorID = ""
+	badKnown.Cases[0].Oracle.ExpectedClassification = ClassificationFalseNegative
+	if err := validateSpec(badKnown); err == nil {
+		t.Fatal("known limit without systematic error should fail")
+	}
+	wrongTotal := cloneSpec(t, base)
+	wrongTotal.Cases = wrongTotal.Cases[:len(wrongTotal.Cases)-1]
+	if err := validateSpec(wrongTotal); err == nil {
+		t.Fatal("wrong case total should fail")
+	}
+	wrongDistribution := cloneSpec(t, base)
+	for i := range wrongDistribution.Cases {
+		if wrongDistribution.Cases[i].Meter == "stale_tests" && wrongDistribution.Cases[i].CaseType == CaseTypeNegativeControl {
+			wrongDistribution.Cases[i].CaseType = CaseTypePositive
+			wrongDistribution.Cases[i].Oracle.ExpectedMeters = []string{"stale_tests"}
+			wrongDistribution.Cases[i].Oracle.PostRepairVerdicts = []string{"clean", "telemetry"}
+			wrongDistribution.Cases[i].Repair = Change{Files: map[string]string{"dummy.txt": "x"}}
+			break
+		}
+	}
+	if err := validateSpec(wrongDistribution); err == nil {
+		t.Fatal("wrong per-meter distribution should fail")
+	}
+	badLifecycleIndex := cloneSpec(t, base)
+	for i := range badLifecycleIndex.Cases {
+		if !originalLifecycleCaseID(badLifecycleIndex.Cases[i].ID) {
+			badLifecycleIndex.Cases[i].LifecycleIndex = 7
+			break
+		}
+	}
+	if err := validateSpec(badLifecycleIndex); err == nil {
+		t.Fatal("non-original lifecycle index should fail")
 	}
 }
 
@@ -223,6 +384,32 @@ func lastForLane(s Suite, lane string) LaneResult {
 		if r.Lane == lane {
 			out = r
 		}
+	}
+	return out
+}
+
+func loadDemoSpec(t *testing.T) EvidenceSpec {
+	t.Helper()
+	raw, err := demoFS.ReadFile("demo.yml")
+	if err != nil {
+		t.Fatal(err)
+	}
+	var spec EvidenceSpec
+	if err := yaml.Unmarshal(raw, &spec); err != nil {
+		t.Fatal(err)
+	}
+	return spec
+}
+
+func cloneSpec(t *testing.T, spec EvidenceSpec) EvidenceSpec {
+	t.Helper()
+	raw, err := yaml.Marshal(spec)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var out EvidenceSpec
+	if err := yaml.Unmarshal(raw, &out); err != nil {
+		t.Fatal(err)
 	}
 	return out
 }

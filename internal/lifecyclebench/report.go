@@ -8,7 +8,6 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
-	"time"
 )
 
 // ReportPaths lists artifacts produced by WriteReport.
@@ -19,11 +18,12 @@ type ReportPaths struct {
 
 // WriteReport writes canonical JSON plus a static HTML evidence report.
 func WriteReport(rootDir string, suite Suite) (ReportPaths, error) {
-	t, err := time.Parse(time.RFC3339, suite.GeneratedAt)
+	suite = AttachRunMetadata(suite, rootDir, suite.RunMetadata.CommandArgs)
+	runID, err := safeReportRunID(suite.RunID)
 	if err != nil {
-		t = time.Now().UTC()
+		return ReportPaths{}, err
 	}
-	dir := filepath.Join(rootDir, ".coherence", "runs", t.UTC().Format("2006-01-02"))
+	dir := filepath.Join(rootDir, ".coherence", "runs", runID)
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		return ReportPaths{}, err
 	}
@@ -44,6 +44,25 @@ func WriteReport(rootDir string, suite Suite) (ReportPaths, error) {
 	return ReportPaths{JSON: jsonPath, HTML: htmlPath}, nil
 }
 
+func safeReportRunID(runID string) (string, error) {
+	if runID == "" {
+		return "", fmt.Errorf("empty run id")
+	}
+	if runID == "." || runID == ".." {
+		return "", fmt.Errorf("unsafe run id: %s", runID)
+	}
+	if filepath.Clean(runID) != runID || strings.ContainsAny(runID, `/\`) {
+		return "", fmt.Errorf("unsafe run id: %s", runID)
+	}
+	for _, r := range runID {
+		if (r >= 'a' && r <= 'z') || (r >= 'A' && r <= 'Z') || (r >= '0' && r <= '9') || r == '-' || r == '_' || r == '.' {
+			continue
+		}
+		return "", fmt.Errorf("unsafe run id: %s", runID)
+	}
+	return runID, nil
+}
+
 // Human renders a compact CLI summary.
 func Human(s Suite) string {
 	var b strings.Builder
@@ -51,6 +70,8 @@ func Human(s Suite) string {
 		s.ScenarioCounts.Total, s.ScenarioCounts.Pass, s.ScenarioCounts.Fail, s.ScenarioCounts.KnownLimits)
 	fmt.Fprintf(&b, "  classifications: hit=%d fn=%d fp=%d errored=%d\n",
 		s.ScenarioCounts.Hit, s.ScenarioCounts.FalseNegative, s.ScenarioCounts.FalsePositive, s.ScenarioCounts.Errored)
+	fmt.Fprintf(&b, "  rates: supported=%s boundary_fn=%s overall=%s\n",
+		s.EvidenceRates.SupportedRecall, s.EvidenceRates.BoundaryFalseNegativeRate, s.EvidenceRates.OverallRecallIncludingKnownLimits)
 	fmt.Fprintf(&b, "  final health: managed=%d unmanaged=%d advantage=%d\n",
 		s.FinalHealth[LaneManaged], s.FinalHealth[LaneUnmanaged], s.LifecycleSummary.ManagedAdvantage)
 	verdict := "pass"
@@ -75,13 +96,18 @@ table{width:100%;border-collapse:collapse;background:white;border:1px solid #d7d
 .warn,.false_negative,.false_positive,.errored{color:#9a3412}.clean,.hit{color:#166534}.telemetry,.known_limit{color:#1d4ed8}.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px}
 </style></head><body>`)
 	fmt.Fprintf(&b, "<h1>%s</h1>", html.EscapeString(s.Name))
-	fmt.Fprintf(&b, "<p>Generated %s. The protocol evaluates explicit oracles, counts false positives and false negatives, and keeps the managed/unmanaged lifecycle chart as a summary view.</p>", html.EscapeString(s.GeneratedAt))
+	fmt.Fprintf(&b, "<p>Generated %s as run <span class=\"mono\">%s</span>. The protocol evaluates explicit oracles, counts false positives and false negatives, and keeps the managed/unmanaged lifecycle chart as a summary view.</p>", html.EscapeString(s.GeneratedAt), html.EscapeString(s.RunID))
 	fmt.Fprintf(&b, "<div class=\"summary\"><div class=\"metric\"><div class=\"label\">Cases</div><div class=\"value\">%d</div></div>", s.ScenarioCounts.Total)
 	fmt.Fprintf(&b, "<div class=\"metric\"><div class=\"label\">Hits</div><div class=\"value\">%d</div></div>", s.ScenarioCounts.Hit)
 	fmt.Fprintf(&b, "<div class=\"metric\"><div class=\"label\">False Negatives</div><div class=\"value\">%d</div></div>", s.ScenarioCounts.FalseNegative)
 	fmt.Fprintf(&b, "<div class=\"metric\"><div class=\"label\">False Positives</div><div class=\"value\">%d</div></div>", s.ScenarioCounts.FalsePositive)
+	fmt.Fprintf(&b, "<div class=\"metric\"><div class=\"label\">FP Attributions</div><div class=\"value\">%d</div></div>", s.ScenarioCounts.FalsePositiveMeterAttributions)
+	fmt.Fprintf(&b, "<div class=\"metric\"><div class=\"label\">Supported Recall</div><div class=\"value\">%s</div></div>", html.EscapeString(s.EvidenceRates.SupportedRecall))
+	fmt.Fprintf(&b, "<div class=\"metric\"><div class=\"label\">Boundary Known FNs</div><div class=\"value\">%s</div></div>", html.EscapeString(s.EvidenceRates.BoundaryKnownLimitFalseNegatives))
 	fmt.Fprintf(&b, "<div class=\"metric\"><div class=\"label\">Managed Health</div><div class=\"value\">%d</div></div>", s.FinalHealth[LaneManaged])
 	fmt.Fprintf(&b, "<div class=\"metric\"><div class=\"label\">Unmanaged Health</div><div class=\"value\">%d</div></div></div>", s.FinalHealth[LaneUnmanaged])
+	fmt.Fprintln(&b, "<h2>Run Metadata</h2>")
+	b.WriteString(renderRunMetadata(s))
 	fmt.Fprintln(&b, "<h2>Claim Summary</h2>")
 	b.WriteString(renderClaims(s))
 	fmt.Fprintln(&b, "<h2>Meter Matrix</h2>")
@@ -116,6 +142,32 @@ func renderClaims(s Suite) string {
 	return b.String()
 }
 
+func renderRunMetadata(s Suite) string {
+	var b strings.Builder
+	fmt.Fprintln(&b, "<table><thead><tr><th>Field</th><th>Value</th></tr></thead><tbody>")
+	rows := [][2]string{
+		{"artifact_kind", s.ArtifactKind},
+		{"schema_version", fmt.Sprintf("%d", s.SchemaVersion)},
+		{"run_id", s.RunID},
+		{"git_revision", s.RunMetadata.GitRevision},
+		{"coherence_revision", s.RunMetadata.CoherenceRevision},
+		{"go_version", s.RunMetadata.GoVersion},
+		{"worktree_dirty", fmt.Sprintf("%t", s.RunMetadata.WorktreeDirty)},
+		{"command_args", strings.Join(s.RunMetadata.CommandArgs, " ")},
+		{"supported_recall", s.EvidenceRates.SupportedRecall},
+		{"boundary_false_negative_rate", s.EvidenceRates.BoundaryFalseNegativeRate},
+		{"boundary_known_limit_false_negatives", s.EvidenceRates.BoundaryKnownLimitFalseNegatives},
+		{"overall_recall_including_known_limits", s.EvidenceRates.OverallRecallIncludingKnownLimits},
+		{"false_positive_cases", fmt.Sprintf("%d", s.ScenarioCounts.FalsePositiveCases)},
+		{"false_positive_meter_attributions", fmt.Sprintf("%d", s.ScenarioCounts.FalsePositiveMeterAttributions)},
+	}
+	for _, row := range rows {
+		fmt.Fprintf(&b, "<tr><td class=\"mono\">%s</td><td class=\"mono\">%s</td></tr>", html.EscapeString(row[0]), html.EscapeString(row[1]))
+	}
+	fmt.Fprintln(&b, "</tbody></table>")
+	return b.String()
+}
+
 func renderMeterMatrix(s Suite) string {
 	meters := sortedMeterKeys(s.ByMeter)
 	var b strings.Builder
@@ -142,24 +194,43 @@ func renderMeterMatrix(s Suite) string {
 
 func renderFPFNTable(s Suite) string {
 	var b strings.Builder
-	fmt.Fprintln(&b, "<table><thead><tr><th>Case</th><th>Meter</th><th>Classification</th><th>Expected</th><th>Actual</th><th>Missing</th><th>Unexpected</th><th>Systematic error</th></tr></thead><tbody>")
+	fmt.Fprintln(&b, "<table><thead><tr><th>Case</th><th>Meter</th><th>Classification</th><th>Detection</th><th>Specificity</th><th>Expected</th><th>Actual</th><th>Missing</th><th>Unexpected</th><th>FP attribution</th><th>Systematic error</th></tr></thead><tbody>")
 	for _, r := range s.Results {
 		if r.Classification == ClassificationHit {
 			continue
 		}
-		fmt.Fprintf(&b, "<tr><td>%s</td><td class=\"mono\">%s</td><td class=\"%s\">%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td class=\"mono\">%s</td></tr>",
+		fmt.Fprintf(&b, "<tr><td>%s</td><td class=\"mono\">%s</td><td class=\"%s\">%s</td><td>%t</td><td>%t</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td class=\"mono\">%s</td></tr>",
 			html.EscapeString(r.Name),
 			html.EscapeString(r.Meter),
 			html.EscapeString(r.Classification),
 			html.EscapeString(r.Classification),
+			r.DetectionHit,
+			r.SpecificityClean,
 			html.EscapeString(strings.Join(r.ExpectedMeters, ", ")),
 			html.EscapeString(strings.Join(r.ActualMeters, ", ")),
 			html.EscapeString(strings.Join(r.MissingMeters, ", ")),
 			html.EscapeString(strings.Join(r.UnexpectedMeters, ", ")),
+			html.EscapeString(formatAttribution(r.FalsePositiveAttribution)),
 			html.EscapeString(r.SystematicErrorID))
 	}
 	fmt.Fprintln(&b, "</tbody></table>")
 	return b.String()
+}
+
+func formatAttribution(values map[string]int) string {
+	if len(values) == 0 {
+		return ""
+	}
+	keys := make([]string, 0, len(values))
+	for key := range values {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+	parts := make([]string, 0, len(keys))
+	for _, key := range keys {
+		parts = append(parts, fmt.Sprintf("%s:%d", key, values[key]))
+	}
+	return strings.Join(parts, ", ")
 }
 
 func renderSystematicErrors(s Suite) string {

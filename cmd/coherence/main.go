@@ -1131,6 +1131,7 @@ func runBench(args parsedArgs, rootDir string) int {
 			fmt.Fprintln(os.Stderr, "coherence: fatal:", err)
 			return 2
 		}
+		life = lifecyclebench.AttachRunMetadata(life, rootDir, benchEvidenceCommandArgs(suite, jsonOut, writeMD))
 		if writeMD {
 			paths, err := lifecyclebench.WriteReport(rootDir, life)
 			if err != nil {
@@ -1351,6 +1352,17 @@ func runBench(args parsedArgs, rootDir string) int {
 		fmt.Fprintf(os.Stderr, "coherence: unknown --suite %q (use templates|coherencebench|external|adversarial|evidence|lifecycle|all)\n", suite)
 		return 2
 	}
+}
+
+func benchEvidenceCommandArgs(suite string, jsonOut, writeReport bool) []string {
+	out := []string{"coherence", "bench", "--suite=" + suite}
+	if jsonOut {
+		out = append(out, "--json")
+	}
+	if writeReport {
+		out = append(out, "--write-report")
+	}
+	return out
 }
 
 func adversarialOptions(args parsedArgs, rootDir string, allSuite bool) (adversarial.Options, error) {
