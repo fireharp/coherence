@@ -2,8 +2,6 @@
 
 Git-native drift detector for agent-assisted repositories.
 
-Docs site: https://fireharp.github.io/coherence/
-
 **Coherence is not an AI reviewer. It is a repo consistency harness for
 AI-edited codebases.**
 
