@@ -1,6 +1,6 @@
 # `stale_decision_links`
 
-> *10 extra meters · 1 of 10*
+> *11 extra meters · 1 of 11*
 
 ## What it detects
 

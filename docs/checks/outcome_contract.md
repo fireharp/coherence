@@ -88,6 +88,8 @@ endpoint):
 | `drift_verdict` | `"clean"` \| `"telemetry"` \| `"warn"` \| omitted | The drift report's overall verdict, when computed. Omitted when the command did not run drift (e.g. plain `scan`). |
 | `drift_regression_count` | int \| omitted | Total diff-aware regressions across the four regression-emitting meters (`path_loss`, `claim_support`, `trace_coverage`, `orphan_endpoints`). |
 | `drift_regressions` | `[{kind, id, suggested_action}]` \| omitted | Flat list of regression entries. Mirrors `drift.regressions.entries` so a consumer reading just the outcome can iterate without descending into the full drift report. |
+| `truth_clarification_required` | bool | True when `truth_alignment` found linked docs and code/tests changed on opposite sides of the baseline. Ask the user which side is intended truth. |
+| `truth_conflicts` | `[{direction, authority_doc, authority_id, artifact, artifact_kind, relation, question, if_artifact_is_truth, if_authority_is_truth}]` \| omitted | Flat list of doc/artifact conflicts that need arbitration. Mirrors `drift.truth_alignment.conflicts`. |
 
 ## Promotion rules
 
@@ -109,7 +111,10 @@ The outcome is computed by `outcome.Compute(Input)`:
 7. If `drift_verdict = "telemetry"` and only movement meters drove the
    promotion → `telemetry_only_movement = true` (lets agents dial down
    the urgency without losing the verdict).
-8. If `BaselineMissing` is set by the caller → override the recommended
+8. If truth clarification is required → `review_recommended = true`,
+   `telemetry_only_movement = false`, and prefer `coherence drift --json`
+   as the next command when no stronger hint exists.
+9. If `BaselineMissing` is set by the caller → override the recommended
    next command to `coherence index` so first-time users see the
    explicit fix.
 

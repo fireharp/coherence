@@ -270,6 +270,47 @@ func TestEmptyDriftRegressionsOmitted(t *testing.T) {
 	}
 }
 
+func TestTruthClarificationSurfacesAtTopLevel(t *testing.T) {
+	conflicts := []TruthConflict{
+		{
+			Direction:          "implementation_ahead",
+			AuthorityDoc:       "docs/user-stories/US-001.md",
+			AuthorityID:        "us:US-001",
+			Artifact:           "internal/auth/auth.go",
+			ArtifactKind:       "code",
+			Relation:           "implements",
+			Question:           "ask",
+			IfArtifactIsTruth:  "update docs",
+			IfAuthorityIsTruth: "fix code",
+		},
+	}
+	o := Compute(Input{
+		Subcommand:                 "review",
+		DriftVerdict:               "telemetry",
+		TruthClarificationRequired: true,
+		TruthConflicts:             conflicts,
+	})
+	if !o.TruthClarificationRequired {
+		t.Fatal("truth clarification should surface at top level")
+	}
+	if len(o.TruthConflicts) != 1 || o.TruthConflicts[0].AuthorityID != "us:US-001" {
+		t.Fatalf("truth conflicts not propagated: %+v", o.TruthConflicts)
+	}
+	if !o.ReviewRecommended {
+		t.Error("truth clarification should recommend review")
+	}
+	if o.TelemetryOnlyMovement {
+		t.Error("truth clarification should not be movement-only telemetry")
+	}
+	if o.RecommendedNextCommand != "coherence drift --json" {
+		t.Errorf("expected drift recommendation, got %q", o.RecommendedNextCommand)
+	}
+	conflicts[0].AuthorityID = "mutated"
+	if o.TruthConflicts[0].AuthorityID == "mutated" {
+		t.Error("truth conflicts should be cloned")
+	}
+}
+
 func TestCheckIncludingUntrackedDoesNotExclude(t *testing.T) {
 	o := Compute(Input{
 		Subcommand:         "check",

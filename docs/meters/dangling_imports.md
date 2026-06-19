@@ -1,6 +1,6 @@
 # `dangling_imports`
 
-> *10 extra meters · 10 of 10 · **promotes to warn***
+> *11 extra meters · 11 of 11 · **promotes to warn***
 
 ## What it detects
 

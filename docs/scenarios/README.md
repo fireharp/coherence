@@ -1,6 +1,6 @@
 # CB-### Scenario Catalog
 
-> 22 scenarios as of writing. 20 deterministic (path-list + files-mode)
+> 23 scenarios as of writing. 21 deterministic (path-list + files-mode)
 > + 2 LLM-mode. The harness exercises every meter and check; every
 > page in `docs/meters/` links to the scenario that asserts on it.
 
@@ -45,6 +45,7 @@ with one or two files:
 | **CB-020** | orphan_endpoints diff fires telemetry on lost test coverage | files | [`orphan_endpoints`](../meters/orphan_endpoints.md) `newly_orphaned_endpoints` |
 | **CB-021** | path_loss convention skip on kickoff project | files | [`path_loss`](../meters/path_loss.md) silencing |
 | **CB-022** | consistent markdown change does not trigger contradiction | **llm** | [`contradiction`](../meters/contradiction.md) — negative case |
+| **CB-023** | code ahead of story doc needs truth clarification | files | [`truth_alignment`](../meters/truth_alignment.md) `implementation_ahead` |
 
 ## Scenario modes
 
@@ -54,7 +55,7 @@ with one or two files:
 treat as the staged set. A sibling `ontology.yml` defines the rules.
 Cheap, fast — purely deterministic.
 
-### Files-mode (CB-004, CB-008, CB-011..021)
+### Files-mode (CB-004, CB-008, CB-011..021, CB-023)
 
 `scenario.yml` ships embedded file contents in `files:` and/or
 `base_files:` maps + optional `removed_files:`. The runner:

@@ -1183,6 +1183,7 @@ func meterScores(r drift.Report, selected []string) map[string]float64 {
 		"orphan_endpoints":         float64(r.OrphanEndpoints.Score),
 		"broken_links":             float64(r.BrokenLinks.Score),
 		"stale_tests":              float64(r.StaleTests.Score),
+		"truth_alignment":          float64(r.TruthAlignment.Score),
 		"orphaned_metric_aliases":  float64(r.OrphanedMetricAliases.Score),
 		"dangling_imports":         float64(r.DanglingImports.Score),
 		"unknown_id_references":    float64(r.UnknownIDReferences.Score),

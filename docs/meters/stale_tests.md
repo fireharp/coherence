@@ -1,6 +1,6 @@
 # `stale_tests`
 
-> *10 extra meters · 8 of 10*
+> *11 extra meters · 8 of 11*
 
 ## What it detects
 

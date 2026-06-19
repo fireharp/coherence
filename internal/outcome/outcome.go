@@ -14,6 +14,21 @@ type Regression struct {
 	SuggestedAction string `json:"suggested_action"`
 }
 
+// TruthConflict mirrors drift.TruthConflict for the top-level outcome
+// surface. It lets agents ask the user for arbitration without parsing
+// the full drift report.
+type TruthConflict struct {
+	Direction          string `json:"direction"`
+	AuthorityDoc       string `json:"authority_doc"`
+	AuthorityID        string `json:"authority_id"`
+	Artifact           string `json:"artifact"`
+	ArtifactKind       string `json:"artifact_kind"`
+	Relation           string `json:"relation"`
+	Question           string `json:"question"`
+	IfArtifactIsTruth  string `json:"if_artifact_is_truth"`
+	IfAuthorityIsTruth string `json:"if_authority_is_truth"`
+}
+
 // Outcome is the high-level vocabulary shared by every JSON command. It is
 // designed so an agent or pre-commit consumer can decide what to do next from
 // these fields alone.
@@ -39,6 +54,13 @@ type Outcome struct {
 	// drift.regressions.entries, surfaced here so an agent gating on the
 	// outcome contract can iterate regressions directly.
 	DriftRegressions []Regression `json:"drift_regressions,omitempty"`
+	// TruthClarificationRequired is true when linked authority docs and
+	// code/tests changed on opposite sides of the baseline. The tool cannot
+	// decide which side is truth; an agent should ask the user.
+	TruthClarificationRequired bool `json:"truth_clarification_required"`
+	// TruthConflicts is the flat list of doc/artifact pairs that require
+	// arbitration. Mirrors drift.truth_alignment.conflicts.
+	TruthConflicts []TruthConflict `json:"truth_conflicts,omitempty"`
 }
 
 // Input captures everything Compute needs. The caller is responsible for
@@ -63,6 +85,10 @@ type Input struct {
 	// converted to outcome.Regression so outcome doesn't import drift.
 	// Empty/nil means no regressions or no drift run.
 	DriftRegressions []Regression
+	// TruthClarificationRequired and TruthConflicts are supplied by callers
+	// that ran drift.truth_alignment.
+	TruthClarificationRequired bool
+	TruthConflicts             []TruthConflict
 	// BaselineMissing is set by callers when `.coherence/graph.json`
 	// (or its snapshot pair) isn't on disk yet. Tells the outcome to
 	// surface `coherence index` as the recommended next step so
@@ -118,6 +144,10 @@ func Compute(in Input) Outcome {
 	if len(in.DriftRegressions) > 0 {
 		o.DriftRegressions = append([]Regression{}, in.DriftRegressions...)
 	}
+	if in.TruthClarificationRequired {
+		o.TruthClarificationRequired = true
+		o.TruthConflicts = append([]TruthConflict{}, in.TruthConflicts...)
+	}
 	if in.BaselineMissing && o.RecommendedNextCommand == "" {
 		o.RecommendedNextCommand = "coherence index"
 	}
@@ -138,6 +168,13 @@ func Compute(in Input) Outcome {
 					o.RecommendedNextCommand = "coherence drift --json"
 				}
 			}
+		}
+	}
+	if in.TruthClarificationRequired {
+		o.ReviewRecommended = true
+		o.TelemetryOnlyMovement = false
+		if o.RecommendedNextCommand == "" {
+			o.RecommendedNextCommand = "coherence drift --json"
 		}
 	}
 

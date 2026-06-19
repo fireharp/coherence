@@ -20,7 +20,7 @@ and *what to do* about a firing signal.
 ```
 docs/
 ├── README.md            ← you are here
-├── meters/              ← 19 drift meters
+├── meters/              ← 20 drift meters
 ├── checks/              ← non-drift signal sources
 ├── scenarios/           ← CB-### benchmark catalog
 └── evidence-protocol.md
@@ -30,7 +30,7 @@ docs/
 
 ## Drift meters
 
-The 19 meters that `coherence drift` runs against a repo, grouped by what
+The 20 meters that `coherence drift` runs against a repo, grouped by what
 they look at.
 
 ### The 9 GOAL.md M4 baseline meters
@@ -47,7 +47,7 @@ they look at.
 | [`claim_support`](meters/claim_support.md) | Claims that don't reach an artifact via the typed-edge graph. |
 | [`contradiction`](meters/contradiction.md) | LLM-detected contradictions between staged markdown and cited markdown. |
 
-### The 10 extra meters
+### The 11 extra meters
 
 | Meter | One-liner |
 |-------|-----------|
@@ -59,6 +59,7 @@ they look at.
 | [`broken_links`](meters/broken_links.md) | Markdown inline links to paths missing from the filesystem entirely. |
 | [`unknown_id_references`](meters/unknown_id_references.md) | Typed-ID mentions in code without a defining doc. |
 | [`stale_tests`](meters/stale_tests.md) | Tests whose linked source changed but they didn't (semantically). |
+| [`truth_alignment`](meters/truth_alignment.md) | Linked docs and code/tests changed on opposite sides of baseline and need user arbitration. |
 | [`orphaned_metric_aliases`](meters/orphaned_metric_aliases.md) | Frontend string refs to metric names removed in the current graph. |
 | [`dangling_imports`](meters/dangling_imports.md) | TS/Python relative-path imports that don't resolve to a tracked file. |
 
@@ -102,7 +103,7 @@ one of three values:
   (`neighborhood_drift`, `semantic_movement`, `blast_radius`),
   diff-aware regressions, or signal-only meters (`broken_links`,
   `unknown_id_references`, `stale_tests`, `orphan_endpoints`,
-  `orphaned_metric_aliases`, `stale_decision_links`,
+  `truth_alignment`, `orphaned_metric_aliases`, `stale_decision_links`,
   `broken_implements_chains`, `unimplemented_stories`, `path_loss`,
   `claim_support`, `contradiction`). Informational; doesn't block
   commit by itself, but `coherence drift --strict` promotes
@@ -125,8 +126,8 @@ The `outcome.json` (written by `scan` / `check` / `review`) adds four
 boolean fields on top of the verdict:
 
 - `safe_to_commit` — false when a `blocking_error` is present.
-- `review_recommended` — true when a `warn`-severity rule fired or
-  a diff-aware regression appeared.
+- `review_recommended` — true when a `warn`-severity rule fired,
+  a diff-aware regression appeared, or truth clarification is required.
 - `blocking_error` — true when an `error`-severity rule fired.
 - `telemetry_only_movement` — true when the verdict is `telemetry`
   AND only movement meters are active AND no diff-aware regression
@@ -163,7 +164,7 @@ Run the full bench from the repo root:
 coherence bench --suite=coherencebench
 ```
 
-22 scenarios as of writing — 20 deterministic + 2 LLM-mode (CB-006
+23 scenarios as of writing — 21 deterministic + 2 LLM-mode (CB-006
 positive + CB-022 negative; skipped automatically when GROQ_API_KEY
 isn't set). When the LLM scenarios run, the suite reports
 **precision / recall / F1** across them.

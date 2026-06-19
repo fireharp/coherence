@@ -47,6 +47,7 @@ var validMeters = map[string]bool{
 	"broken_links":             true,
 	"unknown_id_references":    true,
 	"stale_tests":              true,
+	"truth_alignment":          true,
 	"orphaned_metric_aliases":  true,
 	"dangling_imports":         true,
 	"callsite_blast_radius":    true,

@@ -1,0 +1,46 @@
+id: CB-023
+name: code ahead of story doc needs truth clarification
+description: |
+  Baseline has US-001, supporting evidence, and Go code that claims to
+  implement the story. Current changes the implementation semantics but
+  leaves the user story doc untouched. The truth_alignment meter should
+  emit an implementation_ahead clarification and promote the drift
+  verdict to telemetry without deciding whether code or docs are right.
+status: deterministic
+base_files:
+  docs/user-stories/US-001.md: |
+    ---
+    id: US-001
+    ---
+
+    # Login policy
+
+    Users can log in when the policy returns allow.
+  docs/evidence/US-001/README.md: |
+    # Evidence for US-001
+
+    Manual validation covers the login policy story.
+  docs/specs/auth.md: |
+    # Auth spec
+
+    The auth flow is governed by [US-001](../user-stories/US-001.md).
+  internal/auth/auth.go: |
+    package auth
+
+    // Login implements US-001.
+    func Login(score int) bool {
+        return score >= 50
+    }
+files:
+  internal/auth/auth.go: |
+    package auth
+
+    // Login implements US-001.
+    func Login(score int) bool {
+        return score >= 80
+    }
+expected:
+  fires: []
+  blocking_error: false
+  drift:
+    verdict: telemetry

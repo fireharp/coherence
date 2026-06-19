@@ -1,12 +1,13 @@
 // Package drift implements the GOAL.md M4 drift-scoring layer. All 9
 // GOAL.md meters ship today (required_edge_breakage, trace_coverage,
 // neighborhood_drift, semantic_movement, claim_support, contradiction,
-// staleness, blast_radius, path_loss) plus 10 extras: stale_decision_links,
+// staleness, blast_radius, path_loss) plus 11 extras: stale_decision_links,
 // broken_implements_chains, dependency_cycles, orphan_endpoints,
 // unimplemented_stories, broken_links, unknown_id_references, stale_tests,
-// orphaned_metric_aliases, dangling_imports. Four meters expose diff-aware
-// `newly_*` transitions aggregated under `Report.Regressions`; the verdict
-// promotion path treats any regression as actionable telemetry.
+// truth_alignment, orphaned_metric_aliases, dangling_imports. Four meters
+// expose diff-aware `newly_*` transitions aggregated under
+// `Report.Regressions`; the verdict promotion path treats any regression as
+// actionable telemetry.
 package drift
 
 import (
@@ -82,7 +83,7 @@ type OrphanedMetricAlias struct {
 	OrphanName string `json:"orphan_name"`
 }
 
-// OrphanedMetricAliases is the 18th drift meter. It catches the
+// OrphanedMetricAliases is the 19th drift meter. It catches the
 // "metric renamed in frontend only" pattern: code keeps referencing an
 // old metric name as a string literal while the canonical definition
 // moved or vanished. Silent without a baseline.
@@ -137,7 +138,7 @@ type DanglingImport struct {
 	Lang   string `json:"lang"`
 }
 
-// DanglingImports is the 19th drift meter — source files whose
+// DanglingImports is the 20th drift meter — source files whose
 // relative-path imports don't resolve to any tracked file, across the
 // TypeScript and Python extractor families. Mirrors `broken_links` for
 // code: a deleted file leaves callers pointing at a nonexistent path;
@@ -414,6 +415,7 @@ type Report struct {
 	BrokenLinks            BrokenLinks            `json:"broken_links"`
 	UnknownIDReferences    UnknownIDReferences    `json:"unknown_id_references"`
 	StaleTests             StaleTests             `json:"stale_tests"`
+	TruthAlignment         TruthAlignment         `json:"truth_alignment"`
 	OrphanedMetricAliases  OrphanedMetricAliases  `json:"orphaned_metric_aliases"`
 	DanglingImports        DanglingImports        `json:"dangling_imports"`
 	// CallsiteBlastRadius is the optional native-Go call-graph meter
@@ -551,10 +553,13 @@ func ComputeWith(rootDir, ontologyPath string, opts ComputeOptions) (Report, err
 	// Meter 17: stale tests (verifies + base/current snapshot diff).
 	report.StaleTests = computeStaleTests(baseSnap, currentSnap, currentGraph)
 
-	// Meter 18: orphaned metric aliases (frontend references a renamed metric).
+	// Meter 18: truth alignment (docs/stories/ADRs vs linked code/tests).
+	report.TruthAlignment = computeTruthAlignment(baseGraph, currentGraph, baseSnap, currentSnap)
+
+	// Meter 19: orphaned metric aliases (frontend references a renamed metric).
 	report.OrphanedMetricAliases = computeOrphanedMetricAliases(rootDir, baseGraph, currentGraph)
 
-	// Meter 19: dangling TypeScript imports (relative target not in tracked set).
+	// Meter 20: dangling TypeScript imports (relative target not in tracked set).
 	report.DanglingImports = computeDanglingImports(rootDir)
 
 	// Optional meter: callsite_blast_radius (native Go call-graph meter,
@@ -654,6 +659,9 @@ func activeMeters(r Report) []string {
 	}
 	if r.StaleTests.Score > 0 {
 		out = append(out, "stale_tests")
+	}
+	if r.TruthAlignment.RequiresClarification {
+		out = append(out, "truth_alignment")
 	}
 	if r.OrphanedMetricAliases.Score > 0 {
 		out = append(out, "orphaned_metric_aliases")
@@ -1854,6 +1862,9 @@ func computeVerdict(r Report) string {
 	if r.StaleTests.Score > 0 {
 		return VerdictTelemetry
 	}
+	if r.TruthAlignment.RequiresClarification {
+		return VerdictTelemetry
+	}
 	if r.OrphanedMetricAliases.Score > 0 {
 		return VerdictTelemetry
 	}
@@ -2020,6 +2031,15 @@ func renderExplanations(r Report) []string {
 			"stale tests: %d test(s) unchanged while their source changed (%s).",
 			r.StaleTests.Score, joinShort(pairs, 3)))
 	}
+	if r.TruthAlignment.RequiresClarification {
+		labels := make([]string, 0, len(r.TruthAlignment.Conflicts))
+		for _, c := range r.TruthAlignment.Conflicts {
+			labels = append(labels, c.Direction+":"+c.AuthorityDoc+"→"+c.Artifact)
+		}
+		out = append(out, fmt.Sprintf(
+			"truth alignment: %d doc/code conflict(s) need clarification (%s).",
+			r.TruthAlignment.Score, joinShort(labels, 3)))
+	}
 	if r.OrphanedMetricAliases.Score > 0 {
 		names := make([]string, 0, len(r.OrphanedMetricAliases.Orphans))
 		for _, o := range r.OrphanedMetricAliases.Orphans {
@@ -2157,6 +2177,14 @@ func renderActions(r Report) []string {
 		}
 		out = append(out, "update the test(s) whose source changed without them (or accept the verifies wiring is wrong): "+
 			joinShort(pairs, 3))
+	}
+	if r.TruthAlignment.RequiresClarification {
+		labels := make([]string, 0, len(r.TruthAlignment.Conflicts))
+		for _, c := range r.TruthAlignment.Conflicts {
+			labels = append(labels, c.AuthorityID+"↔"+c.Artifact)
+		}
+		out = append(out, "ask whether code/test is intended truth; if yes update docs/user story/ADR, otherwise fix code/tests: "+
+			joinShort(labels, 3))
 	}
 	if r.OrphanedMetricAliases.Score > 0 {
 		names := make([]string, 0, len(r.OrphanedMetricAliases.Orphans))
@@ -2361,6 +2389,7 @@ func Human(r Report) string {
 	fmt.Fprintf(&b, "  broken_links:           %d markdown link(s) to missing files\n", r.BrokenLinks.Score)
 	fmt.Fprintf(&b, "  unknown_id_refs:        %d typed-id mention(s) in code without a defining doc\n", r.UnknownIDReferences.Score)
 	fmt.Fprintf(&b, "  stale_tests:            %d test(s) with changed source but no test edit\n", r.StaleTests.Score)
+	fmt.Fprintf(&b, "  truth_alignment:        %d doc/code clarification(s)\n", r.TruthAlignment.Score)
 	fmt.Fprintf(&b, "  orphaned_metric_aliases:%d frontend reference(s) to renamed/removed metric(s)\n", r.OrphanedMetricAliases.Score)
 	fmt.Fprintf(&b, "  dangling_imports:       %d TS import(s) to unresolved relative path(s)\n", r.DanglingImports.Score)
 	if r.CallsiteBlastRadius.Enabled {

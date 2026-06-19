@@ -502,6 +502,8 @@ func runEvaluation(sub string, fs fileSet, args parsedArgs, rootDir, ontPath str
 
 	driftRegressionCount := 0
 	var driftRegressions []outcome.Regression
+	truthClarificationRequired := false
+	var truthConflicts []outcome.TruthConflict
 	baselineMissing := false
 	if driftReport != nil {
 		driftRegressionCount = driftReport.Regressions.Count
@@ -512,19 +514,35 @@ func runEvaluation(sub string, fs fileSet, args parsedArgs, rootDir, ontPath str
 				SuggestedAction: e.SuggestedAction,
 			})
 		}
+		truthClarificationRequired = driftReport.TruthAlignment.RequiresClarification
+		for _, c := range driftReport.TruthAlignment.Conflicts {
+			truthConflicts = append(truthConflicts, outcome.TruthConflict{
+				Direction:          c.Direction,
+				AuthorityDoc:       c.AuthorityDoc,
+				AuthorityID:        c.AuthorityID,
+				Artifact:           c.Artifact,
+				ArtifactKind:       c.ArtifactKind,
+				Relation:           c.Relation,
+				Question:           c.Question,
+				IfArtifactIsTruth:  c.IfArtifactIsTruth,
+				IfAuthorityIsTruth: c.IfAuthorityIsTruth,
+			})
+		}
 		baselineMissing = !driftReport.NeighborhoodDrift.BaseAvailable
 	}
 	oc := outcome.Compute(outcome.Input{
-		Subcommand:           sub,
-		Findings:             findings,
-		StagedFileCount:      fs.stagedCount,
-		TrackedDirtyCount:    fs.trackedDirtyCount,
-		UntrackedFileCount:   fs.untrackedCount,
-		IncludeUntracked:     fs.includeUntracked,
-		DriftVerdict:         driftVerdict,
-		DriftRegressionCount: driftRegressionCount,
-		DriftRegressions:     driftRegressions,
-		BaselineMissing:      baselineMissing,
+		Subcommand:                 sub,
+		Findings:                   findings,
+		StagedFileCount:            fs.stagedCount,
+		TrackedDirtyCount:          fs.trackedDirtyCount,
+		UntrackedFileCount:         fs.untrackedCount,
+		IncludeUntracked:           fs.includeUntracked,
+		DriftVerdict:               driftVerdict,
+		DriftRegressionCount:       driftRegressionCount,
+		DriftRegressions:           driftRegressions,
+		TruthClarificationRequired: truthClarificationRequired,
+		TruthConflicts:             truthConflicts,
+		BaselineMissing:            baselineMissing,
 	})
 
 	suggested := rules.AggregateSuggestedCommands(findings)

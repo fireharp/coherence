@@ -82,8 +82,8 @@ Use Go 1.22 or newer.
   All 9 GOAL.md M4 meters: `required_edge_breakage`, `trace_coverage`,
   `neighborhood_drift`, `semantic_movement`, `path_loss`, `blast_radius`,
   `staleness`, `claim_support`, `contradiction` (LLM-fed; disabled
-  otherwise), plus 10 extra graph-traversal and link-integrity meters
-  (19 total):
+  otherwise), plus 11 extra graph-traversal, link-integrity, and
+  truth-alignment meters (20 total):
   `stale_decision_links` (supersedes + mentions),
   `broken_implements_chains` (implements + supports),
   `dependency_cycles` (DFS over depends_on; promotes to `warn` since
@@ -98,9 +98,12 @@ Use Go 1.22 or newer.
   `unknown_id_references` (typed-id mentions in code without a defining
   doc; lifted from the original IDs scanner), `stale_tests` (tests
   unchanged while their `verifies`-linked source changed between
-  baseline and current snapshots), `orphaned_metric_aliases` (frontend
-  string refs to metric names that vanished between base and current
-  graphs), and `dangling_imports` (TS + Python relative-path imports
+  baseline and current snapshots), `truth_alignment` (linked
+  user stories/ADR/IDR/docs vs code/tests changed on opposite sides
+  of the baseline and require user arbitration),
+  `orphaned_metric_aliases` (frontend string refs to metric names that
+  vanished between base and current graphs), and `dangling_imports`
+  (TS + Python relative-path imports
   that don't resolve to a tracked file; entries are tagged
   `lang: "ts"`/`lang: "py"`; warn-level since the build would break).
   The top-level `verdict` is
@@ -123,7 +126,7 @@ Use Go 1.22 or newer.
   [--template=<name>] [--json] [--write-report]` runs the shipped scenario
   / evaluation suites. Templates is the v0.3 onboarding suite (38 scenarios
   across 11 templates). CoherenceBench is the M1 internal CB-### suite
-  (21 scenarios; 20 deterministic / 1 LLM-only deferred).
+  (23 scenarios; 21 deterministic / 2 LLM-mode).
   External is the M7 evaluation harness — 3 samples across swe-bench /
   tebench / doc-code categories, scored via precision/recall/F1 against
   gold impact sets.
@@ -149,7 +152,8 @@ contract rather than the human prose: `safe_to_commit`, `review_recommended`,
 `blocking_error`, `telemetry_only_movement`, `staged`, `worktree`,
 `untracked_files_excluded`, `untracked_file_count`,
 `recommended_next_command`, `drift_verdict`, `drift_regression_count`,
-and `drift_regressions`. The same vocabulary appears at the top level of
+`drift_regressions`, `truth_clarification_required`, and
+`truth_conflicts`. The same vocabulary appears at the top level of
 `.coherence/last-report.json`. Ontology rules may carry `suggested_commands:`
 which are surfaced both per-finding and aggregated under top-level
 `suggested_commands` in the JSON payload — agents should prefer those over

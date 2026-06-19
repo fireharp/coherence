@@ -66,7 +66,7 @@ func TestIDsShipsAllExpectedScenarios(t *testing.T) {
 		"CB-006", "CB-007", "CB-008", "CB-009", "CB-010",
 		"CB-011", "CB-012", "CB-013", "CB-014", "CB-015",
 		"CB-016", "CB-017", "CB-018", "CB-019", "CB-020",
-		"CB-021", "CB-022",
+		"CB-021", "CB-022", "CB-023",
 	}
 	gotSet := map[string]bool{}
 	for _, n := range got {
@@ -90,8 +90,8 @@ func TestRunAllPassesDeterministicAndSkipsRest(t *testing.T) {
 		}
 		t.Fatal("suite did not pass")
 	}
-	if suite.Counts.Total != 22 {
-		t.Errorf("total = %d, want 22", suite.Counts.Total)
+	if suite.Counts.Total != 23 {
+		t.Errorf("total = %d, want 23", suite.Counts.Total)
 	}
 	if suite.Counts.Pass < 13 {
 		t.Errorf("expected >=13 deterministic passes, got %d", suite.Counts.Pass)

@@ -1,6 +1,6 @@
 # `orphaned_metric_aliases`
 
-> *10 extra meters · 9 of 10*
+> *11 extra meters · 10 of 11*
 
 ## What it detects
 

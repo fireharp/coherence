@@ -1,6 +1,6 @@
 # `broken_implements_chains`
 
-> *10 extra meters · 2 of 10*
+> *11 extra meters · 2 of 11*
 
 ## What it detects
 

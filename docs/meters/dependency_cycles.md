@@ -1,6 +1,6 @@
 # `dependency_cycles`
 
-> *10 extra meters · 3 of 10 · **promotes to warn***
+> *11 extra meters · 3 of 11 · **promotes to warn***
 
 ## What it detects
 
